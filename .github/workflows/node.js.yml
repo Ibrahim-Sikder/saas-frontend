@@ -34,8 +34,8 @@ jobs:
             npm run build
 
             # Copy the build files to the Nginx public directory
-            rm -rf /var/www/html/admin/*  # Clear previous build files
-            cp -r build/* /var/www/html/admin/
+            rm -rf /var/www/html/saas/admin/*  # Clear previous build files
+            cp -r build/* /var/www/html/saas/admin/
 
             # If you want to restart Nginx to reflect changes (optional)
             sudo systemctl restart nginx
