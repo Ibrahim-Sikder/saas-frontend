@@ -71,7 +71,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/dashboard">
               <h3 className="ml-5 text-xl lg:text-2xl font-semibold text-white hidden xl:block">
-                Trust Auto Solution
+             SAAS APPLICATION
               </h3>
             </Link>
             <Box
