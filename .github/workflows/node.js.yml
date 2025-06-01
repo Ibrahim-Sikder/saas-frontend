@@ -17,25 +17,28 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
 
-            # Go to the app source directory
+            # Go to the client (admin) directory
             cd /var/www/html/saas/admin
 
-            # Pull latest code
+            # Fetch the latest changes from the Git repository
             git fetch --all
             git reset --hard origin/main
 
-            # Setup environment and install dependencies
+            # Setup environment and dependencies
             if [ ! -f .env ]; then
               cp .env.example .env
             fi
             npm install
 
-            # Build the app using Vite
+            # Build the React application for production
             npm run build
 
-            # Deploy Vite's build (output is in 'dist/')
-            rm -rf /var/www/html/admin/*  # Clear Nginx public directory
-            cp -r dist/* /var/www/html/admin/
+            # Copy the build files to the Nginx public directory
+            rm -rf /var/www/html/admin/*  # Clear previous build files
+            cp -r build/* /var/www/html/admin/
 
-            # Restart Nginx to apply changes
+            # If you want to restart Nginx to reflect changes (optional)
             sudo systemctl restart nginx
+
+            # Optionally, restart PM2 or ensure the app is running in PM2
+            # pm2 restart trust-auto-server  # If necessary for PM2 processes
