@@ -1,4 +1,5 @@
 name: Node.js Deployment with NGINX and SSL
+
 on:
   push:
     branches: [main]
@@ -15,26 +16,26 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+
             # Go to the app source directory
             cd /var/www/html/saas/admin
-            
+
             # Pull latest code
             git fetch --all
             git reset --hard origin/main
-            
+
             # Setup environment and install dependencies
             if [ ! -f .env ]; then
               cp .env.example .env
             fi
             npm install
-            
+
             # Build the app using Vite
             npm run build
-            
+
             # Deploy Vite's build (output is in 'dist/')
-            # Clear the current directory and copy built files
-            rm -rf ./*
-            cp -r dist/* ./
-            
+            rm -rf /var/www/html/admin/*  # Clear Nginx public directory
+            cp -r dist/* /var/www/html/admin/
+
             # Restart Nginx to apply changes
             sudo systemctl restart nginx
