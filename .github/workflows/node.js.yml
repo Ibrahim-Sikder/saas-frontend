@@ -1,5 +1,4 @@
 name: Node.js Deployment with NGINX and SSL
-
 on:
   push:
     branches: [main]
@@ -16,29 +15,26 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-
-            # Go to the client (admin) directory
+            # Go to the app source directory
             cd /var/www/html/saas/admin
-
-            # Fetch the latest changes from the Git repository
+            
+            # Pull latest code
             git fetch --all
             git reset --hard origin/main
-
-            # Setup environment and dependencies
+            
+            # Setup environment and install dependencies
             if [ ! -f .env ]; then
               cp .env.example .env
             fi
             npm install
-
-            # Build the React application for production
+            
+            # Build the app using Vite
             npm run build
-
-            # Copy the build files to the Nginx public directory
-            rm -rf /var/www/html/admin/*  # Clear previous build files
-            cp -r build/* /var/www/html/admin/
-
-            # If you want to restart Nginx to reflect changes (optional)
+            
+            # Deploy Vite's build (output is in 'dist/')
+            # Clear the current directory and copy built files
+            rm -rf ./*
+            cp -r dist/* ./
+            
+            # Restart Nginx to apply changes
             sudo systemctl restart nginx
-
-            # Optionally, restart PM2 or ensure the app is running in PM2
-            # pm2 restart trust-auto-server  # If necessary for PM2 processes
