@@ -1,0 +1,27 @@
+.changPasswordWrap{
+    background:#fff;
+    padding:30px;
+    border-radius: 30px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    width:1000px;
+}
+.updateProfileBtnWrap{
+    display: flex ;
+    align-items: center;
+}
+.updateProfileBtnWrap button{
+    background:#0E74E9;
+    color:#fff;
+    width:150px;
+    margin:10px;
+    height:50px;
+    border-radius: 5px;
+}
+.updateProfileBtnWrap button:nth-child(2){
+    background:red
+}
+@media only screen and (max-width:1024px){
+    .changPasswordWrap{
+        width:100%;
+    }
+}

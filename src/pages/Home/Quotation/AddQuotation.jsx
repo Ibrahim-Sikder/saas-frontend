@@ -1,0 +1,1505 @@
+"use client";
+
+/* eslint-disable no-unused-vars */
+import { useLocation, useNavigate } from "react-router-dom";
+import logo from "../../../../public/assets/logo.png";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import InputMask from "react-input-mask";
+import Loading from "../../../components/Loading/Loading";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  Grid,
+  TextField,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
+import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
+import { cmDmOptions, countries } from "../../../constant";
+import {
+  useCreateQuotationMutation,
+  useDeleteQuotationMutation,
+  useGetAllQuotationsQuery,
+} from "../../../redux/api/quotation";
+import QuotationTable from "./QuotationTable";
+import { unitOptions } from "../../../utils/options";
+import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
+import { suggestionStyles } from "../../../utils/customStyle";
+import { formatNumber } from "../../../utils/formateSemicolon";
+
+const AddQuotation = () => {
+  const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+
+  const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no);
+  const parsedDate = new Date();
+  const day = parsedDate.getDate().toString().padStart(2, "0");
+  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
+  const year = parsedDate.getFullYear();
+  const formattedDate = `${day}-${month}-${year}`;
+
+  const location = useLocation();
+  const job_no = new URLSearchParams(location.search).get("order_no");
+
+  const [orderNumber, setOrderNumber] = useState(job_no);
+
+  const navigate = useNavigate();
+  const textInputRef = useRef(null);
+
+  const [filterType, setFilterType] = useState("");
+
+  const [goOtherButton, setGoOtherButton] = useState("");
+
+  const [selectedDate, setSelectedDate] = useState("");
+  const [countryCode, setCountryCode] = useState(countries[0]);
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [vat, setVAT] = useState(0);
+  const [partsTotal, setPartsTotal] = useState(0);
+  const [serviceTotal, setServiceTotal] = useState(0);
+
+  const [items, setItems] = useState([
+    { description: "", unit: "", quantity: "", rate: "", total: "" },
+  ]);
+  const [serviceItems, setServiceItems] = useState([
+    {
+      description: "",
+      quantity: "",
+      unit: "",
+      rate: "",
+      total: "",
+    },
+  ]);
+
+  const [productSuggestions, setProductSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+  const [activeInputType, setActiveInputType] = useState(null);
+  const [activeInputIndex, setActiveInputIndex] = useState(null);
+
+  const limit = 10;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+  const queryParams = {
+    page: currentPage,
+    searchTerm: filterType,
+    isRecycled: false,
+  };
+
+  const { data: stockData } = useGetAllStocksQuery(queryParams);
+
+  const [
+    createQuotation,
+    { error: createQuotationError, isLoading: createLoading },
+  ] = useCreateQuotationMutation();
+  const [deleteQuotation, { isLoading: deleteLoading, error: deleteError }] =
+    useDeleteQuotationMutation();
+
+  const {
+    data: jobCardData,
+    refetch,
+    error,
+  } = useGetSingleJobCardWithJobNoQuery(orderNumber);
+
+  const {
+    data: allQuotations,
+    isLoading: quotationLoading,
+    refetch: allQuotationRefetch,
+  } = useGetAllQuotationsQuery({
+    limit,
+    page: currentPage,
+    searchTerm: filterType,
+  });
+
+  useEffect(() => {
+    if (jobCardData?.data?.date) {
+      setSelectedDate(jobCardData?.data?.date);
+    } else {
+      setSelectedDate(formattedDate);
+    }
+  }, [formattedDate, jobCardData?.data?.date]);
+
+  useEffect(() => {
+    if (jobCardData?.data?.user_type === "customer") {
+      reset({
+        job_no: jobCardData?.data?.job_no,
+        Id: jobCardData?.data?.Id,
+        company_name: jobCardData?.data?.customer?.company_name,
+
+        customer_name: jobCardData?.data?.customer?.customer_name,
+        customer_country_code:
+          jobCardData?.data?.customer?.customer_country_code,
+        customer_contact: jobCardData?.data?.customer?.customer_contact,
+
+        customer_address: jobCardData?.data?.customer?.customer_address,
+
+        chassis_no: getDataWithChassisNo?.chassis_no,
+        carReg_no: getDataWithChassisNo?.carReg_no,
+        car_registration_no: getDataWithChassisNo?.car_registration_no,
+        engine_no: getDataWithChassisNo?.engine_no,
+        vehicle_brand: getDataWithChassisNo?.vehicle_brand,
+        vehicle_name: getDataWithChassisNo?.vehicle_name,
+
+        mileage: getDataWithChassisNo?.mileage,
+      });
+    }
+    if (jobCardData?.data?.user_type === "company") {
+      reset({
+        job_no: jobCardData?.data?.job_no,
+        Id: jobCardData?.data?.Id,
+        company_name: jobCardData?.data?.company?.company_name,
+        vehicle_username: jobCardData?.data?.company?.vehicle_username,
+        company_address: jobCardData?.data?.company?.company_address,
+        company_contact: jobCardData?.data?.company?.company_contact,
+        company_country_code: jobCardData?.data?.company?.company_country_code,
+        company_email: jobCardData?.data?.company?.company_email,
+        customer_address: jobCardData?.data?.company?.customer_address,
+
+        chassis_no: getDataWithChassisNo?.chassis_no,
+        carReg_no: getDataWithChassisNo?.carReg_no,
+        car_registration_no: getDataWithChassisNo?.car_registration_no,
+        engine_no: getDataWithChassisNo?.engine_no,
+        vehicle_brand: getDataWithChassisNo?.vehicle_brand,
+        vehicle_name: getDataWithChassisNo?.vehicle_name,
+
+        mileage: getDataWithChassisNo?.mileage,
+      });
+    }
+    if (jobCardData?.data?.user_type === "showRoom") {
+      reset({
+        job_no: jobCardData?.data?.job_no,
+        Id: jobCardData?.data?.Id,
+        showRoom_name: jobCardData?.data?.showRoom?.showRoom_name,
+        vehicle_username: jobCardData?.data?.showRoom?.vehicle_username,
+        showRoom_address: jobCardData?.data?.showRoom?.showRoom_address,
+        company_name: jobCardData?.data?.showRoom?.company_name,
+        company_contact:
+          phoneNumber || jobCardData?.data?.showRoom?.company_contact,
+        company_country_code: jobCardData?.data?.showRoom?.company_country_code,
+
+        chassis_no: getDataWithChassisNo?.chassis_no,
+        carReg_no: getDataWithChassisNo?.carReg_no,
+        car_registration_no: getDataWithChassisNo?.car_registration_no,
+        engine_no: getDataWithChassisNo?.engine_no,
+        vehicle_brand: getDataWithChassisNo?.vehicle_brand,
+        vehicle_name: getDataWithChassisNo?.vehicle_name,
+
+        mileage: getDataWithChassisNo?.mileage,
+      });
+    }
+  }, [
+    getDataWithChassisNo?.carReg_no,
+    getDataWithChassisNo?.car_registration_no,
+    getDataWithChassisNo?.chassis_no,
+    getDataWithChassisNo?.engine_no,
+    getDataWithChassisNo?.mileage,
+    getDataWithChassisNo?.vehicle_brand,
+    getDataWithChassisNo?.vehicle_name,
+    jobCardData?.data?.Id,
+    jobCardData?.data?.company?.company_address,
+    jobCardData?.data?.company?.company_contact,
+    jobCardData?.data?.company?.company_country_code,
+    jobCardData?.data?.company?.company_email,
+    jobCardData?.data?.company?.company_name,
+    jobCardData?.data?.company?.customer_address,
+    jobCardData?.data?.company?.vehicle_username,
+    jobCardData?.data?.customer?.company_name,
+    jobCardData?.data?.customer?.customer_address,
+    jobCardData?.data?.customer?.customer_contact,
+    jobCardData?.data?.customer?.customer_country_code,
+    jobCardData?.data?.customer?.customer_name,
+    jobCardData?.data?.job_no,
+    jobCardData?.data?.showRoom?.company_contact,
+    jobCardData?.data?.showRoom?.company_country_code,
+    jobCardData?.data?.showRoom?.company_name,
+    jobCardData?.data?.showRoom?.showRoom_address,
+    jobCardData?.data?.showRoom?.showRoom_name,
+    jobCardData?.data?.showRoom?.vehicle_username,
+    jobCardData?.data?.user_type,
+    phoneNumber,
+    reset,
+  ]);
+
+  const handleAddClick = () => {
+    setItems([
+      ...items,
+      { description: "", unit: "", quantity: "", rate: "", total: "" },
+    ]);
+  };
+
+  const handleServiceAdd = () => {
+    setServiceItems([
+      ...serviceItems,
+      { description: "", unit: "", quantity: "", rate: "", total: "" },
+    ]);
+  };
+
+  const handleRemove = (index) => {
+    // Check if index is a valid number and within the array bounds
+    if (typeof index === "number" && index >= 0 && index < items.length) {
+      const list = [...items];
+      list.splice(index, 1); // Remove item at the specified index
+      setItems(list);
+    } else {
+      console.error("Invalid index");
+    }
+  };
+
+  const handleServiceRemove = (index) => {
+    if (!index) {
+      const list = [...serviceItems];
+
+      setServiceItems(list);
+    } else {
+      const list = [...serviceItems];
+      list.splice(index, 1);
+      setServiceItems(list);
+    }
+  };
+
+  useEffect(() => {
+    const totalSum = items.reduce((sum, item) => sum + Number(item.total), 0);
+    const serviceTotalSum = serviceItems.reduce(
+      (sum, item) => sum + Number(item.total),
+      0
+    );
+
+    const roundedTotalSum = Number.parseFloat(
+      totalSum + serviceTotalSum
+    ).toFixed(2);
+    setPartsTotal(Number(totalSum));
+    setServiceTotal(Number(serviceTotalSum));
+    setGrandTotal(Number(roundedTotalSum));
+  }, [items, serviceItems]);
+
+  const filterProductSuggestions = (searchTerm) => {
+    if (!searchTerm || searchTerm.length < 2 || !stockData?.data) {
+      setProductSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const filteredProducts = stockData.data.filter((stock) =>
+      stock.product.product_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+
+    setProductSuggestions(filteredProducts);
+    setShowSuggestions(filteredProducts.length > 0);
+    setActiveSuggestionIndex(0);
+  };
+
+  const handleServiceDescriptionChange = (index, value) => {
+    const newItems = [...serviceItems];
+    newItems[index].description = value;
+
+    // If the user is typing manually, remove any product/warehouse references
+    // This ensures we don't have partial data that might cause backend validation issues
+    if (newItems[index].product) {
+      delete newItems[index].product;
+      delete newItems[index].warehouse;
+      delete newItems[index].product_name;
+      delete newItems[index].sellingPrice;
+      delete newItems[index].batchNumber;
+    }
+
+    setServiceItems(newItems);
+
+    setActiveInputType("service");
+    setActiveInputIndex(index);
+    filterProductSuggestions(value);
+  };
+
+  const handleDescriptionChange = (index, value) => {
+    const newItems = [...items];
+    newItems[index].description = value;
+
+    // If the user is typing manually, remove any product/warehouse references
+    // This ensures we don't have partial data that might cause backend validation issues
+    if (newItems[index].product) {
+      delete newItems[index].product;
+      delete newItems[index].warehouse;
+      delete newItems[index].product_name;
+      delete newItems[index].sellingPrice;
+      delete newItems[index].batchNumber;
+    }
+
+    setItems(newItems);
+
+    setActiveInputType("parts");
+    setActiveInputIndex(index);
+    filterProductSuggestions(value);
+  };
+
+  const handleUnitChange = (index, value) => {
+    const newItems = [...items];
+    newItems[index].unit = value;
+    setItems(newItems);
+  };
+  const handleServiceUnitChange = (index, value) => {
+    const newItems = [...serviceItems];
+    newItems[index].unit = value;
+    setServiceItems(newItems);
+  };
+
+  const handleQuantityChange = (index, value) => {
+    const newItems = [...items];
+
+    // Round the value to the nearest integer
+    const roundedValue = Math.round(value) || 0;
+
+    newItems[index].quantity = roundedValue;
+    newItems[index].total = roundedValue * newItems[index].rate;
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+
+    setItems(newItems);
+  };
+
+  const handleServiceQuantityChange = (index, value) => {
+    const newItems = [...serviceItems];
+    const roundedValue = Math.round(value) || 0;
+
+    newItems[index].quantity = roundedValue;
+
+    newItems[index].total = roundedValue * newItems[index].rate;
+
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+
+    setServiceItems(newItems);
+  };
+
+  const handleRateChange = (index, value) => {
+    // Remove any non-numeric characters except decimal point
+    const numericValue = value.replace(/[^0-9.]/g, "");
+
+    const newItems = [...items];
+
+    // Store the actual numeric value for calculations
+    newItems[index].rate = Number.parseFloat(numericValue) || 0;
+
+    // Calculate total with the updated rate
+    newItems[index].total = newItems[index].quantity * newItems[index].rate;
+
+    // Round total to two decimal places
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+
+    setItems(newItems);
+  };
+
+  const handleServiceRateChange = (index, value) => {
+    // Remove any non-numeric characters except decimal point
+    const numericValue = value.replace(/[^0-9.]/g, "");
+
+    const newItems = [...serviceItems];
+
+    // Store the actual numeric value for calculations
+    newItems[index].rate = Number.parseFloat(numericValue) || 0;
+
+    // Calculate total with the updated rate
+    newItems[index].total = newItems[index].quantity * newItems[index].rate;
+
+    // Round total to two decimal places
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+
+    setServiceItems(newItems);
+  };
+
+  const handleDiscountChange = (value) => {
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
+
+    if (!isNaN(parsedValue)) {
+      setDiscount(parsedValue);
+    }
+  };
+
+  const handleVATChange = (value) => {
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
+
+    if (!isNaN(parsedValue)) {
+      setVAT(parsedValue);
+    }
+  };
+
+  const calculateFinalTotal = () => {
+    const discountAsPercentage = discount;
+    const totalAfterDiscount = grandTotal - discountAsPercentage;
+
+    const vatAsPercentage = vat / 100;
+    let finalTotal = totalAfterDiscount + totalAfterDiscount * vatAsPercentage;
+    finalTotal = Number.parseFloat(finalTotal).toFixed(2);
+    return finalTotal;
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    const newPhoneNumber = e.target.value;
+    if (
+      /^\d*$/.test(newPhoneNumber) &&
+      newPhoneNumber.length <= 10 &&
+      (newPhoneNumber === "" ||
+        !newPhoneNumber.startsWith("0") ||
+        newPhoneNumber.length > 1)
+    ) {
+      setPhoneNumber(newPhoneNumber);
+    }
+  };
+
+  const handleSelectSuggestion = (product) => {
+    if (activeInputType === "service") {
+      const newItems = [...serviceItems];
+      newItems[activeInputIndex].description = product.product.product_name;
+      newItems[activeInputIndex].unit = product.product.unit?.unit || "Pcs";
+      newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+      newItems[activeInputIndex].quantity =
+        product.product.product_quantity || 0;
+      newItems[activeInputIndex].product = product.product._id;
+      newItems[activeInputIndex].warehouse = product.warehouse;
+      newItems[activeInputIndex].product_name = product.product.product_name;
+      newItems[activeInputIndex].sellingPrice =
+        product.product.sellingPrice || 0;
+      newItems[activeInputIndex].batchNumber = product.batchNumber || "";
+
+      // Calculate total based on quantity and rate
+      newItems[activeInputIndex].total =
+        newItems[activeInputIndex].quantity * newItems[activeInputIndex].rate;
+      newItems[activeInputIndex].total = Number.parseFloat(
+        newItems[activeInputIndex].total.toFixed(2)
+      );
+
+      setServiceItems(newItems);
+    } else if (activeInputType === "parts") {
+      const newItems = [...items];
+      newItems[activeInputIndex].description = product.product.product_name;
+      newItems[activeInputIndex].unit = product.product.unit?.unit || "Pcs";
+      newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+      newItems[activeInputIndex].quantity =
+        product.product.product_quantity || 0;
+      newItems[activeInputIndex].product = product.product._id;
+      newItems[activeInputIndex].warehouse = product.warehouse;
+      newItems[activeInputIndex].product_name = product.product.product_name;
+      newItems[activeInputIndex].sellingPrice =
+        product.product.sellingPrice || 0;
+      newItems[activeInputIndex].batchNumber = product.batchNumber || "";
+
+      // Calculate total based on quantity and rate
+      newItems[activeInputIndex].total =
+        newItems[activeInputIndex].quantity * newItems[activeInputIndex].rate;
+      newItems[activeInputIndex].total = Number.parseFloat(
+        newItems[activeInputIndex].total.toFixed(2)
+      );
+
+      setItems(newItems);
+    }
+
+    setShowSuggestions(false);
+  };
+
+  // Function to prepare items for submission
+  const prepareItemsForSubmission = (itemsArray) => {
+    return itemsArray.map((item) => {
+      // If the item has product and warehouse, it's from stock
+      if (item.product && item.warehouse) {
+        return item;
+      } else {
+        // For manually entered items, add default warehouse
+        return {
+          ...item,
+          // Don't include product or warehouse fields for manual entries
+        };
+      }
+    });
+  };
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating Quotation...");
+    const customer = {
+      company_name: data.company_name,
+
+      customer_name: data.customer_name,
+      customer_contact: data.customer_contact,
+      customer_country_code: data.company_country_code,
+
+      customer_address: data.customer_address,
+    };
+    const company = {
+      company_name: data.company_name,
+      vehicle_username: data.vehicle_username,
+      company_address: data.company_address,
+      company_contact: data.company_contact,
+      company_country_code: data.company_country_code,
+    };
+    const showRoom = {
+      showRoom_name: data.showRoom_name,
+      vehicle_username: data.vehicle_username,
+
+      company_name: data.company_name,
+      company_contact: data.company_contact,
+      company_country_code: data.company_country_code,
+
+      company_address: data.company_address,
+    };
+    data.mileage = Number(data.mileage);
+
+    // Get the current mileage value
+    const newMileageValue = Number(data.mileage);
+
+    // Check if we need to add a new mileage entry
+    const updatedMileageHistory = [
+      ...(getDataWithChassisNo.mileageHistory || []),
+    ];
+
+    // Only add a new entry if it's a valid number and not already in the history
+    if (!isNaN(newMileageValue) && newMileageValue > 0) {
+      const mileageExists = updatedMileageHistory.some(
+        (entry) => entry.mileage === newMileageValue
+      );
+
+      if (!mileageExists) {
+        updatedMileageHistory.push({
+          mileage: newMileageValue,
+          date: new Date().toISOString(),
+        });
+      }
+    }
+    const vehicle = {
+      carReg_no: data.carReg_no,
+      car_registration_no: data.car_registration_no,
+      chassis_no: data.chassis_no,
+      engine_no: data.engine_no,
+      vehicle_brand: data.vehicle_brand,
+      vehicle_name: data.vehicle_name,
+      mileageHistory: updatedMileageHistory,
+    };
+
+    // Prepare items for submission
+    const preparedItems = prepareItemsForSubmission(items);
+    const preparedServiceItems = prepareItemsForSubmission(serviceItems);
+
+    const quotation = {
+      user_type: jobCardData?.data?.user_type,
+      Id: jobCardData?.data?.Id,
+      job_no: orderNumber,
+      date: selectedDate,
+      parts_total: partsTotal,
+      service_total: serviceTotal,
+      total_amount: grandTotal,
+      discount: discount,
+      vat: vat,
+      net_total: calculateFinalTotal(),
+      input_data: preparedItems,
+      service_input_data: preparedServiceItems,
+      logo,
+    };
+    const values = {
+      customer,
+      company,
+      showRoom,
+      vehicle,
+      quotation,
+    };
+    console.log("submit value", values);
+    try {
+      const res = await createQuotation(values).unwrap();
+      console.log("response", res);
+      if (res.success) {
+        toast.success(res.message);
+
+        if (goOtherButton === "preview") {
+          navigate(`/dashboard/quotation-view?id=${res?.data?._id}`);
+          setGoOtherButton("");
+        } else if (goOtherButton === "invoice") {
+          navigate(
+            `/dashboard/invoice?order_no=${jobCardData?.data?.job_no}&id=${res?.data?._id}`
+          );
+          setGoOtherButton("");
+        } else {
+          navigate("/dashboard/quotation-list");
+          setGoOtherButton("");
+        }
+
+        refetch();
+        allQuotationRefetch();
+      }
+    } catch (err) {
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to create quotation";
+
+      toast.error(errorMessage);
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
+  useEffect(() => {
+    setGetDataWithChassisNo(jobCardData?.data?.vehicle);
+  }, [jobCardData?.data?.vehicle]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSuggestions) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showSuggestions]);
+
+  if (quotationLoading) {
+    return <Loading />;
+  }
+  if (deleteError) {
+    toast.error(deleteError?.message);
+  }
+
+  return (
+    <div className="md:px-5 md:py-10">
+      <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
+        <div className=" addJobCardHeads">
+          <img
+            src={logo || "/placeholder.svg"}
+            alt="logo"
+            className=" addJobLogoImg"
+          />
+          <div>
+            <h2 className=" trustAutoTitle trustAutoTitleQutation">
+              Trust Auto Solution{" "}
+            </h2>
+            <span className="text-[12px] lg:text-xl mt-5 block">
+              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+            </span>
+          </div>
+          <TrustAutoAddress />
+        </div>
+      </div>
+      <div className="mt-5">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex md:flex-row flex-col justify-between items-center">
+            <div className="hidden"></div>
+            <div className="vehicleCard">Create Quotation </div>
+
+            <div>
+              <input
+                type="date"
+                className="border px-3 py-1 rounded-md "
+                defaultValue={new Date().toISOString().slice(0, 10)}
+                {...register("date", {
+                  required: "Date is required!",
+                })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 my-10">
+            <Box>
+              <h3 className="text-xl lg:text-3xl font-bold mb-5">
+                Customer Info
+              </h3>
+              <Grid container spacing={2}>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Job Card No"
+                    onChange={(e) => setOrderNumber(e.target.value)}
+                    required
+                    focused={job_no}
+                    defaultValue={job_no || ""}
+                  />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Customer Id"
+                    {...register("Id")}
+                    focused={jobCardData?.data?.Id}
+                    required
+                  />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Company"
+                    focused={
+                      jobCardData?.data?.customer?.company_name ||
+                      jobCardData?.data?.company?.company_name ||
+                      jobCardData?.data?.showRoom?.company_name
+                    }
+                    {...register("company_name")}
+                  />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  {!jobCardData?.data && (
+                    <TextField
+                      fullWidth
+                      label="Customer"
+                      focused={jobCardData?.data?.customer?.customer_name}
+                      {...register("customer_name")}
+                    />
+                  )}
+                  {jobCardData?.data?.user_type === "customer" && (
+                    <TextField
+                      fullWidth
+                      label="Customer"
+                      focused={jobCardData?.data?.customer?.customer_name}
+                      {...register("customer_name")}
+                    />
+                  )}
+                  {(jobCardData?.data?.user_type === "company" ||
+                    jobCardData?.data?.user_type === "showRoom") && (
+                    <TextField
+                      fullWidth
+                      label="Customer"
+                      focused={
+                        jobCardData?.data?.company?.vehicle_username ||
+                        jobCardData?.data?.showRoom?.vehicle_username
+                      }
+                      {...register("vehicle_username")}
+                    />
+                  )}
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Grid container spacing={1}>
+                    <Grid item lg={3} md={4} sm={12} xs={12}>
+                      <Autocomplete
+                        fullWidth
+                        freeSolo
+                        options={countries}
+                        getOptionLabel={(option) => option.label}
+                        value={countryCode}
+                        onChange={(event, newValue) => {
+                          setCountryCode(newValue);
+                          setPhoneNumber("");
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            {...register("customer_country_code")}
+                            label="Select Country Code"
+                            variant="outlined"
+                            focused={
+                              jobCardData?.data?.customer?.customer_country_code
+                            }
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item lg={9} md={8} sm={12} xs={12}>
+                      {!jobCardData?.data && (
+                        <TextField
+                          {...register("customer_contact")}
+                          variant="outlined"
+                          fullWidth
+                          type="tel"
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
+                          onChange={handlePhoneNumberChange}
+                          placeholder="Customer Contact No (N)"
+                        />
+                      )}
+                      {jobCardData?.data?.user_type === "customer" && (
+                        <TextField
+                          {...register("customer_contact")}
+                          variant="outlined"
+                          fullWidth
+                          type="tel"
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
+                          onChange={handlePhoneNumberChange}
+                          placeholder="Customer Contact No (N)"
+                          focused={
+                            jobCardData?.data?.customer?.customer_contact || ""
+                          }
+                        />
+                      )}
+                      {(jobCardData?.data?.user_type === "company" ||
+                        jobCardData?.data?.user_type === "showRoom") && (
+                        <TextField
+                          {...register("company_contact")}
+                          variant="outlined"
+                          fullWidth
+                          type="tel"
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
+                          onChange={handlePhoneNumberChange}
+                          placeholder="Company Contact No (N)"
+                          focused={
+                            jobCardData?.data?.company?.company_contact ||
+                            jobCardData?.data?.showRoom?.company_contact
+                          }
+                        />
+                      )}
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  {!jobCardData?.data && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("customer_address")}
+                    />
+                  )}
+                  {jobCardData?.data?.user_type === "customer" && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("customer_address")}
+                      focused={jobCardData?.data?.customer?.customer_address}
+                    />
+                  )}
+                  {jobCardData?.data?.user_type === "company" && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("company_address")}
+                      focused={
+                        jobCardData?.data?.company?.company_address || ""
+                      }
+                    />
+                  )}
+                  {jobCardData?.data?.user_type === "showRoom" && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("showRoom_address")}
+                      focused={
+                        jobCardData?.data?.showRoom?.showRoom_address || ""
+                      }
+                    />
+                  )}
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Box>
+              <h3 className="text-xl lg:text-3xl font-bold mb-5 ">
+                Vehicle Info
+              </h3>
+
+              <Grid container spacing={2}>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Chassis No"
+                    {...register("chassis_no")}
+                    focused={getDataWithChassisNo?.chassis_no || ""}
+                    required
+                  />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Grid container spacing={1}>
+                    <Grid item lg={3} md={4} sm={12} xs={12}>
+                      <Autocomplete
+                        sx={{ marginRight: "5px" }}
+                        freeSolo
+                        fullWidth
+                        id="free-solo-demo"
+                        options={cmDmOptions.map((option) => option.label)}
+                        value={jobCardData?.data?.vehicle?.carReg_no || ""}
+                        onChange={(event, newValue) => {
+                          setValue("carReg_no", newValue);
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            fullWidth
+                            {...params}
+                            label="Vehicle Reg No (New field)"
+                            {...register("carReg_no")}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid item lg={9} md={8} sm={12} xs={12}>
+                      <InputMask
+                        mask="99-9999"
+                        maskChar={null}
+                        {...register("car_registration_no")}
+                        value={getDataWithChassisNo?.car_registration_no || ""}
+                      >
+                        {(inputProps) => (
+                          <TextField
+                            fullWidth
+                            {...inputProps}
+                            {...register("car_registration_no")}
+                            label="Car R (N)"
+                            focused={
+                              getDataWithChassisNo?.car_registration_no || ""
+                            }
+                          />
+                        )}
+                      </InputMask>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Engine & CC"
+                    {...register("engine_no")}
+                    focused={getDataWithChassisNo?.engine_no || ""}
+                  />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Vehicle Name"
+                    {...register("vehicle_name")}
+                    focused={getDataWithChassisNo?.vehicle_name || ""}
+                  />
+                </Grid>
+                {/* <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Mileage"
+                    type="number"
+                    {...register("mileage")}
+                    defaultValue={getDataWithChassisNo?.mileage || "0"}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                  />
+                </Grid> */}
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Box sx={{ mb: 2 }}>
+                    <Autocomplete
+                      multiple
+                      id="tags-filled"
+                      options={
+                        getDataWithChassisNo?.mileageHistory
+                          ?.slice(-1)
+                          .map(
+                            (option) =>
+                              `${option.mileage} km (${new Date(
+                                option.date
+                              ).toLocaleDateString()})`
+                          ) || []
+                      }
+                      value={
+                        getDataWithChassisNo?.mileageHistory
+                          ?.slice(-1)
+                          .map(
+                            (option) =>
+                              `${option.mileage} km (${new Date(
+                                option.date
+                              ).toLocaleDateString()})`
+                          ) || []
+                      }
+                      freeSolo
+                      disableClearable
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.stopPropagation();
+                        }
+                      }}
+                      onChange={(event, newValue) => {
+                        const currentHistory = [
+                          ...(getDataWithChassisNo?.mileageHistory || []),
+                        ];
+
+                        // Handle deletion of last entry
+                        if (newValue.length === 0) {
+                          const updatedHistory = currentHistory.slice(0, -1);
+                          setGetDataWithChassisNo((prevState) => ({
+                            ...prevState,
+                            mileageHistory: updatedHistory,
+                          }));
+                          return;
+                        }
+
+                        // Handle new entry addition
+                        const newEntry = newValue[newValue.length - 1];
+                        const mileageMatch = newEntry.match(/^(\d+)/);
+                        const newMileage = mileageMatch
+                          ? Number.parseInt(mileageMatch[1])
+                          : 0;
+                        const lastEntry =
+                          currentHistory[currentHistory.length - 1];
+
+                        // Only add if different from last entry
+                        if (!lastEntry || lastEntry.mileage !== newMileage) {
+                          const updatedHistory = [
+                            ...currentHistory,
+                            {
+                              mileage: newMileage,
+                              date: new Date().toISOString(),
+                            },
+                          ];
+
+                          setGetDataWithChassisNo((prevState) => ({
+                            ...prevState,
+                            mileageHistory: updatedHistory,
+                          }));
+                        }
+                      }}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip
+                            variant="outlined"
+                            label={option}
+                            key={index}
+                            {...getTagProps({ index })}
+                            onDelete={(e) => {
+                              // Handle chip delete specifically
+                              const currentHistory = [
+                                ...(getDataWithChassisNo?.mileageHistory || []),
+                              ];
+                              const updatedHistory = currentHistory.slice(
+                                0,
+                                -1
+                              );
+
+                              setGetDataWithChassisNo((prevState) => ({
+                                ...prevState,
+                                mileageHistory: updatedHistory,
+                              }));
+                            }}
+                            className="bg-gray-100 border-gray-300 text-gray-800"
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          label="Mileage History"
+                          placeholder="Add new mileage"
+                          size="medium"
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      )}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          </div>
+          <Box sx={{ marginTop: "50px" }}>
+            <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 ">
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+                SL No
+              </label>
+              <label className="col-span-12 md:col-span-6 text-center">
+                Services Description
+              </label>
+              <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+                Qty
+              </label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+                Rate
+              </label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+                Amount
+              </label>
+              <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
+                hidden items for responsive
+              </label>
+            </div>
+            {serviceItems.map((item, i) => {
+              return (
+                <div key={i}>
+                  <div className="grid grid-cols-12 gap-2 items-center mt-3 ">
+                    <div className="col-span-12 md:col-span-1">
+                      <input
+                        className="inputField"
+                        autoComplete="off"
+                        type="text"
+                        placeholder="SL No "
+                        defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                        required
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-6">
+                      <div style={suggestionStyles.suggestionContainer}>
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Description"
+                          onChange={(e) =>
+                            handleServiceDescriptionChange(i, e.target.value)
+                          }
+                          value={item.description}
+                          required
+                        />
+                        {showSuggestions &&
+                          activeInputType === "service" &&
+                          activeInputIndex === i && (
+                            <div style={suggestionStyles.suggestionsList}>
+                              {productSuggestions.map((product, index) => (
+                                <div
+                                  key={product._id}
+                                  style={{
+                                    ...suggestionStyles.suggestionItem,
+                                    ...(index === activeSuggestionIndex
+                                      ? suggestionStyles.suggestionItemActive
+                                      : {}),
+                                  }}
+                                  onClick={() =>
+                                    handleSelectSuggestion(product)
+                                  }
+                                >
+                                  <div
+                                    style={
+                                      suggestionStyles.suggestionItemContent
+                                    }
+                                  >
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemName
+                                      }
+                                    >
+                                      {product.product.product_name}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      ${product.product.sellingPrice}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                    <div className="col-span-12 md:col-span-2 flex gap-2">
+                      <div className="grid grid-cols-12 quotationSelect">
+                        <input
+                          className="inputField col-span-3"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Qty"
+                          onChange={(e) =>
+                            handleServiceQuantityChange(i, e.target.value)
+                          }
+                          value={item.quantity}
+                          required
+                        />
+                        <select
+                          className="inputField col-span-9"
+                          onChange={(e) =>
+                            handleServiceUnitChange(i, e.target.value)
+                          }
+                          value={item.unit || ""}
+                          required
+                        >
+                          <option value="" disabled>
+                            Select Unit
+                          </option>
+                          {unitOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="col-span-12 md:col-span-1">
+                      <input
+                        className="inputField"
+                        autoComplete="off"
+                        placeholder="Rate"
+                        onChange={(e) =>
+                          handleServiceRateChange(i, e.target.value)
+                        }
+                        value={item.rate ? formatNumber(item.rate) : ""}
+                        required
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-1">
+                      <input
+                        className="inputField"
+                        autoComplete="off"
+                        type="text"
+                        placeholder="Amount"
+                        value={formatNumber(item.total)}
+                        readOnly
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-1">
+                      {serviceItems.length !== 0 && (
+                        <button
+                          onClick={() => handleServiceRemove(i)}
+                          className="w-full  bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md  py-2 px-2 justify-center "
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-3 ">
+                    {serviceItems.length - 1 === i && (
+                      <button
+                        onClick={handleServiceAdd}
+                        className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md"
+                      >
+                        Add
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </Box>
+
+          <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5 ">
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              SL No
+            </label>
+            <label className="col-span-12 md:col-span-6 text-center ">
+              Parts Description
+            </label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+              Qty
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              Rate
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+              Amount
+            </label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
+              hidden items for responsive
+            </label>
+          </div>
+          {items.map((item, i) => {
+            return (
+              <div key={i}>
+                <div className="grid grid-cols-12 gap-2 items-center mt-3 ">
+                  <div className="col-span-12 md:col-span-1">
+                    <input
+                      className="inputField"
+                      autoComplete="off"
+                      type="text"
+                      placeholder="SL No "
+                      defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                      required
+                    />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <div style={suggestionStyles.suggestionContainer}>
+                      <input
+                        className="inputField"
+                        autoComplete="off"
+                        type="text"
+                        placeholder="Description"
+                        onChange={(e) =>
+                          handleDescriptionChange(i, e.target.value)
+                        }
+                        value={item.description}
+                        required
+                      />
+                      {showSuggestions &&
+                        activeInputType === "parts" &&
+                        activeInputIndex === i && (
+                          <div style={suggestionStyles.suggestionsList}>
+                            {productSuggestions.map((product, index) => (
+                              <div
+                                key={product._id}
+                                style={{
+                                  ...suggestionStyles.suggestionItem,
+                                  ...(index === activeSuggestionIndex
+                                    ? suggestionStyles.suggestionItemActive
+                                    : {}),
+                                }}
+                                onClick={() => handleSelectSuggestion(product)}
+                              >
+                                <div
+                                  style={suggestionStyles.suggestionItemContent}
+                                >
+                                  <span
+                                    style={suggestionStyles.suggestionItemName}
+                                  >
+                                    {product.product.product_name}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    ${product.product.sellingPrice}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                  <div className="col-span-12 md:col-span-2 flex gap-2">
+                    <div className="grid grid-cols-12 quotationSelect">
+                      <input
+                        className="inputField col-span-3"
+                        autoComplete="off"
+                        type="text"
+                        placeholder="Qty"
+                        onChange={(e) =>
+                          handleQuantityChange(i, e.target.value)
+                        }
+                        value={item.quantity}
+                        required
+                      />
+                      <select
+                        className="inputField col-span-9"
+                        onChange={(e) => handleUnitChange(i, e.target.value)}
+                        value={item.unit || ""}
+                        required
+                      >
+                        <option value="" disabled>
+                          Select Unit
+                        </option>
+                        {unitOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="col-span-12 md:col-span-1">
+                    <input
+                      className="inputField"
+                      autoComplete="off"
+                      placeholder="Rate"
+                      onChange={(e) => handleRateChange(i, e.target.value)}
+                      required
+                      type="text"
+                      value={item.rate ? formatNumber(item.rate) : ""}
+                    />
+                  </div>
+                  <div className="col-span-12 md:col-span-1">
+                    <input
+                      className="inputField"
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Amount"
+                      value={formatNumber(item.total)}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col-span-12 md:col-span-1">
+                    {items.length !== 0 && (
+                      <button
+                        onClick={() => handleRemove(i)}
+                        className="w-full  bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md  py-2 px-2 justify-center "
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-1 ">
+                  {items.length - 1 === i && (
+                    <button
+                      onClick={handleAddClick}
+                      className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md"
+                    >
+                      Add
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="discountFieldWrap mt-5 ">
+            <div className="flex items-center ">
+              <b className="mr-2 hideAmountText"> Total Amount: </b>
+              <span>{formatNumber(grandTotal)}</span>
+            </div>
+            <div>
+              <b className="mr-2 hideAmountText "> Discount: </b>
+              <input
+                className="py-1 text-center"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/,/g, "");
+                  handleDiscountChange(rawValue);
+                }}
+                value={formatNumber(discount)}
+                autoComplete="off"
+                type="text"
+                placeholder="Discount"
+              />
+            </div>
+            <div>
+              <b className="mr-2 hideAmountText">Vat: </b>
+              <input
+                className="text-center"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/,/g, "");
+                  handleVATChange(rawValue);
+                }}
+                value={formatNumber(vat)}
+                autoComplete="off"
+                type="text"
+                placeholder="Vat"
+              />
+            </div>
+            <div>
+              <div className="flex items-center ml-3 ">
+                <b className="mr-2 ">Final Total: </b>
+                <span>{formatNumber(calculateFinalTotal())}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 md:mt-8  buttonGroup">
+            <div className="md:hidden flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
+              <button type="submit" disabled={createLoading}>
+                Add Quotation{" "}
+              </button>
+            </div>
+
+            <div className="flex">
+              <button onClick={() => setGoOtherButton("preview")}>
+                Preview
+              </button>
+
+              <button>Print </button>
+              <button onClick={() => setGoOtherButton("invoice")}>
+                Invoice{" "}
+              </button>
+            </div>
+
+            <div className="hidden  md:flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
+              <button type="submit" disabled={createLoading}>
+                Add Quotation{" "}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <QuotationTable />
+    </div>
+  );
+};
+
+export default AddQuotation;

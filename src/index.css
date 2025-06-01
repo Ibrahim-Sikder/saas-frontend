@@ -1,0 +1,120 @@
+@import url(./style/style.css);
+@import "./style/CardStyle.css";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  font-family: "Poppins", sans-serif;
+
+}
+
+.qutationForm {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.inputField {
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+.quotationSelect select{
+border-top-right-radius: 4px;
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+
+}
+.quotationSelect input{
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+
+}
+
+@media (max-width: 768px) {
+  .qutationForm {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+
+
+
+
+
+/* Additional styles for overtime form component */
+@media (max-width: 600px) {
+  .MuiInputLabel-root {
+    font-size: 0.9rem;
+  }
+
+  .MuiInputBase-input {
+    font-size: 0.95rem;
+  }
+
+  .MuiButton-root {
+    font-size: 0.9rem;
+  }
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 600px) {
+  .MuiIconButton-root {
+    padding: 8px;
+  }
+
+  .MuiButton-root {
+    min-height: 42px;
+  }
+}
+
+/* Enhance calendar appearance on mobile */
+@media (max-width: 600px) {
+  .MuiPickersDay-root {
+    margin: 0 1px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Improve form spacing on mobile */
+@media (max-width: 600px) {
+  .MuiFormControl-root {
+    margin-bottom: 8px;
+  }
+}
+
+/* Adjust calendar size on different screens */
+@media (min-width: 601px) and (max-width: 960px) {
+  .MuiCalendarPicker-root {
+    width: 100%;
+  }
+}
+
+/* Enhance switch component on mobile */
+@media (max-width: 600px) {
+  .MuiSwitch-root {
+    margin: 8px 0;
+  }
+
+  .MuiFormControlLabel-root {
+    margin-left: 0;
+  }
+}
+
+
+

@@ -1,0 +1,171 @@
+
+
+
+
+.messageRightSide{
+    background-color: #fff;
+    height: 800px;
+    border-radius: 20px;
+
+}
+.chatWraps{
+    width:100%;
+    height:540px;
+    overflow-y: scroll;
+}
+.userChat, .adminChat{
+    background: #0F79F3;
+    color: #fff;
+    padding: 15px 10px;
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin: 5px;
+    text-align: right;
+    max-width: auto;
+}
+.adminChat{
+    background: #F4F6FC;
+    color: black;
+    max-width: 80%;
+    text-align: left;
+}
+.chatting{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.chatting{
+    background:#F4F6FC;
+    width:100%;
+    height:100px;
+}
+.chatBtn{
+    background: #0F79F3;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    width: 68px;
+    height: 53px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.chatInput{
+    background: #fff;
+    padding: 10px 5px;
+    border-radius: 3px;
+    margin: 0 10px;
+    height: 55px;
+}
+
+/* rightSide chat styling */
+.messageLeftSide{
+    background:#FFFFFF;
+    height:800px;
+    border-radius: 10px;
+    padding:10px;
+}
+.searchChat{
+    width: 100%;
+    height: 50px;
+    background: #F4F6FC;
+    display: flex;
+    border-radius: 5px;
+    align-items: center;
+    padding: 5px;
+    justify-content: space-between;
+}
+.searchChat input{
+    background: transparent;
+    height: 100%;
+    width: 94%;
+    padding-left: 10px;
+}
+.messageList{
+    overflow-y: scroll;
+    height:600px;
+}
+.userMessageList{
+    border-bottom:1px solid #f4f6fc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding:12px 8px;
+    padding-right:16px;
+    transition:all .5s ease-in-out;
+}
+.userMessageList:hover{
+    background:#F7F7F7;
+}
+.createGroup{
+    background: #0E74E9;
+    color: #fff;
+    justify-content: center;
+    padding: 18px;
+}
+.activeUsers{
+    border-radius: 100%;
+    height:8px;
+    width:8px;
+    bottom:0px;
+    left:24px;
+    position: absolute;
+}
+
+@media only screen and (min-width:1441px){
+    .messageRightSide{
+        width: 1200px;
+    
+    }
+    .messageLeftSide{
+        width:600px;
+    }
+  
+    .chatInput{
+        width: 975px;
+    }
+}
+@media only screen and (max-width:1440px){
+    .chatInput {
+        width: 715px;
+    }
+}
+
+@media only screen and (max-width:1024px){
+    .chatInput {
+        width: 390px;
+    }
+}
+@media only screen and (max-width:500px){
+    .chatInput {
+        width: 100%;
+        height: 30px;
+    }
+    .userMessageList {
+        padding: 0px;
+        padding-right: 0px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .userChat, .adminChat {
+        background: #0F79F3;
+        color: #fff;
+        padding: 15px 10px;
+        border-top-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        margin: 5px;
+        text-align: right;
+        max-width: auto;
+        font-size: 12px;
+    }
+    .userChat, .adminChat {
+        font-size: 12px;
+    }
+.chatBtn{
+    width: 30px;
+    height: 22px;
+}
+}
+
