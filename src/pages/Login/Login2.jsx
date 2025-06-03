@@ -2,44 +2,38 @@
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
-  TextField,
   Button,
   Box,
   Typography,
   Link,
-  InputAdornment,
-  IconButton,
   Divider,
   Alert,
 } from "@mui/material";
 import {
-  Email,
   Lock,
-  Visibility,
-  VisibilityOff,
   Google,
   Facebook,
+  Person,
 } from "@mui/icons-material";
-import { useAuth } from "../../context/AuthContext";
 import AuthLayout from "../../auth/AuthLayout";
-
+import { useTenantLoginMutation } from "../../redux/api/authApi";
+import toast from "react-hot-toast";
+import GarageForm from "../../components/form/Form";
+import TASInput from "../../components/form/Input";
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
+  const [tenantLogin] = useTenantLoginMutation();
+  const handleSubmit = async (data) => {
+    console.log(data);
     try {
-      await login(email, password);
+      const res = tenantLogin(data).unwrap();
       navigate("/dashboard");
+      if (res.success) {
+        toast.success(res.message || "Congrate!!! Login successfully!");
+      }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {
@@ -58,56 +52,29 @@ const LoginPage = () => {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
-        <TextField
-          margin="normal"
+      <GarageForm onSubmit={handleSubmit}>
+        <TASInput
+          name="name"
+          label="User Name"
+          placeholder="User Name"
           required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Email color="action" />
-              </InputAdornment>
-            ),
-          }}
+          icon={Person}
+          iconPosition="start"
         />
-
-        <TextField
-          margin="normal"
+        <TASInput
+          name="tenantDomain"
+          label="Domain"
           required
-          fullWidth
+          icon={Person}
+          iconPosition="start"
+        />
+        <TASInput
           name="password"
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          id="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Lock color="action" />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
+          label="User password"
+          placeholder="User password"
+          required
+          icon={Lock}
+          iconPosition="start"
         />
 
         <Box sx={{ textAlign: "right", mt: 1 }}>
@@ -169,7 +136,7 @@ const LoginPage = () => {
             </Link>
           </Typography>
         </Box>
-      </Box>
+      </GarageForm>
     </AuthLayout>
   );
 };

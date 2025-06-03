@@ -7,22 +7,26 @@ const customerApi = baseApi.injectEndpoints({
         url: "/customers",
         method: "POST",
         body: customerInfo,
+        headers: {
+          tenant: window.location.hostname,
+        },
       }),
       invalidatesTags: ["customer"],
     }),
     getAllCustomers: builder.query({
-      query: ({ limit, page, searchTerm,isRecycled }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/customers`,
         method: "GET",
-        params: { limit, page, searchTerm, isRecycled },
+        params: {tenantDomain, limit, page, searchTerm, isRecycled },
       }),
       providesTags: ["customer", "vehicle", "jobCard", "quotation", "invoice"],
     }),
 
     getSingleCustomer: builder.query({
-      query: (id) => ({
+      query: ({tenantDomain, id}) => ({
         url: `/customers/${id}`,
         method: "GET",
+        params: {tenantDomain },
       }),
       providesTags: ["customer", "vehicle", "jobCard", "quotation", "invoice"],
     }),
@@ -69,10 +73,10 @@ const customerApi = baseApi.injectEndpoints({
       query: ({ limit, page, searchTerm }) => ({
         url: `/meta/allcustomer`,
         method: "GET",
-        params: { 
-          limit: limit || 10, 
-          page: page || 1,    
-          searchTerm 
+        params: {
+          limit: limit || 10,
+          page: page || 1,
+          searchTerm,
         },
       }),
       providesTags: ["customer", "vehicle", "jobCard", "quotation", "invoice"],

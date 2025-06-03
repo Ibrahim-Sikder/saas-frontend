@@ -27,6 +27,8 @@ const CustomerListTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
+  console.log(domain);
 
   const {
     data: customerData,
@@ -34,12 +36,14 @@ const CustomerListTable = () => {
     error: customerError,
     refetch,
   } = useGetAllCustomersQuery({
+    tenantDomain: domain,
     limit,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   });
 
+  console.log("customer data ", customerData);
   const [
     moveRecycledCustomer,
     { isLoading: customerDeleteLoading, error: deleteError },

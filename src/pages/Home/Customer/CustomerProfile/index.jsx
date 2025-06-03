@@ -37,11 +37,16 @@ const CustomerProfile = () => {
     localStorage.setItem(`customer-tab-${id}`, value.toString());
   }, [value, id]);
 
+  const tenantDomain = typeof window !== "undefined"
+  ? window.location.hostname.split(".")[0]
+  : "default"
+
+
   const {
     data: profileData,
     isLoading,
     error: customerError,
-  } = useGetSingleCustomerQuery(id);
+  } = useGetSingleCustomerQuery({id, tenantDomain});
   console.log(profileData);
 
   if (isLoading) {

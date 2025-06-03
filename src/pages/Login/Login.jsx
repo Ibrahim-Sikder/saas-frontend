@@ -23,7 +23,7 @@ const Login = () => {
     if (
       email.current.value === "trustautosolution@gmail.com" &&
       password.current.value === "trust@#Auto5033"
-    ) {
+  ) {
       Cookies.set("tas-auth", "51RSM78du77QnlJy86LgWSEUpVM", { expires: 7 });
       navigate("/dashboard");
       toast.success("Login Successfully");

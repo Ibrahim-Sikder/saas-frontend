@@ -78,7 +78,6 @@ import Unit from "../pages/Home/Unit/Unit";
 import Barcode from "../pages/Home/Barcode/Barcode";
 import ProductList from "../pages/Home/Products/ProductList";
 import ExpenseList from "../pages/Home/Expense/ExpenseList";
-
 import ProductType from "../pages/Home/ProductType/ProductType";
 import CategoryList from "../pages/Home/Category/CategoryList";
 import DuemoneyReceiptList from "../pages/Home/MoneyReceived/DuemoneyReceiptList";
@@ -131,6 +130,7 @@ import WarehouseManagement from "../pages/Inventory/WarehouseManagement";
 import StockAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import AddAdjustment from "../pages/Inventory/Adjustment/AddAdjustment";
 import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
+import CreateTenant from "../pages/Tenant/CreateTenant";
 // import LandingPage from "../pages/Login/LandingPage";
 
 export const router = createBrowserRouter([
@@ -140,7 +140,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Login></Login>,
+        element: <Login />,
       },
       {
         path: "signup",
@@ -149,6 +149,10 @@ export const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "create-tenant",
+        element: <CreateTenant />,
       },
       {
         path: "register",
@@ -171,9 +175,10 @@ export const router = createBrowserRouter([
   {
     path: "dashboard",
     element: (
-      <PrivateRoute>
-        <DashboardLayout />
-      </PrivateRoute>
+      // <PrivateRoute>
+      //   <DashboardLayout />
+      // </PrivateRoute>
+      <DashboardLayout />
     ),
     children: [
       {
@@ -568,11 +573,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "add-adjustment",
-        element: <AddAdjustment/>,
+        element: <AddAdjustment />,
       },
       {
         path: "quantity-adjustment",
-        element: <QuantityAdjustment/>,
+        element: <QuantityAdjustment />,
       },
       {
         path: "low-stocks",
@@ -586,7 +591,7 @@ export const router = createBrowserRouter([
         path: "variants",
         element: <Variants />,
       },
- 
+
       {
         path: "warranties",
         element: <Warranties />,
@@ -641,7 +646,7 @@ export const router = createBrowserRouter([
         path: "stock",
         element: <StockPage />,
       },
-  
+
       {
         path: "recycle-bin-jobcard-list",
         element: <RecyclebinJobcardList />,
