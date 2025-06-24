@@ -29,17 +29,19 @@ const RecycledbinCompanyList = () => {
   };
 
   const limit = 10;
-
+const domain = window.location.hostname.split(".")[0];
   const {
     data: companyData,
     isLoading: companyLoading,
     refetch,
   } = useGetAllCompaniesQuery({
+    tenantDomain:domain,
     limit,
     page: currentPage,
     searchTerm: filterType,
   });
 
+  
   const [permanantlyDeleteCompany] = usePermanantlyDeleteCompanyMutation();
   const [
     restoreFromRecycledCompany,
@@ -70,7 +72,7 @@ const RecycledbinCompanyList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledCompany(id).unwrap();
+        await restoreFromRecycledCompany({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Company has been restored successfully.",
@@ -87,7 +89,7 @@ const RecycledbinCompanyList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteCompany(id).unwrap();
+        await permanantlyDeleteCompany({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Company has been permanently deleted.",

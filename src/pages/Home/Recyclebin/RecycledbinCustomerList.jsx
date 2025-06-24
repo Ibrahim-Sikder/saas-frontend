@@ -27,13 +27,16 @@ const RecycledbinCustomerList = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
 
   const {
+
     data: customerData,
     isLoading: customerLoading,
     error: customerError,
     refetch,
   } = useGetAllCustomersQuery({
+      tenantDomain: domain,
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -73,7 +76,7 @@ const RecycledbinCustomerList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledCustomer(id).unwrap();
+        await restoreFromRecycledCustomer({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Customer has been restored successfully.",
@@ -90,7 +93,7 @@ const RecycledbinCustomerList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteCustomer(id).unwrap();
+        await permanantlyDeleteCustomer({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Customer has been permanently deleted.",

@@ -22,8 +22,10 @@ const RecyclebinJobcardList = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
+        tenantDomain:domain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -64,7 +66,7 @@ const RecyclebinJobcardList = () => {
 
     if (result === "restore") {
       try {
-        await restorefromRecyclebinJobCard(id).unwrap();
+        await restorefromRecyclebinJobCard({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Job card has been restored successfully.",
@@ -81,7 +83,7 @@ const RecyclebinJobcardList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanentlyDeleteJobCard(id).unwrap();
+        await permanentlyDeleteJobCard({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Job card has been permanently deleted.",

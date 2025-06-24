@@ -29,6 +29,7 @@ const UpdateCustomer = () => {
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+
   const [customerOwnerCountryCode, setCustomerOwnerCountryCode] = useState(
     countries[0]
   );
@@ -36,6 +37,7 @@ const UpdateCustomer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+
   const handleBrandChange = (_, newValue) => {
     const filtered = vehicleName.filter(
       (vehicle) => vehicle.label === newValue
@@ -70,11 +72,13 @@ const UpdateCustomer = () => {
     setFilteredOptions([]);
   };
 
+  const domain = window.location.hostname.split(".")[0];
+
   const {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCustomerQuery(id);
+  } = useGetSingleCustomerQuery({ tenantDomain: domain, id });
 
   const [updateCustomer, { isLoading: updateLoading, error }] =
     useUpdateCustomerMutation();
@@ -177,6 +181,17 @@ const UpdateCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
+    const getTenantName = () => {
+      const host = window.location.hostname;
+
+      if (host.includes("localhost")) {
+        return host.split(".")[0];
+      }
+
+      return host.split(".")[0];
+    };
+
+    const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -240,12 +255,14 @@ const UpdateCustomer = () => {
     };
 
     const updateData = {
-      id: id,
-      data: newData,
+      tenantDomain,
+      ...newData,
     };
-
     try {
-      const res = await updateCustomer(updateData).unwrap();
+      const res = await updateCustomer({
+        id: id,
+        data: updateData,
+      }).unwrap();
 
       if (res.success) {
         toast.success(res.message);

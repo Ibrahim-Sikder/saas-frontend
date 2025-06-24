@@ -38,6 +38,7 @@ const UpdateShowRoom = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const domain = window.location.hostname.split(".")[0];
 
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
 
@@ -71,8 +72,7 @@ const UpdateShowRoom = () => {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleShowRoomQuery(id);
-
+  } = useGetSingleShowRoomQuery({ tenantDomain: domain, id });
   const [updateShowroom, { isLoading: updateLoading, error }] =
     useUpdateShowRoomMutation();
 
@@ -125,6 +125,16 @@ const UpdateShowRoom = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
+     const getTenantName = () => {
+      const host = window.location.hostname;
+
+      if (host.includes("localhost")) {
+        return host.split(".")[0];
+      }
+
+      return host.split(".")[0];
+    };
+    const tenantDomain = getTenantName();
     const showroom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,
@@ -141,16 +151,12 @@ const UpdateShowRoom = () => {
     };
     data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
-
-    // Get the current mileage value
     const newMileageValue = Number(data.mileage);
 
-    // Check if we need to add a new mileage entry
     const updatedMileageHistory = [
       ...(getDataWithChassisNo.mileageHistory || []),
     ];
 
-    // Only add a new entry if it's a valid number and not already in the history
     if (!isNaN(newMileageValue) && newMileageValue > 0) {
       const mileageExists = updatedMileageHistory.some(
         (entry) => entry.mileage === newMileageValue
@@ -163,7 +169,6 @@ const UpdateShowRoom = () => {
         });
       }
     }
-    // Extract vehicle information
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -183,13 +188,14 @@ const UpdateShowRoom = () => {
       vehicle,
     };
 
+  
     const updateData = {
-      id: id,
-      data: newData,
+      tenantDomain,
+      ...newData,
     };
 
     try {
-      const res = await updateShowroom(updateData).unwrap();
+      const res = await updateShowroom({ id: id, data: updateData }).unwrap();
       if (res.success) {
         toast.success(res.message);
         navigate("/dashboard/show-room-list");
