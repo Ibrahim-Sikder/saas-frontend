@@ -100,7 +100,6 @@ const AddCustomer = () => {
   const {
     register,
     handleSubmit,
-
     setValue,
     formState: { errors },
   } = useForm();
@@ -120,7 +119,6 @@ const AddCustomer = () => {
     };
 
     const tenantDomain = getTenantName();
-
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -143,7 +141,7 @@ const AddCustomer = () => {
     data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
 
-    // Extract vehicle information
+
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,

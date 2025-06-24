@@ -25,7 +25,6 @@ import {
 import Loading from "../../../components/Loading/Loading";
 
 const UpdateCompany = () => {
- 
   const [filteredVehicles, setFilteredVehicles] = useState([]);
 
   const [filteredOptions, setFilteredOptions] = useState([]);
@@ -44,6 +43,7 @@ const UpdateCompany = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const domain = window.location.hostname.split(".")[0];
 
   const handleBrandChange = (event, newValue) => {
     const filtered = vehicleName.filter(
@@ -52,9 +52,7 @@ const UpdateCompany = () => {
     setFilteredVehicles(filtered);
   };
 
-  // year select only number 4 digit
 
-  // Handle input changes
   const handleYearSelectInput = (event) => {
     const value = event.target.value;
     // Check if the input is a number and does not exceed 4 digits
@@ -71,10 +69,8 @@ const UpdateCompany = () => {
 
   const handleOptionClick = (option) => {
     setYearSelectInput(option.label);
-    setFilteredOptions([]); // This assumes option.label is the value you want to set in the input
+    setFilteredOptions([]);
   };
-
-  // country code set
 
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
@@ -113,9 +109,13 @@ const UpdateCompany = () => {
       setOwnerPhoneNumber(newPhoneNumber);
     }
   };
-  const { data: singleCard, isLoading, refetch } = useGetSingleCompanyQuery(id);
+  const {
+    data: singleCard,
+    isLoading,
+    refetch,
+  } = useGetSingleCompanyQuery({ tenantDomain: domain, id });
 
-  const [updateCustomer, { isLoading: updateLoading, error }] =
+  const [updateCompany] =
     useUpdateCompanyMutation();
 
   const {
@@ -177,6 +177,16 @@ const UpdateCompany = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Company...");
+    const getTenantName = () => {
+      const host = window.location.hostname;
+
+      if (host.includes("localhost")) {
+        return host.split(".")[0];
+      }
+
+      return host.split(".")[0];
+    };
+    const tenantDomain = getTenantName();
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -240,12 +250,11 @@ const UpdateCompany = () => {
     };
 
     const updateData = {
-      id: id,
-      data: newData,
+      tenantDomain,
+      ...newData,
     };
-
     try {
-      const res = await updateCustomer(updateData).unwrap();
+      const res = await updateCompany({ id: id, data: updateData }).unwrap();
 
       if (res.success) {
         toast.success(res.message);

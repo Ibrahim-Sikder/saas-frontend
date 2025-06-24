@@ -11,30 +11,36 @@ const companyApi = baseApi.injectEndpoints({
       invalidatesTags: ["company"],
     }),
     getAllCompanies: builder.query({
-      query: ({ limit, page, searchTerm,isRecycled }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/companies`,
         method: "GET",
-        params: { limit, page, searchTerm,isRecycled },
+        params: { tenantDomain, limit, page, searchTerm, isRecycled },
       }),
       providesTags: ["company", "jobCard", "invoice", "quotation", "vehicle"],
     }),
 
     getSingleCompany: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/companies/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["company", "jobCard", "invoice", "quotation", "vehicle"],
     }),
+
     updateCompany: builder.mutation({
-      query: (companyInfo) => {
-        return {
-          url: `/companies/${companyInfo.id}`,
-          method: "PUT",
-          body: companyInfo.data,
-        };
-      },
-      invalidatesTags:  ["company", "jobCard", "invoice", "quotation", "vehicle"],
+      query: ({ id, data }) => ({
+        url: `/companies/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: [
+        "company",
+        "jobCard",
+        "invoice",
+        "quotation",
+        "vehicle",
+      ],
     }),
 
     deleteCompany: builder.mutation({
@@ -42,28 +48,62 @@ const companyApi = baseApi.injectEndpoints({
         url: `/companies/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags:  ["company", "jobCard", "invoice", "quotation", "vehicle"],
+      invalidatesTags: [
+        "company",
+        "jobCard",
+        "invoice",
+        "quotation",
+        "vehicle",
+      ],
     }),
     permanantlyDeleteCompany: builder.mutation({
-      query: (id) => ({
+      query: ({tenantDomain,id}) => ({
         url: `/companies/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
-      invalidatesTags:  ["company", "jobCard", "invoice", "quotation", "vehicle"],
+      invalidatesTags: [
+        "company",
+        "jobCard",
+        "invoice",
+        "quotation",
+        "vehicle",
+      ],
     }),
     moveRecycledCompany: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/companies/recycle/${id}`,
         method: "PATCH",
+        params: {
+          tenantDomain,
+        },
       }),
-      invalidatesTags:  ["company", "jobCard", "invoice", "quotation", "vehicle"],
+      invalidatesTags: [
+        "company",
+        "jobCard",
+        "invoice",
+        "quotation",
+        "vehicle",
+      ],
     }),
+
     restoreFromRecycledCompany: builder.mutation({
-      query: (id) => ({
+      query: ({tenantDomain, id}) => ({
         url: `/companies/restore/${id}`,
         method: "PATCH",
+         params: {
+          tenantDomain,
+        },
       }),
-      invalidatesTags:  ["company", "jobCard", "invoice", "quotation", "vehicle"],
+      invalidatesTags: [
+        "company",
+        "jobCard",
+        "invoice",
+        "quotation",
+        "vehicle",
+      ],
     }),
   }),
 });
@@ -76,5 +116,5 @@ export const {
   useDeleteCompanyMutation,
   useMoveRecycledCompanyMutation,
   useRestoreFromRecycledCompanyMutation,
-  usePermanantlyDeleteCompanyMutation
+  usePermanantlyDeleteCompanyMutation,
 } = companyApi;

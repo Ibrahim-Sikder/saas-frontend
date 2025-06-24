@@ -58,13 +58,8 @@ const AddCompany = () => {
     );
     setFilteredVehicles(filtered);
   };
-
-  // year select only number 4 digit
-
-  // Handle input changes
   const handleYearSelectInput = (event) => {
     const value = event.target.value;
-    // Check if the input is a number and does not exceed 4 digits
     if (/^\d{0,4}$/.test(value)) {
       setYearSelectInput(value);
       const filtered = vehicleModels.filter((option) =>
@@ -80,8 +75,6 @@ const AddCompany = () => {
       shouldValidate: true,
     });
   };
-  // country code set
-
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
     if (
@@ -133,7 +126,6 @@ const AddCompany = () => {
       setRegistrationError("Car registration number must be 7 characters");
     }
 
-    // Update input value
     setValue("car_registration_no", value, {
       shouldValidate: true,
     });
@@ -141,6 +133,17 @@ const AddCompany = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Company...");
+      const getTenantName = () => {
+      const host = window.location.hostname;
+
+      if (host.includes("localhost")) {
+        return host.split(".")[0];
+      }
+
+      return host.split(".")[0];
+    };
+
+    const tenantDomain = getTenantName();
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -182,10 +185,10 @@ const AddCompany = () => {
     };
 
     const newData = {
+       tenantDomain,
       company,
       vehicle,
     };
-
 
     try {
       const res = await createCompany(newData).unwrap();
@@ -578,7 +581,6 @@ const AddCompany = () => {
                       error={!!errors.mileage}
                       helperText={errors.mileage?.message}
                     />
-                    
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

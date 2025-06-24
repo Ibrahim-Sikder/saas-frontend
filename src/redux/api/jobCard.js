@@ -11,35 +11,37 @@ const jobCardApi = baseApi.injectEndpoints({
       invalidatesTags: ["jobCard"],
     }),
     getAllJobCards: builder.query({
-      query: ({ id, limit, page, searchTerm,isRecycled }) => ({
+      query: ({tenantDomain, id, limit, page, searchTerm,isRecycled }) => ({
         url: `/jobCards`,
         method: "GET",
-        params: { id,limit, page, searchTerm, isRecycled},
+        params: {tenantDomain, id,limit, page, searchTerm, isRecycled},
       }),
       providesTags: ["jobCard"],
     }),
     
 
     getSingleJobCard: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/jobCards/${id}`,
         method: "GET",
+            params: { tenantDomain },
       }),
       providesTags: ["jobCard"],
     }),
     getUserDetailsForJobCard: builder.query({
-      query: ({id, userType}) => ({
+      query: ({tenantDomain, id, userType}) => ({
         url: `/jobCards/${id}/${userType}`,
         method: "GET",
+            params: { tenantDomain },
       }),
       providesTags: ["jobCard"],
     }),
 
     getSingleJobCardWithJobNo: builder.query({
-      query: (jobNo) => ({
+      query: ({tenantDomain, jobNo}) => ({
         url: `/jobCards/getWithJobNo`,
         method: "GET",
-        params: { jobNo },
+        params: { tenantDomain, jobNo },
       }),
       providesTags: ["jobCard"],
     }),
@@ -62,28 +64,32 @@ const jobCardApi = baseApi.injectEndpoints({
       invalidatesTags: ["jobCard"],
     }),
     movetoRecyclebinJobCard: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/jobcards/recycle-bin/${id}`,
         method: "DELETE",
+        params:{tenantDomain}
       }),
       invalidatesTags: ["jobCard"],
     }),
     restorfromRecyclebinJobCard: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/jobcards/recycle-bin/restore/${id}`,
         method: "DELETE",
+         params:{tenantDomain}
       }),
       invalidatesTags: ["jobCard"],
     }),
     permanantlyDeleteJobCard: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/jobCards/recycle-bin/delete-permanantly/${id}`,
         method: "DELETE",
+         params:{tenantDomain}
       }),
       invalidatesTags: ["jobCard"],
     }),
   }),
 });
+
 
 export const {
   useCreateJobCardMutation,

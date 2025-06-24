@@ -90,7 +90,7 @@ const AddJobCard = () => {
   const navigate = useNavigate();
   const limit = 10;
   const jobCardLimit = 500000;
-
+ const domain = window.location.hostname.split(".")[0];
   const {
     register,
     handleSubmit,
@@ -109,21 +109,24 @@ const AddJobCard = () => {
 
   const { data: customerData, isLoading: customerLoading } =
     useGetAllCustomersQuery({
+      tenantDomain: domain,
       limit: jobCardLimit,
       page: currentPage,
     });
 
   const { data: companyData, isLoading: companyLoading } =
-    useGetAllCompaniesQuery({ limit: jobCardLimit, page: currentPage });
+    useGetAllCompaniesQuery({tenantDomain: domain, limit: jobCardLimit, page: currentPage });
 
   const { data: showroomData, isLoading: showroomLoading } =
-    useGetAllShowRoomsQuery({ limit: jobCardLimit, page: currentPage });
+    useGetAllShowRoomsQuery({tenantDomain: domain, limit: jobCardLimit, page: currentPage });
 
   const { data: userDetails, isLoading: userDetailsLoading } =
-    useGetUserDetailsForJobCardQuery({ id: userId, userType: newId });
+    useGetUserDetailsForJobCardQuery({ tenantDomain: domain, id: userId, userType: newId });
+
 
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
+      tenantDomain: domain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -401,6 +404,7 @@ const AddJobCard = () => {
     };
 
     const newCard = {
+      tenantDomain:domain,
       customer,
       company,
       showroom,

@@ -42,14 +42,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import Lottie from "lottie-react"
 import AuthLayout from "../../auth/AuthLayout"
-// import successAnimation from "../../assets/animations/success.json"
-// import AuthLayout from "../../auth/AuthLayout"
-
-// Password strength component
 const PasswordStrength = ({ password }) => {
   const theme = useTheme()
-
-  // Calculate password strength
   const getStrength = (pass) => {
     let score = 0
 

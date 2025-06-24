@@ -24,9 +24,10 @@ const RecycledbinShowRoomList = () => {
 
   const navigate = useNavigate();
   const limit = 10;
-
+  const domain = window.location.hostname.split(".")[0];
   const { data: showRoomData, isLoading: showroomLoading } =
     useGetAllShowRoomsQuery({
+      tenantDomain: domain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -67,7 +68,10 @@ const RecycledbinShowRoomList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledShowRoom(id).unwrap();
+        await restoreFromRecycledShowRoom({
+          tenantDomain: domain,
+          id,
+        }).unwrap();
         swal({
           title: "Restored!",
           text: "Show Room has been restored successfully.",
@@ -84,7 +88,7 @@ const RecycledbinShowRoomList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteShowRoom(id).unwrap();
+        await permanantlyDeleteShowRoom({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Show Room has been permanently deleted.",

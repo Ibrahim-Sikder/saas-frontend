@@ -13,21 +13,16 @@ import {
   vehicleName,
   vehicleTypes,
 } from "../../../constant";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
 import { toast } from "react-toastify";
 import { HiOutlineUserGroup } from "react-icons/hi";
-
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
-import { ArrowBack, NotificationAdd } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useCreateShowRoomMutation } from "../../../redux/api/showRoomApi";
 import ShowRoomListTable from "./ShowRoomListTable";
 
 const AddShowRoom = () => {
   const [registrationError, setRegistrationError] = useState("");
-
   const [selectedBrand, setSelectedBrand] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
 
@@ -133,6 +128,17 @@ const AddShowRoom = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Show Room...");
+      const getTenantName = () => {
+      const host = window.location.hostname;
+
+      if (host.includes("localhost")) {
+        return host.split(".")[0];
+      }
+
+      return host.split(".")[0];
+    };
+
+    const tenantDomain = getTenantName();
     const showroom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,
@@ -172,6 +178,7 @@ const AddShowRoom = () => {
     };
 
     const newData = {
+      tenantDomain,
       showroom,
       vehicle,
     };

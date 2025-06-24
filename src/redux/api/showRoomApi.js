@@ -11,18 +11,19 @@ const showRoomApi = baseApi.injectEndpoints({
       invalidatesTags: ["showroom"],
     }),
     getAllShowRooms: builder.query({
-      query: ({ limit, page, searchTerm,isRecycled }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm,isRecycled }) => ({
         url: `/showrooms`,
         method: "GET",
-        params: { limit, page, searchTerm,isRecycled },
+        params: {tenantDomain,  limit, page, searchTerm,isRecycled },
       }),
       providesTags: ["showroom", "jobCard", "invoice", "quotation", "vehicle"],
     }),
 
     getSingleShowRoom: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/showrooms/${id}`,
         method: "GET",
+            params: { tenantDomain },
       }),
       providesTags: ["showroom", "jobCard", "invoice", "quotation", "vehicle"],
     }),
@@ -45,23 +46,32 @@ const showRoomApi = baseApi.injectEndpoints({
       invalidatesTags: ["showroom"],
     }),
     permanantlyDeleteShowRoom: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/showrooms/${id}`,
         method: "DELETE",
+          params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["showroom"],
     }),
     moveRecycledShowRoom: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/showrooms/recycle/${id}`,
         method: "PATCH",
+         params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["showroom"],
     }),
     restoreFromRecycledShowRoom: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/showrooms/restore/${id}`,
         method: "PATCH",
+         params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["showroom"],
     }),

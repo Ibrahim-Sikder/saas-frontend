@@ -36,8 +36,10 @@ const JobcardTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
+       tenantDomain:domain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -74,7 +76,7 @@ const JobcardTable = () => {
 
     if (willDelete) {
       try {
-        await movetoRecyclebinJobCard(id).unwrap();
+        await movetoRecyclebinJobCard({tenantDomain:domain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

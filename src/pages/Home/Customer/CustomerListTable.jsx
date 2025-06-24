@@ -28,7 +28,6 @@ const CustomerListTable = () => {
 
   const limit = 10;
   const domain = window.location.hostname.split(".")[0];
-  console.log(domain);
 
   const {
     data: customerData,
@@ -43,7 +42,6 @@ const CustomerListTable = () => {
     isRecycled: false,
   });
 
-  console.log("customer data ", customerData);
   const [
     moveRecycledCustomer,
     { isLoading: customerDeleteLoading, error: deleteError },
@@ -63,7 +61,7 @@ const CustomerListTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledCustomer(id).unwrap();
+        await moveRecycledCustomer({ tenantDomain: domain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
