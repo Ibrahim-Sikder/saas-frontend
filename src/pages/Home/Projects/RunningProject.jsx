@@ -16,6 +16,7 @@ import { backBtnStyle } from "../../../utils/customStyle";
 const QuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const [filterType, setFilterType] = useState("");
 
@@ -37,6 +38,7 @@ const QuotationList = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,

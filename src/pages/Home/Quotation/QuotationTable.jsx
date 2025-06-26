@@ -20,6 +20,7 @@ import {
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
 
+
 const QuotationTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
@@ -30,6 +31,7 @@ const QuotationTable = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
+const domain = window.location.hostname.split(".")[0];
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -42,6 +44,7 @@ const QuotationTable = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+       tenantDomain: domain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -57,7 +60,7 @@ const QuotationTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledQuotation(id).unwrap();
+        await moveRecycledQuotation({ tenantDomain: domain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -67,16 +70,6 @@ const QuotationTable = () => {
         swal("Error", "An error occurred while deleting the card.", "error");
       }
     }
-  };
-
-  // Format date for mileage history display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
   };
 
   useEffect(() => {

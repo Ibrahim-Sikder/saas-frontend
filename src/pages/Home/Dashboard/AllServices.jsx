@@ -16,7 +16,13 @@ import "./AllService.css";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
 import { AssuredWorkload } from "@mui/icons-material";
 const AllServices = () => {
-  const { data: allMetaData, isLoading, isError } = useGetAllMetaQuery({});
+  const tenantDomain = window.location.hostname.split(".")[0];
+
+  const {
+    data: allMetaData,
+    isLoading,
+    isError,
+  } = useGetAllMetaQuery(tenantDomain);
 
   if (isError) return <h2>Oops! Data not found.</h2>;
   if (isLoading) return <Loading />;
@@ -100,7 +106,6 @@ const AllServices = () => {
               <p className="label">Total Sale </p>
             </div>
           </div>
-
 
           <div class="wave-background">
             <svg

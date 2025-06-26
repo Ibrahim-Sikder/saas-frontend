@@ -18,6 +18,7 @@ import InputMask from "react-input-mask";
 import { cmDmOptions, countries } from "../../../constant";
 import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
 import {
+  useGetSingleQuotationQuery,
   useRemoveQuotationMutation,
   useUpdateQuotationMutation,
 } from "../../../redux/api/quotation";
@@ -30,6 +31,7 @@ import dayjs from "dayjs";
 import { useGetAllIProductQuery } from "../../../redux/api/productApi";
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
+import { getTenantName } from "../../../utils/getTenantName";
 // Function to format numbers with thousand separators
 const formatNumber = (num) => {
   if (num === undefined || num === null || num === "") return "";
@@ -57,6 +59,8 @@ const UpdateQuotation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = window.location.hostname.split(".")[0];
+
   const userTypeFromProfile = new URLSearchParams(location.search).get(
     "user_type"
   );
@@ -81,7 +85,7 @@ const UpdateQuotation = () => {
   const [productSuggestions, setProductSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
-  const [activeInputType, setActiveInputType] = useState(null); // 'service' or 'parts'
+  const [activeInputType, setActiveInputType] = useState(null);
   const [activeInputIndex, setActiveInputIndex] = useState(null);
 
   const {
@@ -92,12 +96,11 @@ const UpdateQuotation = () => {
   } = useForm();
 
   const queryParams = {
+    tenantDomain,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   };
-
-  const { data: productData, isLoading } = useGetAllIProductQuery(queryParams);
 
   const { data: stockData } = useGetAllStocksQuery(queryParams);
 
@@ -148,13 +151,16 @@ const UpdateQuotation = () => {
     }
   };
 
+  const { data } = useGetSingleQuotationQuery({
+    tenantDomain,
+    id,
+  });
+
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/quotations/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSpecificQuotation(data.data);
-      });
-  }, [id, reload]);
+    if (data?.data) {
+      setSpecificQuotation(data.data);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (specificQuotation?.user_type === "customer") {
@@ -773,6 +779,7 @@ const UpdateQuotation = () => {
   ];
 
   const onSubmit = async (data) => {
+    const tenantDomain = getTenantName();
     setRemoveButton("");
     try {
       const customer = {
@@ -860,20 +867,24 @@ const UpdateQuotation = () => {
         service_input_data: service_input_data,
       };
       const values = {
+        tenantDomain,
         customer,
         company,
         showRoom,
         vehicle,
         quotation,
       };
+
       const newValue = {
         id: id,
-        data: values,
+        data: {
+          ...values,
+        },
       };
 
       if (removeButton === "") {
         const res = await updateQuotation(newValue).unwrap();
-
+        console.log("response ", res);
         if (res.success) {
           setReload(!reload);
         }
@@ -949,7 +960,7 @@ const UpdateQuotation = () => {
         />
         <div>
           <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            Trust Auto Solution{" "}
+            Softypy Garage{" "}
           </h2>
           <span className="text-[12px] lg:text-xl mt-5 block">
             Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

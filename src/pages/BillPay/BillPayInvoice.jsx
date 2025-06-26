@@ -210,7 +210,7 @@ const BillPayInvoice = () => {
                     />
                     <div>
                       <h2 className="trustAutoTitle qoutationTitle">
-                        Trust Auto Solution{" "}
+                        Softypy Garage{" "}
                       </h2>
                       <small className="block">
                         Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

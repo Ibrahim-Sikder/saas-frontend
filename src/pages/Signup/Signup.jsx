@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 "use client";
 
@@ -42,7 +43,6 @@ const mockRoles = [
 ];
 
 const SignupPage = () => {
-  const subdomain = window.location.hostname.split('.')[0];
 
   const navigate = useNavigate();
   const [createUser, { isLoading }] = useCreateUserMutation();
@@ -81,7 +81,6 @@ const SignupPage = () => {
   const handleToggleConfirmPassword = () =>
     setShowConfirmPassword((prev) => !prev);
 
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -99,28 +98,20 @@ const SignupPage = () => {
     } else if (!emailRegex.test(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address";
     }
-
-    // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } 
-
-    // Confirm password validation
+    }
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    // Tenant validation
     if (!formData.tenantDomain) {
       newErrors.tenantDomain = "Please select a tenant";
     }
-
-    // Role validation
     if (!formData.role) {
       newErrors.role = "Please select a role";
     }
 
-    // Terms agreement validation
     if (!formData.agreeTerms) {
       newErrors.agreeTerms = "You must agree to the terms and conditions";
     }
@@ -452,6 +443,24 @@ const SignupPage = () => {
                       helperText={errors.confirmPassword}
                     />
                   </Grid>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      mt: 1,
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                    }}
+                  >
+                    Don't have a tenant?&nbsp;
+                    <RouterLink
+                      to="/create-tenant"
+                      style={{ color: "#1976d2", textDecoration: "none" }}
+                    >
+                      Create Tenant
+                    </RouterLink>
+                  </Typography>
 
                   <Grid item xs={12}>
                     <FormControlLabel

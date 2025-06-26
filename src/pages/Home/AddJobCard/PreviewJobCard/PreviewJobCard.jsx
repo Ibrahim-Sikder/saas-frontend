@@ -84,7 +84,7 @@ const PreviewJobCard = () => {
             <div className="mx-auto text-center border-b-2 border-[#110255]">
               <div className="flex  justify-between items-center">
                 <img className="w-[150px] " src={logo} alt="logo" />
-                <h2 className="trustAutoTitle ">Trust Auto Solution</h2>
+                <h2 className="trustAutoTitle ">Softypy Garage</h2>
               </div>
             </div>
             <div>

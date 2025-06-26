@@ -18,6 +18,7 @@ const MoneyReceiptTable = () => {
   const limit = 10;
   const navigate = useNavigate();
   const textInputRef = useRef(null);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   useEffect(() => {
     if (search) {
@@ -27,13 +28,12 @@ const MoneyReceiptTable = () => {
 
   const { data: allMoneyReceipts, isLoading: moneyReceiptLoading } =
     useGetAllMoneyReceiptsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
       isRecycled: false,
     });
-
-  console.log("money receipt list this ", allMoneyReceipts);
 
   const [
     moveRecycledMoneyReceipt,
@@ -54,7 +54,7 @@ const MoneyReceiptTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledMoneyReceipt(id).unwrap();
+        await moveRecycledMoneyReceipt({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -121,7 +121,6 @@ const MoneyReceiptTable = () => {
             {allMoneyReceipts?.data?.moneyReceipts?.map((card, index) => {
               const serialNumber = (currentPage - 1) * limit + index + 1;
 
-        
               return (
                 <tr
                   key={card._id}

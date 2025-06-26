@@ -612,7 +612,7 @@
 //         />
 //         <div>
 //           <h2 className=" trustAutoTitle trustAutoTitleQutation">
-//             Trust Auto Solution{" "}
+//             Softypy Garage{" "}
 //           </h2>
 //           <span className="mt-5 block text-center">
 //             Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
@@ -1506,7 +1506,7 @@ const Detail = () => {
                     <img className="w-[120px] " src={logo} alt="logo" />
                     <div>
                       <h2 className="trustAutoTitle qoutationTitle">
-                        Trust Auto Solution{" "}
+                        Softypy Garage{" "}
                       </h2>
                       <small className="block">
                         Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
@@ -1725,7 +1725,7 @@ const Detail = () => {
                       Customer Signature :{" "}
                     </b>
                     <b className="text-sm customerSignatur">
-                      Trust Auto Solution
+                      Softypy Garage
                     </b>
                   </div>
                 </div>

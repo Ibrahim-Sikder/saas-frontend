@@ -20,6 +20,7 @@ import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
 import InvoiceTable from "./InvoiceTable";
 import { unitOptions } from "../../../utils/options";
 import { formatNumber } from "../../../utils/formateSemicolon";
+import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 
 const Invoice = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
@@ -34,6 +35,7 @@ const Invoice = () => {
   const location = useLocation();
   const job_no = new URLSearchParams(location.search).get("order_no");
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const [orderNumber, setOrderNumber] = useState(job_no);
 
@@ -74,8 +76,10 @@ const Invoice = () => {
     { isLoading: createLoading, error: createInvoiceError },
   ] = useCreateInvoiceMutation();
 
-  const { data: jobCardData, refetch } =
-    useGetSingleJobCardWithJobNoQuery(orderNumber);
+  const { data: jobCardData, refetch } = useGetSingleJobCardWithJobNoQuery({
+    tenantDomain,
+    jobNo: orderNumber,
+  });
 
   useEffect(() => {
     if (jobCardData?.data?.date) {
@@ -191,13 +195,25 @@ const Invoice = () => {
     reset,
   ]);
 
+  const {
+    data: quotationResponse,
+    isLoading,
+    error,
+    refetch: singleRefetch,
+  } = useGetSingleQuotationQuery({
+    tenantDomain,
+    id,
+  });
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/quotations/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSpecificQuotation(data.data);
-      });
-  }, [id, reload]);
+    if (quotationResponse?.data) {
+      setSpecificQuotation(quotationResponse.data);
+    }
+  }, [quotationResponse]);
+  useEffect(() => {
+    if (reload) {
+      singleRefetch();
+    }
+  }, [reload]);
 
   useEffect(() => {
     if (job_no && id) {
@@ -560,6 +576,7 @@ const Invoice = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Company...");
+      // const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
 
@@ -599,7 +616,7 @@ const Invoice = () => {
       ...(getDataWithChassisNo.mileageHistory || []),
     ];
 
-    // Only add a new entry if it's a valid number and not already in the history
+   
     if (!isNaN(newMileageValue) && newMileageValue > 0) {
       const mileageExists = updatedMileageHistory.some(
         (entry) => entry.mileage === newMileageValue
@@ -640,6 +657,7 @@ const Invoice = () => {
     };
 
     const values = {
+      tenantDomain,
       customer,
       company,
       showRoom,
@@ -695,7 +713,7 @@ const Invoice = () => {
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Trust Auto Solution{" "}
+              Softypy Garage{" "}
             </h2>
             <span className="block mt-5">
               Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

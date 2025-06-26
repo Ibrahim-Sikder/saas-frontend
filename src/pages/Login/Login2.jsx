@@ -1,25 +1,14 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import {
-  Button,
-  Box,
-  Typography,
-  Link,
-  Divider,
-  Alert,
-} from "@mui/material";
-import {
-  Lock,
-  Google,
-  Facebook,
-  Person,
-} from "@mui/icons-material";
+import { Button, Box, Typography, Link, Divider, Alert } from "@mui/material";
+import { Lock, Google, Facebook, Person } from "@mui/icons-material";
 import AuthLayout from "../../auth/AuthLayout";
 import { useTenantLoginMutation } from "../../redux/api/authApi";
-import toast from "react-hot-toast";
+
 import GarageForm from "../../components/form/Form";
 import TASInput from "../../components/form/Input";
+import { toast } from "react-toastify";
 const LoginPage = () => {
   const navigate = useNavigate();
 
@@ -27,14 +16,20 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
   const handleSubmit = async (data) => {
-    console.log(data);
+    setLoading(true);
+    setError("");
+
     try {
-      const res = tenantLogin(data).unwrap();
-      navigate("/dashboard");
+      const res = await tenantLogin(data).unwrap();
+
       if (res.success) {
-        toast.success(res.message || "Congrate!!! Login successfully!");
+        toast.success(res.message || "Congrats! Login successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.error(res.message || "Invalid username or password!");
       }
     } catch (err) {
+      toast.error(err?.data?.message || "Login failed. Please try again.");
       setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);

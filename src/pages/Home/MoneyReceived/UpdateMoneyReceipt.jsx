@@ -26,15 +26,18 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 const UpdateMoneyReceipt = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const userTypeFromProfile = new URLSearchParams(location.search).get(
     "user_type"
   );
   const userFromProfile = new URLSearchParams(location.search).get("user");
   const { origin } = location.state || {};
-  const { data: singleMoneyReceipt, refetch } =
-    useGetSingleMoneyReceiptQuery(id);
-  console.log(singleMoneyReceipt);
+  const { data: singleMoneyReceipt, refetch } = useGetSingleMoneyReceiptQuery({
+    tenantDomain,
+    id,
+  });
+  console.log("single money", singleMoneyReceipt);
 
   const [updateMoneyReceipt, { isLoading: updateLoading, error: updateError }] =
     useUpdateMoneyReceiptMutation();
@@ -319,6 +322,7 @@ const UpdateMoneyReceipt = () => {
 
     try {
       const values = {
+        tenantDomain,
         id,
         data,
       };
@@ -419,7 +423,7 @@ const UpdateMoneyReceipt = () => {
             <img className="" src={logo} alt="logo" />
           </div>
           <div className="moneyHead ">
-            <h2 className="receivedTitle ">Trust Auto Solution </h2>
+            <h2 className="receivedTitle ">Softypy Garage </h2>
             <small>
               It's trusted computerized Organization for all kinds of vehicle
               check up & maintenance such as computerized Engine Analysis,

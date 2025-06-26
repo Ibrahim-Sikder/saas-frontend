@@ -23,6 +23,7 @@ const Home = () => {
       </div>
       <AllServices />
 
+
       <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />
         <YearlyIncomeChart />

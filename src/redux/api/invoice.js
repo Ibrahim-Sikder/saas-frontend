@@ -11,18 +11,19 @@ const invoiceApi = baseApi.injectEndpoints({
       invalidatesTags: ["invoice"],
     }),
     getAllInvoices: builder.query({
-      query: ({ id, limit, page, searchTerm, isRecycled }) => ({
+      query: ({ tenantDomain,id, limit, page, searchTerm, isRecycled }) => ({
         url: `/invoices`,
         method: "GET",
-        params: { id, limit, page, searchTerm, isRecycled },
+        params: {tenantDomain, id, limit, page, searchTerm, isRecycled },
       }),
       providesTags: ["invoice"],
     }),
 
     getSingleInvoice: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/invoices/${id}`,
         method: "GET",
+         params: { tenantDomain },
       }),
       providesTags: ["invoice"],
     }),
@@ -50,30 +51,34 @@ const invoiceApi = baseApi.injectEndpoints({
     }),
 
     deleteInvoice: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/invoices/${id}`,
         method: "DELETE",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["invoice"],
     }),
     permanantlyDeleteInvoice: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/invoices/${id}`,
         method: "DELETE",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["invoice"],
     }),
     moveRecycledInvoice: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/invoices/recycle/${id}`,
         method: "PATCH",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["invoice"],
     }),
     restoreFromRecycledInvoice: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/invoices/restore/${id}`,
         method: "PATCH",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["invoice"],
     }),

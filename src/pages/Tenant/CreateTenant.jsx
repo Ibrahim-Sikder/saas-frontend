@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 "use client";
 
 import { useState } from "react";
@@ -37,16 +38,15 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { subscriptionPlans } from "../../data";
 import { useCreateTenantMutation } from "../../redux/api/tenantApi";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 const TenantRegisterPage = () => {
   const navigate = useNavigate();
-  const { registerTenant } = useAuth();
+  const {} = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [createTenant] = useCreateTenantMutation();
-
   // Form state
   const [tenantData, setTenantData] = useState({
     name: "",
@@ -95,24 +95,22 @@ const TenantRegisterPage = () => {
         businessType: tenantData.businessType,
         plan: tenantData.selectedPlan,
       };
-      console.log(tenantPayload);
 
       const result = await createTenant(tenantPayload);
-      if (result.success) {
-        toast.success(result.message || "Tenant create successfully!");
-      }
       console.log(result);
+
       if ("error" in result) {
         throw new Error(
-          result.error.data?.message ||
-            "Failed to register tenant. Please try again."
+          result.error?.data?.message || "Failed to register tenant."
         );
       }
-      if (result.data) {
-        registerTenant(result.data);
+
+      if (result?.data?.success) {
+        toast.success(result.data.message || "Tenant created successfully!");
+        navigate("/signup");
       }
 
-      navigate("/tenant/success");
+      // navigate('/signup')
     } catch (err) {
       setError(
         err.message ||

@@ -117,8 +117,8 @@ const AddCustomer = () => {
 
       return host.split(".")[0];
     };
-
     const tenantDomain = getTenantName();
+    
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,

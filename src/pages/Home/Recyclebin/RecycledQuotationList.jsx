@@ -24,6 +24,7 @@ const RecycledQuotationList = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -35,10 +36,11 @@ const RecycledQuotationList = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain: domain,
       limit,
       page: currentPage,
       searchTerm: filterType,
-      isRecycled:true,
+      isRecycled: true,
     });
 
   const handleDeleteOrRestore = async (id) => {
@@ -65,7 +67,10 @@ const RecycledQuotationList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledQuotation(id).unwrap();
+        await restoreFromRecycledQuotation({
+          tenantDomain: domain,
+          id,
+        }).unwrap();
         swal({
           title: "Restored!",
           text: "Quotation has been restored successfully.",
@@ -82,7 +87,7 @@ const RecycledQuotationList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteQuotation(id).unwrap();
+        await permanantlyDeleteQuotation({ tenantDomain: domain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Quotation has been permanently deleted.",
@@ -142,7 +147,6 @@ const RecycledQuotationList = () => {
         <div className="w-full mt-5 mb-24">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-3xl font-bold text-center ">
-     
               Recycled Bin Quotation List:
             </h3>
             <div className="flex items-center">

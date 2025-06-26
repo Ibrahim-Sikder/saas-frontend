@@ -65,7 +65,6 @@ import Message from "../pages/Message/Message";
 import Notification from "../pages/Notification/Notification";
 import EmployeeHoliday from "../pages/Holiday/Holiday";
 import ShiftList from "../pages/Home/Employee/ShiftAndSchedule/ShiftList";
-import PrivateRoute from "./PrivateRoute";
 import UpdateBillPay from "../pages/BillPay/UpdateBillPay";
 import BillPayInvoice from "../pages/BillPay/BillPayInvoice";
 import PurchaseList from "../pages/Home/Parchase/PurchasList";
@@ -131,7 +130,8 @@ import StockAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import AddAdjustment from "../pages/Inventory/Adjustment/AddAdjustment";
 import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import CreateTenant from "../pages/Tenant/CreateTenant";
-// import LandingPage from "../pages/Login/LandingPage";
+import LandingPage from "../pages/Login/LandingPage";
+import SubscriptionManagement from "../pages/Subscription/Subscription";
 
 export const router = createBrowserRouter([
   {
@@ -161,6 +161,14 @@ export const router = createBrowserRouter([
       {
         path: "tenant",
         element: <TenantRegistrationPage />,
+      },
+      {
+        path: "landing-page",
+        element: <LandingPage />,
+      },
+      {
+        path: "subscription",
+        element: <SubscriptionManagement />,
       },
       {
         path: "subscription",

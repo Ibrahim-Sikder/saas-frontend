@@ -373,7 +373,7 @@ const EmployeeProfile = () => {
 
           <div>
             <p className="my-5 text-center">
-              © Copyright 2024 | Trust Auto Solution | All Rights Reserved
+              © Copyright 2024 | Softypy Garage | All Rights Reserved
             </p>
           </div>
         </div>

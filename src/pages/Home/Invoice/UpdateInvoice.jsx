@@ -24,6 +24,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 import {
+  useGetSingleInvoiceQuery,
   useRemoveInvoiceMutation,
   useUpdateInvoiceMutation,
 } from "../../../redux/api/invoice";
@@ -37,6 +38,7 @@ const UpdateInvoice = () => {
   const [serviceTotal, setServiceTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const [discount, setDiscount] = useState("");
   const [vat, setVAT] = useState("");
@@ -232,19 +234,12 @@ const UpdateInvoice = () => {
     }
   };
 
+  const { data } = useGetSingleInvoiceQuery({ tenantDomain, id });
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/invoices/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSpecificInvoice(data.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching invoice:", error);
-        setIsLoading(false);
-      });
-  }, [id, reload]);
+    if (data?.data) {
+      setSpecificInvoice(data.data);
+    }
+  }, [data]);
 
   useEffect(() => {
     const totalSum = specificInvoice.input_data?.reduce(
@@ -747,17 +742,20 @@ const UpdateInvoice = () => {
       };
 
       const values = {
+        tenantDomain,
         customer,
         company,
         showRoom,
         vehicle,
         invoice,
       };
-
-      const newValue = {
+  const newValue = {
         id: id,
-        data: values,
+        data: {
+          ...values,
+        },
       };
+      
 
       if (removeButton === "") {
         const res = await updateInvoice(newValue).unwrap();
@@ -801,14 +799,14 @@ const UpdateInvoice = () => {
     navigate(`/dashboard/detail?id=${id}`);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <CircularProgress size={60} thickness={4} color="primary" />
-        <p className="ml-4 text-xl">Loading invoice data...</p>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <CircularProgress size={60} thickness={4} color="primary" />
+  //       <p className="ml-4 text-xl">Loading invoice data...</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="px-5 py-10">
@@ -820,7 +818,7 @@ const UpdateInvoice = () => {
         />
         <div>
           <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            Trust Auto Solution{" "}
+            Softypy Garage{" "}
           </h2>
           <span className="text-[12px] lg:text-xl mt-5 block">
             Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

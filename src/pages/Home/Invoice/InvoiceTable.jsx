@@ -16,6 +16,8 @@ const InvoiceTable = () => {
   const [filterType, setFilterType] = useState("");
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+const tenantDomain = window.location.hostname.split(".")[0];
+
 
   const navigate = useNavigate();
   const textInputRef = useRef(null);
@@ -31,12 +33,12 @@ const InvoiceTable = () => {
 
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
       isRecycled: false,
     });
-  console.log("all invoices", allInvoices);
   const handleMoveToRecycledbin = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",
@@ -47,7 +49,7 @@ const InvoiceTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice(id).unwrap();
+        await moveRecycledInvoice({tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

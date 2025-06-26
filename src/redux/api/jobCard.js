@@ -44,6 +44,7 @@ const jobCardApi = baseApi.injectEndpoints({
         params: { tenantDomain, jobNo },
       }),
       providesTags: ["jobCard"],
+      
     }),
     updateJobCard: builder.mutation({
       query: (jobCardInfo) => {

@@ -21,14 +21,13 @@ import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
 import { cmDmOptions, countries } from "../../../constant";
 import {
   useCreateQuotationMutation,
-  useDeleteQuotationMutation,
-  useGetAllQuotationsQuery,
 } from "../../../redux/api/quotation";
 import QuotationTable from "./QuotationTable";
 import { unitOptions } from "../../../utils/options";
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
 import { formatNumber } from "../../../utils/formateSemicolon";
+import { getTenantName } from "../../../utils/getTenantName";
 
 const AddQuotation = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
@@ -84,6 +83,7 @@ const AddQuotation = () => {
   const [activeInputIndex, setActiveInputIndex] = useState(null);
 
   const limit = 10;
+  const domain = window.location.hostname.split(".")[0];
 
   const {
     register,
@@ -92,6 +92,7 @@ const AddQuotation = () => {
     formState: { errors },
   } = useForm();
   const queryParams = {
+    tenantDomain: domain,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
@@ -101,26 +102,19 @@ const AddQuotation = () => {
 
   const [
     createQuotation,
-    { error: createQuotationError, isLoading: createLoading },
+    {  isLoading: createLoading },
   ] = useCreateQuotationMutation();
-  const [deleteQuotation, { isLoading: deleteLoading, error: deleteError }] =
-    useDeleteQuotationMutation();
 
   const {
     data: jobCardData,
     refetch,
     error,
-  } = useGetSingleJobCardWithJobNoQuery(orderNumber);
-
-  const {
-    data: allQuotations,
-    isLoading: quotationLoading,
-    refetch: allQuotationRefetch,
-  } = useGetAllQuotationsQuery({
-    limit,
-    page: currentPage,
-    searchTerm: filterType,
+  } = useGetSingleJobCardWithJobNoQuery({
+    tenantDomain: domain,
+    jobNo: orderNumber,
   });
+
+  console.log("jobdata order number", orderNumber);
 
   useEffect(() => {
     if (jobCardData?.data?.date) {
@@ -246,10 +240,9 @@ const AddQuotation = () => {
   };
 
   const handleRemove = (index) => {
-    // Check if index is a valid number and within the array bounds
     if (typeof index === "number" && index >= 0 && index < items.length) {
       const list = [...items];
-      list.splice(index, 1); // Remove item at the specified index
+      list.splice(index, 1);
       setItems(list);
     } else {
       console.error("Invalid index");
@@ -304,9 +297,6 @@ const AddQuotation = () => {
   const handleServiceDescriptionChange = (index, value) => {
     const newItems = [...serviceItems];
     newItems[index].description = value;
-
-    // If the user is typing manually, remove any product/warehouse references
-    // This ensures we don't have partial data that might cause backend validation issues
     if (newItems[index].product) {
       delete newItems[index].product;
       delete newItems[index].warehouse;
@@ -325,9 +315,6 @@ const AddQuotation = () => {
   const handleDescriptionChange = (index, value) => {
     const newItems = [...items];
     newItems[index].description = value;
-
-    // If the user is typing manually, remove any product/warehouse references
-    // This ensures we don't have partial data that might cause backend validation issues
     if (newItems[index].product) {
       delete newItems[index].product;
       delete newItems[index].warehouse;
@@ -356,8 +343,6 @@ const AddQuotation = () => {
 
   const handleQuantityChange = (index, value) => {
     const newItems = [...items];
-
-    // Round the value to the nearest integer
     const roundedValue = Math.round(value) || 0;
 
     newItems[index].quantity = roundedValue;
@@ -381,36 +366,23 @@ const AddQuotation = () => {
   };
 
   const handleRateChange = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
 
     const newItems = [...items];
-
-    // Store the actual numeric value for calculations
     newItems[index].rate = Number.parseFloat(numericValue) || 0;
 
-    // Calculate total with the updated rate
     newItems[index].total = newItems[index].quantity * newItems[index].rate;
-
-    // Round total to two decimal places
     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 
     setItems(newItems);
   };
 
   const handleServiceRateChange = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
 
     const newItems = [...serviceItems];
-
-    // Store the actual numeric value for calculations
     newItems[index].rate = Number.parseFloat(numericValue) || 0;
-
-    // Calculate total with the updated rate
     newItems[index].total = newItems[index].quantity * newItems[index].rate;
-
-    // Round total to two decimal places
     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 
     setServiceItems(newItems);
@@ -505,17 +477,13 @@ const AddQuotation = () => {
     setShowSuggestions(false);
   };
 
-  // Function to prepare items for submission
   const prepareItemsForSubmission = (itemsArray) => {
     return itemsArray.map((item) => {
-      // If the item has product and warehouse, it's from stock
       if (item.product && item.warehouse) {
         return item;
       } else {
-        // For manually entered items, add default warehouse
         return {
           ...item,
-          // Don't include product or warehouse fields for manual entries
         };
       }
     });
@@ -523,6 +491,7 @@ const AddQuotation = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Quotation...");
+   const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
 
@@ -602,13 +571,13 @@ const AddQuotation = () => {
       logo,
     };
     const values = {
+      tenantDomain,
       customer,
       company,
       showRoom,
       vehicle,
       quotation,
     };
-    console.log("submit value", values);
     try {
       const res = await createQuotation(values).unwrap();
       console.log("response", res);
@@ -629,7 +598,6 @@ const AddQuotation = () => {
         }
 
         refetch();
-        allQuotationRefetch();
       }
     } catch (err) {
       const errorMessage =
@@ -658,12 +626,7 @@ const AddQuotation = () => {
     };
   }, [showSuggestions]);
 
-  if (quotationLoading) {
-    return <Loading />;
-  }
-  if (deleteError) {
-    toast.error(deleteError?.message);
-  }
+
 
   return (
     <div className="md:px-5 md:py-10">
@@ -676,7 +639,7 @@ const AddQuotation = () => {
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Trust Auto Solution{" "}
+              Softypy Garage{" "}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
               Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

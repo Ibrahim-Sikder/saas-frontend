@@ -525,7 +525,7 @@ const UpdateJobCard = () => {
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Trust Auto Solution{" "}
+              Softypy Garage{" "}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
               Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229

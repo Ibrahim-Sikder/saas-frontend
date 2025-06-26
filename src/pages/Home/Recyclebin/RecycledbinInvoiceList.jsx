@@ -17,6 +17,7 @@ const InvoiceTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,6 +35,7 @@ const InvoiceTable = () => {
 
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -63,7 +65,7 @@ const InvoiceTable = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledInvoice(id).unwrap();
+        await restoreFromRecycledInvoice({ tenantDomain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Invoice has been restored successfully.",
@@ -80,7 +82,10 @@ const InvoiceTable = () => {
       }
     } else if (result === "delete") {
       try {
-        const res = await permanantlyDeleteInvoice(id).unwrap();
+        const res = await permanantlyDeleteInvoice({
+          tenantDomain,
+          id,
+        }).unwrap();
 
         swal({
           title: "Deleted!",
@@ -117,7 +122,9 @@ const InvoiceTable = () => {
     <div className="mt-5 overflow-x-auto">
       <div className=" overflow-x-auto">
         <div className="flex flex-wrap  items-center justify-between mb-5">
-          <h3 className="mb-3 text-xl  md:text-3xl font-bold">Recycledbin Invoice List:</h3>
+          <h3 className="mb-3 text-xl  md:text-3xl font-bold">
+            Recycledbin Invoice List:
+          </h3>
           <div className="flex items-center searcList">
             <div className="searchGroup">
               <input

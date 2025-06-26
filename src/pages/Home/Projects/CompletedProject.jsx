@@ -17,6 +17,7 @@ const InvoiceTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
+ const tenantDomain = window.location.hostname.split(".")[0];
 
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +36,7 @@ const InvoiceTable = () => {
 
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -50,7 +52,7 @@ const InvoiceTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice(id).unwrap();
+        await moveRecycledInvoice({tenantDomain,id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

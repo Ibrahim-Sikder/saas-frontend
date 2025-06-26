@@ -73,6 +73,7 @@ const MoneyReceiptView = () => {
   const location = useLocation();
   const jobNo = new URLSearchParams(location.search).get("order_no");
   const net_total = new URLSearchParams(location.search).get("net_total");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const parsedDate = new Date();
   const day = parsedDate.getDate().toString().padStart(2, "0");
@@ -117,8 +118,10 @@ const MoneyReceiptView = () => {
   const [createMoneyReceipt, { isLoading: createLoading }] =
     useCreateMoneyReceiptMutation();
 
-  const { data: jobCard, isLoading } =
-    useGetSingleJobCardWithJobNoQuery(job_no);
+ const { data: jobCard, isLoading } = useGetSingleJobCardWithJobNoQuery({
+  tenantDomain,
+  jobNo: job_no, 
+});
 
   const amountInWords = (amount) => {
     const numberWords = [
@@ -318,6 +321,7 @@ const MoneyReceiptView = () => {
     data.remaining = numRemaining;
 
     const values = {
+           tenantDomain,
       Id: jobCard?.data?.Id,
       user_type: jobCard?.data?.user_type,
       job_no: job_no,
@@ -418,14 +422,12 @@ const MoneyReceiptView = () => {
         <Button
           onClick={handleBack}
           startIcon={<ArrowBack />}
-          sx={{ mr: 2, color: "#fff", borderRadius:5 }}
+          sx={{ mr: 2, color: "#fff", borderRadius: 5 }}
         >
           Back
         </Button>
         <HiOutlineUserGroup className="invoicIcon" />
       </div>
-
-
 
       <div className="md:w-[1300px] p-2 md:p-5 border border-black rounded-[5px] m-[30px] mx-auto ">
         <div className="flex items-center justify-between flex-col lg:flex-row gap-3  ">
@@ -433,7 +435,7 @@ const MoneyReceiptView = () => {
             <img className="" src={logo || "/placeholder.svg"} alt="logo" />
           </div>
           <div className="md:w-[570px] text-center text-[#0950a1]  ">
-            <h2 className="receivedTitle md:mb-2">Trust Auto Solution </h2>
+            <h2 className="receivedTitle md:mb-2">Softypy Garage </h2>
             <span className="text-xs md:text-sm">
               It's trusted computerized Organization for all kinds of vehicle
               cheque up & maintenance such as computerized Engine Analysis,

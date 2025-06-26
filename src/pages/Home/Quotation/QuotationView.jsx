@@ -11,6 +11,7 @@ import "../Invoice/Invoice.css";
 import "./Quotation.css";
 import { Divider } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
+import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 
 const Detail = () => {
   const componentRef = useRef();
@@ -18,6 +19,7 @@ const Detail = () => {
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -26,23 +28,21 @@ const Detail = () => {
   const [quotationPreview, setQuotationPreview] = useState({});
   console.log("quotation preview", quotationPreview);
   const [loading, setLoading] = useState(false);
+  const { data } = useGetSingleQuotationQuery({
+    tenantDomain,
+    id,
+  });
 
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      fetch(`${import.meta.env.VITE_API_URL}/quotations/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setQuotationPreview(data.data);
-          setLoading(false);
-        });
+    if (data?.data) {
+      setQuotationPreview(data.data);
     }
-  }, [id]);
+  }, [data]);
 
   if (loading) {
     return <Loading />;
   }
-  
+
   return (
     <div ref={componentRef} className="h-screen">
       <main ref={targetRef} className="invoicePrintWrap">
@@ -54,7 +54,7 @@ const Detail = () => {
                   <img className="w-[120px] " src={logo} alt="logo" />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                      Trust Auto Solution{" "}
+                      Softypy Garage{" "}
                     </h2>
                     <small className="block">
                       Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
@@ -213,7 +213,10 @@ const Detail = () => {
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}
-                        {quotationPreview?.vehicle?.mileageHistory?.[0]?.mileage}
+                        {
+                          quotationPreview?.vehicle?.mileageHistory?.[0]
+                            ?.mileage
+                        }
                       </small>
                     </div>
                   </div>

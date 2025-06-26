@@ -13,20 +13,24 @@ import { Button } from "@mui/material";
 const PdfGenerator = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
-  const { data: singleMoneyReceipt, isLoading } =
-    useGetSingleMoneyReceiptQuery(id);
+  const { data: singleMoneyReceipt, isLoading } = useGetSingleMoneyReceiptQuery(
+    {
+      tenantDomain,
+      id,
+    }
+  );
 
   if (isLoading) {
     return <Loading />;
   }
 
-  console.log('single money receipt',singleMoneyReceipt);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -48,7 +52,7 @@ const PdfGenerator = () => {
 
               <div className="moneyHead moneyHead2">
                 <h2 className="receivedTitle receivedTitle2">
-                  Trust Auto Solution{" "}
+                  Softypy Garage{" "}
                 </h2>
                 <span className="mt-1 block">
                   It's trusted computerized Organization for all kinds of
