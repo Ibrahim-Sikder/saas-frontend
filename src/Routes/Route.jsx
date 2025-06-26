@@ -19,7 +19,6 @@ import AddJobCard from "../pages/Home/AddJobCard/AddJobCard";
 import PreviewJobCard from "../pages/Home/AddJobCard/PreviewJobCard/PreviewJobCard";
 import UpdateProduct from "../pages/Home/Products/UpdateProduct";
 import UpdateRole from "../pages/Home/Role/UpdateRole";
-import Login from "../pages/Login/Login";
 import DashboardLayout from "../Layout/DashboardLayout";
 import MoneyReceived from "../pages/Home/MoneyReceived/MoneyReceived";
 import MoneyReceiptList from "../pages/Home/MoneyReceived/MoneyReceiptList";
@@ -140,7 +139,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Login />,
+        element: <LandingPage />,
       },
       {
         path: "signup",
@@ -162,10 +161,7 @@ export const router = createBrowserRouter([
         path: "tenant",
         element: <TenantRegistrationPage />,
       },
-      {
-        path: "landing-page",
-        element: <LandingPage />,
-      },
+    
       {
         path: "subscription",
         element: <SubscriptionManagement />,

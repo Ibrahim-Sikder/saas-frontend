@@ -136,7 +136,7 @@ const handleSubmit = async (data) => {
         <Box sx={{ textAlign: "center", mt: 2 }}>
           <Typography variant="body2">
             Don't have an account?{" "}
-            <Link component={RouterLink} to="/register" variant="body2">
+            <Link component={RouterLink} to="/signup" variant="body2">
               Sign up
             </Link>
           </Typography>

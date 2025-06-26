@@ -1,7 +1,9 @@
-"use client"
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/prop-types */
+"use client";
 
-import React from "react"
-import { useState, useEffect, useRef } from "react"
+import React from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   AppBar,
   Box,
@@ -27,7 +29,7 @@ import {
   Paper,
   TextField,
   Drawer,
-} from "@mui/material"
+} from "@mui/material";
 import {
   CheckCircle,
   DirectionsCar,
@@ -59,15 +61,23 @@ import {
   Verified,
   AutoAwesome,
   PersonAdd,
-} from "@mui/icons-material"
-import { motion, useScroll, useTransform } from "framer-motion"
+} from "@mui/icons-material";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
 
 // Floating Particles Component
 const FloatingParticles = () => {
-  const particles = Array.from({ length: 30 }, (_, i) => i)
+  const particles = Array.from({ length: 30 }, (_, i) => i);
 
   return (
-    <Box sx={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+    <Box
+      sx={{
+        position: "absolute",
+        inset: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+      }}
+    >
       {particles.map((particle) => (
         <motion.div
           key={particle}
@@ -76,7 +86,9 @@ const FloatingParticles = () => {
             width: Math.random() * 4 + 2,
             height: Math.random() * 4 + 2,
             borderRadius: "50%",
-            background: `linear-gradient(45deg, #1976d2${Math.floor(Math.random() * 100)}, #00bcd4${Math.floor(Math.random() * 100)})`,
+            background: `linear-gradient(45deg, #1976d2${Math.floor(
+              Math.random() * 100
+            )}, #00bcd4${Math.floor(Math.random() * 100)})`,
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
           }}
@@ -93,41 +105,41 @@ const FloatingParticles = () => {
         />
       ))}
     </Box>
-  )
-}
+  );
+};
 
 // Animated Counter Component
 const AnimatedCounter = ({ value, suffix = "", duration = 2 }) => {
-  const [count, setCount] = useState(0)
-  const countRef = useRef(null)
+  const [count, setCount] = useState(0);
+  const countRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          let start = 0
-          const end = value
-          const increment = end / (duration * 60)
+          let start = 0;
+          const end = value;
+          const increment = end / (duration * 60);
           const timer = setInterval(() => {
-            start += increment
+            start += increment;
             if (start >= end) {
-              setCount(end)
-              clearInterval(timer)
+              setCount(end);
+              clearInterval(timer);
             } else {
-              setCount(Math.floor(start))
+              setCount(Math.floor(start));
             }
-          }, 1000 / 60)
+          }, 1000 / 60);
         }
       },
-      { threshold: 0.5 },
-    )
+      { threshold: 0.5 }
+    );
 
     if (countRef.current) {
-      observer.observe(countRef.current)
+      observer.observe(countRef.current);
     }
 
-    return () => observer.disconnect()
-  }, [value, duration])
+    return () => observer.disconnect();
+  }, [value, duration]);
 
   return (
     <Typography
@@ -135,7 +147,8 @@ const AnimatedCounter = ({ value, suffix = "", duration = 2 }) => {
       variant="h2"
       sx={{
         fontWeight: 900,
-        background: "linear-gradient(135deg, #1976d2 0%, #00bcd4 50%, #ff9800 100%)",
+        background:
+          "linear-gradient(135deg, #1976d2 0%, #00bcd4 50%, #ff9800 100%)",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         fontSize: { xs: "2rem", md: "3rem" },
@@ -144,19 +157,18 @@ const AnimatedCounter = ({ value, suffix = "", duration = 2 }) => {
       {count.toLocaleString()}
       {suffix}
     </Typography>
-  )
-}
+  );
+};
 
 const GarageERP = () => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const { scrollY } = useScroll()
-  const y1 = useTransform(scrollY, [0, 500], [0, 150])
-  const y2 = useTransform(scrollY, [0, 500], [0, -150])
-  const opacity = useTransform(scrollY, [0, 300], [1, 0])
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
 
   // Enhanced color palette
   const colors = {
@@ -167,99 +179,109 @@ const GarageERP = () => {
     purple: "#9c27b0",
     pink: "#e91e63",
     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    gradientHero: "linear-gradient(135deg, #1976d2 0%, #00bcd4 30%, #9c27b0 60%, #ff9800 100%)",
-    gradientCard: "linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+    gradientHero:
+      "linear-gradient(135deg, #1976d2 0%, #00bcd4 30%, #9c27b0 60%, #ff9800 100%)",
+    gradientCard:
+      "linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
     neon: "linear-gradient(45deg, #ff006e, #8338ec, #3a86ff)",
-  }
+  };
 
   // Smooth scroll function
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId)
+    const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({
         behavior: "smooth",
         block: "start",
-      })
+      });
     }
-    setDrawerOpen(false)
-  }
+    setDrawerOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
+      setScrolled(window.scrollY > 50);
+    };
 
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
   // Workflow steps
   const workflowSteps = [
     {
       step: 1,
       title: "Customer Registration",
-      description: "Easy customer onboarding with complete profile management and vehicle history tracking.",
+      description:
+        "Easy customer onboarding with complete profile management and vehicle history tracking.",
       icon: <PersonAdd fontSize="large" />,
       color: colors.primary,
     },
     {
       step: 2,
       title: "Job Card Creation",
-      description: "Digital job cards with photos, diagnostics, and real-time progress tracking.",
+      description:
+        "Digital job cards with photos, diagnostics, and real-time progress tracking.",
       icon: <Assignment fontSize="large" />,
       color: colors.secondary,
     },
     {
       step: 3,
       title: "Smart Quotation",
-      description: "AI-powered quotations with parts pricing, labor costs, and approval workflows.",
+      description:
+        "AI-powered quotations with parts pricing, labor costs, and approval workflows.",
       icon: <RequestQuote fontSize="large" />,
       color: colors.accent,
     },
     {
       step: 4,
       title: "Professional Invoice",
-      description: "Automated invoicing with tax calculations, multiple payment options, and delivery.",
+      description:
+        "Automated invoicing with tax calculations, multiple payment options, and delivery.",
       icon: <Receipt fontSize="large" />,
       color: colors.success,
     },
     {
       step: 5,
       title: "Payment Processing",
-      description: "Secure payment gateway integration with multiple payment methods and receipts.",
+      description:
+        "Secure payment gateway integration with multiple payment methods and receipts.",
       icon: <Payment fontSize="large" />,
       color: colors.purple,
     },
     {
       step: 6,
       title: "Inventory Management",
-      description: "Real-time inventory tracking with auto-reordering and supplier management.",
+      description:
+        "Real-time inventory tracking with auto-reordering and supplier management.",
       icon: <Inventory fontSize="large" />,
       color: colors.pink,
     },
     {
       step: 7,
       title: "Account Management",
-      description: "Complete financial management with P&L reports, cash flow, and business analytics.",
+      description:
+        "Complete financial management with P&L reports, cash flow, and business analytics.",
       icon: <AccountBalance fontSize="large" />,
       color: "#795548",
     },
-  ]
+  ];
 
   // Features data
   const features = [
     {
       title: "Customer Management",
-      description: "Complete 360° customer lifecycle management with AI-powered insights and personalized experiences.",
+      description:
+        "Complete 360° customer lifecycle management with AI-powered insights and personalized experiences.",
       icon: <People fontSize="large" />,
       color: colors.primary,
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -288,7 +310,8 @@ const GarageERP = () => {
     },
     {
       title: "Smart Quotations",
-      description: "AI-powered quotation system with dynamic pricing, parts integration, and instant approvals.",
+      description:
+        "AI-powered quotation system with dynamic pricing, parts integration, and instant approvals.",
       icon: <RequestQuote fontSize="large" />,
       color: colors.accent,
       gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
@@ -317,7 +340,8 @@ const GarageERP = () => {
     },
     {
       title: "Payment Gateway",
-      description: "Secure payment processing with multiple payment methods, installments, and automated receipts.",
+      description:
+        "Secure payment processing with multiple payment methods, installments, and automated receipts.",
       icon: <Payment fontSize="large" />,
       color: colors.purple,
       gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
@@ -331,7 +355,8 @@ const GarageERP = () => {
     },
     {
       title: "Inventory Control",
-      description: "Smart inventory management with predictive analytics, auto-reordering, and supplier integration.",
+      description:
+        "Smart inventory management with predictive analytics, auto-reordering, and supplier integration.",
       icon: <Inventory fontSize="large" />,
       color: colors.pink,
       gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
@@ -345,7 +370,8 @@ const GarageERP = () => {
     },
     {
       title: "Financial Management",
-      description: "Complete accounting solution with P&L reports, cash flow management, and business intelligence.",
+      description:
+        "Complete accounting solution with P&L reports, cash flow management, and business intelligence.",
       icon: <AccountBalance fontSize="large" />,
       color: "#795548",
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -372,7 +398,7 @@ const GarageERP = () => {
         "📋 Custom Reports",
       ],
     },
-  ]
+  ];
 
   // Client testimonials
   const testimonials = [
@@ -420,7 +446,7 @@ const GarageERP = () => {
         "The complete workflow from job card to payment is incredible. Our customers love the transparency and we love the efficiency. Highly recommended!",
       badge: "💎 Premium User",
     },
-  ]
+  ];
 
   // Pricing plans
   const pricingPlans = [
@@ -488,7 +514,7 @@ const GarageERP = () => {
       gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
       savings: "Save $1200/year",
     },
-  ]
+  ];
 
   // Client logos
   const clientLogos = [
@@ -498,15 +524,39 @@ const GarageERP = () => {
     { name: "Premium Auto", logo: "/placeholder.svg?height=60&width=120" },
     { name: "Garage Master", logo: "/placeholder.svg?height=60&width=120" },
     { name: "Auto Excellence", logo: "/placeholder.svg?height=60&width=120" },
-  ]
+  ];
 
   // Stats data
   const stats = [
-    { value: 2500, label: "Happy Clients", suffix: "+", icon: <People />, color: colors.primary },
-    { value: 150000, label: "Vehicles Managed", suffix: "+", icon: <DirectionsCar />, color: colors.secondary },
-    { value: 99.99, label: "Uptime Guarantee", suffix: "%", icon: <Shield />, color: colors.success },
-    { value: 85, label: "Average Growth", suffix: "%", icon: <TrendingUp />, color: colors.accent },
-  ]
+    {
+      value: 2500,
+      label: "Happy Clients",
+      suffix: "+",
+      icon: <People />,
+      color: colors.primary,
+    },
+    {
+      value: 150000,
+      label: "Vehicles Managed",
+      suffix: "+",
+      icon: <DirectionsCar />,
+      color: colors.secondary,
+    },
+    {
+      value: 99.99,
+      label: "Uptime Guarantee",
+      suffix: "%",
+      icon: <Shield />,
+      color: colors.success,
+    },
+    {
+      value: 85,
+      label: "Average Growth",
+      suffix: "%",
+      icon: <TrendingUp />,
+      color: colors.accent,
+    },
+  ];
 
   // Navigation items
   const navItems = [
@@ -517,7 +567,7 @@ const GarageERP = () => {
     { label: "Testimonials", id: "testimonials" },
     { label: "Consultancy", id: "consultancy" },
     { label: "Contact", id: "contact" },
-  ]
+  ];
 
   return (
     <Box sx={{ overflow: "hidden", position: "relative" }}>
@@ -530,7 +580,8 @@ const GarageERP = () => {
           width: 20,
           height: 20,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(25,118,210,0.3) 0%, transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(25,118,210,0.3) 0%, transparent 70%)",
           pointerEvents: "none",
           zIndex: 9999,
         }}
@@ -550,8 +601,12 @@ const GarageERP = () => {
           backdropFilter: scrolled ? "blur(20px)" : "none",
           backgroundColor: scrolled ? alpha("#ffffff", 0.95) : "transparent",
           transition: "all 0.3s ease",
-          borderBottom: scrolled ? `1px solid ${alpha(colors.primary, 0.1)}` : "none",
-          boxShadow: scrolled ? `0 8px 32px ${alpha(colors.primary, 0.1)}` : "none",
+          borderBottom: scrolled
+            ? `1px solid ${alpha(colors.primary, 0.1)}`
+            : "none",
+          boxShadow: scrolled
+            ? `0 8px 32px ${alpha(colors.primary, 0.1)}`
+            : "none",
         }}
       >
         <Toolbar sx={{ py: 1 }}>
@@ -604,11 +659,21 @@ const GarageERP = () => {
           </Box>
 
           {isMobile ? (
-            <IconButton size="large" edge="end" color="inherit" sx={{ ml: "auto" }} onClick={() => setDrawerOpen(true)}>
+            <IconButton
+              size="large"
+              edge="end"
+              color="inherit"
+              sx={{ ml: "auto" }}
+              onClick={() => setDrawerOpen(true)}
+            >
               <MenuIcon />
             </IconButton>
           ) : (
-            <Stack direction="row" spacing={1} sx={{ ml: "auto", alignItems: "center" }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ ml: "auto", alignItems: "center" }}
+            >
               {navItems.map((item) => (
                 <motion.div key={item.id} whileHover={{ y: -2 }}>
                   <Button
@@ -621,7 +686,10 @@ const GarageERP = () => {
                       borderRadius: 3,
                       position: "relative",
                       "&:hover": {
-                        background: `linear-gradient(135deg, ${alpha(colors.primary, 0.1)} 0%, ${alpha(colors.secondary, 0.1)} 100%)`,
+                        background: `linear-gradient(135deg, ${alpha(
+                          colors.primary,
+                          0.1
+                        )} 0%, ${alpha(colors.secondary, 0.1)} 100%)`,
                         "&::after": {
                           content: '""',
                           position: "absolute",
@@ -641,8 +709,13 @@ const GarageERP = () => {
                 </motion.div>
               ))}
 
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
+                  component={Link}
+                  to="/login"
                   variant="outlined"
                   sx={{
                     borderWidth: 2,
@@ -665,7 +738,10 @@ const GarageERP = () => {
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="contained"
                   sx={{
@@ -705,7 +781,14 @@ const GarageERP = () => {
           },
         }}
       >
-        <Box sx={{ p: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" fontWeight="bold">
             Menu
           </Typography>
@@ -716,7 +799,11 @@ const GarageERP = () => {
         <Divider sx={{ borderColor: alpha("#ffffff", 0.2) }} />
         <List>
           {navItems.map((item) => (
-            <ListItem button key={item.id} onClick={() => scrollToSection(item.id)}>
+            <ListItem
+              button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+            >
               <ListItemText primary={item.label} />
             </ListItem>
           ))}
@@ -732,9 +819,18 @@ const GarageERP = () => {
           alignItems: "center",
           position: "relative",
           background: `
-            radial-gradient(circle at 20% 80%, ${alpha(colors.primary, 0.1)} 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, ${alpha(colors.secondary, 0.1)} 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, ${alpha(colors.purple, 0.05)} 0%, transparent 50%)
+            radial-gradient(circle at 20% 80%, ${alpha(
+              colors.primary,
+              0.1
+            )} 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, ${alpha(
+              colors.secondary,
+              0.1
+            )} 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, ${alpha(
+              colors.purple,
+              0.05
+            )} 0%, transparent 50%)
           `,
           pt: { xs: 12, md: 0 },
           overflow: "hidden",
@@ -772,7 +868,10 @@ const GarageERP = () => {
               width: 200,
               height: 200,
               borderRadius: "50%",
-              background: `linear-gradient(45deg, ${alpha(colors.accent, 0.2)}, ${alpha(colors.pink, 0.2)})`,
+              background: `linear-gradient(45deg, ${alpha(
+                colors.accent,
+                0.2
+              )}, ${alpha(colors.pink, 0.2)})`,
               filter: "blur(40px)",
             }}
           />
@@ -781,11 +880,18 @@ const GarageERP = () => {
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
           <Grid container spacing={8} alignItems="center">
             <Grid item xs={12} md={6}>
-              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
                 <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                    transition={{
+                      duration: 2,
+                      repeat: Number.POSITIVE_INFINITY,
+                    }}
                   >
                     <Chip
                       label="🏆 #1 Garage Management Platform"
@@ -827,7 +933,10 @@ const GarageERP = () => {
                   >
                     Management Solution
                   </Box>
-                  <Box component="span" sx={{ fontSize: "0.5em", opacity: 0.8 }}>
+                  <Box
+                    component="span"
+                    sx={{ fontSize: "0.5em", opacity: 0.8 }}
+                  >
                     From Customer to Payment
                   </Box>
                 </Typography>
@@ -842,16 +951,28 @@ const GarageERP = () => {
                     maxWidth: 600,
                   }}
                 >
-                  Streamline your entire garage workflow with our AI-powered platform.
-                  <Box component="span" sx={{ fontWeight: 700, color: colors.primary }}>
+                  Streamline your entire garage workflow with our AI-powered
+                  platform.
+                  <Box
+                    component="span"
+                    sx={{ fontWeight: 700, color: colors.primary }}
+                  >
                     {" "}
-                    Customer → Job Card → Quotation → Invoice → Payment → Inventory → Accounts{" "}
+                    Customer → Job Card → Quotation → Invoice → Payment →
+                    Inventory → Accounts{" "}
                   </Box>
                   - all in one seamless system.
                 </Typography>
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={3} sx={{ mb: 6 }}>
-                  <motion.div whileHover={{ scale: 1.05, y: -5 }} whileTap={{ scale: 0.95 }}>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={3}
+                  sx={{ mb: 6 }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Button
                       variant="contained"
                       size="large"
@@ -868,7 +989,10 @@ const GarageERP = () => {
                         overflow: "hidden",
                         "&:hover": {
                           background: colors.neon,
-                          boxShadow: `0 20px 60px ${alpha(colors.primary, 0.6)}`,
+                          boxShadow: `0 20px 60px ${alpha(
+                            colors.primary,
+                            0.6
+                          )}`,
                         },
                         "&::before": {
                           content: '""',
@@ -877,7 +1001,8 @@ const GarageERP = () => {
                           left: "-100%",
                           width: "100%",
                           height: "100%",
-                          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                          background:
+                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
                           transition: "left 0.6s",
                         },
                         "&:hover::before": {
@@ -889,7 +1014,10 @@ const GarageERP = () => {
                     </Button>
                   </motion.div>
 
-                  <motion.div whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }}>
+                  <motion.div
+                    whileHover={{ scale: 1.05, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Button
                       variant="outlined"
                       size="large"
@@ -905,8 +1033,14 @@ const GarageERP = () => {
                         borderRadius: 4,
                         "&:hover": {
                           borderWidth: 3,
-                          background: `linear-gradient(135deg, ${alpha(colors.primary, 0.1)} 0%, ${alpha(colors.secondary, 0.1)} 100%)`,
-                          boxShadow: `0 15px 40px ${alpha(colors.primary, 0.3)}`,
+                          background: `linear-gradient(135deg, ${alpha(
+                            colors.primary,
+                            0.1
+                          )} 0%, ${alpha(colors.secondary, 0.1)} 100%)`,
+                          boxShadow: `0 15px 40px ${alpha(
+                            colors.primary,
+                            0.3
+                          )}`,
                         },
                       }}
                     >
@@ -915,14 +1049,23 @@ const GarageERP = () => {
                   </motion.div>
                 </Stack>
 
-                <Stack direction="row" spacing={6} alignItems="center" flexWrap="wrap">
+                <Stack
+                  direction="row"
+                  spacing={6}
+                  alignItems="center"
+                  flexWrap="wrap"
+                >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Stack direction="row" spacing={0.5}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <motion.div
                           key={star}
                           animate={{ rotate: [0, 360] }}
-                          transition={{ duration: 2, delay: star * 0.1, repeat: Number.POSITIVE_INFINITY }}
+                          transition={{
+                            duration: 2,
+                            delay: star * 0.1,
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
                         >
                           <Star sx={{ color: "#ffc107", fontSize: 24 }} />
                         </motion.div>
@@ -1038,7 +1181,11 @@ const GarageERP = () => {
                           <TrendingUp sx={{ color: "#ffffff", fontSize: 24 }} />
                         </Box>
                         <Box>
-                          <Typography variant="h6" fontWeight="bold" sx={{ color: colors.success }}>
+                          <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                            sx={{ color: colors.success }}
+                          >
                             +250% Revenue
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -1075,7 +1222,10 @@ const GarageERP = () => {
                         background: colors.gradientCard,
                         backdropFilter: "blur(20px)",
                         border: `1px solid ${alpha("#ffffff", 0.3)}`,
-                        boxShadow: `0 20px 60px ${alpha(colors.secondary, 0.3)}`,
+                        boxShadow: `0 20px 60px ${alpha(
+                          colors.secondary,
+                          0.3
+                        )}`,
                         minWidth: 180,
                       }}
                     >
@@ -1090,7 +1240,11 @@ const GarageERP = () => {
                           <Speed sx={{ color: "#ffffff", fontSize: 24 }} />
                         </Box>
                         <Box>
-                          <Typography variant="h6" fontWeight="bold" sx={{ color: colors.secondary }}>
+                          <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                            sx={{ color: colors.secondary }}
+                          >
                             85% Faster
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -1117,12 +1271,22 @@ const GarageERP = () => {
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Typography variant="h4" fontWeight="bold" color="text.secondary" gutterBottom>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               Trusted by 2,500+ Garage Owners Worldwide
             </Typography>
           </Box>
 
-          <Grid container spacing={4} alignItems="center" justifyContent="center">
+          <Grid
+            container
+            spacing={4}
+            alignItems="center"
+            justifyContent="center"
+          >
             {clientLogos.map((client, index) => (
               <Grid item xs={6} sm={4} md={2} key={index}>
                 <motion.div
@@ -1175,15 +1339,25 @@ const GarageERP = () => {
         sx={{
           py: 12,
           background: `
-            linear-gradient(135deg, ${alpha(colors.primary, 0.03)} 0%, ${alpha(colors.secondary, 0.03)} 100%),
-            radial-gradient(circle at 50% 50%, ${alpha(colors.purple, 0.02)} 0%, transparent 50%)
+            linear-gradient(135deg, ${alpha(colors.primary, 0.03)} 0%, ${alpha(
+            colors.secondary,
+            0.03
+          )} 100%),
+            radial-gradient(circle at 50% 50%, ${alpha(
+              colors.purple,
+              0.02
+            )} 0%, transparent 50%)
           `,
           position: "relative",
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 8 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h3"
                 sx={{
@@ -1197,7 +1371,8 @@ const GarageERP = () => {
                 🚀 Proven Results That Speak for Themselves
               </Typography>
               <Typography variant="h6" color="text.secondary">
-                Join thousands of successful garage owners who've transformed their business
+                Join thousands of successful garage owners who've transformed
+                their business
               </Typography>
             </motion.div>
           </Box>
@@ -1239,7 +1414,9 @@ const GarageERP = () => {
                         left: 0,
                         right: 0,
                         height: 4,
-                        background: `linear-gradient(90deg, ${stat.color}, ${alpha(stat.color, 0.5)})`,
+                        background: `linear-gradient(90deg, ${
+                          stat.color
+                        }, ${alpha(stat.color, 0.5)})`,
                         opacity: 0.7,
                         transition: "opacity 0.3s ease",
                       },
@@ -1258,7 +1435,9 @@ const GarageERP = () => {
                     >
                       <Box
                         sx={{
-                          background: `linear-gradient(135deg, ${stat.color}, ${alpha(stat.color, 0.7)})`,
+                          background: `linear-gradient(135deg, ${
+                            stat.color
+                          }, ${alpha(stat.color, 0.7)})`,
                           borderRadius: "50%",
                           p: 2,
                           display: "inline-flex",
@@ -1272,9 +1451,18 @@ const GarageERP = () => {
                       </Box>
                     </motion.div>
 
-                    <AnimatedCounter value={stat.value} suffix={stat.suffix} duration={2} />
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      duration={2}
+                    />
 
-                    <Typography variant="body1" color="text.secondary" fontWeight={600} sx={{ mt: 1 }}>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      fontWeight={600}
+                      sx={{ mt: 1 }}
+                    >
                       {stat.label}
                     </Typography>
                   </Paper>
@@ -1289,7 +1477,11 @@ const GarageERP = () => {
       <Box id="workflow" sx={{ py: 15 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 12 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h2"
                 sx={{
@@ -1316,8 +1508,9 @@ const GarageERP = () => {
                   fontWeight: 500,
                 }}
               >
-                Our streamlined 7-step process ensures nothing falls through the cracks. Every step is automated,
-                tracked, and optimized for maximum efficiency.
+                Our streamlined 7-step process ensures nothing falls through the
+                cracks. Every step is automated, tracked, and optimized for
+                maximum efficiency.
               </Typography>
             </motion.div>
           </Box>
@@ -1361,20 +1554,26 @@ const GarageERP = () => {
                         left: 0,
                         right: 0,
                         height: 4,
-                        background: `linear-gradient(90deg, ${step.color}, ${alpha(step.color, 0.5)})`,
+                        background: `linear-gradient(90deg, ${
+                          step.color
+                        }, ${alpha(step.color, 0.5)})`,
                         opacity: 0.7,
                         transition: "opacity 0.3s ease",
                       },
                     }}
                   >
                     <CardContent sx={{ p: 0 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 3 }}
+                      >
                         <Box
                           sx={{
                             width: 60,
                             height: 60,
                             borderRadius: "50%",
-                            background: `linear-gradient(135deg, ${step.color}, ${alpha(step.color, 0.7)})`,
+                            background: `linear-gradient(135deg, ${
+                              step.color
+                            }, ${alpha(step.color, 0.7)})`,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -1382,7 +1581,11 @@ const GarageERP = () => {
                             boxShadow: `0 8px 25px ${alpha(step.color, 0.3)}`,
                           }}
                         >
-                          <Typography variant="h5" fontWeight="bold" sx={{ color: "#ffffff" }}>
+                          <Typography
+                            variant="h5"
+                            fontWeight="bold"
+                            sx={{ color: "#ffffff" }}
+                          >
                             {step.step}
                           </Typography>
                         </Box>
@@ -1399,7 +1602,9 @@ const GarageERP = () => {
                         >
                           <Box
                             sx={{
-                              background: `linear-gradient(135deg, ${step.color}, ${alpha(step.color, 0.7)})`,
+                              background: `linear-gradient(135deg, ${
+                                step.color
+                              }, ${alpha(step.color, 0.7)})`,
                               borderRadius: 3,
                               p: 1.5,
                               display: "flex",
@@ -1419,7 +1624,9 @@ const GarageERP = () => {
                         fontWeight="bold"
                         gutterBottom
                         sx={{
-                          background: `linear-gradient(135deg, ${step.color}, ${alpha(step.color, 0.7)})`,
+                          background: `linear-gradient(135deg, ${
+                            step.color
+                          }, ${alpha(step.color, 0.7)})`,
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                         }}
@@ -1464,7 +1671,10 @@ const GarageERP = () => {
                                 background: alpha("#ffffff", 0.9),
                                 borderRadius: "50%",
                                 p: 1,
-                                boxShadow: `0 4px 15px ${alpha(step.color, 0.3)}`,
+                                boxShadow: `0 4px 15px ${alpha(
+                                  step.color,
+                                  0.3
+                                )}`,
                               }}
                             />
                           </motion.div>
@@ -1485,14 +1695,24 @@ const GarageERP = () => {
         sx={{
           py: 15,
           background: `
-            linear-gradient(135deg, ${alpha(colors.primary, 0.02)} 0%, ${alpha(colors.secondary, 0.02)} 100%),
-            radial-gradient(circle at 30% 70%, ${alpha(colors.purple, 0.02)} 0%, transparent 50%)
+            linear-gradient(135deg, ${alpha(colors.primary, 0.02)} 0%, ${alpha(
+            colors.secondary,
+            0.02
+          )} 100%),
+            radial-gradient(circle at 30% 70%, ${alpha(
+              colors.purple,
+              0.02
+            )} 0%, transparent 50%)
           `,
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 12 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h2"
                 sx={{
@@ -1519,8 +1739,9 @@ const GarageERP = () => {
                   fontWeight: 500,
                 }}
               >
-                Everything you need to run a modern, efficient garage business. From customer management to financial
-                reporting, we've got you covered.
+                Everything you need to run a modern, efficient garage business.
+                From customer management to financial reporting, we've got you
+                covered.
               </Typography>
             </motion.div>
           </Box>
@@ -1578,13 +1799,16 @@ const GarageERP = () => {
                         left: "-100%",
                         width: "100%",
                         height: "100%",
-                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
                         transition: "transform 0.6s ease",
                       },
                     }}
                   >
                     <CardContent sx={{ p: 0 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 4 }}
+                      >
                         <motion.div
                           animate={{
                             rotate: [0, 10, -10, 0],
@@ -1606,7 +1830,10 @@ const GarageERP = () => {
                               justifyContent: "center",
                               background: feature.gradient,
                               mr: 3,
-                              boxShadow: `0 15px 40px ${alpha(feature.color, 0.3)}`,
+                              boxShadow: `0 15px 40px ${alpha(
+                                feature.color,
+                                0.3
+                              )}`,
                               position: "relative",
                               "&::before": {
                                 content: '""',
@@ -1618,7 +1845,12 @@ const GarageERP = () => {
                             }}
                           >
                             {React.cloneElement(feature.icon, {
-                              sx: { color: "#ffffff", fontSize: 36, zIndex: 1, position: "relative" },
+                              sx: {
+                                color: "#ffffff",
+                                fontSize: 36,
+                                zIndex: 1,
+                                position: "relative",
+                              },
                             })}
                           </Box>
                         </motion.div>
@@ -1670,12 +1902,18 @@ const GarageERP = () => {
                               }}
                             >
                               <ListItemIcon sx={{ minWidth: 40 }}>
-                                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.3 }}>
+                                <motion.div
+                                  whileHover={{ rotate: 360 }}
+                                  transition={{ duration: 0.3 }}
+                                >
                                   <CheckCircle
                                     sx={{
                                       color: feature.color,
                                       fontSize: 20,
-                                      filter: `drop-shadow(0 2px 4px ${alpha(feature.color, 0.3)})`,
+                                      filter: `drop-shadow(0 2px 4px ${alpha(
+                                        feature.color,
+                                        0.3
+                                      )})`,
                                     }}
                                   />
                                 </motion.div>
@@ -1705,7 +1943,11 @@ const GarageERP = () => {
       <Box id="pricing" sx={{ py: 15 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 12 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h2"
                 sx={{
@@ -1727,8 +1969,8 @@ const GarageERP = () => {
                 color="text.secondary"
                 sx={{ maxWidth: 800, mx: "auto", lineHeight: 1.6, mb: 4 }}
               >
-                Choose the perfect plan for your garage business. All plans include our complete workflow system and
-                premium support.
+                Choose the perfect plan for your garage business. All plans
+                include our complete workflow system and premium support.
               </Typography>
 
               <Stack direction="row" spacing={2} justifyContent="center">
@@ -1784,9 +2026,13 @@ const GarageERP = () => {
                       p: 5,
                       borderRadius: 6,
                       position: "relative",
-                      background: plan.popular ? colors.gradientCard : alpha("#ffffff", 0.8),
+                      background: plan.popular
+                        ? colors.gradientCard
+                        : alpha("#ffffff", 0.8),
                       backdropFilter: "blur(20px)",
-                      border: plan.popular ? `3px solid ${colors.primary}` : `2px solid ${alpha(colors.primary, 0.1)}`,
+                      border: plan.popular
+                        ? `3px solid ${colors.primary}`
+                        : `2px solid ${alpha(colors.primary, 0.1)}`,
                       transform: plan.popular ? "scale(1.05)" : "scale(1)",
                       overflow: "hidden",
                       "&:hover": {
@@ -1835,13 +2081,22 @@ const GarageERP = () => {
                             px: 3,
                             py: 1,
                             fontSize: "0.9rem",
-                            boxShadow: `0 8px 25px ${alpha(colors.primary, 0.4)}`,
+                            boxShadow: `0 8px 25px ${alpha(
+                              colors.primary,
+                              0.4
+                            )}`,
                           }}
                         />
                       </motion.div>
                     )}
 
-                    <Box sx={{ textAlign: "center", mb: 5, mt: plan.popular ? 3 : 0 }}>
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        mb: 5,
+                        mt: plan.popular ? 3 : 0,
+                      }}
+                    >
                       <Typography
                         variant="h3"
                         fontWeight="bold"
@@ -1865,7 +2120,12 @@ const GarageERP = () => {
                       </Typography>
 
                       <Box sx={{ my: 4 }}>
-                        <Stack direction="row" alignItems="baseline" justifyContent="center" spacing={1}>
+                        <Stack
+                          direction="row"
+                          alignItems="baseline"
+                          justifyContent="center"
+                          spacing={1}
+                        >
                           <Typography
                             variant="h6"
                             sx={{
@@ -1932,7 +2192,10 @@ const GarageERP = () => {
                                 sx={{
                                   color: colors.success,
                                   fontSize: 22,
-                                  filter: `drop-shadow(0 2px 4px ${alpha(colors.success, 0.3)})`,
+                                  filter: `drop-shadow(0 2px 4px ${alpha(
+                                    colors.success,
+                                    0.3
+                                  )})`,
                                   transition: "all 0.3s ease",
                                 }}
                               />
@@ -1950,7 +2213,10 @@ const GarageERP = () => {
                       ))}
                     </List>
 
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       <Button
                         variant={plan.popular ? "contained" : "outlined"}
                         fullWidth
@@ -1963,10 +2229,16 @@ const GarageERP = () => {
                           ...(plan.popular
                             ? {
                                 background: plan.gradient,
-                                boxShadow: `0 15px 40px ${alpha(colors.primary, 0.4)}`,
+                                boxShadow: `0 15px 40px ${alpha(
+                                  colors.primary,
+                                  0.4
+                                )}`,
                                 "&:hover": {
                                   background: colors.neon,
-                                  boxShadow: `0 20px 50px ${alpha(colors.primary, 0.5)}`,
+                                  boxShadow: `0 20px 50px ${alpha(
+                                    colors.primary,
+                                    0.5
+                                  )}`,
                                 },
                               }
                             : {
@@ -1976,7 +2248,10 @@ const GarageERP = () => {
                                 "&:hover": {
                                   borderWidth: 3,
                                   background: alpha(colors.primary, 0.1),
-                                  boxShadow: `0 15px 40px ${alpha(colors.primary, 0.2)}`,
+                                  boxShadow: `0 15px 40px ${alpha(
+                                    colors.primary,
+                                    0.2
+                                  )}`,
                                 },
                               }),
                         }}
@@ -2006,9 +2281,18 @@ const GarageERP = () => {
         sx={{
           py: 15,
           background: `
-            linear-gradient(135deg, ${alpha(colors.primary, 0.05)} 0%, ${alpha(colors.secondary, 0.05)} 100%),
-            radial-gradient(circle at 30% 70%, ${alpha(colors.purple, 0.03)} 0%, transparent 50%),
-            radial-gradient(circle at 70% 30%, ${alpha(colors.accent, 0.03)} 0%, transparent 50%)
+            linear-gradient(135deg, ${alpha(colors.primary, 0.05)} 0%, ${alpha(
+            colors.secondary,
+            0.05
+          )} 100%),
+            radial-gradient(circle at 30% 70%, ${alpha(
+              colors.purple,
+              0.03
+            )} 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, ${alpha(
+              colors.accent,
+              0.03
+            )} 0%, transparent 50%)
           `,
           position: "relative",
           overflow: "hidden",
@@ -2018,7 +2302,11 @@ const GarageERP = () => {
 
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
           <Box sx={{ textAlign: "center", mb: 12 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h2"
                 sx={{
@@ -2035,9 +2323,14 @@ const GarageERP = () => {
                   Success Stories
                 </Box>
               </Typography>
-              <Typography variant="h5" color="text.secondary" sx={{ maxWidth: 800, mx: "auto", lineHeight: 1.6 }}>
-                Discover how garage owners worldwide are achieving extraordinary results and transforming their
-                businesses with our complete workflow solution.
+              <Typography
+                variant="h5"
+                color="text.secondary"
+                sx={{ maxWidth: 800, mx: "auto", lineHeight: 1.6 }}
+              >
+                Discover how garage owners worldwide are achieving extraordinary
+                results and transforming their businesses with our complete
+                workflow solution.
               </Typography>
             </motion.div>
           </Box>
@@ -2165,14 +2458,20 @@ const GarageERP = () => {
                     </Box>
 
                     <Stack direction="row" spacing={3} alignItems="center">
-                      <motion.div whileHover={{ scale: 1.1, rotate: 5 }} transition={{ duration: 0.3 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         <Avatar
                           src={testimonial.avatar}
                           sx={{
                             width: 70,
                             height: 70,
                             border: `3px solid ${colors.primary}`,
-                            boxShadow: `0 8px 25px ${alpha(colors.primary, 0.3)}`,
+                            boxShadow: `0 8px 25px ${alpha(
+                              colors.primary,
+                              0.3
+                            )}`,
                           }}
                         />
                       </motion.div>
@@ -2188,7 +2487,11 @@ const GarageERP = () => {
                         >
                           {testimonial.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" fontWeight={600}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontWeight={600}
+                        >
                           {testimonial.role}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
@@ -2209,7 +2512,11 @@ const GarageERP = () => {
         <Container maxWidth="lg">
           <Grid container spacing={8} alignItems="center">
             <Grid item xs={12} md={6}>
-              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
                 <Typography
                   variant="h2"
                   sx={{
@@ -2227,9 +2534,14 @@ const GarageERP = () => {
                   </Box>
                 </Typography>
 
-                <Typography variant="h5" color="text.secondary" sx={{ mb: 6, lineHeight: 1.6, fontWeight: 500 }}>
-                  Get personalized guidance from our garage management experts. We'll help you implement the perfect
-                  workflow and maximize your ROI from day one.
+                <Typography
+                  variant="h5"
+                  color="text.secondary"
+                  sx={{ mb: 6, lineHeight: 1.6, fontWeight: 500 }}
+                >
+                  Get personalized guidance from our garage management experts.
+                  We'll help you implement the perfect workflow and maximize
+                  your ROI from day one.
                 </Typography>
 
                 <Grid container spacing={4} sx={{ mb: 6 }}>
@@ -2237,22 +2549,26 @@ const GarageERP = () => {
                     {
                       icon: <Business />,
                       title: "Business Analysis",
-                      description: "Complete assessment of your current operations and growth opportunities",
+                      description:
+                        "Complete assessment of your current operations and growth opportunities",
                     },
                     {
                       icon: <AutoAwesome />,
                       title: "Custom Setup",
-                      description: "Tailored system configuration to match your specific business needs",
+                      description:
+                        "Tailored system configuration to match your specific business needs",
                     },
                     {
                       icon: <Support />,
                       title: "Training & Support",
-                      description: "Comprehensive team training and ongoing support for maximum success",
+                      description:
+                        "Comprehensive team training and ongoing support for maximum success",
                     },
                     {
                       icon: <TrendingUp />,
                       title: "Growth Strategy",
-                      description: "Data-driven recommendations to accelerate your business growth",
+                      description:
+                        "Data-driven recommendations to accelerate your business growth",
                     },
                   ].map((service, index) => (
                     <Grid item xs={12} sm={6} key={index}>
@@ -2272,7 +2588,10 @@ const GarageERP = () => {
                             backdropFilter: "blur(20px)",
                             border: `1px solid ${alpha(colors.primary, 0.1)}`,
                             "&:hover": {
-                              boxShadow: `0 15px 40px ${alpha(colors.primary, 0.1)}`,
+                              boxShadow: `0 15px 40px ${alpha(
+                                colors.primary,
+                                0.1
+                              )}`,
                             },
                             transition: "all 0.3s ease",
                           }}
@@ -2290,7 +2609,11 @@ const GarageERP = () => {
                               sx: { color: "#ffffff", fontSize: 24 },
                             })}
                           </Box>
-                          <Typography variant="h6" fontWeight="bold" gutterBottom>
+                          <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                            gutterBottom
+                          >
                             {service.title}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -2302,7 +2625,10 @@ const GarageERP = () => {
                   ))}
                 </Grid>
 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
                     variant="contained"
                     size="large"
@@ -2345,13 +2671,23 @@ const GarageERP = () => {
                     boxShadow: `0 25px 80px ${alpha(colors.primary, 0.2)}`,
                   }}
                 >
-                  <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ color: colors.primary }}>
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    gutterBottom
+                    sx={{ color: colors.primary }}
+                  >
                     🚀 Implementation Package
                   </Typography>
 
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7 }}>
-                    Get your garage up and running with our complete implementation package. Everything you need for a
-                    successful digital transformation.
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ mb: 4, lineHeight: 1.7 }}
+                  >
+                    Get your garage up and running with our complete
+                    implementation package. Everything you need for a successful
+                    digital transformation.
                   </Typography>
 
                   <List disablePadding>
@@ -2385,8 +2721,19 @@ const GarageERP = () => {
                     ))}
                   </List>
 
-                  <Box sx={{ mt: 4, p: 3, borderRadius: 3, background: alpha(colors.success, 0.1) }}>
-                    <Typography variant="h5" fontWeight="bold" sx={{ color: colors.success, mb: 1 }}>
+                  <Box
+                    sx={{
+                      mt: 4,
+                      p: 3,
+                      borderRadius: 3,
+                      background: alpha(colors.success, 0.1),
+                    }}
+                  >
+                    <Typography
+                      variant="h5"
+                      fontWeight="bold"
+                      sx={{ color: colors.success, mb: 1 }}
+                    >
                       💰 Implementation Value: $2,500
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -2406,13 +2753,20 @@ const GarageERP = () => {
         sx={{
           py: 15,
           background: `
-            linear-gradient(135deg, ${alpha(colors.primary, 0.03)} 0%, ${alpha(colors.secondary, 0.03)} 100%)
+            linear-gradient(135deg, ${alpha(colors.primary, 0.03)} 0%, ${alpha(
+            colors.secondary,
+            0.03
+          )} 100%)
           `,
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 12 }}>
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <Typography
                 variant="h2"
                 sx={{
@@ -2429,16 +2783,24 @@ const GarageERP = () => {
                   Let's Transform Your Garage
                 </Box>
               </Typography>
-              <Typography variant="h5" color="text.secondary" sx={{ maxWidth: 800, mx: "auto", lineHeight: 1.6 }}>
-                Ready to revolutionize your garage business? Contact our experts today for a personalized demo and
-                consultation.
+              <Typography
+                variant="h5"
+                color="text.secondary"
+                sx={{ maxWidth: 800, mx: "auto", lineHeight: 1.6 }}
+              >
+                Ready to revolutionize your garage business? Contact our experts
+                today for a personalized demo and consultation.
               </Typography>
             </motion.div>
           </Box>
 
           <Grid container spacing={8}>
             <Grid item xs={12} md={6}>
-              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
                 <Paper
                   elevation={0}
                   sx={{
@@ -2450,12 +2812,22 @@ const GarageERP = () => {
                     height: "100%",
                   }}
                 >
-                  <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ color: colors.primary }}>
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    gutterBottom
+                    sx={{ color: colors.primary }}
+                  >
                     💬 Send us a Message
                   </Typography>
 
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Fill out the form below and our team will get back to you within 24 hours.
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ mb: 4 }}
+                  >
+                    Fill out the form below and our team will get back to you
+                    within 24 hours.
                   </Typography>
 
                   <Stack spacing={3}>
@@ -2518,7 +2890,10 @@ const GarageERP = () => {
                       }}
                     />
 
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       <Button
                         variant="contained"
                         fullWidth
@@ -2529,10 +2904,16 @@ const GarageERP = () => {
                           fontSize: "1.1rem",
                           fontWeight: 700,
                           borderRadius: 3,
-                          boxShadow: `0 15px 40px ${alpha(colors.primary, 0.4)}`,
+                          boxShadow: `0 15px 40px ${alpha(
+                            colors.primary,
+                            0.4
+                          )}`,
                           "&:hover": {
                             background: colors.neon,
-                            boxShadow: `0 20px 50px ${alpha(colors.primary, 0.5)}`,
+                            boxShadow: `0 20px 50px ${alpha(
+                              colors.primary,
+                              0.5
+                            )}`,
                           },
                         }}
                       >
@@ -2545,7 +2926,11 @@ const GarageERP = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
                 <Stack spacing={4}>
                   {[
                     {
@@ -2587,7 +2972,10 @@ const GarageERP = () => {
                           backdropFilter: "blur(20px)",
                           border: `1px solid ${alpha(contact.color, 0.2)}`,
                           "&:hover": {
-                            boxShadow: `0 15px 40px ${alpha(contact.color, 0.2)}`,
+                            boxShadow: `0 15px 40px ${alpha(
+                              contact.color,
+                              0.2
+                            )}`,
                             borderColor: alpha(contact.color, 0.4),
                           },
                           transition: "all 0.3s ease",
@@ -2596,7 +2984,9 @@ const GarageERP = () => {
                         <Stack direction="row" spacing={3} alignItems="center">
                           <Box
                             sx={{
-                              background: `linear-gradient(135deg, ${contact.color}, ${alpha(contact.color, 0.7)})`,
+                              background: `linear-gradient(135deg, ${
+                                contact.color
+                              }, ${alpha(contact.color, 0.7)})`,
                               borderRadius: "50%",
                               p: 2,
                               display: "flex",
@@ -2609,10 +2999,19 @@ const GarageERP = () => {
                             })}
                           </Box>
                           <Box>
-                            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              gutterBottom
+                            >
                               {contact.title}
                             </Typography>
-                            <Typography variant="body1" fontWeight="bold" sx={{ color: contact.color }} gutterBottom>
+                            <Typography
+                              variant="body1"
+                              fontWeight="bold"
+                              sx={{ color: contact.color }}
+                              gutterBottom
+                            >
                               {contact.content}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -2644,9 +3043,13 @@ const GarageERP = () => {
                         🎯 Ready to Get Started?
                       </Typography>
                       <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                        Book a free 30-minute consultation with our garage management experts.
+                        Book a free 30-minute consultation with our garage
+                        management experts.
                       </Typography>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
                         <Button
                           variant="contained"
                           size="large"
@@ -2686,7 +3089,10 @@ const GarageERP = () => {
       >
         <FloatingParticles />
 
-        <Container maxWidth="md" sx={{ textAlign: "center", position: "relative", zIndex: 2 }}>
+        <Container
+          maxWidth="md"
+          sx={{ textAlign: "center", position: "relative", zIndex: 2 }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -2732,13 +3138,22 @@ const GarageERP = () => {
                 textShadow: "0 2px 10px rgba(0,0,0,0.2)",
               }}
             >
-              Join over <strong>2,500 successful garage owners</strong> who have revolutionized their business with our
-              complete workflow solution. Start your transformation today with our <strong>30-day FREE trial</strong> -
-              no credit card required!
+              Join over <strong>2,500 successful garage owners</strong> who have
+              revolutionized their business with our complete workflow solution.
+              Start your transformation today with our{" "}
+              <strong>30-day FREE trial</strong> - no credit card required!
             </Typography>
 
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={4} justifyContent="center" sx={{ mb: 8 }}>
-              <motion.div whileHover={{ scale: 1.1, y: -5 }} whileTap={{ scale: 0.95 }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={4}
+              justifyContent="center"
+              sx={{ mb: 8 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="contained"
                   size="large"
@@ -2762,7 +3177,10 @@ const GarageERP = () => {
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="outlined"
                   size="large"
@@ -2788,33 +3206,57 @@ const GarageERP = () => {
               </motion.div>
             </Stack>
 
-            <Grid container spacing={4} justifyContent="center" sx={{ opacity: 0.9 }}>
+            <Grid
+              container
+              spacing={4}
+              justifyContent="center"
+              sx={{ opacity: 0.9 }}
+            >
               <Grid item xs={12} sm={4}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="center"
+                >
                   <Security fontSize="large" />
                   <Box>
                     <Typography variant="h6" fontWeight="bold">
                       Enterprise Security
                     </Typography>
-                    <Typography variant="body2">Bank-level encryption</Typography>
+                    <Typography variant="body2">
+                      Bank-level encryption
+                    </Typography>
                   </Box>
                 </Stack>
               </Grid>
 
               <Grid item xs={12} sm={4}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="center"
+                >
                   <Support fontSize="large" />
                   <Box>
                     <Typography variant="h6" fontWeight="bold">
                       24/7 VIP Support
                     </Typography>
-                    <Typography variant="body2">Dedicated success team</Typography>
+                    <Typography variant="body2">
+                      Dedicated success team
+                    </Typography>
                   </Box>
                 </Stack>
               </Grid>
 
               <Grid item xs={12} sm={4}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="center"
+                >
                   <CloudSync fontSize="large" />
                   <Box>
                     <Typography variant="h6" fontWeight="bold">
@@ -2834,7 +3276,12 @@ const GarageERP = () => {
         <Container maxWidth="lg">
           <Grid container spacing={6}>
             <Grid item xs={12} md={4}>
-              <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 4 }}>
+              <Stack
+                direction="row"
+                spacing={3}
+                alignItems="center"
+                sx={{ mb: 4 }}
+              >
                 <Box
                   sx={{
                     background: colors.gradientHero,
@@ -2858,8 +3305,9 @@ const GarageERP = () => {
                   fontSize: "1.1rem",
                 }}
               >
-                The world's most advanced garage management platform. Complete workflow solution from customer to
-                payment with AI-powered insights and automation.
+                The world's most advanced garage management platform. Complete
+                workflow solution from customer to payment with AI-powered
+                insights and automation.
               </Typography>
 
               <Stack direction="row" spacing={3}>
@@ -2901,19 +3349,43 @@ const GarageERP = () => {
             {[
               {
                 title: "Product",
-                items: ["🚀 Features", "🔄 Workflow", "💎 Pricing", "🎬 Demo", "📱 Mobile App"],
+                items: [
+                  "🚀 Features",
+                  "🔄 Workflow",
+                  "💎 Pricing",
+                  "🎬 Demo",
+                  "📱 Mobile App",
+                ],
               },
               {
                 title: "Company",
-                items: ["🏢 About", "💼 Careers", "📞 Contact", "📝 Blog", "🏆 Success Stories"],
+                items: [
+                  "🏢 About",
+                  "💼 Careers",
+                  "📞 Contact",
+                  "📝 Blog",
+                  "🏆 Success Stories",
+                ],
               },
               {
                 title: "Support",
-                items: ["❓ Help Center", "📚 Documentation", "👥 Community", "📊 Status", "🎓 Training"],
+                items: [
+                  "❓ Help Center",
+                  "📚 Documentation",
+                  "👥 Community",
+                  "📊 Status",
+                  "🎓 Training",
+                ],
               },
               {
                 title: "Solutions",
-                items: ["🔧 Implementation", "🎯 Consultancy", "📈 Analytics", "🔌 Integrations", "🏅 Enterprise"],
+                items: [
+                  "🔧 Implementation",
+                  "🎯 Consultancy",
+                  "📈 Analytics",
+                  "🔌 Integrations",
+                  "🏅 Enterprise",
+                ],
               },
             ].map((section, index) => (
               <Grid item xs={6} md={2} key={index}>
@@ -2956,9 +3428,15 @@ const GarageERP = () => {
 
           <Divider sx={{ my: 6, borderColor: alpha("#ffffff", 0.1) }} />
 
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={3}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={3}
+          >
             <Typography variant="body1" sx={{ opacity: 0.6 }}>
-              © 2024 GarageERP Pro. All rights reserved. Built with ❤️ for garage owners worldwide.
+              © 2024 GarageERP Pro. All rights reserved. Built with ❤️ for
+              garage owners worldwide.
             </Typography>
 
             <Stack direction="row" spacing={4} alignItems="center">
@@ -2976,7 +3454,7 @@ const GarageERP = () => {
         </Container>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default GarageERP
+export default GarageERP;
