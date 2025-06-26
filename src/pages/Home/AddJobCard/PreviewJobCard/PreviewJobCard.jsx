@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import { useGetSingleJobCardQuery } from "../../../../redux/api/jobCard";
 import Loading from "../../../../components/Loading/Loading";
 import { useReactToPrint } from "react-to-print";
-import { Button, ButtonBase, Link } from "@mui/material";
+import { Button, Link } from "@mui/material";
 import { WhatsApp } from "@mui/icons-material";
 import { WhatsappShareButton } from "react-share";
 const PreviewJobCard = () => {
@@ -16,17 +16,18 @@ const PreviewJobCard = () => {
   const [vehicleInterior, setVehicleInterior] = useState("");
   const [reportedDefect, setReportedDefect] = useState("");
   const [reportedAction, setReportedAction] = useState("");
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
-  const { data, isLoading } = useGetSingleJobCardQuery(id);
+  const { data, isLoading } = useGetSingleJobCardQuery({ tenantDomain, id });
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
   const previewData = data?.data;
-
+  console.log("preivew data this ", previewData);
 
   const extractTextFromHTML = (htmlString) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
@@ -128,10 +129,8 @@ const PreviewJobCard = () => {
                         <input
                           type="text"
                           defaultValue={`${previewData?.vehicle?.carReg_no} ${previewData?.vehicle?.car_registration_no}`}
-               
                           disabled
                         />
-
                       </div>
                       <div>
                         <label className="block">Vehicle Model </label>
@@ -180,7 +179,7 @@ const PreviewJobCard = () => {
                         <input
                           type="text"
                           placeholder="Mileage"
-                          defaultValue={previewData?.vehicle?.mileage}
+                          defaultValue={previewData?.mileage}
                           disabled
                         />
                       </div>
@@ -208,8 +207,8 @@ const PreviewJobCard = () => {
                 <div className=" inputGroup">
                   <h6 className=" mb-2 font-bold ">
                     {" "}
-                    {previewData.user_type.charAt(0)?.toUpperCase() +
-                      previewData.user_type.slice(1)}{" "}
+                    {previewData?.user_type?.charAt(0)?.toUpperCase() +
+                      previewData?.user_type?.slice(1)}{" "}
                     Information{" "}
                   </h6>
                   <div className="flex">
@@ -281,8 +280,8 @@ const PreviewJobCard = () => {
                       </div>
                       <div>
                         <label className="block">
-                          {previewData.user_type.charAt(0).toUpperCase() +
-                            previewData.user_type.slice(1)}{" "}
+                          {previewData?.user_type?.charAt(0).toUpperCase() +
+                            previewData?.user_type?.slice(1)}{" "}
                           Email{" "}
                         </label>
                         <input
@@ -413,7 +412,7 @@ const PreviewJobCard = () => {
         <a
           className="bg-[#42A0D9] text-white px-3 py-2  rounded-full mx-2 "
           href={`${import.meta.env.VITE_API_URL}/jobCards/jobcard/${
-            previewData._id
+            previewData?._id
           }`}
           target="_blank"
           rel="noreferrer"

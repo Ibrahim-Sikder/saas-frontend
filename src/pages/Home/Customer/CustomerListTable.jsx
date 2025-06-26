@@ -14,8 +14,6 @@ import {
 } from "../../../redux/api/customerApi";
 import { toast } from "react-toastify";
 import EmptyData from "../../../components/EmptyData/EmptyData";
-import { mileageStyle } from "../../../utils/customStyle";
-
 const CustomerListTable = () => {
   const textInputRef = useRef(null);
   const location = useLocation();
