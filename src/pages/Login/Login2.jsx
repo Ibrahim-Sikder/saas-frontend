@@ -15,26 +15,45 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
-  const handleSubmit = async (data) => {
-    setLoading(true);
-    setError("");
+const handleSubmit = async (data) => {
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await tenantLogin(data).unwrap();
+  try {
+    const res = await tenantLogin(data).unwrap();
 
-      if (res.success) {
-        toast.success(res.message || "Congrats! Login successfully!");
-        navigate("/dashboard");
+    if (res.success) {
+      toast.success(res.message || "Login successful!");
+
+      const tenantDomain = res?.user?.tenantDomain || data.tenantDomain;
+      const isLocalhost = window.location.hostname.includes("localhost");
+
+      if (tenantDomain) {
+        let redirectURL;
+
+        if (isLocalhost) {
+          redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
+        } else {
+          redirectURL = `https://${tenantDomain}.trustautosolution.com/dashboard`;
+        }
+
+        window.location.href = redirectURL;
       } else {
-        toast.error(res.message || "Invalid username or password!");
+        navigate("/dashboard");
       }
-    } catch (err) {
-      toast.error(err?.data?.message || "Login failed. Please try again.");
-      setError("Invalid email or password. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error(res.message || "Invalid username or password!");
     }
-  };
+  } catch (err) {
+    toast.error(err?.data?.message || "Login failed. Please try again.");
+    setError("Invalid email or password. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   return (
     <AuthLayout
