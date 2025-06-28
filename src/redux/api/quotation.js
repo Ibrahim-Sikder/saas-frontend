@@ -67,7 +67,7 @@ const quotationApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteQuotation: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/quotations/${id}`,
+        url: `/quotations/delete-permanantly/${id}`,
         method: "DELETE",
           params: { tenantDomain },
       }),

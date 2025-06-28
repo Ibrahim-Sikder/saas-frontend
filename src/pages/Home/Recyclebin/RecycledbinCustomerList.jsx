@@ -51,7 +51,6 @@ const RecycledbinCustomerList = () => {
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/customer-profile?id=${e}`);
   };
-
   const handleDeleteOrRestore = async (id) => {
     const result = await swal({
       title: "Select Action",

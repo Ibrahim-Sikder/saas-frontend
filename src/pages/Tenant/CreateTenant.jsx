@@ -1,8 +1,8 @@
 /* eslint-disable no-empty-pattern */
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import {
   TextField,
   Button,
@@ -26,7 +26,9 @@ import {
   FormControl,
   FormLabel,
   Container,
-} from "@mui/material";
+  Divider,
+  Chip,
+} from "@mui/material"
 import {
   Business,
   Domain,
@@ -34,100 +36,194 @@ import {
   ArrowForward,
   ArrowBack,
   Build,
-} from "@mui/icons-material";
-import { useAuth } from "../../context/AuthContext";
-import { subscriptionPlans } from "../../data";
-import { useCreateTenantMutation } from "../../redux/api/tenantApi";
-import { toast } from "react-toastify";
+  Payment,
+  AttachMoney,
+  Person,
+  Email,
+  Lock,
+} from "@mui/icons-material"
+import { useAuth } from "../../context/AuthContext"
+import { subscriptionPlans } from "../../data"
+import { useCreateTenantMutation } from "../../redux/api/tenantApi"
+import { toast } from "react-toastify"
 
 const TenantRegisterPage = () => {
-  const navigate = useNavigate();
-  const {} = useAuth();
-  const [activeStep, setActiveStep] = useState(0);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [createTenant] = useCreateTenantMutation();
-  // Form state
+  const navigate = useNavigate()
+  const { user } = useAuth() // Get current user if logged in
+  const [activeStep, setActiveStep] = useState(0)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [createTenant] = useCreateTenantMutation()
+
+  // Form state with all required fields
   const [tenantData, setTenantData] = useState({
+    // Business Information
     name: "",
     domain: "",
     businessType: "independent",
+    contactEmail: "",
+    phoneNumber: "",
+    address: "",
+
+    // User Information (for subscription)
+    firstName: "",
+    lastName: "",
+    userEmail: "",
+    password: "",
+    confirmPassword: "",
+
+    // Subscription Information
     selectedPlan: "HalfYearly",
+    paymentMethod: "Manual",
+    amount: 0,
+
+    // Terms
     agreeToTerms: false,
-  });
+  })
+
+  // Calculate amount based on selected plan
+  const calculateAmount = (planId) => {
+    const plan = subscriptionPlans.find((p) => p.id === planId)
+    if (!plan) return 0
+
+    // Extract numeric value from price string
+    const priceMatch = plan.price.match(/\$?(\d+(?:\.\d{2})?)/)
+    return priceMatch ? Number.parseFloat(priceMatch[1]) : 0
+  }
+
+  // Set initial amount when component mounts
+  useEffect(() => {
+    setTenantData((prev) => ({
+      ...prev,
+      amount: calculateAmount(prev.selectedPlan),
+    }))
+  }, [])
 
   const handleChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setTenantData({
-      ...tenantData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
+    const { name, value, checked, type } = e.target
+    const newValue = type === "checkbox" ? checked : value
+
+    setTenantData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: newValue,
+      }
+
+      // Auto-calculate amount when plan changes
+      if (name === "selectedPlan") {
+        updated.amount = calculateAmount(value)
+      }
+
+      return updated
+    })
+  }
 
   const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
-  };
+    setActiveStep((prevStep) => prevStep + 1)
+  }
 
   const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
+    setActiveStep((prevStep) => prevStep - 1)
+  }
 
   const validateStep = () => {
     if (activeStep === 0) {
-      return tenantData.name.trim() !== "" && tenantData.domain.trim() !== "";
+      return tenantData.name.trim() !== "" && tenantData.domain.trim() !== "" && tenantData.contactEmail.trim() !== ""
     } else if (activeStep === 1) {
-      return tenantData.selectedPlan !== "";
+      return (
+        tenantData.firstName.trim() !== "" &&
+        tenantData.lastName.trim() !== "" &&
+        tenantData.userEmail.trim() !== "" &&
+        tenantData.password.length >= 6 &&
+        tenantData.password === tenantData.confirmPassword
+      )
     } else if (activeStep === 2) {
-      return tenantData.agreeToTerms;
+      return tenantData.selectedPlan !== ""
+    } else if (activeStep === 3) {
+      return tenantData.paymentMethod !== ""
+    } else if (activeStep === 4) {
+      return tenantData.agreeToTerms
     }
-    return true;
-  };
+    return true
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
     try {
+      // Calculate subscription dates
+      const startDate = new Date()
+      const endDate = new Date()
+
+      if (tenantData.selectedPlan === "Monthly") {
+        endDate.setMonth(startDate.getMonth() + 1)
+      } else if (tenantData.selectedPlan === "HalfYearly") {
+        endDate.setMonth(startDate.getMonth() + 6)
+      } else if (tenantData.selectedPlan === "Yearly") {
+        endDate.setFullYear(startDate.getFullYear() + 1)
+      }
+
       const tenantPayload = {
+        // Business Information
         name: tenantData.name,
         domain: tenantData.domain,
         businessType: tenantData.businessType,
-        plan: tenantData.selectedPlan,
-      };
+        contactEmail: tenantData.contactEmail,
+        phoneNumber: tenantData.phoneNumber,
+        address: tenantData.address,
 
-      const result = await createTenant(tenantPayload);
-      console.log(result);
+        // User Information
+        user: {
+          firstName: tenantData.firstName,
+          lastName: tenantData.lastName,
+          email: tenantData.userEmail,
+          password: tenantData.password,
+        },
+
+        // Subscription Information
+        subscription: {
+          plan: tenantData.selectedPlan,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          status: "Pending",
+          isPaid: false,
+          isActive: false,
+          paymentMethod: tenantData.paymentMethod,
+          amount: tenantData.amount,
+        },
+      }
+
+      const result = await createTenant(tenantPayload)
+      console.log(result)
 
       if ("error" in result) {
-        throw new Error(
-          result.error?.data?.message || "Failed to register tenant."
-        );
+        throw new Error(result.error?.data?.message || "Failed to register tenant.")
       }
 
       if (result?.data?.success) {
-        toast.success(result.data.message || "Tenant created successfully!");
-        navigate("/signup");
+        toast.success(result.data.message || "Tenant created successfully!")
+        navigate("/login")
       }
-
-      // navigate('/signup')
     } catch (err) {
-      setError(
-        err.message ||
-          "Failed to register tenant. Please check your information and try again."
-      );
+      setError(err.message || "Failed to register tenant. Please check your information and try again.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const steps = ["Business Information", "Choose Plan", "Review & Confirm"];
+  const steps = ["Business Info", "User Account", "Choose Plan", "Payment Details", "Review & Confirm"]
 
   const getStepContent = (step) => {
     switch (step) {
       case 0:
         return (
           <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Business Information
+            </Typography>
+
             <TextField
               margin="normal"
               required
@@ -168,33 +264,165 @@ const TenantRegisterPage = () => {
               }}
             />
 
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="contactEmail"
+              label="Business Contact Email"
+              name="contactEmail"
+              type="email"
+              autoComplete="email"
+              value={tenantData.contactEmail}
+              onChange={handleChange}
+              helperText="Primary contact email for your business"
+            />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              id="phoneNumber"
+              label="Phone Number"
+              name="phoneNumber"
+              type="tel"
+              autoComplete="tel"
+              value={tenantData.phoneNumber}
+              onChange={handleChange}
+            />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              id="address"
+              label="Business Address"
+              name="address"
+              multiline
+              rows={2}
+              value={tenantData.address}
+              onChange={handleChange}
+            />
+
             <FormControl component="fieldset" sx={{ mt: 3 }}>
               <FormLabel component="legend">Business Type</FormLabel>
-              <RadioGroup
-                name="businessType"
-                value={tenantData.businessType}
-                onChange={handleChange}
-              >
-                <FormControlLabel
-                  value="independent"
-                  control={<Radio />}
-                  label="Independent Garage"
-                />
-                <FormControlLabel
-                  value="chain"
-                  control={<Radio />}
-                  label="Chain/Multiple Locations"
-                />
-                <FormControlLabel
-                  value="dealership"
-                  control={<Radio />}
-                  label="Dealership Service"
-                />
+              <RadioGroup name="businessType" value={tenantData.businessType} onChange={handleChange}>
+                <FormControlLabel value="independent" control={<Radio />} label="Independent Garage" />
+                <FormControlLabel value="chain" control={<Radio />} label="Chain/Multiple Locations" />
+                <FormControlLabel value="dealership" control={<Radio />} label="Dealership Service" />
               </RadioGroup>
             </FormControl>
           </Box>
-        );
+        )
+
       case 1:
+        return (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Create Admin User Account
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              This will be the main administrator account for your business
+            </Typography>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  name="firstName"
+                  autoComplete="given-name"
+                  value={tenantData.firstName}
+                  onChange={handleChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  autoComplete="family-name"
+                  value={tenantData.lastName}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="userEmail"
+              label="Admin Email"
+              name="userEmail"
+              type="email"
+              autoComplete="username"
+              value={tenantData.userEmail}
+              onChange={handleChange}
+              helperText="This email will be used to log into the system"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="password"
+              label="Password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              value={tenantData.password}
+              onChange={handleChange}
+              helperText="Minimum 6 characters"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="confirmPassword"
+              label="Confirm Password"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              value={tenantData.confirmPassword}
+              onChange={handleChange}
+              error={tenantData.password !== tenantData.confirmPassword && tenantData.confirmPassword !== ""}
+              helperText={
+                tenantData.password !== tenantData.confirmPassword && tenantData.confirmPassword !== ""
+                  ? "Passwords do not match"
+                  : ""
+              }
+            />
+          </Box>
+        )
+
+      case 2:
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -205,9 +433,13 @@ const TenantRegisterPage = () => {
                 <Card
                   key={plan.id}
                   variant="outlined"
-                  onClick={() =>
-                    setTenantData({ ...tenantData, selectedPlan: plan.id })
-                  }
+                  onClick={() => {
+                    setTenantData((prev) => ({
+                      ...prev,
+                      selectedPlan: plan.id,
+                      amount: calculateAmount(plan.id),
+                    }))
+                  }}
                   sx={{
                     mb: 2,
                     position: "relative",
@@ -215,14 +447,14 @@ const TenantRegisterPage = () => {
                       tenantData.selectedPlan === plan.id
                         ? "2px solid #1976d2"
                         : plan.recommended
-                        ? "2px solid #1976d2"
-                        : "1px solid rgba(0, 0, 0, 0.12)",
+                          ? "2px solid #1976d2"
+                          : "1px solid rgba(0, 0, 0, 0.12)",
                     boxShadow:
                       tenantData.selectedPlan === plan.id
                         ? "0 0 10px rgba(25, 118, 210, 0.5)"
                         : plan.recommended
-                        ? "0 0 10px rgba(25, 118, 210, 0.3)"
-                        : "none",
+                          ? "0 0 10px rgba(25, 118, 210, 0.3)"
+                          : "none",
                     transition: "all 0.2s ease-in-out",
                     cursor: "pointer",
                     "&:hover": {
@@ -253,14 +485,8 @@ const TenantRegisterPage = () => {
                     title={plan.name}
                     titleTypographyProps={{ align: "center", variant: "h6" }}
                     sx={{
-                      bgcolor:
-                        tenantData.selectedPlan === plan.id
-                          ? "primary.light"
-                          : "grey.50",
-                      color:
-                        tenantData.selectedPlan === plan.id
-                          ? "white"
-                          : "inherit",
+                      bgcolor: tenantData.selectedPlan === plan.id ? "primary.light" : "grey.50",
+                      color: tenantData.selectedPlan === plan.id ? "white" : "inherit",
                       transition: "all 0.2s ease-in-out",
                       py: 1,
                     }}
@@ -288,21 +514,12 @@ const TenantRegisterPage = () => {
                                 mb: 0.5,
                               }}
                             >
-                              <CheckCircle
-                                fontSize="small"
-                                color="primary"
-                                sx={{ mr: 1, flexShrink: 0 }}
-                              />
-                              <Typography variant="caption">
-                                {feature}
-                              </Typography>
+                              <CheckCircle fontSize="small" color="primary" sx={{ mr: 1, flexShrink: 0 }} />
+                              <Typography variant="caption">{feature}</Typography>
                             </Box>
                           ))}
                           {plan.features.length > 3 && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
+                            <Typography variant="caption" color="text.secondary">
                               +{plan.features.length - 3} more features
                             </Typography>
                           )}
@@ -324,17 +541,8 @@ const TenantRegisterPage = () => {
                         value={plan.id}
                         sx={{ mr: 1 }}
                       />
-                      <Typography
-                        variant="body2"
-                        fontWeight={
-                          tenantData.selectedPlan === plan.id
-                            ? "bold"
-                            : "normal"
-                        }
-                      >
-                        {tenantData.selectedPlan === plan.id
-                          ? "Selected"
-                          : "Select This Plan"}
+                      <Typography variant="body2" fontWeight={tenantData.selectedPlan === plan.id ? "bold" : "normal"}>
+                        {tenantData.selectedPlan === plan.id ? "Selected" : "Select This Plan"}
                       </Typography>
                     </Box>
                   </CardContent>
@@ -342,51 +550,184 @@ const TenantRegisterPage = () => {
               ))}
             </Box>
           </Box>
-        );
-      case 2:
+        )
+
+      case 3:
+        return (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Payment Details
+            </Typography>
+
+            <Paper variant="outlined" sx={{ p: 3, mt: 2, bgcolor: "grey.50" }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <AttachMoney color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Total Amount: ${tenantData.amount.toFixed(2)}</Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                Selected Plan: {subscriptionPlans.find((p) => p.id === tenantData.selectedPlan)?.name}
+              </Typography>
+            </Paper>
+
+            <FormControl component="fieldset" sx={{ mt: 3, width: "100%" }}>
+              <FormLabel component="legend" sx={{ mb: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Payment sx={{ mr: 1 }} />
+                  Payment Method
+                </Box>
+              </FormLabel>
+              <RadioGroup name="paymentMethod" value={tenantData.paymentMethod} onChange={handleChange}>
+                <Card variant="outlined" sx={{ mb: 2 }}>
+                  <CardContent sx={{ py: 2 }}>
+                    <FormControlLabel
+                      value="Manual"
+                      control={<Radio />}
+                      label={
+                        <Box>
+                          <Typography variant="body1" fontWeight="medium">
+                            Manual Payment
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Pay via bank transfer or check. Account will be activated after payment verification.
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card variant="outlined" sx={{ mb: 2 }}>
+                  <CardContent sx={{ py: 2 }}>
+                    <FormControlLabel
+                      value="Gateway"
+                      control={<Radio />}
+                      label={
+                        <Box>
+                          <Typography variant="body1" fontWeight="medium">
+                            Online Payment Gateway
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Pay instantly with credit/debit card or digital wallet. Immediate activation.
+                          </Typography>
+                          <Chip label="Coming Soon" size="small" color="secondary" sx={{ mt: 1 }} />
+                        </Box>
+                      }
+                      disabled
+                    />
+                  </CardContent>
+                </Card>
+              </RadioGroup>
+            </FormControl>
+
+            {tenantData.paymentMethod === "Manual" && (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                <Typography variant="body2">
+                  <strong>Manual Payment Instructions:</strong>
+                  <br />
+                  After registration, you will receive payment instructions via email. Your account will be activated
+                  within 24 hours of payment verification.
+                </Typography>
+              </Alert>
+            )}
+          </Box>
+        )
+
+      case 4:
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBottom>
               Review Your Information
             </Typography>
-            <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-              <Grid container spacing={2}>
+            <Paper variant="outlined" sx={{ p: 3, mt: 2 }}>
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
+                  <Typography variant="h6" color="primary" gutterBottom>
+                    Business Information
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2" color="text.secondary">
                     Business Name
                   </Typography>
                   <Typography variant="body1">{tenantData.name}</Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2" color="text.secondary">
                     Domain
                   </Typography>
-                  <Typography variant="body1">
-                    {tenantData.domain}.ourplatform.com
+                  <Typography variant="body1">{tenantData.domain}.ourplatform.com</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Contact Email
                   </Typography>
+                  <Typography variant="body1">{tenantData.contactEmail}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Phone Number
+                  </Typography>
+                  <Typography variant="body1">{tenantData.phoneNumber || "Not provided"}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" color="text.secondary">
                     Business Type
                   </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {tenantData.businessType}
+                  <Typography variant="body1" sx={{ textTransform: "capitalize" }}>
+                    {tenantData.businessType.replace(/([A-Z])/g, " $1").trim()}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
+                    Admin User
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Name
+                  </Typography>
+                  <Typography variant="body1">
+                    {tenantData.firstName} {tenantData.lastName}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Email
+                  </Typography>
+                  <Typography variant="body1">{tenantData.userEmail}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
+                    Subscription Details
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Selected Plan
+                  </Typography>
+                  <Typography variant="body1">
+                    {subscriptionPlans.find((p) => p.id === tenantData.selectedPlan)?.name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Amount
+                  </Typography>
+                  <Typography variant="body1" fontWeight="bold">
+                    ${tenantData.amount.toFixed(2)}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Selected Plan
+                    Payment Method
                   </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {subscriptionPlans.find(
-                      (p) => p.id === tenantData.selectedPlan
-                    )?.name || tenantData.selectedPlan}
+                  <Typography variant="body1">
+                    {tenantData.paymentMethod === "Manual" ? "Manual Payment" : "Online Payment Gateway"}
                   </Typography>
                 </Grid>
               </Grid>
@@ -412,16 +753,17 @@ const TenantRegisterPage = () => {
                     <Link component={RouterLink} to="/privacy">
                       Privacy Policy
                     </Link>
+                    , and confirm that all information provided is accurate.
                   </Typography>
                 }
               />
             </Box>
           </Box>
-        );
+        )
       default:
-        return "Unknown step";
+        return "Unknown step"
     }
-  };
+  }
 
   return (
     <Box
@@ -435,35 +777,20 @@ const TenantRegisterPage = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4} justifyContent="center" alignItems="center">
-          <Grid
-            item
-            xs={12}
-            md={6}
-            lg={7}
-            sx={{ display: { xs: "none", md: "block" } }}
-          >
+          <Grid item xs={12} md={6} lg={7} sx={{ display: { xs: "none", md: "block" } }}>
             <Box sx={{ color: "white", p: 4 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
                 <Build sx={{ fontSize: 40, mr: 2 }} />
-                <Typography
-                  variant="h4"
-                  component="div"
-                  sx={{ fontWeight: "bold" }}
-                >
+                <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
                   Garage ERP
                 </Typography>
               </Box>
-              <Typography
-                variant="h3"
-                component="h1"
-                gutterBottom
-                sx={{ fontWeight: "bold" }}
-              >
+              <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
                 Start Your Garage Business Journey
               </Typography>
               <Typography variant="h6" paragraph>
-                Join thousands of garage owners who trust our platform to manage
-                their operations efficiently and grow their business.
+                Join thousands of garage owners who trust our platform to manage their operations efficiently and grow
+                their business.
               </Typography>
               <Box sx={{ mt: 4 }}>
                 <Typography variant="body1" paragraph>
@@ -478,9 +805,7 @@ const TenantRegisterPage = () => {
                 <Typography variant="body1" paragraph>
                   • 24/7 customer support
                 </Typography>
-                <Typography variant="body1">
-                  • Secure cloud-based platform
-                </Typography>
+                <Typography variant="body1">• Secure cloud-based platform</Typography>
               </Box>
             </Box>
           </Grid>
@@ -492,7 +817,7 @@ const TenantRegisterPage = () => {
                 borderRadius: 2,
                 backdropFilter: "blur(10px)",
                 backgroundColor: "rgba(255, 255, 255, 0.95)",
-                maxHeight: "80vh",
+                maxHeight: "85vh",
                 overflowY: "auto",
               }}
             >
@@ -529,11 +854,7 @@ const TenantRegisterPage = () => {
                     mt: 4,
                   }}
                 >
-                  <Button
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    startIcon={<ArrowBack />}
-                  >
+                  <Button disabled={activeStep === 0} onClick={handleBack} startIcon={<ArrowBack />}>
                     Back
                   </Button>
 
@@ -574,7 +895,7 @@ const TenantRegisterPage = () => {
         </Grid>
       </Container>
     </Box>
-  );
-};
+  )
+}
 
-export default TenantRegisterPage;
+export default TenantRegisterPage

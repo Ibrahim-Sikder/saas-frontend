@@ -20,7 +20,7 @@ import {
 import { Pagination } from "@mui/material";
 import { toast } from "react-toastify";
 import { HiOutlinePlus } from "react-icons/hi";
-const CustomerQoutationList = ({ id, customerId, user_type }) => {
+const CustomerQoutationList = ({ id, customerId, user_type,tenantDomain }) => {
   const [filterType, setFilterType] = useState("");
 
   const [limit, setLimit] = useState(10);
@@ -35,6 +35,7 @@ const CustomerQoutationList = ({ id, customerId, user_type }) => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain,
       id,
       limit,
       page: currentPage,
@@ -57,7 +58,7 @@ const CustomerQoutationList = ({ id, customerId, user_type }) => {
 
     if (willDelete) {
       try {
-        await moveRecycledQuotation(id).unwrap();
+        await moveRecycledQuotation({tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

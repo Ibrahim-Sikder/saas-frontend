@@ -65,6 +65,7 @@ const UpdateJobCard = () => {
 
   const [dateChange, setDateChange] = useState(false);
   const [techDateChange, setTechDateChange] = useState(false);
+ const tenantDomain = window.location.hostname.split(".")[0];
 
   const formRef = useRef();
   const navigate = useNavigate();
@@ -77,10 +78,8 @@ const UpdateJobCard = () => {
     formState: { errors },
   } = useForm();
 
-  const [
-    updateJobCard,
-    { isLoading: updateJobCardLoading, error: jobCardUpdateError },
-  ] = useUpdateJobCardMutation();
+  const [updateJobCard, { isLoading: updateJobCardLoading }] =
+    useUpdateJobCardMutation();
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
@@ -89,9 +88,10 @@ const UpdateJobCard = () => {
   );
   const userFromProfile = new URLSearchParams(location.search).get("user");
 
-  const { data, isLoading, refetch } = useGetSingleJobCardQuery(id);
+  const { data, isLoading, refetch } = useGetSingleJobCardQuery({tenantDomain,id});
 
   const singleCard = data?.data;
+  console.log("single jobcard", singleCard);
 
   useEffect(() => {
     if (singleCard?.user_type === "customer") {

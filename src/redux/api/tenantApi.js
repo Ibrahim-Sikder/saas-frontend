@@ -2,13 +2,15 @@ import { baseApi } from "./baseApi";
 
 const tenantApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createTenant: builder.mutation({
-      query: (data) => ({
+   createTenant: builder.mutation({
+      query: ({ payload, plan }) => ({
         url: "/tenants",
         method: "POST",
-        body: data,
+        body: {
+          ...payload,
+          plan,
+        },
       }),
-      invalidatesTags: ["tenant"],
     }),
 
     getAllTenant: builder.query({

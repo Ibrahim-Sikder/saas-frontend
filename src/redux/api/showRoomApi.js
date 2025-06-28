@@ -47,7 +47,7 @@ const showRoomApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteShowRoom: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/showrooms/${id}`,
+        url: `/showrooms/delete-permanantly/${id}`,
         method: "DELETE",
           params: {
           tenantDomain,

@@ -24,7 +24,7 @@ const RecycledQuotationList = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -36,7 +36,7 @@ const RecycledQuotationList = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
-      tenantDomain: domain,
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -68,7 +68,7 @@ const RecycledQuotationList = () => {
     if (result === "restore") {
       try {
         await restoreFromRecycledQuotation({
-          tenantDomain: domain,
+          tenantDomain,
           id,
         }).unwrap();
         swal({
@@ -87,7 +87,7 @@ const RecycledQuotationList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteQuotation({ tenantDomain: domain, id }).unwrap();
+        await permanantlyDeleteQuotation({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Quotation has been permanently deleted.",

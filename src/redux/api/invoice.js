@@ -60,7 +60,7 @@ const invoiceApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteInvoice: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/invoices/${id}`,
+        url: `/invoices/delete-permanantly/${id}`,
         method: "DELETE",
          params: { tenantDomain },
       }),

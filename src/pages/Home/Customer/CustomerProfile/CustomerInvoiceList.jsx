@@ -18,7 +18,7 @@ import {
 import { Pagination } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { HiOutlinePlus } from "react-icons/hi";
-const CustomerInvoiceList = ({ id, user_type }) => {
+const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
   const [filterType, setFilterType] = useState("");
 
   const [limit, setLimit] = useState(10);
@@ -38,6 +38,7 @@ const CustomerInvoiceList = ({ id, user_type }) => {
 
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
+      tenantDomain,
       id,
       limit,
       page: currentPage,
@@ -55,7 +56,7 @@ const CustomerInvoiceList = ({ id, user_type }) => {
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice(id).unwrap();
+        await moveRecycledInvoice({tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -67,12 +68,7 @@ const CustomerInvoiceList = ({ id, user_type }) => {
     }
   };
 
-  const handleAllInvoice = () => {
-    setFilterType("");
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-  };
+
 
   return (
     <div className=" mb-24 mt-10 w-full">

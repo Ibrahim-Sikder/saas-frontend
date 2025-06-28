@@ -74,7 +74,7 @@ const moneyReceiptApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteMoneyReceipt: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/money-receipts/${id}`,
+        url: `/money-receipts/delete-permanantly/${id}`,
         method: "DELETE",
         params: { tenantDomain },
       }),

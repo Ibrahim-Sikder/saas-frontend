@@ -20,12 +20,11 @@ import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 
 const ShowRoomProfile = () => {
-  const [invoiceData, setInvoiceData] = useState([]);
-
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+ const tenantDomain = window.location.hostname.split(".")[0];
 
-  const { data: profileData, isLoading } = useGetSingleShowRoomQuery(id);
+  const { data: profileData, isLoading } = useGetSingleShowRoomQuery({tenantDomain, id});
 
   // Initialize tab value from localStorage or default to 0
   const [value, setValue] = useState(() => {
@@ -151,32 +150,32 @@ const ShowRoomProfile = () => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <ShowRoomAccount profileData={profileData} />
+          <ShowRoomAccount tenantDomain={tenantDomain} profileData={profileData} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <VehicleDetails id={id} />
+          <VehicleDetails tenantDomain={tenantDomain} id={id} />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <CustomerJobCardList
+          <CustomerJobCardList tenantDomain={tenantDomain}
             id={id}
             customerId={profileData?.data?.showRoomId}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          <CustomerQoutationList
+          <CustomerQoutationList tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={4}>
-          <CustomerInvoiceList
+          <CustomerInvoiceList tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={5}>
-          <CustomerMoneyList id={id} user_type={profileData?.data?.user_type} />
+          <CustomerMoneyList tenantDomain={tenantDomain} id={id} user_type={profileData?.data?.user_type} />
         </TabPanel>
 
         <TabPanel value={value} index={6}>

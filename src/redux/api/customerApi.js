@@ -47,7 +47,7 @@ const customerApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteCustomer: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/customers/${id}`,
+        url: `/customers/delete-permanantly/${id}`,
         method: "DELETE",
           params: {
           tenantDomain,

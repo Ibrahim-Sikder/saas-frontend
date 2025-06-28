@@ -84,13 +84,12 @@ const AddJobCard = () => {
   const [filterType, setFilterType] = useState("");
 
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState("");
-  console.log(getDataWithChassisNo);
   const formRef = useRef();
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
   const jobCardLimit = 500000;
- const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = window.location.hostname.split(".")[0];
   const {
     register,
     handleSubmit,
@@ -109,24 +108,35 @@ const AddJobCard = () => {
 
   const { data: customerData, isLoading: customerLoading } =
     useGetAllCustomersQuery({
-      tenantDomain: domain,
+      tenantDomain: tenantDomain,
       limit: jobCardLimit,
       page: currentPage,
     });
 
   const { data: companyData, isLoading: companyLoading } =
-    useGetAllCompaniesQuery({tenantDomain: domain, limit: jobCardLimit, page: currentPage });
-
+    useGetAllCompaniesQuery({
+      tenantDomain: tenantDomain,
+      limit: jobCardLimit,
+      page: currentPage,
+    });
   const { data: showroomData, isLoading: showroomLoading } =
-    useGetAllShowRoomsQuery({tenantDomain: domain, limit: jobCardLimit, page: currentPage });
+    useGetAllShowRoomsQuery({
+      tenantDomain: tenantDomain,
+      limit: jobCardLimit,
+      page: currentPage,
+    });
 
   const { data: userDetails, isLoading: userDetailsLoading } =
-    useGetUserDetailsForJobCardQuery({ tenantDomain: domain, id: userId, userType: newId });
-
+    useGetUserDetailsForJobCardQuery({
+      tenantDomain: tenantDomain,
+      id: userId,
+      userType: newId,
+    });
+  console.log(userDetails);
 
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
-      tenantDomain: domain,
+      tenantDomain: tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -404,7 +414,7 @@ const AddJobCard = () => {
     };
 
     const newCard = {
-      tenantDomain:domain,
+      tenantDomain: tenantDomain,
       customer,
       company,
       showroom,

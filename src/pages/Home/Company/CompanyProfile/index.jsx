@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { HiLocationMarker } from "react-icons/hi";
-import { HiEnvelope, HiMiniPhone } from "react-icons/hi2";
+import { HiMiniPhone } from "react-icons/hi2";
 import { ImUserTie } from "react-icons/im";
 import "../../Customer/Customer.css";
 import SupplierPaymentList from "../../Suppliers/SupplierPaymentList";
@@ -20,20 +19,15 @@ import CustomerMoneyList from "../../Customer/CustomerProfile/CustomerMoneyList"
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 const CompanyProfile = () => {
-  const [jobCardData, setJobCardData] = useState([]);
-  const [quotationData, setQuotationData] = useState([]);
-  const [invoiceData, setInvoiceData] = useState([]);
-
-  const [moneyReceiptData, setMoneyReceiptData] = useState([]);
-
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+ const tenantDomain = window.location.hostname.split(".")[0];
 
   const {
     data: profileData,
     isLoading,
     error: companyError,
-  } = useGetSingleCompanyQuery(id);
+  } = useGetSingleCompanyQuery({tenantDomain, id});
 
   const [value, setValue] = useState(() => {
     const savedTab = localStorage.getItem(`company-tab-${id}`);
@@ -158,35 +152,35 @@ const CompanyProfile = () => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <CompanyAccount profileData={profileData} />
+          <CompanyAccount tenantDomain={tenantDomain} profileData={profileData} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <VehicleDetails id={id} />
+          <VehicleDetails tenantDomain={tenantDomain} id={id} />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <CustomerJobCardList
+          <CustomerJobCardList tenantDomain={tenantDomain}
             id={id}
             customerId={profileData?.data?.companyId}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          <CustomerQoutationList
+          <CustomerQoutationList tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={4}>
-          <CustomerInvoiceList
+          <CustomerInvoiceList tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={5}>
-          <CustomerMoneyList id={id} user_type={profileData?.data?.user_type} />
+          <CustomerMoneyList tenantDomain={tenantDomain} id={id} user_type={profileData?.data?.user_type} />
         </TabPanel>
         <TabPanel value={value} index={6}>
-          <SupplierPaymentList />
+          <SupplierPaymentList  tenantDomain={tenantDomain}/>
         </TabPanel>
         <TabPanel value={value} index={7}>
           <Message />
