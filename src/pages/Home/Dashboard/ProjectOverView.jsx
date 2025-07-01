@@ -10,8 +10,8 @@ import Loading from "../../../components/Loading/Loading";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
 
 const ProjectOverView = () => {
-  const { data: allMetaData, isLoading, isError } = useGetAllMetaQuery({});
-  if (isError) return <h2>Oops! Data not found.</h2>;
+  const tenantDomain = window.location.hostname.split(".")[0];
+  const { data: allMetaData, isLoading } = useGetAllMetaQuery({ tenantDomain });
   if (isLoading) return <Loading />;
 
   const userData = [

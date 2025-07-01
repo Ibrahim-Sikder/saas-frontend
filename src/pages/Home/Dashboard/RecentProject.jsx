@@ -23,7 +23,9 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
 }));
 
 const RecentProject = () => {
+    const tenantDomain = window.location.hostname.split(".")[0];
   const { data, error, isLoading } = useGetAllJobCardsQuery({
+    tenantDomain,
     limit: 5,
     page: 1,
   });

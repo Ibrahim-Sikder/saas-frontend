@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import * as React from "react";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useGetAllIncomesQuery } from "../../redux/api/income";
 import Loading from "../Loading/Loading";
@@ -20,27 +21,38 @@ const monthNames = [
   "December",
 ];
 
-
 export default function YearlyIncomeChart() {
   const [radius, setRadius] = React.useState(50);
   const [itemNb, setItemNb] = React.useState(12);
   const [skipAnimation, setSkipAnimation] = React.useState(false);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
-  const { data: incomeData, isLoading: expenseLoading } = useGetAllIncomesQuery(
-    {
-      limit: 10,
-      page: 1,
-    }
-  );
+  const { data: incomeData, isLoading: incomeLoading } = useGetAllIncomesQuery({
+    tenantDomain,
+    limit: 10,
+    page: 1,
+  });
 
-  if (expenseLoading) {
+  if (incomeLoading) {
     return <Loading />;
   }
 
-  const monthlyIncom = incomeData?.data?.incomes.map((income) => income.amount);
+  const incomeList = incomeData?.data?.incomes || [];
 
-  const dynamicData = monthlyIncom?.map((amount, index) => ({
-    label: monthNames[index], 
+  if (incomeList.length === 0) {
+    return (
+      <Box textAlign="center" py={5}>
+        <Typography variant="h6" color="textSecondary">
+          No income data found.
+        </Typography>
+      </Box>
+    );
+  }
+
+  const monthlyIncom = incomeList.map((income) => income.amount || 0);
+
+  const dynamicData = monthlyIncom.map((amount, index) => ({
+    label: monthNames[index] || `Month ${index + 1}`,
     value: amount,
   }));
 
@@ -51,10 +63,9 @@ export default function YearlyIncomeChart() {
         series={[
           { data: dynamicData, outerRadius: radius },
           {
-            data: dynamicData?.slice(0, itemNb),
+            data: dynamicData.slice(0, itemNb),
             innerRadius: radius,
-          
-            arcLabel: () => "", 
+            arcLabel: () => "",
           },
         ]}
         skipAnimation={skipAnimation}

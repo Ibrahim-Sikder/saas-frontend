@@ -32,9 +32,11 @@ const handleSubmit = async (data) => {
         let redirectURL;
 
         if (isLocalhost) {
+          // ✅ Localhost subdomain with custom domain
           redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
         } else {
-          redirectURL = `https://${tenantDomain}.trustautosolution.com/dashboard`;
+          // ✅ Live site
+          redirectURL = `https://${tenantDomain}/dashboard`;
         }
 
         window.location.href = redirectURL;
@@ -51,7 +53,6 @@ const handleSubmit = async (data) => {
     setLoading(false);
   }
 };
-
 
 
 

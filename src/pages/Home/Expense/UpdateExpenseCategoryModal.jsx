@@ -10,13 +10,23 @@ import {
 } from "../../../redux/api/expense";
 
 const UpdateExpenseCategoryModal = ({ open, setOpen, categoryId }) => {
-  const { data, isLoading } = useGetSingleExpenseCategoryQuery(categoryId);
+  const tenantDomain = window.location.hostname.split(".")[0];
+
+  const { data, isLoading } = useGetSingleExpenseCategoryQuery({
+    tenantDomain,
+    id: categoryId,
+  });
+  console.log("single expense ", data);
   const [updateCategory] = useUpdateExpenseCategoryMutation();
 
   const handleSubmit = async (data, reset) => {
     const toastId = toast.loading("Updating expense category");
     try {
-      const res = await updateCategory({ id: categoryId, ...data }).unwrap();
+      const res = await updateCategory({
+        tenantDomain,
+        id: categoryId,
+        ...data,
+      }).unwrap();
       toast.success(res.message || "Expense Category update successfully!");
       reset();
       setOpen();
@@ -32,8 +42,8 @@ const UpdateExpenseCategoryModal = ({ open, setOpen, categoryId }) => {
   }
 
   const defaultValues = {
-    name: data?.data?.name || "",
-    code: data?.data?.code || "",
+    name: data?.name || "",
+    code: data?.code || "",
   };
   return (
     <TASRightSideModal

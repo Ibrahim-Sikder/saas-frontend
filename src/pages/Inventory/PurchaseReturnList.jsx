@@ -71,6 +71,7 @@ export default function PurchaseReturnList() {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const [search, setSearch] = useState("");
   const [deletePurchaseReturn] = useDeletePurchaseReturnMutation();
@@ -79,6 +80,7 @@ export default function PurchaseReturnList() {
     isLoading: purchaseLoading,
     refetch,
   } = useGetAllPurchaseReturnsQuery({
+    tenantDomain,
     limit: 10,
     page,
     searchTerm: search,
@@ -101,11 +103,6 @@ export default function PurchaseReturnList() {
     purchaseReturnData?.data?.returns?.filter(
       (ret) => ret.status === "cancelled"
     ).length || 0;
-
-  // const handleMenuOpen = (event, returnItem) => {
-  //   setAnchorEl(event.currentTarget);
-  //   setSelectedReturn(returnItem);
-  // };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -138,7 +135,10 @@ export default function PurchaseReturnList() {
     if (selectedReturn) {
       try {
         setIsLoading(true);
-        await deletePurchaseReturn(selectedReturn._id).unwrap();
+        await deletePurchaseReturn({
+          tenantDomain,
+          id: selectedReturn._id,
+        }).unwrap();
         toast.success("Purchase return deleted successfully!");
         refetch(); // Refresh the data after deletion
       } catch (error) {

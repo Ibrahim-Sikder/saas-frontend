@@ -14,9 +14,12 @@ import {
 } from "../../../redux/api/expense";
 
 export default function ExpenseList() {
+  const tenantDomain = window.location.hostname.split(".")[0];
+
   const [currentPage, setCurrentPage] = useState(1);
   const [search, SetSearch] = useState("");
   const { data, isLoading } = useGetAllExpensesQuery({
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
@@ -34,7 +37,7 @@ export default function ExpenseList() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteExpense(id).unwrap();
+          await deleteExpense({tenantDomain, id}).unwrap();
           Swal.fire("Deleted!", "The product has been deleted.", "success");
         } catch (error) {
           Swal.fire(

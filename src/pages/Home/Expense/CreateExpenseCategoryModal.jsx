@@ -1,49 +1,36 @@
-import { Box, Button, Grid, Typography, TextField, MenuItem, Divider } from "@mui/material"
-import { styled } from "@mui/material/styles"
-import TASRightSideModal from "../../../components/Share/Modal/Modal"
-import TASForm from "../../../components/form/Form"
+/* eslint-disable react/prop-types */
+import { Box, Grid, Typography, TextField, MenuItem, Divider } from "@mui/material"
+
 import TASInput from "../../../components/form/Input"
 import { toast } from "react-toastify"
 import { useCreateExpenseCategoryMutation } from "../../../redux/api/expense"
 import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material"
+import { StyledForm, StyledModal } from "../../../utils/customStyle"
+import { StyledButton } from "../../../utils"
 
-const StyledModal = styled(TASRightSideModal)(({ theme }) => ({
-  "& .MuiPaper-root": {
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    borderRadius: "8px 0 0 8px",
-  },
-}))
-
-const StyledForm = styled(TASForm)(({ theme }) => ({
-  "& .MuiGrid-item": {
-    marginBottom: theme.spacing(2),
-  },
-}))
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(1, 3),
-  textTransform: "none",
-  fontWeight: 600,
-}))
 
 const CreateExpenseCategoryModal = ({ open, setOpen }) => {
   const [createExpenseCategory] = useCreateExpenseCategoryMutation()
+ const tenantDomain = window.location.hostname.split(".")[0];
 
   const handleSubmit = async (data, reset) => {
-    const toastId = toast.loading("Creating expense category")
-    try {
-      const res = await createExpenseCategory(data).unwrap()
-      toast.success(res.message || "Expense Category created successfully!")
-      reset()
-      setOpen(false)
-    } catch (error) {
-      toast.error("Error creating category: " + (error.message || "Something went wrong!"))
-    } finally {
-      toast.dismiss(toastId)
-    }
+  const toastId = toast.loading("Creating expense category...");
+  try {
+    const res = await createExpenseCategory({
+      tenantDomain,
+      expenseInfo: data,
+    }).unwrap();
+
+    toast.success(res.message || "Expense Category created successfully!");
+    reset();
+    setOpen(false);
+  } catch (error) {
+    toast.error("Error creating category: " + (error.message || "Something went wrong!"));
+  } finally {
+    toast.dismiss(toastId);
   }
+};
+
 
   return (
     <StyledModal open={open} setOpen={setOpen} width="500px" title="Create Expense Category">

@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material";
 import PurchaseOrderForm from "./PurchaseOrderForm";
 
-const PurchaseOrderModal = ({ open, onClose, onSave }) => {
+const PurchaseOrderModal = ({tenantDomain, open, onClose, onSave }) => {
   const theme = useTheme();
 
   return (
@@ -75,7 +75,7 @@ const PurchaseOrderModal = ({ open, onClose, onSave }) => {
       </DialogTitle>
 
       <DialogContent dividers sx={{ p: 8 }}>
-        <PurchaseOrderForm onClose={onClose}/>
+        <PurchaseOrderForm tenantDomain={tenantDomain} onClose={onClose}/>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>

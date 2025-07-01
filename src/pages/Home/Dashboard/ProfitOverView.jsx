@@ -7,7 +7,6 @@ import { useGetAllExpensesQuery } from "../../../redux/api/expense";
 import { useGetAllIncomesQuery } from "../../../redux/api/income";
 import { useGetAllDonationQuery } from "../../../redux/api/donationApi";
 import Loading from "../../../components/Loading/Loading";
-import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
   height: 10,
@@ -24,18 +23,19 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
 }));
 
 const ProfitOverView = () => {
+  const tenantDomain = window.location.hostname.split(".")[0];
 
-  const { data: allMetaData, isLoading, isError } = useGetAllMetaQuery({});
 
- 
-  const { data: donationData, isLoading: donationLoading } =
+  const { data: donationData, isLoading } =
     useGetAllDonationQuery();
+  console.log("donation data", donationData);
   const {
     data: expenseData,
     error: expenseError,
     isLoading: expenseLoading,
   } = useGetAllExpensesQuery({
-    limit: 90000000000000000000000,
+    tenantDomain,
+    limit: 9000000000000,
     page: 1,
   });
 
@@ -44,14 +44,17 @@ const ProfitOverView = () => {
     error: incomeError,
     isLoading: incomeLoading,
   } = useGetAllIncomesQuery({
-    limit: 900000000000000000000000,
+    tenantDomain,
+    limit: 900000000000,
     page: 1,
   });
+
+  console.log("incomedata", incomeData);
+  console.log("expense data", expenseData);
 
   if (expenseLoading || incomeLoading) return <Loading />;
   if (expenseError || incomeError)
     return <div>Error: {expenseError?.message || incomeError?.message}</div>;
-
 
   const totalIncome =
     incomeData?.data?.incomes?.reduce(
@@ -76,8 +79,6 @@ const ProfitOverView = () => {
     Math.round((totalIncome / (totalIncome + totalExpenses)) * 100)
   );
 
-
-
   const expensePercentage = Number(
     Math.round((totalExpenses / (totalIncome + totalExpenses)) * 100)
   );
@@ -93,10 +94,8 @@ const ProfitOverView = () => {
   const previousMonthEarnings = 5785;
   const previousMonthExpenses = 305785;
 
-
-  if (isError) return <h2>Oops! Data not found.</h2>;
   if (isLoading) return <Loading />;
- 
+
   return (
     <div className="profiteCardWrap lg:flex-nowrap flex-wrap flex items-center justify-between sectionMargin">
       <div className="profitCard ">

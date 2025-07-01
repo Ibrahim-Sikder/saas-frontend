@@ -5,7 +5,7 @@ const metaApi = baseApi.injectEndpoints({
  
 
     getAllMeta: builder.query({
-      query: (tenantDomain) => ({
+      query: ({tenantDomain}) => ({
         url: `/meta`,
         method: "GET",
          params:{tenantDomain}
@@ -13,7 +13,7 @@ const metaApi = baseApi.injectEndpoints({
       providesTags: ["meta"],
     }),
     allCustomer: builder.query({
-      query: (tenantDomain) => ({
+      query: ({tenantDomain}) => ({
         url: `/meta/allcustomer`,
         method: "GET",
         params:{tenantDomain}

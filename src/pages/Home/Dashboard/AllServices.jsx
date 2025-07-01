@@ -22,9 +22,9 @@ const AllServices = () => {
     data: allMetaData,
     isLoading,
     isError,
-  } = useGetAllMetaQuery(tenantDomain);
+  } = useGetAllMetaQuery({tenantDomain});
 
-  if (isError) return <h2>Oops! Data not found.</h2>;
+
   if (isLoading) return <Loading />;
 
   return (

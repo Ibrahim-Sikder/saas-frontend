@@ -36,10 +36,18 @@ const JobcardTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+
+const isLocalhost = window.location.hostname.includes("localhost");
+let tenantDomain = "";
+if (isLocalhost) {
+  tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
+} else {
+  tenantDomain = window.location.hostname.split(".")[0];
+}
+
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
-       tenantDomain:domain, 
+       tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -76,7 +84,7 @@ const JobcardTable = () => {
 
     if (willDelete) {
       try {
-        await movetoRecyclebinJobCard({tenantDomain:domain, id}).unwrap();
+        await movetoRecyclebinJobCard({tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

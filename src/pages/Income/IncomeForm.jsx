@@ -68,12 +68,13 @@ import { useIncomeForm } from "../../hooks/useIncomeForm";
 import FormTextArea from "../../components/form/FormTextArea";
 
 const IncomeForm = ({ id }) => {
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
 
   const { data: singleIncome, isLoading: incomeLoading } =
-    useGetSingleIncomeQuery(id);
+    useGetSingleIncomeQuery({tenantDomain, id});
 
   const { invoiceOption, jobcardOption, customerOption, vehicleOptions } =
     useFormOptions();

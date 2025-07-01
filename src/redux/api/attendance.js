@@ -10,6 +10,7 @@ const attendanceApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["attendance", "employee"],
     }),
+
     getTodayAttendance: builder.query({
       query: () => ({
         url: `/attendances/today`,
@@ -18,29 +19,29 @@ const attendanceApi = baseApi.injectEndpoints({
       providesTags: ["attendance"],
     }),
     getAllAttendances: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/attendances`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["attendance"],
     }),
 
-    
     getSingleAttendance: builder.query({
-      query: (date) => ({
+      query: ({tenantDomain,date}) => ({
         url: `/attendances/${date}`,
         method: "GET",
+        params:{tenantDomain}
       }),
       providesTags: ["attendance"],
     }),
 
-    
     deleteAttendance: builder.mutation({
-      query: (attendanceInfo) => ({
+      query: ({tenantDomain , attendanceInfo}) => ({
         url: "/attendances/remove",
         method: "PUT",
         body: attendanceInfo,
+        params:{tenantDomain}
       }),
       invalidatesTags: ["attendance"],
     }),
@@ -52,5 +53,5 @@ export const {
   useGetTodayAttendanceQuery,
   useGetAllAttendancesQuery,
   useGetSingleAttendanceQuery,
-  useDeleteAttendanceMutation
+  useDeleteAttendanceMutation,
 } = attendanceApi;

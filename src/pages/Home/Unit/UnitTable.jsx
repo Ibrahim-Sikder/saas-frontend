@@ -43,18 +43,17 @@ import {
 } from "../../../redux/api/unitApi";
 import { UpdateUnitModal } from "./UpdateUnitModal";
 
-const MotionBox = motion(Box);
-
 const UnitTable = ({ handleUpdateOpen }) => {
-  const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [viewDetailsModal, setViewDetailsModal] = useState(false);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const { data, isLoading, refetch } = useGetAllIUnitQuery({
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
@@ -62,7 +61,6 @@ const UnitTable = ({ handleUpdateOpen }) => {
 
   const [deleteUnit, { isLoading: isDeleting }] = useDeleteUnitMutation();
 
-  // Safely extract units and meta data with fallbacks
   const units = data?.data?.units || [];
   const meta = data?.data?.meta || {};
   const totalPage = meta.totalPage || 1;
@@ -122,7 +120,7 @@ const UnitTable = ({ handleUpdateOpen }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteUnit(id).unwrap();
+          await deleteUnit({tenantDomain, id}).unwrap();
           Swal.fire({
             title: "Deleted!",
             text: "The unit has been deleted successfully.",
@@ -155,22 +153,22 @@ const UnitTable = ({ handleUpdateOpen }) => {
 
   // Get random color for unit cards
   const getRandomColor = (id) => {
-    if (!id) return "#6366f1"; // Default color if no ID
+    if (!id) return "#6366f1"; 
 
     const colors = [
-      "#6366f1", // Indigo
-      "#8b5cf6", // Violet
-      "#ec4899", // Pink
-      "#f43f5e", // Rose
-      "#f97316", // Orange
-      "#eab308", // Yellow
-      "#10b981", // Emerald
-      "#06b6d4", // Cyan
-      "#3b82f6", // Blue
+      "#6366f1",
+      "#8b5cf6", 
+      "#ec4899",
+      "#f43f5e", 
+      "#f97316", 
+      "#eab308",
+      "#10b981", 
+      "#06b6d4",
+      "#3b82f6",
     ];
 
     try {
-      // Use the id to deterministically select a color
+
       const index =
         id
           .toString()
@@ -179,17 +177,13 @@ const UnitTable = ({ handleUpdateOpen }) => {
       return colors[index];
     } catch (error) {
       console.error("Error generating color:", error);
-      return "#6366f1"; // Default color if there's an error
+      return "#6366f1"; 
     }
   };
 
   return (
-    <MotionBox
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Search and Filter Bar */}
+    <>
+   
       <Box
         sx={{
           p: 2,
@@ -654,7 +648,7 @@ const UnitTable = ({ handleUpdateOpen }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </MotionBox>
+    </>
   );
 };
 

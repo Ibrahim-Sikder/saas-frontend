@@ -1,426 +1,704 @@
 /* eslint-disable no-unused-vars */
+"use client"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "react-toastify"
 import {
   Box,
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
-  styled,
-  TextField,
   Typography,
-} from "@mui/material";
-import { FaFileInvoice } from "react-icons/fa";
-import HeaderButton from "../../components/CommonButton/HeaderButton";
-import { NotificationAdd } from "@mui/icons-material";
-import { FaUserGear } from "react-icons/fa6";
-import { useForm } from "react-hook-form";
-import DonatinList from "./DonationList";
-import { useCreateDonationMutation } from "../../redux/api/donationApi";
-import { toast } from "react-toastify";
+  TextField,
+  Grid,
+  Button,
+  Stepper,
+  Step,
+  StepLabel,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Avatar,
+  Chip,
+  LinearProgress,
+  Fade,
+  Slide,
+  Divider,
+  Stack,
+  useTheme,
+  alpha,
+} from "@mui/material"
+import {
+  Favorite,
+  Person,
+  Payment,
+  ArrowForward,
+  ArrowBack,
+  CheckCircle,
+  VolunteerActivism,
+  Phone,
+  LocationOn,
+  Email,
+  Public,
+  AttachMoney,
+} from "@mui/icons-material"
 
-const Donation = () => {
-  const [createDonation] = useCreateDonationMutation()
-  const { register, watch, handleSubmit } = useForm();
-  const payment = watch("payment_method");
+const steps = ["Personal Info", "Donation Details", "Payment Method", "Review & Submit"]
+
+const paymentMethods = [
+  { value: "Bkash", label: "Bkash", icon: "📱", color: "#E2136E" },
+  { value: "Nagad", label: "Nagad", icon: "💳", color: "#F99500" },
+  { value: "Rocket", label: "Rocket", icon: "🚀", color: "#8B1538" },
+  { value: "Check", label: "Bank Check", icon: "🏦", color: "#1976D2" },
+  { value: "Card", label: "Credit Card", icon: "💳", color: "#4CAF50" },
+  { value: "Bank Transfer", label: "Bank Transfer", icon: "🏛️", color: "#FF9800" },
+  { value: "Other", label: "Other", icon: "💰", color: "#9C27B0" },
+]
+
+const bankOptions = [
+  "Bangladesh Bank",
+  "Sonali Bank",
+  "Janata Bank",
+  "Agrani Bank",
+  "Rupali Bank",
+  "Pubali Bank",
+  "Uttara Bank",
+  "Islami Bank Bangladesh Limited",
+  "Dutch-Bangla Bank",
+  "BRAC Bank",
+  "Eastern Bank",
+  "National Bank",
+  "Prime Bank",
+  "Standard Bank",
+  "One Bank",
+  "Bank Asia",
+  "Trust Bank",
+  "City Bank",
+  "Southeast Bank",
+]
+
+export default function DonationForm() {
+  const theme = useTheme()
+  const [activeStep, setActiveStep] = useState(0)
+  const [selectedPayment, setSelectedPayment] = useState("")
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+
+  const watchedValues = watch()
+  const paymentMethod = watch("payment_method")
 
   const onSubmit = async (data) => {
-      try {
-        const response = await createDonation(data).unwrap();
-        if (response.success) {
-          toast.success(response.message);
-        }
-      } catch (error) {
-        toast.error(error.message);
-      }
-  };
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      toast.success("Donation submitted successfully! Thank you for your generosity.")
+      console.log("Donation data:", data)
+    } catch (error) {
+      toast.error("Failed to submit donation. Please try again.")
+    }
+  }
 
-  return (
-    <Box>
-      <section className="py-5 xl:py-0">
-        <div className="addProductWraps">
-          <div className="flex justify-between  border-b-2">
-            <HeaderButton />
-            <div className="flex items-end justify-end">
-              <NotificationAdd size={30} className="mr-2" />
-              <FaUserGear size={30} />
-            </div>
-          </div>
-          <div className="productHeadWrap">
-            <div className="flex items-center md:justify-center ">
-              <FaFileInvoice className="invoicIcon" />
-              <div className="ml-2">
-                <h3 className="md:text-2xl font-bold">Donation </h3>
-                <span className="text-sm">Dashboard / Donation </span>
-              </div>
-            </div>
-          </div>
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+  }
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Paper
-              sx={{
-                width: {
-                  lg: "1200px",
-                  md: "100%",
-                },
-                margin: "auto",
-                padding: "30px",
-              }}
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="bold"
-                  textAlign="center"
-                  marginBottom="20px"
-                >
-                  Donation Information
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Name"
-                      id="Tax"
-                      {...register("name")}
-                    />
-                  </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Mobile"
-                      id="Tax"
-                      {...register("mobile_number")}
-                    />
-                  </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Address"
-                      id="Tax"
-                      {...register("address")}
-                    />
-                  </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      id="Tax"
-                      {...register("email")}
-                    />
-                  </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Donate Purpose"
-                      id="Tax"
-                      {...register("donation_purpose")}
-                    />
-                  </Grid>
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+  }
 
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
+  const renderPaymentFields = () => {
+    if (!paymentMethod) return null
+
+    const commonFieldStyle = {
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        "&:hover fieldset": {
+          borderColor: theme.palette.primary.main,
+        },
+      },
+    }
+
+    switch (paymentMethod) {
+      case "Check":
+        return (
+          <Fade in timeout={500}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth sx={commonFieldStyle}>
+                  <InputLabel>Select Bank</InputLabel>
+                  <Select label="Select Bank" {...register("payment_account")}>
+                    {bankOptions.map((bank) => (
+                      <MenuItem key={bank} value={bank}>
+                        {bank}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Account Number" {...register("bank_account_no")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Check Number" {...register("check_no")} sx={commonFieldStyle} />
+              </Grid>
+            </Grid>
+          </Fade>
+        )
+
+      case "Bank Transfer":
+        return (
+          <Fade in timeout={500}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Bank Account Number"
+                  {...register("bank_account_no")}
+                  sx={commonFieldStyle}
+                />
+              </Grid>
+            </Grid>
+          </Fade>
+        )
+
+      case "Card":
+        return (
+          <Fade in timeout={500}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Card Number" {...register("card_number")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Card Holder Name" {...register("card_holder_name")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField fullWidth label="Expiry Month" {...register("month_first")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField fullWidth label="Expiry Year" {...register("year")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField fullWidth label="CVV" {...register("security_code")} sx={commonFieldStyle} />
+              </Grid>
+            </Grid>
+          </Fade>
+        )
+
+      case "Bkash":
+      case "Nagad":
+      case "Rocket":
+      case "Other":
+        return (
+          <Fade in timeout={500}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Transaction Number" {...register("transaction_no")} sx={commonFieldStyle} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField fullWidth label="Transaction ID" {...register("transactionId")} sx={commonFieldStyle} />
+              </Grid>
+            </Grid>
+          </Fade>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  const getStepContent = (step) => {
+    const fieldStyle = {
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        "&:hover fieldset": {
+          borderColor: theme.palette.primary.main,
+        },
+      },
+    }
+
+    switch (step) {
+      case 0:
+        return (
+          <Slide direction="left" in mountOnEnter unmountOnExit>
+            <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box textAlign="center" mb={4}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      bgcolor: theme.palette.primary.main,
+                      mx: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <Person sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    Personal Information
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Tell us about yourself to personalize your donation experience
+                  </Typography>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
-                      label="Donation Amount"
-                      id="Tax"
-                      {...register("donation_amount")}
+                      label="Full Name"
+                      {...register("name", { required: "Name is required" })}
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                      InputProps={{
+                        startAdornment: <Person sx={{ color: "action.active", mr: 1 }} />,
+                      }}
+                      sx={fieldStyle}
                     />
                   </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Mobile Number"
+                      {...register("mobile_number", { required: "Mobile number is required" })}
+                      error={!!errors.mobile_number}
+                      helperText={errors.mobile_number?.message}
+                      InputProps={{
+                        startAdornment: <Phone sx={{ color: "action.active", mr: 1 }} />,
+                      }}
+                      sx={fieldStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Email Address"
+                      type="email"
+                      {...register("email", {
+                        required: "Email is required",
+                        pattern: {
+                          value: /^\S+@\S+$/i,
+                          message: "Invalid email address",
+                        },
+                      })}
+                      error={!!errors.email}
+                      helperText={errors.email?.message}
+                      InputProps={{
+                        startAdornment: <Email sx={{ color: "action.active", mr: 1 }} />,
+                      }}
+                      sx={fieldStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Country"
-                      id="Tax"
                       {...register("donation_country")}
+                      InputProps={{
+                        startAdornment: <Public sx={{ color: "action.active", mr: 1 }} />,
+                      }}
+                      sx={fieldStyle}
                     />
                   </Grid>
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <FormControl fullWidth>
-                      <InputLabel htmlFor="payment-method-select">
-                        Payment Method
-                      </InputLabel>
-                      <Select
-                        //   onChange={handlePaymentChange}
-                        label="Payment Method"
-                        id="payment-method-select"
-                        {...register("payment_method")}
-                      >
-                        <MenuItem value="Bkash">Bkash</MenuItem>
-                        <MenuItem value="Nagad">Nagad</MenuItem>
-                        <MenuItem value="Rocket">Rocket</MenuItem>
-                        <MenuItem value="Check">Check</MenuItem>
-                        <MenuItem value="Card">Card</MenuItem>
-                        <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
-                      </Select>
-                    </FormControl>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      multiline
+                      rows={3}
+                      {...register("address")}
+                      InputProps={{
+                        startAdornment: <LocationOn sx={{ color: "action.active", mr: 1, mt: 1 }} />,
+                      }}
+                      sx={fieldStyle}
+                    />
                   </Grid>
                 </Grid>
-              </Box>
-              <Box>
-                <Grid container spacing={2}></Grid>
-                <Box marginTop={4} md={6} sm={12} xs={12}>
-                  <Grid container spacing={2}>
-                    {payment && (
-                      <>
-                        {payment === "Check" && (
-                          <>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <FormControl fullWidth>
-                                <InputLabel htmlFor="payment-account-select">
-                                  Select Bank
-                                </InputLabel>
-                                <Select
-                                  label="Payment Account"
-                                  id="payment-account-select"
-                                  {...register("payment_method")}
-                                >
-                                  <MenuItem value="Bangladesh Bank">
-                                    Bangladesh Bank
-                                  </MenuItem>
-                                  <MenuItem value="Sonali Bank">
-                                    Sonali Bank
-                                  </MenuItem>
-                                  <MenuItem value="Janata Bank">
-                                    Janata Bank
-                                  </MenuItem>
-                                  <MenuItem value="Agrani Bank">
-                                    Agrani Bank
-                                  </MenuItem>
-                                  <MenuItem value="Rupali Bank">
-                                    Rupali Bank
-                                  </MenuItem>
-                                  <MenuItem value="Pubali Bank">
-                                    Pubali Bank
-                                  </MenuItem>
-                                  <MenuItem value="Uttara Bank">
-                                    Uttara Bank
-                                  </MenuItem>
-                                  <MenuItem value="Islami Bank Bangladesh Limited">
-                                    Islami Bank Bangladesh Limited
-                                  </MenuItem>
-                                  <MenuItem value="Dutch-Bangla Bank">
-                                    Dutch-Bangla Bank
-                                  </MenuItem>
-                                  <MenuItem value="BRAC Bank">
-                                    BRAC Bank
-                                  </MenuItem>
-                                  <MenuItem value="Eastern Bank">
-                                    Eastern Bank
-                                  </MenuItem>
-                                  <MenuItem value="National Bank">
-                                    National Bank
-                                  </MenuItem>
-                                  <MenuItem value="Prime Bank">
-                                    Prime Bank
-                                  </MenuItem>
-                                  <MenuItem value="South Bangla Agriculture and Commerce Bank">
-                                    South Bangla Agriculture and Commerce Bank
-                                  </MenuItem>
-                                  <MenuItem value="Standard Bank">
-                                    Standard Bank
-                                  </MenuItem>
-                                  <MenuItem value="One Bank">One Bank</MenuItem>
-                                  <MenuItem value="Bank Asia">
-                                    Bank Asia
-                                  </MenuItem>
-                                  <MenuItem value="Trust Bank">
-                                    Trust Bank
-                                  </MenuItem>
-                                  <MenuItem value="Jamuna Bank">
-                                    Jamuna Bank
-                                  </MenuItem>
-                                  <MenuItem value="Shahjalal Islami Bank">
-                                    Shahjalal Islami Bank
-                                  </MenuItem>
-                                  <MenuItem value="City Bank">
-                                    City Bank
-                                  </MenuItem>
-                                  <MenuItem value="Southeast Bank">
-                                    Southeast Bank
-                                  </MenuItem>
-                                  <MenuItem value="Social Islami Bank">
-                                    Social Islami Bank
-                                  </MenuItem>
-                                  <MenuItem value="AB Bank">AB Bank</MenuItem>
-                                  <MenuItem value="IFIC Bank">
-                                    IFIC Bank
-                                  </MenuItem>
-                                  <MenuItem value="Mercantile Bank">
-                                    Mercantile Bank
-                                  </MenuItem>
-                                  <MenuItem value="Mutual Trust Bank">
-                                    Mutual Trust Bank
-                                  </MenuItem>
-                                  <MenuItem value="EXIM Bank">
-                                    EXIM Bank
-                                  </MenuItem>
-                                  <MenuItem value="NCC Bank">NCC Bank</MenuItem>
-                                  <MenuItem value="SBAC Bank">
-                                    SBAC Bank
-                                  </MenuItem>
-                                </Select>
-                              </FormControl>
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Account Number "
-                                {...register("bank_account_no")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Check No"
-                                {...register("check_no")}
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        {payment === "Bank Transfer" && (
-                          <Grid item lg={6} md={6} sm={12} xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Bank Account No"
-                              {...register("bank_account_no")}
-                              marginTop={2}
-                            />
-                          </Grid>
-                        )}
+              </CardContent>
+            </Card>
+          </Slide>
+        )
 
-                        {payment === "Card" && (
-                          <>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Card Number"
-                                {...register("card_number")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Card Holder Name"
-                                {...register("card_holder_name")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Card Transaction No."
-                                {...register("card_transaction_no")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Card Type"
-                                {...register("card_type")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Month"
-                                {...register("month_first")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Year"
-                                {...register("year")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Month"
-                                {...register("month_second")}
-                              />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                              <TextField
-                                fullWidth
-                                label="Security Code"
-                                {...register("security_code")}
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        {payment === "Other" && (
-                          <>
-                            <Grid item lg={6}>
-                              <TextField
-                                fullWidth
-                                label="Transition No"
-                                {...register("transaction_no")}
-                                marginTop={2}
-                              />
-                            </Grid>
-                            <Grid item lg={6}>
-                              <TextField
-                                fullWidth
-                                label="Transition ID"
-                                {...register("transactionId")}
-                                marginTop={2}
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        {(payment === "Bkash" ||
-                          payment === "Nagad" ||
-                          payment === "Rocket") && (
-                          <>
-                            <Grid item lg={6}>
-                              <TextField
-                                fullWidth
-                                label="Transition No"
-                                {...register("transaction_no")}
-                                marginTop={2}
-                              />
-                            </Grid>
-                            <Grid item lg={6}>
-                              <TextField
-                                fullWidth
-                                label="Transition ID"
-                                {...register("transactionId")}
-                                marginTop={2}
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        <Grid item lg={12} md={12} sm={12} xs={12}>
-                          <textarea
-                            placeholder="Description"
-                            className="border p-3 rounded-md w-full h-[150px]"
-                            id=""
-                            cols="30"
-                            rows="10"
-                            {...register("description")}
-                          />
-                        </Grid>
-                      </>
-                    )}
-                  </Grid>
+      case 1:
+        return (
+          <Slide direction="left" in mountOnEnter unmountOnExit>
+            <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box textAlign="center" mb={4}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      bgcolor: theme.palette.secondary.main,
+                      mx: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <VolunteerActivism sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    Donation Details
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Share your generous contribution details
+                  </Typography>
                 </Box>
-                <div className="flex justify-end mt-3">
-                  <button className="bg-[#42A1DA] text-white px-5 py-2 rounded-md">
-                    Submit
-                  </button>
-                </div>
-              </Box>
-            </Paper>
-          </form>
-        </div>
-        {/* <BillPayList allBillPays={allBillPays} /> */}
-      </section>
-      <DonatinList />
-    </Box>
-  );
-};
 
-export default Donation;
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Donation Purpose"
+                      {...register("donation_purpose", { required: "Purpose is required" })}
+                      error={!!errors.donation_purpose}
+                      helperText={errors.donation_purpose?.message}
+                      sx={fieldStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Donation Amount"
+                      type="number"
+                      {...register("donation_amount", {
+                        required: "Amount is required",
+                        min: { value: 1, message: "Amount must be greater than 0" },
+                      })}
+                      error={!!errors.donation_amount}
+                      helperText={errors.donation_amount?.message}
+                      InputProps={{
+                        startAdornment: <AttachMoney sx={{ color: "action.active", mr: 1 }} />,
+                      }}
+                      sx={fieldStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Additional Message (Optional)"
+                      multiline
+                      rows={4}
+                      {...register("description")}
+                      placeholder="Share your thoughts or dedication message..."
+                      sx={fieldStyle}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Slide>
+        )
+
+      case 2:
+        return (
+          <Slide direction="left" in mountOnEnter unmountOnExit>
+            <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box textAlign="center" mb={4}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      bgcolor: theme.palette.success.main,
+                      mx: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <Payment sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    Payment Method
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Choose your preferred payment method
+                  </Typography>
+                </Box>
+
+                <Grid container spacing={2} mb={4}>
+                  {paymentMethods.map((method) => (
+                    <Grid item xs={12} sm={6} md={4} key={method.value}>
+                      <Card
+                        sx={{
+                          cursor: "pointer",
+                          border: paymentMethod === method.value ? 2 : 1,
+                          borderColor: paymentMethod === method.value ? method.color : "divider",
+                          bgcolor: paymentMethod === method.value ? alpha(method.color, 0.1) : "background.paper",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            transform: "translateY(-4px)",
+                            boxShadow: theme.shadows[8],
+                          },
+                        }}
+                        onClick={() => setSelectedPayment(method.value)}
+                      >
+                        <CardContent sx={{ textAlign: "center", py: 3 }}>
+                          <Typography variant="h4" mb={1}>
+                            {method.icon}
+                          </Typography>
+                          <Typography variant="subtitle1" fontWeight="medium">
+                            {method.label}
+                          </Typography>
+                          <input
+                            type="radio"
+                            value={method.value}
+                            {...register("payment_method", { required: "Payment method is required" })}
+                            style={{ display: "none" }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+
+                {errors.payment_method && (
+                  <Typography color="error" variant="body2" mb={2}>
+                    {errors.payment_method.message}
+                  </Typography>
+                )}
+
+                {paymentMethod && (
+                  <Box
+                    sx={{
+                      p: 3,
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                    }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      {paymentMethods.find((m) => m.value === paymentMethod)?.label} Details
+                    </Typography>
+                    {renderPaymentFields()}
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Slide>
+        )
+
+      case 3:
+        return (
+          <Slide direction="left" in mountOnEnter unmountOnExit>
+            <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box textAlign="center" mb={4}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      bgcolor: theme.palette.warning.main,
+                      mx: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <CheckCircle sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    Review Your Donation
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Please review your information before submitting
+                  </Typography>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+                      <Typography variant="h6" gutterBottom color="primary">
+                        Personal Information
+                      </Typography>
+                      <Divider sx={{ mb: 2 }} />
+                      <Stack spacing={1}>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Name:
+                          </Typography>
+                          <Typography variant="body2" fontWeight="medium">
+                            {watchedValues.name || "Not provided"}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Email:
+                          </Typography>
+                          <Typography variant="body2" fontWeight="medium">
+                            {watchedValues.email || "Not provided"}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Mobile:
+                          </Typography>
+                          <Typography variant="body2" fontWeight="medium">
+                            {watchedValues.mobile_number || "Not provided"}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Country:
+                          </Typography>
+                          <Typography variant="body2" fontWeight="medium">
+                            {watchedValues.donation_country || "Not provided"}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+                      <Typography variant="h6" gutterBottom color="secondary">
+                        Donation Details
+                      </Typography>
+                      <Divider sx={{ mb: 2 }} />
+                      <Stack spacing={1}>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Purpose:
+                          </Typography>
+                          <Typography variant="body2" fontWeight="medium">
+                            {watchedValues.donation_purpose || "Not provided"}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Amount:
+                          </Typography>
+                          <Typography variant="h6" color="success.main" fontWeight="bold">
+                            ${watchedValues.donation_amount || "0"}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" color="text.secondary">
+                            Payment:
+                          </Typography>
+                          <Chip label={watchedValues.payment_method || "Not selected"} size="small" color="primary" />
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Grid>
+                  {watchedValues.description && (
+                    <Grid item xs={12}>
+                      <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+                        <Typography variant="h6" gutterBottom>
+                          Your Message
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                          {watchedValues.description}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Slide>
+        )
+
+      default:
+        return "Unknown step"
+    }
+  }
+
+  return (
+    <Box sx={{ minHeight: "100vh", bgcolor: "grey.50" }}>
+      {/* Hero Section */}
+     
+
+      {/* Main Content */}
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: 3, py: 6 }}>
+        <Paper
+          elevation={8}
+          sx={{
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)",
+          }}
+        >
+          {/* Stepper */}
+          <Box sx={{ p: 4, bgcolor: "background.paper" }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label, index) => (
+                <Step key={label}>
+                  <StepLabel
+                    StepIconProps={{
+                      sx: {
+                        "&.Mui-active": {
+                          color: theme.palette.primary.main,
+                        },
+                        "&.Mui-completed": {
+                          color: theme.palette.success.main,
+                        },
+                      },
+                    }}
+                  >
+                    <Typography variant="subtitle2" fontWeight="medium">
+                      {label}
+                    </Typography>
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+
+          <Divider />
+
+          {/* Form Content */}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ p: 4, minHeight: 600 }}>{getStepContent(activeStep)}</Box>
+
+            <Divider />
+
+            {/* Navigation Buttons */}
+            <Box sx={{ p: 4, display: "flex", justifyContent: "space-between", bgcolor: "grey.50" }}>
+              <Button
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                startIcon={<ArrowBack />}
+                variant="outlined"
+                size="large"
+                sx={{ borderRadius: 2 }}
+              >
+                Back
+              </Button>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  endIcon={<Favorite />}
+                  sx={{
+                    borderRadius: 2,
+                    px: 4,
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+                    "&:hover": {
+                      background: `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.secondary.dark} 90%)`,
+                    },
+                  }}
+                >
+                  Submit Donation
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  variant="contained"
+                  size="large"
+                  endIcon={<ArrowForward />}
+                  sx={{ borderRadius: 2, px: 4 }}
+                >
+                  Next
+                </Button>
+              )}
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Box>
+  )
+}

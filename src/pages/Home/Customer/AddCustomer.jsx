@@ -97,6 +97,22 @@ const AddCustomer = () => {
     });
   };
 
+  const isLocalhost = window.location.hostname.includes("localhost");
+
+let tenantDomain = "";
+
+if (isLocalhost) {
+  // For fashions.com.localhost → ['fashions', 'com', 'localhost']
+  tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
+} else {
+  // For live (like rahim.trustautosolution.com)
+  // → tenant = 'rahim'
+  tenantDomain = window.location.hostname.split(".")[0];
+}
+
+console.log("Tenant Domain:", tenantDomain);
+
+
   const {
     register,
     handleSubmit,
@@ -108,16 +124,16 @@ const AddCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Customer...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
+    // const getTenantName = () => {
+    //   const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
+    //   if (host.includes("localhost")) {
+    //     return host.split(".")[0];
+    //   }
 
-      return host.split(".")[0];
-    };
-    const tenantDomain = getTenantName();
+    //   return host.split(".")[0];
+    // };
+    // const tenantDomain = getTenantName();
     
     const customer = {
       company_name: data.company_name,

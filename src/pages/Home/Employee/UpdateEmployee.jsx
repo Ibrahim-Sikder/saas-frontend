@@ -9,14 +9,13 @@ import {
   FormControl,
   Grid,
   InputLabel,
-  MenuItem,
   Select,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaUsers, FaCloudUploadAlt } from "react-icons/fa";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaUsers } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { countries } from "../../../constant";
 import {
@@ -24,19 +23,17 @@ import {
   useUpdateEmployeeMutation,
 } from "../../../redux/api/employee";
 import ImageUploader from "../../../helper/uploadImage";
-import { ErrorMessage } from "../../../components/error-message";
-import Loading from "../../../components/Loading/Loading";
-import uploadFile from "../../../helper/uploadFile";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { ArrowBack } from "@mui/icons-material";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import Loading from "../../../components/Loading/Loading";
 
 const UpdateEmployee = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [guardianCountryCode, setGuardianCountryCode] = useState(countries[0]);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -57,7 +54,7 @@ const UpdateEmployee = () => {
     data: singleEmployee,
     isLoading: employeeLoading,
     error: employeeError,
-  } = useGetSingleEmployeeQuery(id);
+  } = useGetSingleEmployeeQuery({ tenantDomain, id });
 
   const [updateEmployee, { isLoading: updateLoading, error: updateError }] =
     useUpdateEmployeeMutation();
@@ -105,29 +102,20 @@ const UpdateEmployee = () => {
   function getFileName(url) {
     return url.split("/").pop().split(".")[0];
   }
-
-  const handleImageUpload = async (event) => {
-    setLoading(true);
-    const file = event.target.files?.[0];
-
-    if (file) {
-      const uploadPhoto = await uploadFile(file);
-      setUrl(uploadPhoto?.secure_url);
-      setLoading(false);
-    }
-  };
   const onSubmit = async (data) => {
     data.country_code = countryCode.code;
     data.guardian_country_code = guardianCountryCode.code;
     data.image = url;
     data.nid_number = Number(data.nid_number);
 
-    const values = {
-      id,
-      data,
-    };
+    const res = await updateEmployee({
+      id: singleEmployee.data._id,
+      data: {
+        tenantDomain,
+        ...data,
+      },
+    }).unwrap();
 
-    const res = await updateEmployee(values).unwrap();
     if (res.success) {
       toast.success(res.message);
       navigate("/dashboard/employee-list");

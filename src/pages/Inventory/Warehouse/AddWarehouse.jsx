@@ -42,12 +42,15 @@ import {
 import { toast } from "react-toastify";
 
 const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
+  const tenantDomain = window.location.hostname.split(".")[0];
+
   const theme = useTheme();
   const [createWarehouse] = useCreateWarehouseMutation();
   const [updateWarehouse] = useUpdateWarehouseMutation();
-  const { data: singleWarehouse, isLoading } =
-    useGetSingleWarehouseQuery(warehouseId);
-
+  const { data: singleWarehouse, isLoading } = useGetSingleWarehouseQuery({
+    tenantDomain,
+    id: warehouseId,
+  });
   const handleClose = () => {
     onClose(false);
   };
@@ -58,18 +61,31 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
       city: data.city[0],
       division: data.division[0],
     };
+    console.log({
+      tenantDomain,
+      id: warehouseId,
+      ...modifiedData,
+    });
+
     try {
       if (warehouseId) {
         const res = await updateWarehouse({
           id: warehouseId,
-          ...modifiedData,
+          data: {
+            ...modifiedData,
+            tenantDomain,
+          },
         }).unwrap();
+
         if (res.success) {
           toast.success("Warehouse update successfully!");
           handleClose();
         }
       } else {
-        const res = await createWarehouse(modifiedData).unwrap();
+        const res = await createWarehouse({
+          tenantDomain,
+          ...modifiedData,
+        }).unwrap();
         if (res.success) {
           toast.success(`Warehouse added successfully!`);
           handleClose();
@@ -340,4 +356,3 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
 };
 
 export default AddWarehouseModal;
-

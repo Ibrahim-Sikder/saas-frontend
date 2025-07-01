@@ -11,64 +11,83 @@ const supplierApi = baseApi.injectEndpoints({
       invalidatesTags: ["supplier"],
     }),
     getAllSuppliers: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/suppliers`,
         method: "GET",
         params: { limit, page, searchTerm },
+         headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
       providesTags: ["supplier"],
     }),
 
     getSingleSupplier: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["supplier"],
     }),
     getSupplierWithBillPay: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/${id}/profile`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["supplier"],
     }),
     updateSupplier: builder.mutation({
-      query: ({ id, ...data }) => {
-        return {
-          url: `/suppliers/${id}`,
-          method: "PUT",
-          body: data,
-        };
-      },
+      query: ({ id, data }) => ({
+        url: `/suppliers/${id}`,
+        method: "PUT",
+        body: data,
+      }),
       invalidatesTags: ["supplier"],
     }),
 
     deleteSupplier: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["supplier"],
     }),
     permenantlyDeleteSupplier: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["supplier"],
     }),
     moveRecycledSupplier: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/recycle/${id}`,
         method: "PATCH",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["supplier"],
     }),
     restoreFromRecycledSupplier: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/suppliers/restore/${id}`,
         method: "PATCH",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["supplier"],
     }),
@@ -83,5 +102,5 @@ export const {
   useRestoreFromRecycledSupplierMutation,
   useMoveRecycledSupplierMutation,
   usePermenantlyDeleteSupplierMutation,
-  useGetSupplierWithBillPayQuery
+  useGetSupplierWithBillPayQuery,
 } = supplierApi;

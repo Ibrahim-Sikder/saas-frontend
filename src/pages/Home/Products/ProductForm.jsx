@@ -118,41 +118,52 @@ export default function ProductForm({ id }) {
   const handleSupplierClose = () => setSupplierOpen(false);
   const handleUnitOpen = () => setUnitOpen(true);
   const handleUnitClose = () => setUnitOpen(false);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const { data: singleProduct, isLoading: singleProductLoading } =
-    useGetSingleProductQuery(id);
+    useGetSingleProductQuery({ tenantDomain, id });
+
   const [updateProduct] = useUpdateProductMutation();
   const [createProduct] = useCreateProductMutation();
   const { data } = useGetAllICategoryQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: brandData } = useGetAllIBrandQuery({
+  const { data: brandData, isLoading: brandLoading } = useGetAllIBrandQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: unitData } = useGetAllIUnitQuery({
+  const { data: unitData, isLoading: unitLoading } = useGetAllIUnitQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: productTypeData } = useGetAllIProductTypeQuery({
-    limit: 99999999999,
-    page: 1,
-    searchTerm: "",
-  });
-  const { data: supplierData } = useGetAllSuppliersQuery({
-    limit: 1000000,
-    page: 1,
-    searchTerm: "",
-  });
-  const { data: wareHouseData } = useGetAllWarehousesQuery({
-    limit: 1000000,
-    page: 1,
-    searchTerm: "",
-  });
+  const { data: productTypeData, isLoading: productTypeLoading } =
+    useGetAllIProductTypeQuery({
+      tenantDomain,
+      limit: 99999999999,
+      page: 1,
+      searchTerm: "",
+    });
+  const { data: supplierData, isLoading: supplierLoading } =
+    useGetAllSuppliersQuery({
+      tenantDomain,
+      limit: 1000000,
+      page: 1,
+      searchTerm: "",
+    });
+  const { data: wareHouseData, isLoading: warehouseLoading } =
+    useGetAllWarehousesQuery({
+      tenantDomain,
+      limit: 1000000,
+      page: 1,
+      searchTerm: "",
+    });
 
   // Options for dropdowns
   const warehouseOptions = useMemo(() => {
@@ -252,7 +263,7 @@ export default function ProductForm({ id }) {
       expiryDate: singleProduct.data.expiryDate || "",
       manufacturingDate: singleProduct.data.manufacturingDate || null,
       shelfLife: singleProduct.data.shelfLife || "",
-      shelfLifeUnit: singleProduct.data.shelfLifeUnit || "days",
+      shelfLifeUnit: singleProduct.data.shelfLifeUnit || "Days",
       batchNumber: singleProduct.data.batchNumber || "",
       expiryAlertDays: singleProduct.data.expiryAlertDays || 30,
       category: singleProduct.data.category
@@ -339,15 +350,17 @@ export default function ProductForm({ id }) {
     }
   }, [singleProduct?.data]);
 
+  if (
+    productTypeLoading |
+    brandLoading |
+    unitLoading |
+    warehouseLoading |
+    supplierLoading
+  ) {
+    return <h4>Loading.........</h4>;
+  }
+
   const handleSubmit = async (data) => {
-    // const processDate = (dateValue) => {
-    //   if (!dateValue) return null;
-
-    //   // Parse the date with dayjs and format it consistently
-    //   const parsed = dayjs(dateValue);
-    //   return parsed.isValid() ? parsed.format("YYYY-MM-DD") : null;
-    // };
-
     try {
       const imageUrl =
         data.image && data.image.length > 0 ? data.image[0] : data?.data?.image;
@@ -431,13 +444,20 @@ export default function ProductForm({ id }) {
         isDeleted: data.isDeleted || false,
       };
       if (!id) {
-        const res = await createProduct(modifyValues).unwrap();
+        const res = await createProduct({
+          tenantDomain,
+          ...modifyValues,
+        }).unwrap();
         if (res.success) {
           toast.success("Product create successfully!");
           navigate("/dashboard/product-list");
         }
       } else {
-        const res = await updateProduct({ id, ...modifyValues }).unwrap();
+        const res = await updateProduct({
+          tenantDomain,
+          id,
+          ...modifyValues,
+        }).unwrap();
         if (res.success) {
           toast.success("Product update successfully!");
           navigate("/dashboard/product-list");
@@ -1246,7 +1266,7 @@ export default function ProductForm({ id }) {
         {/* Header */}
         <Box
           sx={{
-            background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+            background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
             color: "white",
             py: 3,
             mb: 4,
@@ -1315,54 +1335,55 @@ export default function ProductForm({ id }) {
                         </Typography>
                       </StepLabel>
                       <StepContent>
-                      <div className="mt-2 mb-1">{step.content}</div>
-                      <div className="md:flex mt-4 mb-2  gap-2 space-x-2">
-                
-                        <div className="mb-2 space-x-2">
-                          <Button
-                            disabled={index === 0}
-                            onClick={handleBack}
-                            sx={{
-                              borderRadius: 100,
-                              px: 3,
-                              color: "white",
-                            }}
-                          >
-                            Back
-                          </Button>
-                          {index === steps.length - 1 ? (
+                        <div className="mt-2 mb-1">{step.content}</div>
+                        <div className="md:flex mt-4 mb-2  gap-2 space-x-2">
+                          <div className="mb-2 space-x-2">
                             <Button
-                              variant="contained"
-                              type="submit"
-                              startIcon={<SaveIcon />}
-                              disabled={submitting}
+                              disabled={index === 0}
+                              onClick={handleBack}
                               sx={{
                                 borderRadius: 100,
-                                background:
-                                  "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                                 px: 3,
                                 color: "white",
                               }}
                             >
-                              {id ? "Update Product " : "Create Product"}
+                              Back
                             </Button>
-                          ) : (
-                            <Button
-                              variant="contained"
-                              onClick={handleNext}
-                              sx={{
-                                borderRadius: 100,
-                                background:
-                                  "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
-                                px: 3,
-                                color: "white",
-                              }}
-                            >
-                              Continue
-                            </Button>
-                          )}
+                            {index === steps.length - 1 ? (
+                              <Button
+                                variant="contained"
+                                type="submit"
+                                startIcon={<SaveIcon />}
+                                disabled={submitting}
+                                sx={{
+                                  borderRadius: 100,
+                                  background:
+                                    "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
+                                  boxShadow:
+                                    "0 4px 10px rgba(106, 27, 154, 0.3)",
+                                  px: 3,
+                                  color: "white",
+                                }}
+                              >
+                                {id ? "Update Product " : "Create Product"}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                sx={{
+                                  borderRadius: 100,
+                                  background:
+                                    "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
+                                  boxShadow:
+                                    "0 4px 10px rgba(106, 27, 154, 0.3)",
+                                  px: 3,
+                                  color: "white",
+                                }}
+                              >
+                                Continue
+                              </Button>
+                            )}
                           </div>
 
                           <Button
@@ -1379,7 +1400,6 @@ export default function ProductForm({ id }) {
                           >
                             Reset
                           </Button>
-                        
                         </div>
                       </StepContent>
                     </Step>

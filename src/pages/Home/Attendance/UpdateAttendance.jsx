@@ -49,15 +49,9 @@ const UpdateAttendance = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const date = new URLSearchParams(location.search).get("date");
-
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [error, setError] = useState("");
-  // const [presentState, setPresentState] = useState([]);
-  // const [absentState, setAbsentState] = useState([]);
-  // const [inTime, setInTime] = useState([]);
-  // const [outTime, setOutTime] = useState([]);
-  // const [overtime, setOvertime] = useState([]);
-  // const [lateStatus, setLateStatus] = useState([]);
   const [presentState, setPresentState] = useState(
     new Array(employeeAttendance?.length).fill(false)
   );
@@ -81,7 +75,7 @@ const UpdateAttendance = () => {
     isLoading: singleAttendanceLoading,
     error: singleAttendanceError,
     refetch,
-  } = useGetSingleAttendanceQuery(date);
+  } = useGetSingleAttendanceQuery({tenantDomain, date});
 
   const [updateAttendance, { isLoading: updateLoading, error: updateError }] =
     useCreateAttendanceMutation();
@@ -119,27 +113,6 @@ const UpdateAttendance = () => {
     if (!time) return "";
     return dayjs(time).format("h:mmA");
   };
-
-  // const handlePresent = (index) => {
-  //   const newPresentState = [...presentState];
-  //   const newAbsentState = [...absentState];
-  //   newPresentState[index] = !newPresentState[index];
-  //   if (newPresentState[index]) {
-  //     newAbsentState[index] = false;
-  //   }
-  //   setPresentState(newPresentState);
-  //   setAbsentState(newAbsentState);
-  // };
-  // const handleAbsent = (index) => {
-  //   const newAbsentState = [...absentState];
-  //   const newPresentState = [...presentState];
-  //   newAbsentState[index] = !newAbsentState[index];
-  //   if (newAbsentState[index]) {
-  //     newPresentState[index] = false;
-  //   }
-  //   setAbsentState(newAbsentState);
-  //   setPresentState(newPresentState);
-  // };
 
   const handlePresent = (index) => {
     const newPresentState = [...presentState];
@@ -229,7 +202,8 @@ const UpdateAttendance = () => {
     );
 
     try {
-      const response = await updateAttendance(newAttendanceData).unwrap();
+      const response = await updateAttendance({   tenantDomain,
+      payload: newAttendanceData,}).unwrap();
       if (response.success) {
         toast.success("Attendance update successful.");
         navigate("/dashboard/attendance-list");

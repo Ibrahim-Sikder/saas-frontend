@@ -107,8 +107,6 @@ const supplierValidationSchema = z.object({
   }),
 });
 
-
-
 export const useSupplierForm = (id) => {
   const [loading, setLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
@@ -116,10 +114,13 @@ export const useSupplierForm = (id) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const theme = useTheme();
   const navigate = useNavigate();
-  const { data: singleSupplier, isLoading: supplierLoading } =
-    useGetSingleSupplierQuery(id);
-    console.log('single supplier',singleSupplier)
-  const [updateSupplier, { isLoading: updateLoading, error: updateError }] =
+  const tenantDomain = window.location.hostname.split(".")[0];
+
+  const { data: singleSupplier, isLoading } = useGetSingleSupplierQuery({
+    tenantDomain,
+    id,
+  });
+  const [updateSupplier, { isLoading: updateLoading }] =
     useUpdateSupplierMutation();
   const defaultSupplierValues = {
     // Basic Information
@@ -178,7 +179,7 @@ export const useSupplierForm = (id) => {
     mode: "onChange",
   });
 
-  const { watch, formState, reset, getValues } = methods;
+  const { watch, formState } = methods;
   const { errors } = formState;
 
   const creditTerms = watch("credit_terms", false);
@@ -188,7 +189,6 @@ export const useSupplierForm = (id) => {
     useCreateSupplierMutation();
 
   const handleTabChange = (event, newValue) => {
-
     const formData = methods.getValues();
     sessionStorage.setItem("supplierFormData", JSON.stringify(formData));
 
@@ -224,14 +224,17 @@ export const useSupplierForm = (id) => {
       lead_time: Number(data.lead_time),
       supplier_photo: data.supplier_photo,
     };
-    console.log("raw value", values);
 
     try {
-      const response = await createSupplier(values).unwrap();
+      const response = await createSupplier({
+        ...values,
+        tenantDomain,
+      }).unwrap();
+
       console.log(response);
       if (response.success) {
         // Clear sessionStorage after successful submission
-    
+
         toast.success(response.message);
         navigate("/dashboard/supplier-list");
       }
@@ -241,7 +244,6 @@ export const useSupplierForm = (id) => {
   };
 
   const onSubmit = async (data) => {
-
     const values = {
       ...data,
       country_code: countryCode.code,
@@ -257,10 +259,12 @@ export const useSupplierForm = (id) => {
     };
 
     try {
-      const response = await updateSupplier({ id, ...values }).unwrap();
+      const response = await updateSupplier({
+        id,
+        data: { ...values, tenantDomain },
+      }).unwrap();
 
       if (response.success) {
-
         toast.success(response.message);
         navigate("/dashboard/supplier-list");
       }
@@ -341,8 +345,6 @@ export const useSupplierForm = (id) => {
       notes: data.notes || "",
       supplier_photo: data.supplier_photo || "",
     });
-
-    
   };
 
   // Load saved form data on component mount

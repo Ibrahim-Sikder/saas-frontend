@@ -69,8 +69,8 @@ export default function LowStocksPage() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [processedProducts, setProcessedProducts] = useState([])
-
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
+const tenantDomain = window.location.hostname.split(".")[0];
+  const queryParams = {tenantDomain, page: currentPage, limit: 100, searchTerm: searchTerm }
   const { data: stockData, isLoading: stockLoading, refetch } = useGetAllStocksQuery(queryParams)
 
 

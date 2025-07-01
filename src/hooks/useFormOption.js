@@ -5,19 +5,22 @@ import { useGetAllInvoicesQuery } from "../redux/api/invoice";
 import { useGetAllJobCardsQuery } from "../redux/api/jobCard";
 
 export const useFormOptions = (initialFilterType = "") => {
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [filterType, setFilterType] = useState(initialFilterType);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
 
   // Fetch data
-  const { data: allCustomers } = useAllCustomerQuery();
+  const { data: allCustomers } = useAllCustomerQuery({tenantDomain});
   const { data: allInvoices, isLoading: invoiceLoading } = useGetAllInvoicesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   });
   const { data: allJobCards, isLoading: jobCardLoading } = useGetAllJobCardsQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,

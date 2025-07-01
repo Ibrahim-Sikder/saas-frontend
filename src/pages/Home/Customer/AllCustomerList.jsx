@@ -22,7 +22,7 @@ const AllCustomerList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const ITEMS_PER_PAGE = 10;
-
+const tenantDomain = window.location.hostname.split(".")[0];
   const searchParam = new URLSearchParams(location.search).get("search");
   const [
     moveRecycledCustomer,
@@ -34,7 +34,7 @@ const AllCustomerList = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/meta/allcustomer`,
+        `${import.meta.env.VITE_API_URL}/meta/allcustomer?tenantDomain=${tenantDomain}`,
         {
           params: {
             limit: ITEMS_PER_PAGE,
@@ -99,7 +99,7 @@ const AllCustomerList = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledCustomer(id).unwrap();
+        await moveRecycledCustomer({tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

@@ -71,8 +71,10 @@ const IncomeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const limit = 15;
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const { data: allIncomes, isLoading: incomeLoading } = useGetAllIncomesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     search: searchTerm,
@@ -92,7 +94,7 @@ const IncomeList = () => {
 
     if (willDelete) {
       try {
-        await deleteIncome(id).unwrap();
+        await deleteIncome({tenantDomain, id}).unwrap();
         swal("Deleted!", "Income record deleted successfully.", "success");
       } catch (error) {
         swal("Error", "An error occurred while deleting the record.", "error");

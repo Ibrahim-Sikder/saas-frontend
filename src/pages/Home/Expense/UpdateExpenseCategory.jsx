@@ -11,9 +11,10 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 
 const CategoryUpdate = () => {
+    const tenantDomain = window.location.hostname.split(".")[0];
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const { data, isLoading } = useGetSingleCategoryQuery(id);
+  const { data, isLoading } = useGetSingleCategoryQuery({tenantDomain, id});
   const [updateCategory] = useUpdateCategoryMutation();
   const navigate = useNavigate()
 

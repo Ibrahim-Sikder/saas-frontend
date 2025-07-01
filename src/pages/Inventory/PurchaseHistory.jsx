@@ -81,6 +81,8 @@ export default function PurchaseHistoryPage() {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadFormat, setDownloadFormat] = useState("")
+   const tenantDomain = window.location.hostname.split(".")[0];
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -90,6 +92,7 @@ export default function PurchaseHistoryPage() {
 
   // Fetch purchase data from API
   const { data: purchaseData, isLoading: isDataLoading } = useGetAllPurchasesQuery({
+    tenantDomain,
     limit: 900,
     page,
     searchTerm: search,

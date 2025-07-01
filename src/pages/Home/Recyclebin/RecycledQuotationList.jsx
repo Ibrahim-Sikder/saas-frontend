@@ -7,7 +7,6 @@ import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { NotificationAdd } from "@mui/icons-material";
 import { Pagination } from "@mui/material";
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
 import {
   useGetAllQuotationsQuery,
   usePermanantlyDeleteQuotationMutation,
@@ -121,13 +120,7 @@ const RecycledQuotationList = () => {
   return (
     <div>
       <div className="overflow-x-auto mt-5">
-        <div className="flex justify-between border-b-2 pb-3">
-          <HeaderButton />
-          <div className="flex  justify-end items-end">
-            <NotificationAdd size={30} className="mr-2" />
-            <FaUserGear size={30} />
-          </div>
-        </div>
+       
 
         <div className="flex items-center justify-between my-3 mb-8">
           <div className="flex items-center justify-center ">

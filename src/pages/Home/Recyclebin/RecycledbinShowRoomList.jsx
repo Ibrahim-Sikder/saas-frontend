@@ -2,20 +2,17 @@
 /* eslint-disable no-unused-vars */
 import { FaTrashAlt, FaEdit, FaUserTie } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { NotificationAdd } from "@mui/icons-material";
-import { FaUserGear } from "react-icons/fa6";
 import { useRef, useState } from "react";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { HiOutlineSearch } from "react-icons/hi";
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
-import { Pagination } from "@mui/material";
 import { toast } from "react-toastify";
 import {
   useGetAllShowRoomsQuery,
   usePermanantlyDeleteShowRoomMutation,
   useRestoreFromRecycledShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
+import { Pagination } from "@mui/material";
 const RecycledbinShowRoomList = () => {
   const textInputRef = useRef(null);
   const [filterType, setFilterType] = useState("");
@@ -122,13 +119,7 @@ const RecycledbinShowRoomList = () => {
 
   return (
     <div className="w-full mt-5 mb-24">
-      <div className="flex justify-between pb-3 border-b-2 px-2">
-        <HeaderButton />
-        <div className="flex items-end justify-end">
-          <NotificationAdd size={30} className="mr-2" />
-          <FaUserGear size={30} />
-        </div>
-      </div>
+     
       <div className="flex flex-wrap items-center justify-between my-3 mb-8">
         <div className="flex items-center justify-center ">
           <FaUserTie className="invoicIcon" />

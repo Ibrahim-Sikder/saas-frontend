@@ -20,18 +20,19 @@ const EmployeeList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const textInputRef = useRef(null);
   const limit = 20;
-
+  const tenantDomain = window.location.hostname.split(".")[0];
   const {
     data: employeeData,
     isLoading: employeesLoading,
     error: employeesError,
   } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
   });
 
-  const [moveRecycledEmployee] = useMoveRecycledEmployeeMutation();
+  const [moveRecycledEmployee] = useMoveRecycledEmployeeMutation(tenantDomain);
 
   const deleteEmployee = async (id) => {
     const willDelete = await swal({
@@ -44,7 +45,7 @@ const EmployeeList = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledEmployee(id).unwrap();
+        await moveRecycledEmployee({ tenantDomain, id }).unwrap();
         swal(
           "Success!",
           "Employee moved to Recycle Bin successfully.",

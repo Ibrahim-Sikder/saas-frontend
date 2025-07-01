@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Box,
   Typography,
@@ -10,10 +9,8 @@ import {
   Link,
   Paper,
   Button,
-  useTheme,
 } from "@mui/material";
 import {
-  Add as AddIcon,
   Dashboard as DashboardIcon,
   Category as CategoryIcon,
   NavigateNext as NavigateNextIcon,
@@ -30,10 +27,7 @@ const Unit = () => {
   const handleUpdateClose = () => setUpdateOpen(null);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <div
       className="py-6 md:px-4"
     >
       {/* Header Section */}
@@ -158,7 +152,7 @@ const Unit = () => {
           unitId={updateOpen}
         />
       )}
-    </motion.div>
+    </div>
   );
 };
 

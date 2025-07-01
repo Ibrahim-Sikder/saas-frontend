@@ -47,45 +47,10 @@ import {
 import CreateExpenseCategoryModal from "./CreateExpenseCategoryModal";
 import UpdateExpenseCategoryModal from "./UpdateExpenseCategoryModal";
 import { styled } from "@mui/material/styles";
+import { ActionButton, StyledDataGrid } from "../../../utils/customStyle";
+import { StyledCard } from "../../../utils";
 
-// Styled components
-const StyledCard = styled(Card)(({ theme }) => ({
-  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.05)",
-  borderRadius: "12px",
-  overflow: "hidden",
-}));
 
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  border: "none",
-  "& .MuiDataGrid-columnHeader": {
-    backgroundColor: "#42A1DA",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "14px",
-    padding: "16px",
-  },
-  "& .MuiDataGrid-cell": {
-    padding: "16px",
-    fontSize: "14px",
-  },
-  "& .MuiDataGrid-row:nth-of-type(even)": {
-    backgroundColor: "#f9f9f9",
-  },
-  "& .MuiDataGrid-row:hover": {
-    backgroundColor: "rgba(66, 161, 218, 0.08)",
-  },
-  "& .MuiDataGrid-footerContainer": {
-    display: "none",
-  },
-}));
-
-const ActionButton = styled(Button)(({ theme, color }) => ({
-  borderRadius: "8px",
-  textTransform: "none",
-  fontWeight: "600",
-  boxShadow: "none",
-  padding: "6px 12px",
-}));
 
 export default function ExpenseCategoryList() {
   const [open, setOpen] = useState(false);
@@ -99,9 +64,11 @@ export default function ExpenseCategoryList() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
+const tenantDomain = window.location.hostname.split(".")[0];
 
   // Fetch data
   const { data, isLoading, refetch } = useGetAllICategoryQuery({
+    tenantDomain, 
     limit: pageSize,
     page: currentPage,
     searchTerm: search,
@@ -109,6 +76,7 @@ export default function ExpenseCategoryList() {
 
   const { data: expenseCategoryData, isLoading: categoryLoading } =
     useGetAllExpensesCategoryQuery({
+      tenantDomain, 
       limit: 9999999999,
       page: currentPage,
       searchTerm: search,
@@ -150,7 +118,7 @@ export default function ExpenseCategoryList() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteExpenseCategory(categoryToDelete).unwrap();
+      await deleteExpenseCategory({tenantDomain, id:categoryToDelete}).unwrap();
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
     } catch (error) {

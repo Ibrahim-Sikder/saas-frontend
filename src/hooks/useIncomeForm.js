@@ -28,6 +28,7 @@ export const defaultIncomeValues = {
 
 export const useIncomeForm = (id) => {
   const navigate = useNavigate()
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [createIncome, { isLoading: createLoading }] = useCreateIncomeMutation()
   const [updateIncome, { isLoading: updateLoading }] = useUpdateIncomeMutation()
 
@@ -71,7 +72,7 @@ export const useIncomeForm = (id) => {
     const processedData = processFormData(data)
 
     try {
-      const response = await createIncome(processedData).unwrap()
+      const response = await createIncome({tenantDomain, ...processedData}).unwrap()
       if (response.success) {
         toast.success(response.message)
         navigate("/dashboard/income-list")
@@ -86,7 +87,8 @@ export const useIncomeForm = (id) => {
     const processedData = processFormData(data)
 
     try {
-      const response = await updateIncome({ id, ...processedData }).unwrap()
+      const response = await updateIncome({ tenantDomain, id, ...processedData }).unwrap();
+
       if (response.success) {
         toast.success(response.message)
         navigate("/dashboard/income-list")

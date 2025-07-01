@@ -78,8 +78,10 @@ export default function WarehouseManagementBangladesh() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+    const tenantDomain = window.location.hostname.split(".")[0];
+
   const { data: warehouseData, isLoading: isDataLoading } =
-    useGetAllWarehousesQuery({});
+    useGetAllWarehousesQuery({tenantDomain});
   const [deleteWarehouse] = useDeleteWarehouseMutation();
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -147,7 +149,7 @@ export default function WarehouseManagementBangladesh() {
 
     if (willDelete) {
       try {
-        await deleteWarehouse(id).unwrap();
+        await deleteWarehouse({tenantDomain,id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

@@ -570,13 +570,16 @@ export default function ProductList() {
   // const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
   // Query parameters
+  const tenantDomain = window.location.hostname.split(".")[0];
+
   const queryParams = {
+    tenantDomain,
+    limit: 10,
     page: currentPage,
     searchTerm: filterType,
-    isRecycled: false,
   };
 
-  const { data, isLoading, refetch } = useGetAllIProductQuery(queryParams);
+  const { data, isLoading } = useGetAllIProductQuery(queryParams);
   const [deleteProduct] = useDeleteProductMutation();
 
   // Mock categories for filter
@@ -682,7 +685,7 @@ export default function ProductList() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteProduct(productToDelete).unwrap();
+      await deleteProduct({ tenantDomain, id: productToDelete }).unwrap();
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -820,7 +823,7 @@ export default function ProductList() {
       {/* Header */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           color: "white",
           py: 3,
           mb: 4,
@@ -845,27 +848,24 @@ export default function ProductList() {
       <Container maxWidth="xl" sx={{ p: { xs: 0 } }}>
         {/* Tabs and Actions */}
         <div className="mb-3">
-        <div className=" md:hidden flex justify-end mb-4 md:mb-0">
-              <Button
-                component={Link}
-                to="/dashboard/add-product"
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{
-                  borderRadius: 100,
-                  background:
-                    "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                  boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
-                  px: 3,
-                  color: "white",
-                }}
-              >
-                Add Product
-              </Button>
-            </div>
+          <div className=" md:hidden flex justify-end mb-4 md:mb-0">
+            <Button
+              component={Link}
+              to="/dashboard/add-product"
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                borderRadius: 100,
+                background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
+                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
+                px: 3,
+                color: "white",
+              }}
+            >
+              Add Product
+            </Button>
+          </div>
           <Grid container spacing={2} alignItems="center">
-            
-
             <Grid item xs={12} md={8}>
               <div className="border-b-2 ">
                 <Tabs
@@ -946,7 +946,7 @@ export default function ProductList() {
                     sx={{
                       borderRadius: 100,
                       background:
-                        "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                        "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                       boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                       px: 3,
                       color: "white",
@@ -1377,7 +1377,7 @@ export default function ProductList() {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     px: 3,
                   }}
@@ -1436,7 +1436,7 @@ export default function ProductList() {
                     bgcolor: "#6a1b9a",
                     color: "white",
                     "&:hover": {
-                      bgcolor: "#4a148c",
+                      bgcolor: "#42A1DA",
                     },
                   },
                 },

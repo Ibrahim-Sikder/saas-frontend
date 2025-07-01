@@ -25,15 +25,21 @@ const CustomerListTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
-
+  
+const isLocalhost = window.location.hostname.includes("localhost");
+let tenantDomain = "";
+if (isLocalhost) {
+  tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
+} else {
+  tenantDomain = window.location.hostname.split(".")[0];
+}
   const {
     data: customerData,
     isLoading: customerLoading,
     error: customerError,
     refetch,
   } = useGetAllCustomersQuery({
-    tenantDomain: domain,
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,

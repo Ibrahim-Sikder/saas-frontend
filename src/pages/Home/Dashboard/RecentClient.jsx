@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { useGetAllCustomersQuery } from "../../../redux/api/customerApi";
 import Loading from "../../../components/Loading/Loading";
 const RecentClient = () => {
+    const tenantDomain = window.location.hostname.split(".")[0];
   const {
     data: customerData,
     error,
     isLoading,
   } = useGetAllCustomersQuery({
+    tenantDomain,
     limit: 5,
     page: 1,
   });

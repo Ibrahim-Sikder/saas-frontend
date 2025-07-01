@@ -50,7 +50,7 @@ export const CreateProductTypeModal = ({ open, setOpen }) => {
     >
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 2,
           px: 3,
           display: "flex",

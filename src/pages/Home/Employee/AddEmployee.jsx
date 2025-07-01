@@ -19,10 +19,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { countries } from "../../../constant";
-import {
-  useCreateEmployeeMutation,
-  useDeleteEmployeeMutation,
-} from "../../../redux/api/employee";
+import { useCreateEmployeeMutation } from "../../../redux/api/employee";
 import uploadFile from "../../../helper/uploadFile";
 import EmployeeTable from "./EmployeeTable";
 import { ArrowBack } from "@mui/icons-material";
@@ -32,7 +29,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 const AddEmployee = () => {
-  const [active, setActive] = useState("");
+  const tenantDomain = window.location.hostname.split(".")[0];
   const [url, setUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,8 +50,6 @@ const AddEmployee = () => {
 
   const [createEmployee, { isLoading: createLoading, error: createError }] =
     useCreateEmployeeMutation();
-  const [deleteEmployee, { isLoading: deleteLoading, error: deleteError }] =
-    useDeleteEmployeeMutation();
 
   const handleImageUpload = async (event) => {
     setLoading(true);
@@ -75,7 +70,7 @@ const AddEmployee = () => {
     data.nid_number = Number(data.nid_number);
 
     try {
-      const res = await createEmployee(data).unwrap();
+      const res = await createEmployee({ tenantDomain, ...data }).unwrap();
 
       if (res.success) {
         toast.success(res.message);

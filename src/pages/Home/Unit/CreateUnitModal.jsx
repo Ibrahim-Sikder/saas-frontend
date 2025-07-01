@@ -24,6 +24,7 @@ import TASInput from "../../../components/form/Input";
 
 export const CreateUnitModal = ({ open, setOpen }) => {
   const [createUnit, { isLoading, isSuccess }] = useCreateUnitMutation();
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const handleSubmit = async (formData) => {
     try {
@@ -31,6 +32,7 @@ export const CreateUnitModal = ({ open, setOpen }) => {
 
       const res = await createUnit({
         ...formData,
+        tenantDomain
       }).unwrap();
 
       if (res.success) {
@@ -61,7 +63,7 @@ export const CreateUnitModal = ({ open, setOpen }) => {
 
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 2,
           px: 3,
           display: "flex",
@@ -131,7 +133,7 @@ export const CreateUnitModal = ({ open, setOpen }) => {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     py: 1.5,
                     textTransform: "none",

@@ -16,6 +16,7 @@ for (let year = 2024; year <= 2030; year++) {
 const initialSelectedOption = allMonths[new Date().getMonth()];
 
 const EmployeeSalary = () => {
+    const tenantDomain = window.location.hostname.split(".")[0];
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
   const limit = 100;
@@ -29,8 +30,9 @@ const EmployeeSalary = () => {
   });
   return (
     <>
-      <EmployeeSalaryForm />
+      <EmployeeSalaryForm tenantDomain={tenantDomain}/>
       <EmployeeSalaryListTable
+      tenantDomain={tenantDomain}
         filterType={filterType}
         setFilterType={setFilterType}
         getAllSalary={getAllSalary}

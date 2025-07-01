@@ -31,7 +31,8 @@ import {
 import { usePartialyPaymentMutation } from "../../../redux/api/salary";
 import { toast } from "react-toastify";
 
- const PartialPaymentModal = ({
+const PartialPaymentModal = ({
+  tenantDomain,
   open,
   onClose,
   employee,
@@ -48,8 +49,6 @@ import { toast } from "react-toastify";
 
   const handleSubmit = async () => {
     const amount = Number.parseFloat(paymentAmount);
-
-    // Validation
     if (!amount || amount <= 0) {
       setError("Please enter a valid payment amount");
       return;
@@ -64,6 +63,7 @@ import { toast } from "react-toastify";
       const result = await partialyPayment({
         id: salaryRecord._id,
         data: {
+          tenantDomain,
           amount,
           note: note.trim() || undefined,
           payment_method: paymentMethod,
@@ -71,25 +71,17 @@ import { toast } from "react-toastify";
       }).unwrap();
 
       console.log(result);
-
-      // Success handling
       toast.success("Payment added successfully!");
-
-      // Reset form
       setPaymentAmount("");
       setNote("");
       setPaymentMethod("cash");
       setError("");
-
-      // Call success callback if provided
       if (onPaymentSuccess) {
         onPaymentSuccess();
       }
 
-      // Close modal
       onClose();
     } catch (error) {
-      // Error handling
       console.error("Error adding payment:", error);
 
       if (error.data && error.data.message) {

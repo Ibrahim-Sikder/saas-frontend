@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-"use client"
+"use client";
 
-import { useMemo } from "react"
+import { useMemo } from "react";
 import {
   Box,
   Button,
@@ -15,100 +15,71 @@ import {
   IconButton,
   Divider,
   styled,
-} from "@mui/material"
-import { LocalizationProvider } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { Clock, Plus, ArrowLeft } from "lucide-react"
-import TASForm from "../../../components/form/Form"
-import TASAutocomplete from "../../../components/form/Autocomplete"
-import TASTextarea from "../../../components/form/Textarea"
-import TASTimePicker from "../../../components/form/TimePicker"
-import TASInput from "../../../components/form/Input"
-import TASSelect from "../../../components/form/Select"
-import { departmentOption } from "../../../constant"
-import TASSwitch from "../../../components/form/switch"
-import { useGetAllEmployeesQuery } from "../../../redux/api/employee"
+} from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { Clock, Plus, ArrowLeft } from "lucide-react";
+import TASForm from "../../../components/form/Form";
+import TASAutocomplete from "../../../components/form/Autocomplete";
+import TASTextarea from "../../../components/form/Textarea";
+import TASTimePicker from "../../../components/form/TimePicker";
+import TASInput from "../../../components/form/Input";
+import TASSelect from "../../../components/form/Select";
+import { departmentOption } from "../../../constant";
+import TASSwitch from "../../../components/form/switch";
+import { useGetAllEmployeesQuery } from "../../../redux/api/employee";
 import {
   useCreateEmployeeOvertimeMutation,
   useGetSingleEmployeeOvertimeQuery,
   useUpdateEmployeeOvertimeMutation,
-} from "../../../redux/api/overtimeApi"
-import { toast } from "react-toastify"
-import TASDateCalendar from "../../../components/form/datecalender"
-import { useNavigate } from "react-router-dom"
-
-// Styled component for responsive calendar container
-const ResponsiveCalendarContainer = styled(Box)(({ theme }) => ({
-  width: "100%",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  "& .MuiCalendarPicker-root, & .MuiPickersCalendarHeader-root, & .MuiDayPicker-header, & .MuiDayPicker-monthContainer":
-    {
-      width: "100%",
-      maxWidth: "100%",
-    },
-  "& .MuiPickersDay-root": {
-    margin: "1px",
-    [theme.breakpoints.down("sm")]: {
-      margin: "0px",
-      fontSize: "0.75rem",
-      padding: "0px",
-      height: "32px",
-      width: "32px",
-    },
-  },
-  "& .MuiPickersCalendarHeader-label": {
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "0.9rem",
-    },
-  },
-  "& .MuiPickersCalendarHeader-switchViewButton, & .MuiPickersArrowSwitcher-button": {
-    [theme.breakpoints.down("sm")]: {
-      padding: "4px",
-    },
-  },
-  "& .MuiDayPicker-weekDayLabel": {
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "0.75rem",
-      width: "32px",
-      height: "24px",
-    },
-  },
-}))
+} from "../../../redux/api/overtimeApi";
+import { toast } from "react-toastify";
+import TASDateCalendar from "../../../components/form/datecalender";
+import { useNavigate } from "react-router-dom";
+import { ResponsiveCalendarContainer } from "../../../utils/customStyle";
 
 export default function OvertimeForm({ overtimeId }) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"))
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"))
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const tenantDomain = window.location.hostname.split(".")[0];
+  const [createEmployeeOvertime] = useCreateEmployeeOvertimeMutation();
+  const [updateEmployeeOvertime] = useUpdateEmployeeOvertimeMutation();
+  const {
+    data: singleOvertime,
+    isLoading,
+    error,
+  } = useGetSingleEmployeeOvertimeQuery({ tenantDomain, overtimeId });
 
-  const [createEmployeeOvertime] = useCreateEmployeeOvertimeMutation()
-  const [updateEmployeeOvertime] = useUpdateEmployeeOvertimeMutation()
-  const { data: singleOvertime, isLoading, error } = useGetSingleEmployeeOvertimeQuery(overtimeId)
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { data } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
-  })
+  });
 
   const employeeOptions = useMemo(() => {
-    if (!data?.data?.employees) return []
+    if (!data?.data?.employees) return [];
     return data.data?.employees?.map((employee) => ({
       label: employee.full_name,
       value: employee._id,
-    }))
-  }, [data])
+    }));
+  }, [data]);
 
   const handleFormSubmit = async (data, reset) => {
-    const toastId = toast.loading("Creating Employee Overtime...")
+    const toastId = toast.loading("Creating Employee Overtime...");
 
     const formsubmit = {
       employee:
-        data.employee && data.employee[0] && employeeOptions.find((cat) => cat.label === data.employee[0])?.value
-          ? [employeeOptions.find((cat) => cat.label === data.employee[0])?.value]
+        data.employee &&
+        data.employee[0] &&
+        employeeOptions.find((cat) => cat.label === data.employee[0])?.value
+          ? [
+              employeeOptions.find((cat) => cat.label === data.employee[0])
+                ?.value,
+            ]
           : [],
       entries: [
         {
@@ -121,40 +92,50 @@ export default function OvertimeForm({ overtimeId }) {
           isUrgent: data.isUrgent,
         },
       ],
-    }
+    };
 
     try {
-      const res = await createEmployeeOvertime(formsubmit).unwrap()
+      const res = await createEmployeeOvertime({
+        tenantDomain,
+        ...formsubmit, 
+      }).unwrap();
+
       toast.update(toastId, {
         render: res.message || "Employee overtime created successfully!",
         type: "success",
         isLoading: false,
         autoClose: 3000,
-      })
+      });
 
-      reset()
-      navigate("/dashboard/employee-overtime")
+      reset();
+      navigate("/dashboard/employee-overtime");
     } catch (error) {
-      const errorMessage = error.message || error?.data?.message || "Something went wrong!"
+      const errorMessage =
+        error.message || error?.data?.message || "Something went wrong!";
 
       toast.update(toastId, {
         render: `Error creating overtime: ${errorMessage}`,
         type: "error",
         isLoading: false,
         autoClose: 3000,
-      })
+      });
     } finally {
-      toast.dismiss(toastId)
+      toast.dismiss(toastId);
     }
-  }
+  };
 
   const handleSubmit = async (data, reset) => {
-    const toastId = toast.loading("Updating Employee Overtime...")
+    const toastId = toast.loading("Updating Employee Overtime...");
 
     const formsubmit = {
       employee:
-        data.employee && data.employee[0] && employeeOptions.find((cat) => cat.label === data.employee[0])?.value
-          ? [employeeOptions.find((cat) => cat.label === data.employee[0])?.value]
+        data.employee &&
+        data.employee[0] &&
+        employeeOptions.find((cat) => cat.label === data.employee[0])?.value
+          ? [
+              employeeOptions.find((cat) => cat.label === data.employee[0])
+                ?.value,
+            ]
           : [],
       entries: [
         {
@@ -167,39 +148,45 @@ export default function OvertimeForm({ overtimeId }) {
           isUrgent: data.isUrgent,
         },
       ],
-    }
+    };
 
     try {
       const res = await updateEmployeeOvertime({
+        tenantDomain,
         overtimeId,
         ...formsubmit,
-      }).unwrap()
-
+      }).unwrap();
+      
       toast.update(toastId, {
         render: res.message || "Employee overtime updated successfully!",
         type: "success",
         isLoading: false,
         autoClose: 3000,
-      })
+      });
 
-      reset()
-      navigate("/dashboard/employee-overtime")
+      reset();
+      navigate("/dashboard/employee-overtime");
     } catch (error) {
-      const errorMessage = error.message || error?.data?.message || "Something went wrong!"
+      const errorMessage =
+        error.message || error?.data?.message || "Something went wrong!";
 
       toast.update(toastId, {
         render: `Error updating overtime: ${errorMessage}`,
         type: "error",
         isLoading: false,
         autoClose: 3000,
-      })
+      });
     } finally {
-      toast.dismiss(toastId)
+      toast.dismiss(toastId);
     }
-  }
+  };
 
   const defaultValues = {
-    employee: (singleOvertime?.data?.employee && [singleOvertime?.data?.employee?.full_name]) || [],
+    employee:
+      (singleOvertime?.data?.employee && [
+        singleOvertime?.data?.employee?.full_name,
+      ]) ||
+      [],
     startTime: singleOvertime?.data?.entries[0].startTime || "",
     endTime: singleOvertime?.data?.entries[0].endTime || "",
     reason: singleOvertime?.data?.entries[0].reason || "",
@@ -207,22 +194,32 @@ export default function OvertimeForm({ overtimeId }) {
     location: singleOvertime?.data?.entries[0].location || "",
     isUrgent: singleOvertime?.data?.entries[0].isUrgent || false,
     date: singleOvertime?.data?.entries[0].date || null,
-  }
+  };
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
         <Typography variant="h6">Loading...</Typography>
       </Box>
-    )
+    );
   }
 
   const handleBack = () => {
-    navigate(-1)
-  }
+    navigate(-1);
+  };
 
   return (
-    <TASForm onSubmit={overtimeId ? handleSubmit : handleFormSubmit} defaultValues={overtimeId && defaultValues}>
+    <TASForm
+      onSubmit={overtimeId ? handleSubmit : handleFormSubmit}
+      defaultValues={overtimeId && defaultValues}
+    >
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Box
           sx={{
@@ -257,10 +254,17 @@ export default function OvertimeForm({ overtimeId }) {
               {isMobile && (
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    <IconButton onClick={handleBack} sx={{ mr: 1, color: theme.palette.primary.main }}>
+                    <IconButton
+                      onClick={handleBack}
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    >
                       <ArrowLeft size={20} />
                     </IconButton>
-                    <Typography variant="h6" component="h1" sx={{ fontWeight: "bold", color: "#1a237e" }}>
+                    <Typography
+                      variant="h6"
+                      component="h1"
+                      sx={{ fontWeight: "bold", color: "#1a237e" }}
+                    >
                       {overtimeId ? "Update Overtime" : "Add Overtime"}
                     </Typography>
                   </Box>
@@ -284,7 +288,11 @@ export default function OvertimeForm({ overtimeId }) {
                 </Typography>
               )}
 
-              <Grid container spacing={isSmallScreen ? 2 : 3} direction={isSmallScreen ? "column-reverse" : "row"}>
+              <Grid
+                container
+                spacing={isSmallScreen ? 2 : 3}
+                direction={isSmallScreen ? "column-reverse" : "row"}
+              >
                 <Grid item xs={12} md={8}>
                   <Paper
                     elevation={isSmallScreen ? 0 : 2}
@@ -351,7 +359,12 @@ export default function OvertimeForm({ overtimeId }) {
                       </Grid>
 
                       <Grid item xs={12} sm={6}>
-                        <TASInput size={isMobile ? "small" : "medium"} fullWidth name="location" label="Location" />
+                        <TASInput
+                          size={isMobile ? "small" : "medium"}
+                          fullWidth
+                          name="location"
+                          label="Location"
+                        />
                       </Grid>
 
                       <Grid item xs={12} sm={6}>
@@ -365,7 +378,13 @@ export default function OvertimeForm({ overtimeId }) {
                       </Grid>
 
                       <Grid item xs={12}>
-                        <TASSwitch name="isUrgent" label="Urgent Overtime" required fullWidth margin="normal" />
+                        <TASSwitch
+                          name="isUrgent"
+                          label="Urgent Overtime"
+                          required
+                          fullWidth
+                          margin="normal"
+                        />
                       </Grid>
 
                       {isSmallScreen && (
@@ -383,7 +402,9 @@ export default function OvertimeForm({ overtimeId }) {
                               borderRadius: "8px",
                             }}
                           >
-                            {overtimeId ? "Update Overtime Entry" : "Add Overtime Entry"}
+                            {overtimeId
+                              ? "Update Overtime Entry"
+                              : "Add Overtime Entry"}
                           </Button>
                         </Grid>
                       )}
@@ -395,7 +416,7 @@ export default function OvertimeForm({ overtimeId }) {
                   <Paper
                     elevation={isSmallScreen ? 0 : 2}
                     sx={{
-                      p: { xs: 1.5, sm: 2, md: 3 }, // Reduced padding on mobile
+                      p: { xs: 1.5, sm: 2, md: 3 },
                       borderRadius: { xs: 1, sm: 2 },
                       bgcolor: "#fff",
                       border: isSmallScreen ? "1px solid #e0e0e0" : "none",
@@ -423,12 +444,10 @@ export default function OvertimeForm({ overtimeId }) {
                   </Paper>
                 </Grid>
               </Grid>
-
-              {/* Summary section */}
               <Box
                 sx={{
                   mt: { xs: 2, md: 4 },
-                  p: { xs: 1.5, sm: 2, md: 3 }, // Reduced padding on mobile
+                  p: { xs: 1.5, sm: 2, md: 3 },
                   border: "1px solid #e0e0e0",
                   borderRadius: { xs: 1, sm: 2 },
                   bgcolor: "#f5f5f5",
@@ -443,19 +462,23 @@ export default function OvertimeForm({ overtimeId }) {
               >
                 <Typography
                   variant={isMobile ? "subtitle1" : "h6"}
-                  sx={{ color: "#1a237e", fontWeight: isMobile ? "medium" : "bold" }}
+                  sx={{
+                    color: "#1a237e",
+                    fontWeight: isMobile ? "medium" : "bold",
+                  }}
                 >
-                  Total Overtime Hours: {/* {calculateTotalHours().toFixed(2)} */}
+                  Total Overtime Hours:
                 </Typography>
                 <Typography
                   variant={isMobile ? "subtitle1" : "h6"}
-                  sx={{ color: "#1a237e", fontWeight: isMobile ? "medium" : "bold" }}
+                  sx={{
+                    color: "#1a237e",
+                    fontWeight: isMobile ? "medium" : "bold",
+                  }}
                 >
-                  Estimated Overtime Pay: ${/* {calculateEstimatedPay().toFixed(2)} */}
+                  Estimated Overtime Pay: $
                 </Typography>
               </Box>
-
-              {/* Action buttons - Hide on mobile as we have the submit button in the form */}
               {!isSmallScreen && (
                 <Box
                   sx={{
@@ -501,5 +524,5 @@ export default function OvertimeForm({ overtimeId }) {
         </Box>
       </LocalizationProvider>
     </TASForm>
-  )
+  );
 }

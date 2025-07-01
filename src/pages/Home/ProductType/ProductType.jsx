@@ -54,14 +54,13 @@ const ProductTypeForm = () => {
   const [productType, { isLoading }] = useCreateProductTypeMutation();
   const [formValue, setFormValue] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const handleSubmit = async (data) => {
     try {
-      await productType(data).unwrap();
+      await productType({ ...data, tenantDomain }).unwrap();
       setIsSuccess(true);
       setFormValue("");
-
-      // Reset success state after animation
       setTimeout(() => {
         setIsSuccess(false);
       }, 2000);
@@ -80,58 +79,10 @@ const ProductTypeForm = () => {
   };
 
   return (
-    <Card
-      elevation={3}
-      sx={{
-        borderRadius: 3,
-        overflow: "visible",
-        position: "relative",
-        transition: "all 0.3s ease",
-      }}
-    >
-      {/* Success animation overlay */}
-      <Fade in={isSuccess} timeout={700}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: "rgba(255, 255, 255, 0.9)",
-            zIndex: 10,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 3,
-          }}
-        >
-          <Zoom in={isSuccess} timeout={500}>
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                bgcolor: alpha("#2e7d32", 0.1),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mb: 2,
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 50, color: "#2e7d32" }} />
-            </Box>
-          </Zoom>
-          <Typography variant="h6" color="#2e7d32" fontWeight={600}>
-            Product Type Added!
-          </Typography>
-        </Box>
-      </Fade>
-
+    <Card>
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 2,
           px: 3,
           borderRadius: "12px 12px 0 0",
@@ -190,7 +141,6 @@ const ProductTypeForm = () => {
               <Button
                 type="submit"
                 variant="contained"
-                // disabled={isLoading || !formValue.trim()}
                 startIcon={
                   isLoading ? (
                     <CircularProgress size={20} color="inherit" />
@@ -201,7 +151,7 @@ const ProductTypeForm = () => {
                 sx={{
                   borderRadius: 100,
                   background:
-                    "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                    "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                   boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                   px: 3,
                   py: 1,
@@ -215,33 +165,6 @@ const ProductTypeForm = () => {
             </Grid>
           </Grid>
         </TASForm>
-
-        <Box sx={{ mt: 4 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              bgcolor: "rgba(106, 27, 154, 0.05)",
-              borderRadius: 2,
-              border: "1px dashed rgba(106, 27, 154, 0.3)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <HelpIcon color="primary" sx={{ mt: 0.5 }} />
-              <Box>
-                <Typography variant="subtitle2" color="primary.main">
-                  What are Product Types?
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Product types help you categorize your inventory at a high
-                  level. They can be used for reporting, filtering, and
-                  organizing your products. Examples include Electronics,
-                  Automotive Parts, or Clothing.
-                </Typography>
-              </Box>
-            </Box>
-          </Paper>
-        </Box>
       </CardContent>
     </Card>
   );
@@ -249,16 +172,20 @@ const ProductTypeForm = () => {
 
 // Enhanced ProductTypeTable component
 const ProductTypeTable = () => {
+  const tenantDomain = window.location.hostname.split(".")[0];
+  console.log("tenant domain this ", tenantDomain);
   const [deleteProductType, { isLoading: isDeleting }] =
     useDeleteProductTypeMutation();
-  const { isLoading, data, refetch } = useGetAllIProductTypeQuery();
+  const { isLoading, data, refetch } = useGetAllIProductTypeQuery({
+    tenantDomain,
+  });
+  console.log("producttype data", data);
   const [searchTerm, setSearchTerm] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productTypeToDelete, setProductTypeToDelete] = useState(null);
 
   const productTypes = data?.data?.productTypes || [];
-
   // Filter product types based on search term
   const filteredProductTypes = productTypes.filter((type) =>
     type.product_type.toLowerCase().includes(searchTerm.toLowerCase())
@@ -290,7 +217,7 @@ const ProductTypeTable = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteProductType(productTypeToDelete).unwrap();
+      await deleteProductType({ productTypeToDelete }).unwrap();
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -406,7 +333,7 @@ const ProductTypeTable = () => {
     >
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 1.5,
           px: 3,
           borderRadius: "12px 12px 0 0",
@@ -672,7 +599,6 @@ const ProductTypeTable = () => {
   );
 };
 
-// Main ProductType component
 const ProductType = () => {
   return (
     <div className="min-h-[100vh] bg-[linear-gradient(to bottom, #f9f9f9, #f0f0f0)] py-2">
@@ -680,7 +606,7 @@ const ProductType = () => {
       <Container maxWidth="xl" sx={{ p: { xs: 0 } }}>
         <Box
           sx={{
-            background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+            background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
             color: "white",
             py: 3,
             mb: 4,

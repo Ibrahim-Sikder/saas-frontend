@@ -27,10 +27,10 @@ const CompanyListTable = () => {
   };
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = window.location.hostname.split(".")[0];
   const { data: companyData, isLoading: companyLoading } =
     useGetAllCompaniesQuery({
-      tenantDomain:domain, 
+      tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -52,7 +52,7 @@ const handleMoveToRecycled = async (id) => {
 
   if (willDelete) {
     try {
-      await moveRecycledCompany({ tenantDomain: domain, id }).unwrap(); 
+      await moveRecycledCompany({ tenantDomain, id }).unwrap(); 
       swal(
         "Moved to Recycle Bin!",
         "Company successfully moved to the recycle bin.",

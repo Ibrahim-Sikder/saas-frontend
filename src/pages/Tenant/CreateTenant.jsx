@@ -1,4 +1,5 @@
 /* eslint-disable no-empty-pattern */
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -28,6 +29,7 @@ import {
   Container,
   Divider,
   Chip,
+  CircularProgress,
 } from "@mui/material"
 import {
   Business,
@@ -49,7 +51,7 @@ import { toast } from "react-toastify"
 
 const TenantRegisterPage = () => {
   const navigate = useNavigate()
-  const { user } = useAuth() // Get current user if logged in
+  const { user } = useAuth()
   const [activeStep, setActiveStep] = useState(0)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -64,19 +66,16 @@ const TenantRegisterPage = () => {
     contactEmail: "",
     phoneNumber: "",
     address: "",
-
     // User Information (for subscription)
     firstName: "",
     lastName: "",
     userEmail: "",
     password: "",
     confirmPassword: "",
-
     // Subscription Information
     selectedPlan: "HalfYearly",
     paymentMethod: "Manual",
     amount: 0,
-
     // Terms
     agreeToTerms: false,
   })
@@ -85,7 +84,6 @@ const TenantRegisterPage = () => {
   const calculateAmount = (planId) => {
     const plan = subscriptionPlans.find((p) => p.id === planId)
     if (!plan) return 0
-
     // Extract numeric value from price string
     const priceMatch = plan.price.match(/\$?(\d+(?:\.\d{2})?)/)
     return priceMatch ? Number.parseFloat(priceMatch[1]) : 0
@@ -101,7 +99,21 @@ const TenantRegisterPage = () => {
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target
-    const newValue = type === "checkbox" ? checked : value
+    let newValue = type === "checkbox" ? checked : value
+
+    // Special handling for domain field - clean and validate
+    if (name === "domain") {
+      newValue = value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]/g, "")                        
+        .replace(/^-+|-+$/g, "")      
+    }
+
+  
+    if (type === "text" || type === "email") {
+      newValue = value.trim()
+    }
 
     setTenantData((prev) => {
       const updated = {
@@ -128,12 +140,19 @@ const TenantRegisterPage = () => {
 
   const validateStep = () => {
     if (activeStep === 0) {
-      return tenantData.name.trim() !== "" && tenantData.domain.trim() !== "" && tenantData.contactEmail.trim() !== ""
+      return (
+        tenantData.name.trim() !== "" &&
+        tenantData.domain.trim() !== "" &&
+        tenantData.domain.length >= 3 && // Minimum domain length
+        tenantData.contactEmail.trim() !== "" &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.contactEmail) // Email validation
+      )
     } else if (activeStep === 1) {
       return (
         tenantData.firstName.trim() !== "" &&
         tenantData.lastName.trim() !== "" &&
         tenantData.userEmail.trim() !== "" &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.userEmail) && // Email validation
         tenantData.password.length >= 6 &&
         tenantData.password === tenantData.confirmPassword
       )
@@ -147,71 +166,71 @@ const TenantRegisterPage = () => {
     return true
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      // Calculate subscription dates
-      const startDate = new Date()
-      const endDate = new Date()
+  try {
+    const startDate = new Date();
+    const endDate = new Date();
 
-      if (tenantData.selectedPlan === "Monthly") {
-        endDate.setMonth(startDate.getMonth() + 1)
-      } else if (tenantData.selectedPlan === "HalfYearly") {
-        endDate.setMonth(startDate.getMonth() + 6)
-      } else if (tenantData.selectedPlan === "Yearly") {
-        endDate.setFullYear(startDate.getFullYear() + 1)
-      }
-
-      const tenantPayload = {
-        // Business Information
-        name: tenantData.name,
-        domain: tenantData.domain,
-        businessType: tenantData.businessType,
-        contactEmail: tenantData.contactEmail,
-        phoneNumber: tenantData.phoneNumber,
-        address: tenantData.address,
-
-        // User Information
-        user: {
-          firstName: tenantData.firstName,
-          lastName: tenantData.lastName,
-          email: tenantData.userEmail,
-          password: tenantData.password,
-        },
-
-        // Subscription Information
-        subscription: {
-          plan: tenantData.selectedPlan,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          status: "Pending",
-          isPaid: false,
-          isActive: false,
-          paymentMethod: tenantData.paymentMethod,
-          amount: tenantData.amount,
-        },
-      }
-
-      const result = await createTenant(tenantPayload)
-      console.log(result)
-
-      if ("error" in result) {
-        throw new Error(result.error?.data?.message || "Failed to register tenant.")
-      }
-
-      if (result?.data?.success) {
-        toast.success(result.data.message || "Tenant created successfully!")
-        navigate("/login")
-      }
-    } catch (err) {
-      setError(err.message || "Failed to register tenant. Please check your information and try again.")
-    } finally {
-      setLoading(false)
+    if (tenantData.selectedPlan === "Monthly") {
+      endDate.setMonth(startDate.getMonth() + 1);
+    } else if (tenantData.selectedPlan === "HalfYearly") {
+      endDate.setMonth(startDate.getMonth() + 6);
+    } else if (tenantData.selectedPlan === "Yearly") {
+      endDate.setFullYear(startDate.getFullYear() + 1);
     }
+
+    const tenantPayload = {
+      name: tenantData.name.trim(),
+      domain: tenantData.domain.trim().toLowerCase(),
+      businessType: tenantData.businessType,
+      contactEmail: tenantData.contactEmail.trim().toLowerCase(),
+      phoneNumber: tenantData.phoneNumber.trim(),
+      address: tenantData.address.trim(),
+      user: {
+        firstName: tenantData.firstName.trim(),
+        lastName: tenantData.lastName.trim(),
+        email: tenantData.userEmail.trim().toLowerCase(),
+        password: tenantData.password,
+      },
+      subscription: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        status: "Pending",
+        isPaid: false,
+        isActive: false,
+        paymentMethod: tenantData.paymentMethod,
+        amount: tenantData.amount,
+      },
+    };
+    console.log('tenant data', tenantPayload)
+
+    const result = await createTenant({
+      payload: tenantPayload,
+      plan: tenantData.selectedPlan,
+    });
+
+    if ("error" in result) {
+      throw new Error(result.error?.data?.message || "Failed to register tenant.");
+    }
+
+    if (result?.data?.success) {
+      toast.success(result.data.message || "Tenant created successfully!");
+      navigate("/login");
+    } else {
+      throw new Error("Unexpected response format from server");
+    }
+  } catch (err) {
+    setError(err.message || "Failed to register tenant.");
+    toast.error(err.message);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   const steps = ["Business Info", "User Account", "Choose Plan", "Payment Details", "Review & Confirm"]
 
@@ -223,7 +242,6 @@ const TenantRegisterPage = () => {
             <Typography variant="h6" gutterBottom>
               Business Information
             </Typography>
-
             <TextField
               margin="normal"
               required
@@ -235,6 +253,8 @@ const TenantRegisterPage = () => {
               autoFocus
               value={tenantData.name}
               onChange={handleChange}
+              error={tenantData.name.trim() === "" && activeStep > 0}
+              helperText={tenantData.name.trim() === "" && activeStep > 0 ? "Business name is required" : ""}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -243,7 +263,6 @@ const TenantRegisterPage = () => {
                 ),
               }}
             />
-
             <TextField
               margin="normal"
               required
@@ -252,9 +271,14 @@ const TenantRegisterPage = () => {
               label="Domain Name"
               name="domain"
               placeholder="your-garage"
-              helperText="This will be your unique identifier: your-garage.ourplatform.com"
+              helperText={
+                tenantData.domain.trim() === "" && activeStep > 0
+                  ? "Domain name is required (minimum 3 characters)"
+                  : "This will be your unique identifier: your-garage.ourplatform.com"
+              }
               value={tenantData.domain}
               onChange={handleChange}
+              error={(tenantData.domain.trim() === "" || tenantData.domain.length < 3) && activeStep > 0}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -263,7 +287,6 @@ const TenantRegisterPage = () => {
                 ),
               }}
             />
-
             <TextField
               margin="normal"
               required
@@ -275,9 +298,17 @@ const TenantRegisterPage = () => {
               autoComplete="email"
               value={tenantData.contactEmail}
               onChange={handleChange}
-              helperText="Primary contact email for your business"
+              error={
+                (tenantData.contactEmail.trim() === "" ||
+                  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.contactEmail)) &&
+                activeStep > 0
+              }
+              helperText={
+                tenantData.contactEmail.trim() === "" && activeStep > 0
+                  ? "Valid business contact email is required"
+                  : "Primary contact email for your business"
+              }
             />
-
             <TextField
               margin="normal"
               fullWidth
@@ -289,7 +320,6 @@ const TenantRegisterPage = () => {
               value={tenantData.phoneNumber}
               onChange={handleChange}
             />
-
             <TextField
               margin="normal"
               fullWidth
@@ -301,7 +331,6 @@ const TenantRegisterPage = () => {
               value={tenantData.address}
               onChange={handleChange}
             />
-
             <FormControl component="fieldset" sx={{ mt: 3 }}>
               <FormLabel component="legend">Business Type</FormLabel>
               <RadioGroup name="businessType" value={tenantData.businessType} onChange={handleChange}>
@@ -322,7 +351,6 @@ const TenantRegisterPage = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               This will be the main administrator account for your business
             </Typography>
-
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -335,6 +363,8 @@ const TenantRegisterPage = () => {
                   autoComplete="given-name"
                   value={tenantData.firstName}
                   onChange={handleChange}
+                  error={tenantData.firstName.trim() === "" && activeStep > 1}
+                  helperText={tenantData.firstName.trim() === "" && activeStep > 1 ? "First name is required" : ""}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -355,10 +385,11 @@ const TenantRegisterPage = () => {
                   autoComplete="family-name"
                   value={tenantData.lastName}
                   onChange={handleChange}
+                  error={tenantData.lastName.trim() === "" && activeStep > 1}
+                  helperText={tenantData.lastName.trim() === "" && activeStep > 1 ? "Last name is required" : ""}
                 />
               </Grid>
             </Grid>
-
             <TextField
               margin="normal"
               required
@@ -370,7 +401,15 @@ const TenantRegisterPage = () => {
               autoComplete="username"
               value={tenantData.userEmail}
               onChange={handleChange}
-              helperText="This email will be used to log into the system"
+              error={
+                (tenantData.userEmail.trim() === "" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.userEmail)) &&
+                activeStep > 1
+              }
+              helperText={
+                tenantData.userEmail.trim() === "" && activeStep > 1
+                  ? "Valid admin email is required"
+                  : "This email will be used to log into the system"
+              }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -379,7 +418,6 @@ const TenantRegisterPage = () => {
                 ),
               }}
             />
-
             <TextField
               margin="normal"
               required
@@ -391,7 +429,12 @@ const TenantRegisterPage = () => {
               autoComplete="new-password"
               value={tenantData.password}
               onChange={handleChange}
-              helperText="Minimum 6 characters"
+              error={tenantData.password.length < 6 && activeStep > 1}
+              helperText={
+                tenantData.password.length < 6 && activeStep > 1
+                  ? "Password must be at least 6 characters"
+                  : "Minimum 6 characters"
+              }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -400,7 +443,6 @@ const TenantRegisterPage = () => {
                 ),
               }}
             />
-
             <TextField
               margin="normal"
               required
@@ -558,7 +600,6 @@ const TenantRegisterPage = () => {
             <Typography variant="h6" gutterBottom>
               Payment Details
             </Typography>
-
             <Paper variant="outlined" sx={{ p: 3, mt: 2, bgcolor: "grey.50" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <AttachMoney color="primary" sx={{ mr: 1 }} />
@@ -568,7 +609,6 @@ const TenantRegisterPage = () => {
                 Selected Plan: {subscriptionPlans.find((p) => p.id === tenantData.selectedPlan)?.name}
               </Typography>
             </Paper>
-
             <FormControl component="fieldset" sx={{ mt: 3, width: "100%" }}>
               <FormLabel component="legend" sx={{ mb: 2 }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -595,7 +635,6 @@ const TenantRegisterPage = () => {
                     />
                   </CardContent>
                 </Card>
-
                 <Card variant="outlined" sx={{ mb: 2 }}>
                   <CardContent sx={{ py: 2 }}>
                     <FormControlLabel
@@ -618,7 +657,6 @@ const TenantRegisterPage = () => {
                 </Card>
               </RadioGroup>
             </FormControl>
-
             {tenantData.paymentMethod === "Manual" && (
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
@@ -675,10 +713,9 @@ const TenantRegisterPage = () => {
                     Business Type
                   </Typography>
                   <Typography variant="body1" sx={{ textTransform: "capitalize" }}>
-                    {tenantData.businessType.replace(/([A-Z])/g, " $1").trim()}
+                    {tenantData?.businessType?.replace(/([A-Z])/g, " $1").trim()}
                   </Typography>
                 </Grid>
-
                 <Grid item xs={12}>
                   <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
                     Admin User
@@ -699,7 +736,6 @@ const TenantRegisterPage = () => {
                   </Typography>
                   <Typography variant="body1">{tenantData.userEmail}</Typography>
                 </Grid>
-
                 <Grid item xs={12}>
                   <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
                     Subscription Details
@@ -732,7 +768,6 @@ const TenantRegisterPage = () => {
                 </Grid>
               </Grid>
             </Paper>
-
             <Box sx={{ mt: 3 }}>
               <FormControlLabel
                 control={
@@ -760,6 +795,7 @@ const TenantRegisterPage = () => {
             </Box>
           </Box>
         )
+
       default:
         return "Unknown step"
     }
@@ -864,7 +900,7 @@ const TenantRegisterPage = () => {
                       variant="contained"
                       color="primary"
                       disabled={loading || !validateStep()}
-                      endIcon={<CheckCircle />}
+                      endIcon={loading ? <CircularProgress size={20} /> : <CheckCircle />}
                     >
                       {loading ? "Creating..." : "Complete Registration"}
                     </Button>

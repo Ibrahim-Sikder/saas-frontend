@@ -12,6 +12,7 @@ import {
 import { useGetAllExpensesQuery } from "../../redux/api/expense";
 import { useGetAllIncomesQuery } from "../../redux/api/income";
 import Loading from "../Loading/Loading";
+import { Box, Typography } from "@mui/material";
 
 const monthNames = [
   "January",
@@ -27,39 +28,49 @@ const monthNames = [
   "November",
   "December",
 ];
-export default function StackBars() {
-  const { data: expenseData, isLoading: incomeLoading } =
-    useGetAllExpensesQuery({
-      limit: 10,
-      page: 1,
-    });
 
-  const { data: incomeData, isLoading: expenseLoading } = useGetAllIncomesQuery(
-    {
-      limit: 10,
-      page: 1,
-    }
-  );
+export default function StackBars() {
+  const tenantDomain = window.location.hostname.split(".")[0];
+
+  const { data: expenseData, isLoading: expenseLoading } = useGetAllExpensesQuery({
+    tenantDomain,
+    limit: 10,
+    page: 1,
+  });
+
+  const { data: incomeData, isLoading: incomeLoading } = useGetAllIncomesQuery({
+    tenantDomain,
+    limit: 10,
+    page: 1,
+  });
 
   if (incomeLoading || expenseLoading) {
     return <Loading />;
   }
 
-  const monthlyIncom = incomeData?.data?.incomes.map((income) => income.amount);
-  const monthlyExpense = expenseData?.data?.expenses.map(
-    (expense) => expense.amount
-  );
+  const incomeList = incomeData?.data?.incomes || [];
+  const expenseList = expenseData?.data?.expenses || [];
 
-  const maxLength = Math.max(monthlyIncom?.length, monthlyExpense?.length);
+  // If both income and expense are empty, show message
+  if (incomeList.length === 0 && expenseList.length === 0) {
+    return (
+      <Box textAlign="center" py={5}>
+        <Typography variant="h6" color="textSecondary">
+          No data found for income and expense.
+        </Typography>
+      </Box>
+    );
+  }
 
-  const monthlyProfit = new Array(maxLength)?.fill(0);
+  const monthlyIncom = incomeList.map((income) => income.amount);
+  const monthlyExpense = expenseList.map((expense) => expense.amount);
 
-  // Calculate profit for each month
-  for (let i = 0; i < maxLength; i++) {
+  const maxLength = Math.max(monthlyIncom.length, monthlyExpense.length);
+  const monthlyProfit = Array.from({ length: maxLength }, (_, i) => {
     const income = monthlyIncom[i] || 0;
     const expense = monthlyExpense[i] || 0;
-    monthlyProfit[i] = income - expense;
-  }
+    return income - expense;
+  });
 
   const dynamicData = [];
   for (let i = 0; i < 5; i++) {

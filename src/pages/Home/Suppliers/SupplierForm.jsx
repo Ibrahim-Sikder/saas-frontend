@@ -117,7 +117,7 @@ const SupplierForm = ({ id }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
+ 
   const {
     methods,
     formSubmit,
@@ -136,6 +136,7 @@ const SupplierForm = ({ id }) => {
     errors,
     isEditing,
   } = useSupplierForm(id);
+
 
   // Enhanced state
   const [formProgress, setFormProgress] = useState(0);

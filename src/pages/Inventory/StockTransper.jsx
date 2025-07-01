@@ -71,8 +71,13 @@ export default function StockTransferPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm };
-
+  const tenantDomain = window.location.hostname.split(".")[0];
+  const queryParams = {
+    tenantDomain,
+    page: currentPage,
+    limit: 100,
+    searchTerm: searchTerm,
+  };
   const { data: stockTransferData, refetch } =
     useGetAllStockTransfersQuery(queryParams);
   const [deleteStockTransfer] = useDeleteStockTransferMutation();
@@ -119,45 +124,43 @@ export default function StockTransferPage() {
     refetch(); // Refresh data after adding new transfer
   };
 
+  const handleDeleteTransfer = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will permanently delete the stock transfer record.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
 
-const handleDeleteTransfer = async (id) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "This will permanently delete the stock transfer record.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "Cancel",
-  });
-
-  if (result.isConfirmed) {
-    try {
-      await deleteStockTransfer(id).unwrap();
-      Swal.fire({
-        icon: "success",
-        title: "Deleted!",
-        text: "Stock transfer has been deleted successfully.",
-        showConfirmButton: false,
-        timer: 2000,
-        background: "#fff",
-        customClass: {
-          title: "text-purple-800 font-medium",
-          content: "text-gray-600",
-        },
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "An error occurred while deleting the stock transfer.",
-        confirmButtonColor: "#6a1b9a",
-      });
+    if (result.isConfirmed) {
+      try {
+        await deleteStockTransfer({ tenantDomain, id }).unwrap();
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Stock transfer has been deleted successfully.",
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#fff",
+          customClass: {
+            title: "text-purple-800 font-medium",
+            content: "text-gray-600",
+          },
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while deleting the stock transfer.",
+          confirmButtonColor: "#6a1b9a",
+        });
+      }
     }
-  }
-};
-
+  };
 
   const getStatusChip = (status) => {
     switch (status) {
@@ -760,7 +763,6 @@ const handleDeleteTransfer = async (id) => {
                     <TableCell align="right">{transfer.quantity}</TableCell>
                     <TableCell>{getStatusChip(transfer.status)}</TableCell>
                     <TableCell align="center">
-                    
                       <Tooltip title="Delete" TransitionComponent={Zoom}>
                         <IconButton
                           size="small"
@@ -795,7 +797,6 @@ const handleDeleteTransfer = async (id) => {
         open={open}
         onClose={handleClose}
         onSubmit={handleSubmit}
-
         employees={employees}
         products={products}
       />

@@ -5,10 +5,8 @@ import { NotificationAdd } from "@mui/icons-material";
 import { FaUserGear } from "react-icons/fa6";
 import { useRef, useState } from "react";
 import swal from "sweetalert";
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
 import {
   useGetAllSuppliersQuery,
-  useMoveRecycledSupplierMutation,
   usePermenantlyDeleteSupplierMutation,
   useRestoreFromRecycledSupplierMutation,
 } from "../../../redux/api/supplier";
@@ -104,13 +102,7 @@ const RecyclebinSupplierList = () => {
   );
   return (
     <div className="w-full mt-5 mb-24">
-      <div className="flex justify-between pb-3 border-b-2 px-2">
-        <HeaderButton />
-        <div className="flex items-end justify-end">
-          <NotificationAdd size={30} className="mr-2" />
-          <FaUserGear size={30} />
-        </div>
-      </div>
+      
       <div className="md:flex items-center justify-between my-3 mb-8">
         <div className="flex items-center justify-center ">
           <FaUsers size={70} className="invoicIcon" />

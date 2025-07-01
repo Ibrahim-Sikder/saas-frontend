@@ -68,6 +68,7 @@ export default function PurchaseReturnForm({ id }) {
   const [activeStep, setActiveStep] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const {
     control,
@@ -87,16 +88,23 @@ export default function PurchaseReturnForm({ id }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const watchedWarehouse = watch("warehouse");
-  
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm };
+
+  const queryParams = {
+    tenantDomain,
+    page: currentPage,
+    limit: 100,
+    searchTerm: searchTerm,
+  };
 
   const { data: stockData, isLoading } = useGetAllStocksQuery(queryParams);
-
   const [createPurchaseReturn, { isLoading: isSubmitting }] =
     useCreatePurchaseReturnMutation();
   const [updatePurchaseReturn, { isLoading: isUpdating }] =
     useUpdatePurchaseReturnMutation();
-  const { data: singlePurchaseReturn } = useGetSinglePurchaseReturnQuery(id);
+  const { data: singlePurchaseReturn } = useGetSinglePurchaseReturnQuery({
+    tenantDomain,
+    id,
+  });
 
   console.log(singlePurchaseReturn);
   useEffect(() => {
@@ -272,7 +280,11 @@ export default function PurchaseReturnForm({ id }) {
           },
         };
 
-        const res = await updatePurchaseReturn({ id, ...updateData }).unwrap();
+        const res = await updatePurchaseReturn({
+          id,
+          tenantDomain,
+          data: updateData.data,
+        }).unwrap();
 
         toast.dismiss(loadingToast);
         toast.success("Purchase return updated successfully");
@@ -315,7 +327,10 @@ export default function PurchaseReturnForm({ id }) {
           supplierName: selectedItems[0]?.supplierName,
         };
 
-        const result = await createPurchaseReturn(returnData).unwrap();
+        const result = await createPurchaseReturn({
+          tenantDomain,
+          ...returnData,
+        }).unwrap();
 
         toast.dismiss(loadingToast);
         toast.success("Purchase return created successfully");

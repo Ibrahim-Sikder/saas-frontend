@@ -2,7 +2,6 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 "use client"
-
 import { useState, useEffect, useCallback } from "react"
 import {
   Dialog,
@@ -42,6 +41,7 @@ import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi"
 import toast from "react-hot-toast"
 
 export default function StockTransferModal({ open, onClose, onSubmit, employees }) {
+    const tenantDomain = window.location.hostname.split(".")[0];
   const theme = useTheme()
   const [formSubmitting, setFormSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -55,13 +55,13 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
   const [errors, setErrors] = useState({})
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
+  const queryParams = {tenantDomain, page: currentPage, limit: 100, searchTerm: searchTerm }
 
   // Fetch stock and warehouse data
   const { data: stockData, isLoading: stockLoading } = useGetAllStocksQuery(queryParams)
   const { data: warehouseResponse, isLoading: warehouseLoading } = useGetAllWarehousesQuery(queryParams)
 
-  console.log("Stock Data:", stockData)
+
   const [stockTransper, { isLoading: isTransferring }] = useStockTransperMutation()
   // Organize stock data by warehouse
   const [warehouseStocks, setWarehouseStocks] = useState({})
@@ -315,7 +315,7 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
             date: formData.date,
           }
           try {
-            return await stockTransper(transferPayload).unwrap()
+            return await stockTransper({tenantDomain, ...transferPayload}).unwrap()
           } catch (error) {
             console.error("Error transferring item:", error)
             return { success: false, error }

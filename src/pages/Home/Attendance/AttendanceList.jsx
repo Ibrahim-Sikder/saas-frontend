@@ -12,7 +12,7 @@ import Loading from "../../../components/Loading/Loading"
 
 const AttendanceList = () => {
   const [filterType, setFilterType] = useState("")
-
+  const tenantDomain = window.location.hostname.split(".")[0];
   const currentPage = 1
   const allAttendanceLimit = 31
 
@@ -21,6 +21,7 @@ const AttendanceList = () => {
     isLoading: allAttendanceLoading,
     error: allAttendanceError,
   } = useGetAllAttendancesQuery({
+    tenantDomain,
     limit: allAttendanceLimit,
     page: currentPage,
     searchTerm: filterType,
@@ -43,7 +44,7 @@ const AttendanceList = () => {
         date,
       }
 
-      const response = await deleteAttendance(values).unwrap()
+      const response = await deleteAttendance({tenantDomain, values}).unwrap()
       if (response.success) {
         toast.success(response.message)
       }

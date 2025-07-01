@@ -73,7 +73,6 @@ import { formatCurrency } from "../../../utils/formatter";
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
 const MotionCard = motion(Card);
 
-
 const Purchasform = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -90,26 +89,39 @@ const Purchasform = () => {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [expandedSummary, setExpandedSummary] = useState(true);
   const productSearchRef = useRef(null);
+
+  const tenantDomain = window.location.hostname.split(".")[0];
+
   const [updatePurchase] = useUpdatePurchaseMutation();
   const {
     data: productsData,
     isLoading: productsLoading,
     isFetching: productsFetching,
-  } = useGetAllIProductQuery([...params]);
+  } = useGetAllIProductQuery({
+    tenantDomain,
+    limit: 100,
+    page: 1,
+    searchTerm: "",
+  });
 
   const { data: supplierData } = useGetAllSuppliersQuery({
+    tenantDomain,
     limit: 1000000,
     page: 1,
     searchTerm: "",
   });
   const { data: warehouseData } = useGetAllWarehousesQuery({
+    tenantDomain,
     limit: 1000000,
     page: 1,
     searchTerm: "",
   });
   const id = new URLSearchParams(location.search).get("id");
 
-  const { data: singlePurchase, isLoading } = useGetSinglePurchaseQuery(id);
+  const { data: singlePurchase, isLoading } = useGetSinglePurchaseQuery({
+    tenantDomain,
+    id,
+  });
   const [createPurchase, { isLoading: isSubmitting }] =
     useCreatePurchaseMutation();
 
@@ -353,20 +365,23 @@ const Purchasform = () => {
       totalShipping,
       grandTotal,
     };
-    console.log('modify data ',modifyData);
+    console.log("modify data ", modifyData);
 
     try {
       setShowSuccessAnimation(true);
       if (id) {
-        const res = await updatePurchase({ id, ...modifyData }).unwrap();
+     const res = await updatePurchase({
+  tenantDomain,
+  id,
+  ...modifyData,
+}).unwrap();
 
         if (res.success) {
           toast.success(res.message || "Purchase update successfully!");
           navigate("/dashboard/purchase-list");
         }
       } else {
-        const res = await createPurchase(modifyData).unwrap();
-
+      const res = await createPurchase({ tenantDomain, ...modifyData }).unwrap();
         if (res.success) {
           toast.success(res.message || "Purchase create successfully!");
           navigate("/dashboard/purchase-list");

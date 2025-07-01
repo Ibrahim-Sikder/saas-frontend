@@ -12,18 +12,24 @@ const unitApi = baseApi.injectEndpoints({
     }),
 
     getAllIUnit: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({tenantDomain, limit, page, searchTerm }) => ({
         url: `/unit`,
         method: "GET",
         params: { limit, page, searchTerm },
+        headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
       providesTags: ["unit"],
     }),
 
     getSingleUnit: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/unit/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["unit"],
     }),
@@ -37,9 +43,12 @@ const unitApi = baseApi.injectEndpoints({
     }),
 
     deleteUnit: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/unit/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["unit"],
     }),
