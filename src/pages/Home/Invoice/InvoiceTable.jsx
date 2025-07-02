@@ -190,7 +190,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
                               className="editIconWrap edit2"
                               href={`${
                                 import.meta.env.VITE_API_URL
-                              }/invoices/invoice/${card._id}?tenantDomain=${tenantDomain}?tenantDomain=${tenantDomain}`}
+                              }/invoices/invoice/${card._id}?tenantDomain=${tenantDomain}`}
                               target="_blank"
                               rel="noreferrer"
                             >

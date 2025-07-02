@@ -24,7 +24,6 @@ const Login = () => {
 
       if (res.success) {
         toast.success(res.message || "Login successful!");
-
         const tenantDomain = res?.user?.tenantDomain || data.tenantDomain;
         const isLocalhost = window.location.hostname.includes("localhost");
 

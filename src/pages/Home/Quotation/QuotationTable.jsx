@@ -206,7 +206,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
                             <td>
                               <a
                                 className="editIconWrap edit2"
-                                href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}?tenantDomain=${tenantDomain}`}
+                                href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
