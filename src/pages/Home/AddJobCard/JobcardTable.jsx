@@ -239,7 +239,7 @@ if (isLocalhost) {
                                 className="editIconWrap edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
-                                }/jobCards/jobcard/${card._id}`}
+                                }/jobCards/jobcard/${card._id}?tenantDomain=${tenantDomain}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

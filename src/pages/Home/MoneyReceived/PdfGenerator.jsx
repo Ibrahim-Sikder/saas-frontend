@@ -341,7 +341,7 @@ const PdfGenerator = () => {
             className="bg-[#82017F] text-white px-3 py-2 text-[12px] rounded-full mr-2"
             href={`${import.meta.env.VITE_API_URL}/money-receipts/money/${
               singleMoneyReceipt.data._id
-            }`}
+            }?tenantDomain=${tenantDomain}`}
             target="_blank"
             rel="noreferrer"
           >

@@ -336,9 +336,7 @@ const Detail = () => {
             </Link>
             <a
               className="bg-[#42A0D9] text-white px-2 py-1  rounded-full "
-              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${
-                quotationPreview?._id
-              }`}
+              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${quotationPreview?._id}?tenantDomain=${tenantDomain}`}
               target="_blank"
               rel="noreferrer"
             >

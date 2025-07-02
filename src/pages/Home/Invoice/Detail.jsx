@@ -396,7 +396,7 @@ const Detail = () => {
               className="text-[10px]"
               href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
                 invoicePreview._id
-              }`}
+              }?tenantDomain=${tenantDomain}`}
               target="_blank"
               rel="noreferrer"
             >

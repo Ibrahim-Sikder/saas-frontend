@@ -7,12 +7,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import {
-  Box,
   IconButton,
   Pagination,
   Paper,
   TextField,
-  Typography,
 } from "@mui/material";
 import {
   useGetAllQuotationsQuery,
@@ -31,7 +29,7 @@ const QuotationTable = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
-const domain = window.location.hostname.split(".")[0];
+const tenantDomain = window.location.hostname.split(".")[0];
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -44,7 +42,7 @@ const domain = window.location.hostname.split(".")[0];
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
-       tenantDomain: domain,
+       tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -60,7 +58,7 @@ const domain = window.location.hostname.split(".")[0];
 
     if (willDelete) {
       try {
-        await moveRecycledQuotation({ tenantDomain: domain, id }).unwrap();
+        await moveRecycledQuotation({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -203,67 +201,12 @@ const domain = window.location.hostname.split(".")[0];
                             ) : (
                               <td></td>
                             )}
-
-                            {/* Mileage History Column */}
-                            {/* <td>
-                              {card.vehicle?.mileageHistory?.length > 0 ? (
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 0.5,
-                                  }}
-                                >
-                                  {card.vehicle.mileageHistory.map(
-                                    (history, idx) => (
-                                      <Tooltip
-                                        key={history._id}
-                                        title={`Recorded on: ${formatDate(
-                                          history.date
-                                        )}`}
-                                        arrow
-                                      >
-                                        <Chip
-                                          icon={<History size={16} />}
-                                          label={`${history.mileage} km`}
-                                          size="small"
-                                          color={
-                                            idx === 0 ? "primary" : "default"
-                                          }
-                                          variant={
-                                            idx === 0 ? "filled" : "outlined"
-                                          }
-                                          sx={{
-                                            fontSize: "0.75rem",
-                                            "& .MuiChip-icon": {
-                                              marginLeft: "4px",
-                                              marginRight: "-4px",
-                                              color: "white",
-                                            },
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    )
-                                  )}
-                                </Box>
-                              ) : (
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  No history
-                                </Typography>
-                              )}
-                            </td> */}
-
                             <td>{card.date}</td>
 
                             <td>
                               <a
                                 className="editIconWrap edit2"
-                                href={`${
-                                  import.meta.env.VITE_API_URL
-                                }/quotations/quotation/${card._id}`}
+                                href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}?tenantDomain=${tenantDomain}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

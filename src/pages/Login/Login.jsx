@@ -9,52 +9,50 @@ import { useTenantLoginMutation } from "../../redux/api/authApi";
 import GarageForm from "../../components/form/Form";
 import TASInput from "../../components/form/Input";
 import { toast } from "react-toastify";
-const LoginPage = () => {
+const Login = () => {
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
-const handleSubmit = async (data) => {
-  setLoading(true);
-  setError("");
+  const handleSubmit = async (data) => {
+    setLoading(true);
+    setError("");
 
-  try {
-    const res = await tenantLogin(data).unwrap();
+    try {
+      const res = await tenantLogin(data).unwrap();
 
-    if (res.success) {
-      toast.success(res.message || "Login successful!");
+      if (res.success) {
+        toast.success(res.message || "Login successful!");
 
-      const tenantDomain = res?.user?.tenantDomain || data.tenantDomain;
-      const isLocalhost = window.location.hostname.includes("localhost");
+        const tenantDomain = res?.user?.tenantDomain || data.tenantDomain;
+        const isLocalhost = window.location.hostname.includes("localhost");
 
-      if (tenantDomain) {
-        let redirectURL;
+        if (tenantDomain) {
+          let redirectURL;
 
-        if (isLocalhost) {
-          // ✅ Localhost subdomain with custom domain
-          redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
+          if (isLocalhost) {
+            // ✅ Localhost subdomain with custom domain
+            redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
+          } else {
+            // ✅ Live site
+            redirectURL = `https://${tenantDomain}/dashboard`;
+          }
+
+          window.location.href = redirectURL;
         } else {
-          // ✅ Live site
-          redirectURL = `https://${tenantDomain}/dashboard`;
+          navigate("/dashboard");
         }
-
-        window.location.href = redirectURL;
       } else {
-        navigate("/dashboard");
+        toast.error(res.message || "Invalid username or password!");
       }
-    } else {
-      toast.error(res.message || "Invalid username or password!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Login failed. Please try again.");
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    toast.error(err?.data?.message || "Login failed. Please try again.");
-    setError("Invalid email or password. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   return (
     <AuthLayout
@@ -156,4 +154,4 @@ const handleSubmit = async (data) => {
   );
 };
 
-export default LoginPage;
+export default Login;

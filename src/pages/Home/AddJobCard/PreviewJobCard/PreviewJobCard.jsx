@@ -413,7 +413,7 @@ const PreviewJobCard = () => {
           className="bg-[#42A0D9] text-white px-3 py-2  rounded-full mx-2 "
           href={`${import.meta.env.VITE_API_URL}/jobCards/jobcard/${
             previewData?._id
-          }`}
+          }?tenantDomain=${tenantDomain}`}
           target="_blank"
           rel="noreferrer"
         >

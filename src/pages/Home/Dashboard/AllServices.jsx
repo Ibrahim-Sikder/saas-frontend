@@ -8,7 +8,6 @@ import {
   FaUsers,
   FaWrench,
 } from "react-icons/fa";
-import { FaCarOn } from "react-icons/fa6";
 import { HiOutlineBriefcase } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import Loading from "../../../components/Loading/Loading";

@@ -101,7 +101,6 @@ import BillPayList from "../pages/BillPay/BillPayList";
 import BillPayHistory from "../pages/BillPay/BillPayHistory";
 import UpdateEmployeeSalary from "../pages/Home/Employee/UpdateEmployeeSalary";
 import Signup from "../pages/Signup/Signup";
-import LoginPage from "../pages/Login/Login2";
 import RegisterPage from "../pages/Login/Register";
 import TenantRegistrationPage from "../pages/Login/TenantRegister";
 import SubscriptionPage from "../pages/Login/Subscription";
@@ -131,6 +130,7 @@ import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import CreateTenant from "../pages/Tenant/CreateTenant";
 import LandingPage from "../pages/Login/LandingPage";
 import SubscriptionManagement from "../pages/Subscription/Subscription";
+import Login from "../pages/Login/Login";
 
 export const router = createBrowserRouter([
   {
@@ -147,7 +147,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "login",
-        element: <LoginPage />,
+        element: <Login />,
       },
       {
         path: "create-tenant",

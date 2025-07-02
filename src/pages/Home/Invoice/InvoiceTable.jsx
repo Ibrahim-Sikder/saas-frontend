@@ -183,58 +183,6 @@ const tenantDomain = window.location.hostname.split(".")[0];
                             <span>{card.vehicle?.vehicle_name}</span>
                           </td>
 
-                          {/* <td>
-                            {card.vehicle?.mileageHistory?.length > 0 ? (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  gap: 0.5,
-                                }}
-                              >
-                                {card.vehicle.mileageHistory.map(
-                                  (history, idx) => (
-                                    <Tooltip
-                                      key={history._id}
-                                      title={`Recorded on: ${formatDate(
-                                        history.date
-                                      )}`}
-                                      arrow
-                                    >
-                                      <Chip
-                                        icon={<History size={16} />}
-                                        label={`${history.mileage} km`}
-                                        size="small"
-                                        color={
-                                          idx === 0 ? "primary" : "default"
-                                        }
-                                        variant={
-                                          idx === 0 ? "filled" : "outlined"
-                                        }
-                                        sx={{
-                                          fontSize: "0.75rem",
-                                          color: "white",
-                                          "& .MuiChip-icon": {
-                                            marginLeft: "4px",
-                                            marginRight: "-4px",
-                                            color: "white",
-                                          },
-                                        }}
-                                      />
-                                    </Tooltip>
-                                  )
-                                )}
-                              </Box>
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{color:'white'}}
-                              >
-                                No history
-                              </Typography>
-                            )}
-                          </td> */}
 
                           <td>{card.date}</td>
                           <td>
@@ -242,7 +190,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
                               className="editIconWrap edit2"
                               href={`${
                                 import.meta.env.VITE_API_URL
-                              }/invoices/invoice/${card._id}`}
+                              }/invoices/invoice/${card._id}?tenantDomain=${tenantDomain}?tenantDomain=${tenantDomain}`}
                               target="_blank"
                               rel="noreferrer"
                             >

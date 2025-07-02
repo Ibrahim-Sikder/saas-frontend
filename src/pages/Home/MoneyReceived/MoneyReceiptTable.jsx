@@ -158,7 +158,7 @@ const MoneyReceiptTable = () => {
                       className="editIconWrap edit2"
                       href={`${
                         import.meta.env.VITE_API_URL
-                      }/money-receipts/money/${card._id}`}
+                      }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}`}
                       target="_blank"
                       rel="noreferrer"
                     >
