@@ -74,19 +74,13 @@ const UserProfile = () => {
               👤 My Profile
             </Link>
             <Link
-              to="/dashboard/support"
+              to="/dashboard/profile-update"
               className="block hover:text-[#42A1DA] transition-colors"
               onClick={() => setDropdownOpen(false)}
             >
-              ⚙️ Settings
+              ⚙️ Update Info
             </Link>
-            <Link
-              to="/dashboard/support"
-              className="block hover:text-[#42A1DA] transition-colors"
-              onClick={() => setDropdownOpen(false)}
-            >
-              🛠️ Support
-            </Link>
+           
             <hr className="border-t" />
             <p
               onClick={handleLogout}

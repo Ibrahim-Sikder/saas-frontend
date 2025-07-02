@@ -37,8 +37,7 @@ import {
   LinearProgress,
   Backdrop,
   Snackbar,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
+} from "@mui/material";        
 import {
   FaUsers,
   FaBuilding,
@@ -71,7 +70,7 @@ import {
   MdOutlineWarning,
 } from "react-icons/md";
 import { FormProvider } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import SupplierListTable from "./SupplierListTable";
 import SupplierHeader from "./SupplierHeader";

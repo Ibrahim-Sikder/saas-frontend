@@ -59,9 +59,6 @@ import EmployeeOvertime from "../pages/Home/Employee/EmployeeOvertime";
 import RunningProject from "../pages/Home/Projects/RunningProject";
 import CompletedProject from "../pages/Home/Projects/CompletedProject";
 import ViewEmployeeAttendance from "../pages/Home/Attendance/ViewEmployeeAttendance";
-import Support from "../pages/Support/Support";
-import Message from "../pages/Message/Message";
-import Notification from "../pages/Notification/Notification";
 import EmployeeHoliday from "../pages/Holiday/Holiday";
 import ShiftList from "../pages/Home/Employee/ShiftAndSchedule/ShiftList";
 import UpdateBillPay from "../pages/BillPay/UpdateBillPay";
@@ -131,6 +128,9 @@ import CreateTenant from "../pages/Tenant/CreateTenant";
 import LandingPage from "../pages/Login/LandingPage";
 import SubscriptionManagement from "../pages/Subscription/Subscription";
 import Login from "../pages/Login/Login";
+import AdminUserListPage from "../pages/Home/Profile/AllUserList";
+import UserProfilePage from "../pages/Home/Profile/Profile";
+import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
 
 export const router = createBrowserRouter([
   {
@@ -499,19 +499,6 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "support",
-        element: <Support />,
-      },
-
-      {
-        path: "message",
-        element: <Message />,
-      },
-      {
-        path: "notification",
-        element: <Notification />,
-      },
-      {
         path: "holiday",
         element: <EmployeeHoliday />,
       },
@@ -690,6 +677,18 @@ export const router = createBrowserRouter([
       {
         path: "all-customer",
         element: <AllCustomerList />,
+      },
+      {
+        path: "all-user",
+        element: <AdminUserListPage />,
+      },
+      {
+        path: "all-user",
+        element: <UserProfilePage/>,
+      },
+      {
+        path: "profile-update",
+        element: <UpdateProfile/>,
       },
       {
         path: "backup",

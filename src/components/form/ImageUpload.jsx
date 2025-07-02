@@ -8,7 +8,6 @@ import { useState, useEffect } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import uploadFile from "../../helpers/uploadFile"
 
-
 const ImageUpload = ({ name, label = "Upload Image", uploadBoxStyles = {}, defaultValues }) => {
   const { control, setValue, getValues } = useFormContext()
   const [imageUrls, setImageUrls] = useState(defaultValues ? [defaultValues] : [])

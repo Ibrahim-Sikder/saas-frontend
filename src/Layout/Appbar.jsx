@@ -6,13 +6,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCalendarDays } from "react-icons/fa6";
 import "./Layout.css";
-import Notification from "../components/Notification/Notification";
-import Message from "../components/Message/Message";
 import TopSearchbar from "../components/TopSearchbar/TopSearchbar";
 import UserProfile from "../components/UserProfile/UserProfile";
 import { Box, Button, IconButton } from "@mui/material";
-import { ExpandMore, MenuOpen } from "@mui/icons-material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { MenuOpen } from "@mui/icons-material";
 
 const Appbar = ({ toggle, navRef, toggleSideBar }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -114,8 +111,6 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
             <Link to="/dashboard/holiday">
               <FaCalendarDays size={20} className="text-[#fff]" />
             </Link>
-            <Notification />
-            <Message />
             <UserProfile />
           </div>
         </div>
@@ -164,8 +159,6 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
             >
               <FaCalendarDays size={22} className="text-white" />
             </Link>
-            <Notification />
-            <Message />
             <UserProfile />
           </div>
         </div>
