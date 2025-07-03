@@ -106,16 +106,16 @@ const AddShowRoom = () => {
     }
   };
   const handleCarRegistrationChange = (e) => {
-    let value = e.target.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+    let value = e.target.value.replace(/[^0-9]/g, "");
     if (value.length > 2) {
-      value = value.slice(0, 2) + "-" + value.slice(2); // Add hyphen after first two numbers
+      value = value.slice(0, 2) + "-" + value.slice(2); 
     }
 
     if (value.length > 7) {
-      value = value.slice(0, 7); // Ensure the value does not exceed 7 characters
+      value = value.slice(0, 7); 
     }
 
-    setRegistrationError(""); // Clear previous error
+    setRegistrationError(""); 
     if (value.length !== 7) {
       setRegistrationError("Car registration number must be 7 characters");
     }
@@ -209,7 +209,7 @@ const AddShowRoom = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-8 ">
         <div className="productHeadWrap">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -219,7 +219,6 @@ const AddShowRoom = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <h3 className="text-sm font-bold md:text-2xl"> Add New Show Room </h3>
           <div className="productHome">
@@ -231,7 +230,7 @@ const AddShowRoom = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
               <Box>
-                <h3 className="mb-1 ml-2 text-xl font-bold md:ml-0">
+                <h3 className="ml-2 text-xl font-bold md:ml-0 my-3">
                   Show Room Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -338,7 +337,7 @@ const AddShowRoom = () => {
               </Box>
 
               <Box>
-                <h3 className="mb-1 ml-2 text-xl font-bold md:ml-0">
+                <h3 className=" ml-2 text-xl font-bold md:ml-0 my-3">
                   Vehicle Information{" "}
                 </h3>
                 <Grid container spacing={2}>

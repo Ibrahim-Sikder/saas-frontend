@@ -44,14 +44,12 @@ import {
   Email,
   Lock,
 } from "@mui/icons-material"
-import { useAuth } from "../../context/AuthContext"
 import { subscriptionPlans } from "../../data"
 import { useCreateTenantMutation } from "../../redux/api/tenantApi"
 import { toast } from "react-toastify"
 
 const TenantRegisterPage = () => {
   const navigate = useNavigate()
-  const { user } = useAuth()
   const [activeStep, setActiveStep] = useState(0)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -59,20 +57,17 @@ const TenantRegisterPage = () => {
 
   // Form state with all required fields
   const [tenantData, setTenantData] = useState({
-    // Business Information
     name: "",
     domain: "",
     businessType: "independent",
     contactEmail: "",
     phoneNumber: "",
     address: "",
-    // User Information (for subscription)
     firstName: "",
     lastName: "",
     userEmail: "",
     password: "",
     confirmPassword: "",
-    // Subscription Information
     selectedPlan: "HalfYearly",
     paymentMethod: "Manual",
     amount: 0,
@@ -80,16 +75,14 @@ const TenantRegisterPage = () => {
     agreeToTerms: false,
   })
 
-  // Calculate amount based on selected plan
   const calculateAmount = (planId) => {
     const plan = subscriptionPlans.find((p) => p.id === planId)
     if (!plan) return 0
-    // Extract numeric value from price string
     const priceMatch = plan.price.match(/\$?(\d+(?:\.\d{2})?)/)
     return priceMatch ? Number.parseFloat(priceMatch[1]) : 0
   }
 
-  // Set initial amount when component mounts
+
   useEffect(() => {
     setTenantData((prev) => ({
       ...prev,
@@ -143,16 +136,16 @@ const TenantRegisterPage = () => {
       return (
         tenantData.name.trim() !== "" &&
         tenantData.domain.trim() !== "" &&
-        tenantData.domain.length >= 3 && // Minimum domain length
+        tenantData.domain.length >= 3 && 
         tenantData.contactEmail.trim() !== "" &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.contactEmail) // Email validation
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.contactEmail)
       )
     } else if (activeStep === 1) {
       return (
         tenantData.firstName.trim() !== "" &&
         tenantData.lastName.trim() !== "" &&
         tenantData.userEmail.trim() !== "" &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.userEmail) && // Email validation
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.userEmail) &&
         tenantData.password.length >= 6 &&
         tenantData.password === tenantData.confirmPassword
       )
@@ -205,8 +198,7 @@ const TenantRegisterPage = () => {
         paymentMethod: tenantData.paymentMethod,
         amount: tenantData.amount,
       },
-    };
-    console.log('tenant data', tenantPayload)
+    }
 
     const result = await createTenant({
       payload: tenantPayload,

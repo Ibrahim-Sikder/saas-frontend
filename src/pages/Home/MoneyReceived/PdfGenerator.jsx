@@ -10,11 +10,14 @@ import "./PrintStyle.css";
 import { useGetSingleMoneyReceiptQuery } from "../../../redux/api/money-receipt";
 import Loading from "../../../components/Loading/Loading";
 import { Button } from "@mui/material";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 const PdfGenerator = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = window.location.hostname.split(".")[0];
-
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -31,7 +34,6 @@ const PdfGenerator = () => {
     return <Loading />;
   }
 
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
@@ -47,14 +49,14 @@ const PdfGenerator = () => {
           <div ref={componentRef} className="moneyFormWrap">
             <div className="flex items-center justify-between  lg:flex-row gap-3">
               <div className="logoWrap logoWrap2">
-                <img className="" src={logo} alt="logo" />
+                <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
               </div>
 
               <div className="moneyHead moneyHead2">
                 <h2 className="receivedTitle receivedTitle2">
-                  Softypy Garage{" "}
+                  {CompanyInfoData?.data?.companyName}
                 </h2>
-                <span className="mt-1 block">
+                <span className="mt-5 block">
                   It's trusted computerized Organization for all kinds of
                   vehicle Cheque up & maintenance such as computerized Engine
                   Analysis, Engine tune up, Denting, Painting, Engine, AC,
@@ -64,21 +66,21 @@ const PdfGenerator = () => {
               <div className="hotlineWrap">
                 <div className="flex items-center">
                   <LocalPhone className="hotlineIcon" />
-                  <small>+880 1821-216465</small>
+                  <small>{CompanyInfoData?.data?.phone}</small>
                 </div>
                 <div className="flex items-center">
                   <Email className="hotlineIcon" />
-                  <small>trustautosolution@gmail.com</small>
+                  <small>{CompanyInfoData?.data?.email}</small>
                 </div>
                 <div className="flex items-center">
                   <Home className="hotlineIcon"> </Home>
                   <small>
-                    Ka-93/4/C Kuril Bishawroad, <br /> Dhaka-1212
+                   {CompanyInfoData?.data?.address}
                   </small>
                 </div>
                 <div className="flex items-center">
                   <WhatsApp className="hotlineIcon" />
-                  <small>+88 01710-700324</small>
+                  <small>{CompanyInfoData?.data?.whatsapp}</small>
                 </div>
               </div>
             </div>

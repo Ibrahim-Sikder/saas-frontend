@@ -11,6 +11,7 @@ import { useReactToPrint } from "react-to-print";
 import { Button, Link } from "@mui/material";
 import { WhatsApp } from "@mui/icons-material";
 import { WhatsappShareButton } from "react-share";
+import { useGetCompanyProfileQuery } from "../../../../redux/api/companyProfile";
 const PreviewJobCard = () => {
   const { componentRef, targetRef } = useContext(PrintContext);
   const [vehicleInterior, setVehicleInterior] = useState("");
@@ -20,7 +21,9 @@ const PreviewJobCard = () => {
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const { data, isLoading } = useGetSingleJobCardQuery({ tenantDomain, id });
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -77,6 +80,8 @@ const PreviewJobCard = () => {
   const urlToShare = window.location.href;
   const title = "Check this out!";
 
+  console.log("company info data", CompanyInfoData);
+
   return (
     <main className="jobCardViewWrap">
       <div ref={componentRef}>
@@ -84,8 +89,8 @@ const PreviewJobCard = () => {
           <div className="headerContainer">
             <div className="mx-auto text-center border-b-2 border-[#110255]">
               <div className="flex  justify-between items-center">
-                <img className="w-[150px] " src={logo} alt="logo" />
-                <h2 className="trustAutoTitle ">Softypy Garage</h2>
+                <img className="w-[150px] " src={CompanyInfoData?.data?.logo[0]} alt="logo" />
+                <h2 className="trustAutoTitle ">{CompanyInfoData?.data?.companyName}</h2>
               </div>
             </div>
             <div>
@@ -390,13 +395,11 @@ const PreviewJobCard = () => {
             </div>
             <div className="text-center  mt-3">
               <p className="text-xs">
-                <b>Office: </b>Ka-93/4/C, Kuril Bishawroad, Dhaka-1229,
-                www.trustautosolution.com
+                <b>Office: </b>{CompanyInfoData?.data?.address}
               </p>
               <p className="text-xs">
                 {" "}
-                <b>Mobile:</b>+880 1821-216465, +880 1972-216465 , <b>Email:</b>{" "}
-                trustautosolution@gmail.com{" "}
+                <b> Mobile:</b> {CompanyInfoData?.data?.phone} , {CompanyInfoData?.data?.whatsapp}<b> Email: </b> {CompanyInfoData?.data?.email}
               </p>
             </div>
           </div>

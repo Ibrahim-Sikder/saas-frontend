@@ -11,12 +11,15 @@ import { usePDF } from "react-to-pdf";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetSingleInvoiceQuery } from "../../../redux/api/invoice";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const Detail = () => {
   const componentRef = useRef();
   const { targetRef } = usePDF({ filename: "page.pdf" });
   const tenantDomain = window.location.hostname.split(".")[0];
-
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
@@ -62,26 +65,26 @@ const Detail = () => {
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#351E98] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src={logo} alt="logo" />
+                  <img className="w-[120px] " src= {CompanyInfoData?.data?.logo} alt="logo" />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                      Softypy Garage{" "}
+                     {CompanyInfoData?.data?.companyName}
                     </h2>
                     <small className="block">
-                      Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+                      Office:  {CompanyInfoData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> +88
-                      01821-216465
+                      <small className="font-bold">Mobile:</small> 
+                     {CompanyInfoData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                      trustautosolution@gmail.com
+                     {CompanyInfoData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                      www.trustautosolution.com
+                       {CompanyInfoData?.data?.website}
                     </small>
                   </div>
                 </div>

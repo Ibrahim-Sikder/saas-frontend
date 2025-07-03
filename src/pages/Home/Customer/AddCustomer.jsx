@@ -244,7 +244,7 @@ console.log("Tenant Domain:", tenantDomain);
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-10">
         <div className="productHeadWrap">
           <div className="flex items-center px-3">
             <Button
@@ -256,7 +256,7 @@ console.log("Tenant Domain:", tenantDomain);
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center">
-            <HiOutlineUserGroup className="invoicIcon" />
+           
             <div className="ml-2">
               <h3 className="text-sm font-bold md:text-2xl">
                 {" "}

@@ -2,7 +2,7 @@
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import "./Layout.css";
@@ -101,24 +101,11 @@ import LeftHoberSidebar from "../components/Appbar/LeftHoberSidebar";
 
 const Sidebar = ({ toggle }) => {
   const [expanded, setExpanded] = useState(false);
-  {
-    /*const [nestedExpanded, setNestedExpanded] = useState({});*/
-  }
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  {
-    /* const handleNestedChange = (panel) => (event, isExpanded) => {
-    event.stopPropagation();
-    setNestedExpanded((prev) => ({
-      ...prev,
-      [panel]: isExpanded ? panel : false,
-    }));
-  };
-*/
-  }
   const navigate = useNavigate();
   const handleLogout = () => {
     Cookies.remove("tas-auth");
@@ -787,59 +774,6 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
 
-        {/* Reports */}
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel14"}
-          onChange={handleChange("panel14")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel6a-content"
-            id="panel6a-header"
-          >
-            <Typography>
-              <span className="flex items-center justify-center ">
-                <Assessment />
-                <span className="ml-2"> Reports</span>
-              </span>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <BarChart className="mr-2" />
-                <NavLink to="/dashboard/backup">Product Stock Report </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <Warning className="mr-2" />
-                <NavLink to="/dashboard/low-stock-report">
-                  Low Stock Report{" "}
-                </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <HiOutlineExclamation className="mr-2" />
-                <NavLink to="/dashboard/expired-product-report">
-                  Expired Product Report
-                </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <DataUsage className="mr-2" />
-                <NavLink to="/dashboard/restore">Daily Stock Movement</NavLink>
-              </div>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Database Backup */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -874,7 +808,14 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
+        <div className="pl-4 space-y-3 mt-3 ">
+          <Link to="/dashboard/all-tenant-list">
+            <div className="flex items-center dashboardItems cursor-pointer">
+              <Logout size={22} />
+              <span className="ml-2">All Tenant List</span>
+            </div>
+          </Link>
+        </div>
         {/* Recycle Bin */}
         <Accordion
           sx={{ paddingBottom: "10px" }}

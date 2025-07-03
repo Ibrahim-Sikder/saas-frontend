@@ -25,14 +25,15 @@ const CustomerListTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  
-const isLocalhost = window.location.hostname.includes("localhost");
-let tenantDomain = "";
-if (isLocalhost) {
-  tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
-} else {
-  tenantDomain = window.location.hostname.split(".")[0];
-}
+
+  const tenantDomain = window.location.hostname.split(".")[0];
+  const isLocalhost = window.location.hostname.includes("localhost");
+  // let tenantDomain = "";
+  // if (isLocalhost) {
+  //   tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
+  // } else {
+  //   tenantDomain = window.location.hostname.split(".")[0];
+  // }
   const {
     data: customerData,
     isLoading: customerLoading,

@@ -22,6 +22,7 @@ import {
   useUpdateMoneyReceiptMutation,
 } from "../../../redux/api/money-receipt";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const UpdateMoneyReceipt = () => {
   const location = useLocation();
@@ -46,6 +47,9 @@ const UpdateMoneyReceipt = () => {
   const [remaining, setRemaining] = useState(
     singleMoneyReceipt?.data?.remaining
   );
+      const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+      tenantDomain,
+    });
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [billNo, setBillNo] = useState("Final Payment against bill no");
@@ -420,11 +424,11 @@ const UpdateMoneyReceipt = () => {
       <div className="moneyReceptWrap ">
         <div className="flex items-center justify-between flex-col lg:flex-row gap-3 ">
           <div className="logoWrap ">
-            <img className="" src={logo} alt="logo" />
+            <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
           </div>
           <div className="moneyHead ">
-            <h2 className="receivedTitle ">Softypy Garage </h2>
-            <small>
+            <h2 className="receivedTitle ">{CompanyInfoData?.data?.companyName}</h2>
+            <small className="block mt-3 ">
               It's trusted computerized Organization for all kinds of vehicle
               check up & maintenance such as computerized Engine Analysis,
               Engine tune up, Denting, Painting, Engine, AC, Electrical Works &
@@ -434,21 +438,21 @@ const UpdateMoneyReceipt = () => {
           <div>
             <div className="flex items-center mt-1">
               <FaGlobe className="hotlineIcon" />
-              <small className="ml-1">www.trustautosolution.com</small>
+              <small className="ml-1">{CompanyInfoData?.data?.website}</small>
             </div>
             <div className="flex items-center mt-1">
               <Email className="hotlineIcon" />
-              <small className="ml-1">trustautosolution@gmail.com</small>
+              <small className="ml-1">{CompanyInfoData?.data?.email}</small>
             </div>
             <div className="flex  mt-1">
               <FaLocationDot className="hotlineIcon"> </FaLocationDot>
               <small className="ml-1">
-                Ka-93/4/C Kuril Bishawroad, <br /> Dhaka-1212
+               {CompanyInfoData?.data?.address}
               </small>
             </div>
             <div className="flex items-center mt-1">
               <WhatsApp className="hotlineIcon" />
-              <small className="ml-1">+88 01710-700324</small>
+              <small className="ml-1">{CompanyInfoData?.data?.phone}</small>
             </div>
           </div>
         </div>

@@ -131,6 +131,7 @@ import Login from "../pages/Login/Login";
 import AdminUserListPage from "../pages/Home/Profile/AllUserList";
 import UserProfilePage from "../pages/Home/Profile/Profile";
 import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
+import AllTenantList from "../pages/Home/Tenant/AllTenantList";
 
 export const router = createBrowserRouter([
   {
@@ -689,6 +690,10 @@ export const router = createBrowserRouter([
       {
         path: "profile-update",
         element: <UpdateProfile/>,
+      },
+      {
+        path: "all-tenant-list",
+        element: <AllTenantList/>,
       },
       {
         path: "backup",

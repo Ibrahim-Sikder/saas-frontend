@@ -32,6 +32,7 @@ import { useGetAllIProductQuery } from "../../../redux/api/productApi";
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
 import { getTenantName } from "../../../utils/getTenantName";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 // Function to format numbers with thousand separators
 const formatNumber = (num) => {
   if (num === undefined || num === null || num === "") return "";
@@ -60,7 +61,9 @@ const UpdateQuotation = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = window.location.hostname.split(".")[0];
-
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const userTypeFromProfile = new URLSearchParams(location.search).get(
     "user_type"
   );
@@ -954,16 +957,16 @@ const UpdateQuotation = () => {
     <div className="px-5 py-10">
       <div className=" addJobCardHeads">
         <img
-          src={logo || "/placeholder.svg"}
+          src={CompanyInfoData?.data?.logo}
           alt="logo"
           className=" addJobLogoImg"
         />
         <div>
           <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            Softypy Garage{" "}
+            {CompanyInfoData?.data?.companyName}
           </h2>
           <span className="text-[12px] lg:text-xl mt-5 block">
-            Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+            Office: {CompanyInfoData?.data?.address}
           </span>
         </div>
         <TrustAutoAddress />

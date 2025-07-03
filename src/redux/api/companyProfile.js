@@ -13,7 +13,6 @@ const companyProfileApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["companyProfile"],
     }),
-
     getCompanyProfile: builder.query({
       query: ({ tenantDomain }) => ({
         url: `/company-profile`,
@@ -25,18 +24,17 @@ const companyProfileApi = baseApi.injectEndpoints({
       providesTags: ["companyProfile"],
     }),
 
-   updateCompanyProfile: builder.mutation({
-  query: ({ tenantDomain, id, data }) => ({
-    url: `/company-profile/update/${id}`,
-    method: "PUT",
-    body: data,
-    params: {
-      tenantDomain,
-    },
-  }),
-  invalidatesTags: ["companyProfile"],
-}),
-
+    updateCompanyProfile: builder.mutation({
+      query: ({ tenantDomain, id, data }) => ({
+        url: `/company-profile/update/${id}`,
+        method: "PUT",
+        body: data,
+        params: {
+          tenantDomain,
+        },
+      }),
+      invalidatesTags: ["companyProfile"],
+    }),
   }),
 });
 

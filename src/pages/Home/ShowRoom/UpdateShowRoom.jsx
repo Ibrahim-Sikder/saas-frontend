@@ -254,7 +254,7 @@ const UpdateShowRoom = () => {
   };
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-8 ">
         <div className="productHeadWrap">
           <div className="flex items-center justify-center ">
             <Button
@@ -264,7 +264,6 @@ const UpdateShowRoom = () => {
             >
               Back
             </Button>
-            <HiOfficeBuilding className="invoicIcon" />
           </div>
           <h3 className="text-xl font-bold md:text-2xl"> Update Show Room </h3>
           <div className="productHome">
@@ -278,7 +277,7 @@ const UpdateShowRoom = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
               <Box>
-                <h3 className="mb-1 ml-2 text-xl font-bold md:ml-0">
+                <h3 className="my-3  ml-2 text-xl font-bold md:ml-0">
                   Show Room Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -400,7 +399,7 @@ const UpdateShowRoom = () => {
               </Box>
 
               <Box>
-                <h3 className="mb-2 text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3 text-xl font-bold">Vehicle Information </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

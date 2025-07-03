@@ -19,15 +19,14 @@ import { useForm } from "react-hook-form";
 import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
 import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
 import { cmDmOptions, countries } from "../../../constant";
-import {
-  useCreateQuotationMutation,
-} from "../../../redux/api/quotation";
+import { useCreateQuotationMutation } from "../../../redux/api/quotation";
 import QuotationTable from "./QuotationTable";
 import { unitOptions } from "../../../utils/options";
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { getTenantName } from "../../../utils/getTenantName";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const AddQuotation = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
@@ -83,7 +82,7 @@ const AddQuotation = () => {
   const [activeInputIndex, setActiveInputIndex] = useState(null);
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = window.location.hostname.split(".")[0];
 
   const {
     register,
@@ -92,25 +91,25 @@ const AddQuotation = () => {
     formState: { errors },
   } = useForm();
   const queryParams = {
-    tenantDomain: domain,
+    tenantDomain,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   };
 
   const { data: stockData } = useGetAllStocksQuery(queryParams);
-
-  const [
-    createQuotation,
-    {  isLoading: createLoading },
-  ] = useCreateQuotationMutation();
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+  const [createQuotation, { isLoading: createLoading }] =
+    useCreateQuotationMutation();
 
   const {
     data: jobCardData,
     refetch,
     error,
   } = useGetSingleJobCardWithJobNoQuery({
-    tenantDomain: domain,
+    tenantDomain,
     jobNo: orderNumber,
   });
 
@@ -491,7 +490,7 @@ const AddQuotation = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Quotation...");
-   const tenantDomain = getTenantName();
+    const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
 
@@ -626,23 +625,21 @@ const AddQuotation = () => {
     };
   }, [showSuggestions]);
 
-
-
   return (
     <div className="md:px-5 md:py-10">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src={logo || "/placeholder.svg"}
+            src={CompanyInfoData?.data?.logo}
             alt="logo"
             className=" addJobLogoImg"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Softypy Garage{" "}
+              {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+              Office: {CompanyInfoData?.data?.address}
             </span>
           </div>
           <TrustAutoAddress />

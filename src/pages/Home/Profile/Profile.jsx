@@ -12,42 +12,126 @@ import {
   FaUserCog,
   FaCrown,
   FaRocket,
-  FaLightbulb,
-  FaTrophy,
   FaUserFriends,
+  FaExclamationTriangle,
+  FaShieldAlt,
+  FaDatabase,
+  FaGlobe,
+  FaBuilding,
+  FaCreditCard,
+  FaHistory,
+  FaTimes,
+  FaMoneyBillWave,
+  FaLock,
+  FaUnlock,
 } from "react-icons/fa";
 import {
   Box,
   Typography,
   Button,
   TextField,
-  TextareaAutosize,
   Avatar,
   Chip,
   Grid,
   Paper,
-  Divider,
-  LinearProgress,
   Tooltip,
   CircularProgress,
   Tabs,
   Tab,
   Card,
   CardContent,
+  Alert,
+  Badge,
+  Fade,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { motion, AnimatePresence } from "framer-motion";
+import { styled } from "@mui/material/styles";
+import { useGetAllUserQuery } from "../../../redux/api/userApi";
+
+const GlowingBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#44b700",
+    color: "#44b700",
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    "&::after": {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      animation: "ripple 1.2s infinite ease-in-out",
+      border: "1px solid currentColor",
+      content: '""',
+    },
+  },
+  "@keyframes ripple": {
+    "0%": {
+      transform: "scale(.8)",
+      opacity: 1,
+    },
+    "100%": {
+      transform: "scale(2.4)",
+      opacity: 0,
+    },
+  },
+}));
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
-  margin: theme.spacing(2, 0),
-  backgroundColor: theme.palette.background.default,
-  borderRadius: "12px",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+  marginBottom: theme.spacing(3),
+  borderRadius: "20px",
+  background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+  border: "1px solid rgba(255,255,255,0.2)",
+  backdropFilter: "blur(10px)",
+  transition: "all 0.3s ease",
   "&:hover": {
     transform: "translateY(-5px)",
-    boxShadow: "0 6px 25px rgba(0,0,0,0.15)",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+  },
+}));
+
+const GradientCard = styled(Card)(({ theme }) => ({
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  color: "white",
+  borderRadius: "20px",
+  overflow: "hidden",
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
+    pointerEvents: "none",
+  },
+}));
+
+const PaymentStatusCard = styled(Card)(({ theme, ispaid }) => ({
+  background:
+    ispaid === "true"
+      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
+      : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
+  color: "white",
+  borderRadius: "16px",
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+  animation: ispaid === "false" ? "pulse 2s infinite" : "none",
+  "@keyframes pulse": {
+    "0%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
+    "50%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.4)",
+    },
+    "100%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
   },
 }));
 
@@ -63,73 +147,117 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const GlowingBadge = styled(Box)(({ theme }) => ({
-  position: "relative",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: -2,
-    left: -2,
-    right: -2,
-    bottom: -2,
-    background: "linear-gradient(45deg, #ff00ea, #00fffb)",
-    zIndex: -1,
-    filter: "blur(5px)",
-    borderRadius: "50%",
-    animation: "glowing 1.5s linear infinite",
-  },
-  "@keyframes glowing": {
-    "0%": { opacity: 0.5 },
-    "50%": { opacity: 1 },
-    "100%": { opacity: 0.5 },
-  },
-}));
-
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState("/assets/team.jpeg");
+  const [profileImage, setProfileImage] = useState(
+    "/placeholder.svg?height=120&width=120"
+  );
   const [activeTab, setActiveTab] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  // Mock user data - replace with actual data from your backend
-  const userData = {
-    name: "MD. ALAMIN",
-    role: "Managing Director",
-    email: "alamin@example.com",
-    about:
-      "I am so grateful that you have taken the time to consider partnering with T A Solution to serve you. While we are proud of our work and the results we will help you achieve, it is the relationships we build that will endure. I look forward to working closely with you and your team.",
-    subscriptionPlan: "Ultimate Pro",
-    subscriptionStatus: "Active",
-    subscriptionExpiry: "2024-12-31",
-    usageStats: {
-      storageUsed: 75,
-      projectsCreated: 12,
-      activeUsers: 8,
-      efficiency: 92,
-    },
-    achievements: [
-      {
-        icon: <FaTrophy />,
-        title: "Top Performer",
-        description: "Ranked in the top 5% of users",
-      },
-      {
-        icon: <FaLightbulb />,
-        title: "Innovator",
-        description: "10 new features suggested",
-      },
-      {
-        icon: <FaUserFriends />,
-        title: "Team Player",
-        description: "Collaborated on 50+ projects",
-      },
-    ],
-    recentActivity: [
-      { action: "Created new project", date: "2023-06-15" },
-      { action: "Updated team settings", date: "2023-06-14" },
-      { action: "Achieved 90% efficiency", date: "2023-06-10" },
-    ],
+  const tenantDomain =
+    typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
+
+  const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
+  console.log("data", data);
+
+  // Extract user data from API response
+  const userData = data?.data?.[0] || {};
+  const tenantInfo = userData.tenantInfo || {};
+  const subscription = tenantInfo.subscription || {};
+
+  // Format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
+
+  // Calculate subscription progress
+  const getSubscriptionProgress = () => {
+    if (!subscription.startDate || !subscription.endDate) return 0;
+    const start = new Date(subscription.startDate);
+    const end = new Date(subscription.endDate);
+    const now = new Date();
+    const total = end - start;
+    const elapsed = now - start;
+    return Math.max(0, Math.min(100, (elapsed / total) * 100));
+  };
+
+  // Calculate days remaining
+  const getDaysRemaining = () => {
+    if (!subscription.endDate) return 0;
+    const end = new Date(subscription.endDate);
+    const now = new Date();
+    const diffTime = end - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
+  // Enhanced achievements based on user data
+  const achievements = [
+    {
+      icon: <FaShieldAlt />,
+      title: "Account Verified",
+      description: `${userData.status} account status`,
+      color: userData.status === "active" ? "#4CAF50" : "#FF9800",
+      earned: userData.status === "active",
+    },
+    {
+      icon: <FaDatabase />,
+      title: "Database Connected",
+      description: "MongoDB integration active",
+      color: "#2196F3",
+      earned: !!tenantInfo.dbUri,
+    },
+    {
+      icon: <FaBuilding />,
+      title: "Business Setup",
+      description: `${tenantInfo.businessType} business type`,
+      color: "#FF9800",
+      earned: !!tenantInfo.businessType,
+    },
+    {
+      icon: <FaMoneyBillWave />,
+      title: "Payment Status",
+      description: subscription.isPaid
+        ? "Payment completed"
+        : "Payment pending",
+      color: subscription.isPaid ? "#4CAF50" : "#f44336",
+      earned: subscription.isPaid,
+    },
+  ];
+
+  // Enhanced recent activity
+  const recentActivity = [
+    {
+      action: "Account created",
+      date: formatDate(userData.createdAt),
+      icon: <FaUserCog />,
+      status: "completed",
+    },
+    {
+      action: "Subscription activated",
+      date: formatDate(subscription.startDate),
+      icon: <FaCreditCard />,
+      status: subscription.isActive ? "active" : "expired",
+    },
+    {
+      action: "Payment status",
+      date: formatDate(subscription.startDate),
+      icon: <FaMoneyBillWave />,
+      status: subscription.isPaid ? "paid" : "pending",
+    },
+    {
+      action: "Last profile update",
+      date: formatDate(userData.updatedAt),
+      icon: <FaHistory />,
+      status: "completed",
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -137,9 +265,7 @@ const Profile = () => {
         prevProgress >= 100 ? 0 : prevProgress + 10
       );
     }, 800);
-    return () => {
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const handleImageUpload = (event) => {
@@ -153,7 +279,6 @@ const Profile = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle form submission here
     setIsEditing(false);
   };
 
@@ -161,247 +286,588 @@ const Profile = () => {
     setActiveTab(newValue);
   };
 
+  const getSubscriptionStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return "#4CAF50";
+      case "expired":
+        return "#f44336";
+      case "pending":
+        return "#FF9800";
+      default:
+        return "#9E9E9E";
+    }
+  };
+
+  const getActivityStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "completed":
+      case "active":
+      case "paid":
+        return "#4CAF50";
+      case "expired":
+      case "pending":
+        return "#f44336";
+      default:
+        return "#FF9800";
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ maxWidth: 1200, margin: "auto", padding: 3 }}>
-      {/* Header Section */}
+    <Box
+      sx={{ maxWidth: 1400, margin: "auto", padding: 3, minHeight: "100vh" }}
+    >
+      {/* Enhanced Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <Box
-          sx={{
-            bgcolor: "#42A1DA",
-            color: "white",
-            borderRadius: "16px",
-            padding: 4,
-            marginBottom: 4,
-            boxShadow: "0 4px 20px rgba(66, 161, 218, 0.2)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "100%",
-              background:
-                "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)",
-              zIndex: 1,
-            }}
-          />
-          <Grid
-            container
-            spacing={3}
-            alignItems="center"
-            sx={{ position: "relative", zIndex: 2 }}
-          >
-            <Grid item>
-              <GlowingBadge>
-                <Avatar
-                  src={profileImage}
-                  alt={userData.name}
-                  sx={{ width: 120, height: 120, border: "4px solid white" }}
-                />
-              </GlowingBadge>
+        <GradientCard sx={{ mb: 4, overflow: "visible" }}>
+          <CardContent sx={{ p: 4 }}>
+            <Grid container spacing={4} alignItems="center">
+              <Grid item>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <GlowingBadge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant="dot"
+                  >
+                    <Avatar
+                      src={profileImage}
+                      alt={userData.name}
+                      sx={{
+                        width: 140,
+                        height: 140,
+                        border: "4px solid rgba(255,255,255,0.3)",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                      }}
+                    />
+                  </GlowingBadge>
+                </motion.div>
+              </Grid>
+
+              <Grid item xs>
+                <Box>
+                  <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    {userData.name || "User Name"}
+                    <Tooltip title="Verified Account">
+                      <FaCheckCircle style={{ color: "#4CAF50" }} />
+                    </Tooltip>
+                    {!subscription.isPaid && (
+                      <Tooltip title="Payment Required">
+                        <FaExclamationTriangle style={{ color: "#FF9800" }} />
+                      </Tooltip>
+                    )}
+                  </Typography>
+
+                  <Typography variant="h5" sx={{ opacity: 0.9, mb: 1 }}>
+                    {userData.role || "User"} •{" "}
+                    {tenantInfo.name || "Organization"}
+                  </Typography>
+
+                  <Typography variant="h6" sx={{ opacity: 0.8, mb: 2 }}>
+                    {userData.email}
+                  </Typography>
+
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    <Chip
+                      icon={<FaCrown />}
+                      label={`${subscription.plan || "Free"} Plan`}
+                      sx={{
+                        background: "linear-gradient(45deg, #FFD700, #FFA500)",
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: "0.9rem",
+                      }}
+                    />
+
+                    <Chip
+                      icon={
+                        subscription.status === "Expired" ? (
+                          <FaExclamationTriangle />
+                        ) : (
+                          <FaCalendarAlt />
+                        )
+                      }
+                      label={`${subscription.status || "Unknown"}`}
+                      sx={{
+                        bgcolor: getSubscriptionStatusColor(
+                          subscription.status
+                        ),
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    />
+
+                    <Chip
+                      icon={subscription.isPaid ? <FaUnlock /> : <FaLock />}
+                      label={subscription.isPaid ? "Paid" : "Unpaid"}
+                      sx={{
+                        bgcolor: subscription.isPaid ? "#4CAF50" : "#f44336",
+                        color: "white",
+                        fontWeight: "bold",
+                        animation: !subscription.isPaid
+                          ? "pulse 2s infinite"
+                          : "none",
+                      }}
+                    />
+
+                    <Chip
+                      icon={<FaGlobe />}
+                      label={`${tenantInfo.domain || "domain"}.app`}
+                      color="secondary"
+                      variant="outlined"
+                      sx={{
+                        borderColor: "rgba(255,255,255,0.5)",
+                        color: "white",
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Grid>
+
+              <Grid item>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={<FaEdit />}
+                    onClick={() => setIsEditing(!isEditing)}
+                    sx={{
+                      bgcolor: "rgba(255,255,255,0.2)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      color: "white",
+                      px: 3,
+                      py: 1.5,
+                      borderRadius: "12px",
+                      "&:hover": {
+                        bgcolor: "rgba(255,255,255,0.3)",
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {isEditing ? "Cancel" : "Edit Profile"}
+                  </Button>
+                </motion.div>
+              </Grid>
             </Grid>
-            <Grid item xs>
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {userData.name}
-                <Tooltip title="Verified Account">
-                  <FaCheckCircle />
-                </Tooltip>
-              </Typography>
-              <Typography variant="h6">{userData.role}</Typography>
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                {userData.email}
-              </Typography>
-              <Box sx={{ mt: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <Chip
-                  icon={<FaCrown />}
-                  label={`${userData.subscriptionPlan}`}
-                  color="secondary"
-                  sx={{
-                    background: "linear-gradient(45deg, #FFD700, #FFA500)",
-                    color: "black",
-                    fontWeight: "bold",
-                  }}
-                />
-                <Chip
-                  icon={<FaCalendarAlt />}
-                  label={`Expires: ${userData.subscriptionExpiry}`}
-                  color="primary"
-                />
-                <Chip
-                  icon={<FaRocket />}
-                  label={`${userData.usageStats.efficiency}% Efficient`}
-                  color="success"
-                />
-              </Box>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                startIcon={<FaEdit />}
-                onClick={() => setIsEditing(!isEditing)}
-                sx={{
-                  bgcolor: "white",
-                  color: "#42A1DA",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.8)",
-                    transform: "scale(1.05)",
-                  },
-                  transition: "all 0.3s ease",
-                }}
-              >
-                {isEditing ? "Cancel" : "Edit Profile"}
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
+          </CardContent>
+        </GradientCard>
       </motion.div>
 
-      {/* Main Content */}
-      <Grid container spacing={3}>
-        {/* Left Column - About and Edit Form */}
-        <Grid item xs={12} md={8}>
+      {/* Payment Status Alert */}
+      {!subscription.isPaid && (
+        <Fade in timeout={1000}>
+          <Alert
+            severity="error"
+            icon={<FaMoneyBillWave />}
+            action={
+              <Button color="inherit" size="small" startIcon={<FaCreditCard />}>
+                Pay Now
+              </Button>
+            }
+            sx={{
+              mb: 3,
+              borderRadius: "12px",
+              "& .MuiAlert-message": { fontSize: "1.1rem" },
+              background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+            }}
+          >
+            Payment Required: Your subscription payment of $
+            {subscription.amount} is pending. Please complete payment to
+            continue using all features.
+          </Alert>
+        </Fade>
+      )}
+
+      {/* Subscription Alert */}
+      {subscription.status === "Expired" && (
+        <Fade in timeout={1000}>
+          <Alert
+            severity="warning"
+            icon={<FaExclamationTriangle />}
+            sx={{
+              mb: 3,
+              borderRadius: "12px",
+              "& .MuiAlert-message": { fontSize: "1.1rem" },
+            }}
+          >
+            Your subscription has expired on {formatDate(subscription.endDate)}.
+            Please renew to continue using all features.
+          </Alert>
+        </Fade>
+      )}
+
+      {/* Main Content Grid */}
+      <Grid container spacing={4}>
+        {/* Left Column */}
+        <Grid item xs={12} lg={8}>
           <StyledPaper>
-            <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
-              <Tab label="About" />
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                mb: 3,
+                "& .MuiTab-root": {
+                  fontSize: "1.1rem",
+                  fontWeight: "600",
+                },
+              }}
+            >
+              <Tab label="Profile Details" />
               <Tab label="Achievements" />
               <Tab label="Recent Activity" />
             </Tabs>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
                 {activeTab === 0 && (
-                  <>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>
-                      About Me
+                  <Box>
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                      Profile Information
                     </Typography>
+
                     {isEditing ? (
                       <form onSubmit={handleSubmit}>
-                        <TextField
-                          fullWidth
-                          label="Name"
-                          defaultValue={userData.name}
-                          margin="normal"
-                        />
-                        <TextField
-                          fullWidth
-                          label="Email"
-                          defaultValue={userData.email}
-                          margin="normal"
-                        />
-                        <TextareaAutosize
-                          minRows={4}
-                          placeholder="About me"
-                          defaultValue={userData.about}
-                          style={{
-                            width: "100%",
-                            marginTop: 16,
-                            padding: 8,
-                            borderColor: "#ccc",
-                          }}
-                        />
-                        <Box sx={{ mt: 2 }}>
-                          <Button
-                            component="label"
-                            variant="contained"
-                            startIcon={<FaCloudUploadAlt />}
-                          >
-                            Upload New Picture
-                            <VisuallyHiddenInput
-                              type="file"
-                              onChange={handleImageUpload}
+                        <Grid container spacing={3}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              label="Name"
+                              defaultValue={userData.name}
+                              variant="outlined"
                             />
-                          </Button>
-                        </Box>
-                        <Box sx={{ mt: 2 }}>
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                          >
-                            Save Changes
-                          </Button>
-                        </Box>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              label="Email"
+                              defaultValue={userData.email}
+                              variant="outlined"
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              fullWidth
+                              multiline
+                              rows={4}
+                              label="About"
+                              defaultValue="Professional garage management specialist"
+                              variant="outlined"
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Button
+                              component="label"
+                              variant="outlined"
+                              startIcon={<FaCloudUploadAlt />}
+                              sx={{ mr: 2 }}
+                            >
+                              Upload New Picture
+                              <VisuallyHiddenInput
+                                type="file"
+                                onChange={handleImageUpload}
+                              />
+                            </Button>
+                            <Button
+                              type="submit"
+                              variant="contained"
+                              color="primary"
+                              size="large"
+                            >
+                              Save Changes
+                            </Button>
+                          </Grid>
+                        </Grid>
                       </form>
                     ) : (
-                      <Typography>{userData.about}</Typography>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            sx={{
+                              p: 3,
+                              borderRadius: "12px",
+                              background:
+                                "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              color="primary"
+                              gutterBottom
+                            >
+                              <FaUserCog style={{ marginRight: 8 }} />
+                              Account Details
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>User ID:</strong> {userData._id}
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Status:</strong>
+                              <Chip
+                                label={userData.status}
+                                size="small"
+                                sx={{
+                                  ml: 1,
+                                  bgcolor:
+                                    userData.status === "active"
+                                      ? "#4CAF50"
+                                      : "#f44336",
+                                  color: "white",
+                                }}
+                              />
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Role:</strong> {userData.role}
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Created:</strong>{" "}
+                              {formatDate(userData.createdAt)}
+                            </Typography>
+                            <Typography>
+                              <strong>Last Login:</strong>{" "}
+                              {userData.lastLogin
+                                ? formatDate(userData.lastLogin)
+                                : "Never"}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            sx={{
+                              p: 3,
+                              borderRadius: "12px",
+                              background:
+                                "linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)",
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              color="primary"
+                              gutterBottom
+                            >
+                              <FaBuilding style={{ marginRight: 8 }} />
+                              Organization
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Name:</strong> {tenantInfo.name}
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Domain:</strong> {tenantInfo.domain}
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Type:</strong> {tenantInfo.businessType}
+                            </Typography>
+                            <Typography sx={{ mb: 1 }}>
+                              <strong>Active:</strong>
+                              <Chip
+                                label={tenantInfo.isActive ? "Yes" : "No"}
+                                size="small"
+                                sx={{
+                                  ml: 1,
+                                  bgcolor: tenantInfo.isActive
+                                    ? "#4CAF50"
+                                    : "#f44336",
+                                  color: "white",
+                                }}
+                              />
+                            </Typography>
+                            <Typography>
+                              <strong>Tenant ID:</strong> {userData.tenantId}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      </Grid>
                     )}
-                  </>
+                  </Box>
                 )}
+
                 {activeTab === 1 && (
-                  <Grid container spacing={2}>
-                    {userData.achievements.map((achievement, index) => (
-                      <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Card
-                          sx={{
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <CardContent>
-                            <Box
+                  <Box>
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                      Achievements & Badges
+                    </Typography>
+                    <Grid container spacing={3}>
+                      {achievements.map((achievement, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                          >
+                            <Card
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: 2,
+                                height: "100%",
+                                borderRadius: "16px",
+                                background: achievement.earned
+                                  ? `linear-gradient(135deg, ${achievement.color}15, ${achievement.color}05)`
+                                  : "linear-gradient(135deg, #f5f5f5, #eeeeee)",
+                                border: `2px solid ${
+                                  achievement.earned
+                                    ? achievement.color + "30"
+                                    : "#e0e0e0"
+                                }`,
+                                transition: "all 0.3s ease",
+                                opacity: achievement.earned ? 1 : 0.6,
+                                "&:hover": {
+                                  transform: "translateY(-5px)",
+                                  boxShadow: `0 10px 30px ${
+                                    achievement.earned
+                                      ? achievement.color + "30"
+                                      : "#00000020"
+                                  }`,
+                                },
                               }}
                             >
-                              {React.cloneElement(achievement.icon, {
-                                style: {
-                                  fontSize: 24,
-                                  marginRight: 8,
-                                  color: "#42A1DA",
-                                },
-                              })}
-                              <Typography variant="h6">
-                                {achievement.title}
-                              </Typography>
-                            </Box>
-                            <Typography variant="body2">
-                              {achievement.description}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
+                              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                                <Box
+                                  sx={{
+                                    display: "inline-flex",
+                                    p: 2,
+                                    borderRadius: "50%",
+                                    bgcolor: achievement.earned
+                                      ? achievement.color
+                                      : "#bdbdbd",
+                                    color: "white",
+                                    mb: 2,
+                                  }}
+                                >
+                                  {React.cloneElement(achievement.icon, {
+                                    size: 24,
+                                  })}
+                                </Box>
+                                <Typography
+                                  variant="h6"
+                                  fontWeight="bold"
+                                  gutterBottom
+                                >
+                                  {achievement.title}
+                                  {achievement.earned && (
+                                    <FaCheckCircle
+                                      style={{
+                                        marginLeft: 8,
+                                        color: "#4CAF50",
+                                      }}
+                                    />
+                                  )}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {achievement.description}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
                 )}
+
                 {activeTab === 2 && (
                   <Box>
-                    {userData.recentActivity.map((activity, index) => (
-                      <Box
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                      Recent Activity
+                    </Typography>
+                    {recentActivity.map((activity, index) => (
+                      <motion.div
                         key={index}
-                        sx={{ mb: 2, display: "flex", alignItems: "center" }}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
                       >
-                        <FaChartLine
-                          style={{ marginRight: 8, color: "#42A1DA" }}
-                        />
-                        <Box>
-                          <Typography variant="body1">
-                            {activity.action}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {activity.date}
-                          </Typography>
-                        </Box>
-                      </Box>
+                        <Paper
+                          sx={{
+                            p: 3,
+                            mb: 2,
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            transition: "all 0.3s ease",
+                            borderLeft: `4px solid ${getActivityStatusColor(
+                              activity.status
+                            )}`,
+                            "&:hover": {
+                              transform: "translateX(10px)",
+                              boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
+                            },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: 48,
+                              height: 48,
+                              borderRadius: "12px",
+                              bgcolor: getActivityStatusColor(activity.status),
+                              color: "white",
+                              mr: 3,
+                            }}
+                          >
+                            {activity.icon}
+                          </Box>
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6" fontWeight="600">
+                              {activity.action}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {activity.date}
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={activity.status}
+                            size="small"
+                            sx={{
+                              bgcolor: getActivityStatusColor(activity.status),
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          />
+                        </Paper>
+                      </motion.div>
                     ))}
                   </Box>
                 )}
@@ -410,115 +876,272 @@ const Profile = () => {
           </StyledPaper>
         </Grid>
 
-        {/* Right Column - Subscription and Usage Info */}
-        <Grid item xs={12} md={4}>
-          <StyledPaper>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Subscription Insights
-            </Typography>
-            <Box sx={{ position: "relative", display: "inline-flex" }}>
-              <CircularProgress
-                variant="determinate"
-                value={progress}
-                size={100}
-                thickness={4}
-              />
+        {/* Right Column */}
+        <Grid item xs={12} lg={4}>
+          {/* Payment Status Card */}
+          <PaymentStatusCard ispaid={subscription.isPaid.toString()}>
+            <CardContent>
               <Box
                 sx={{
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  right: 0,
-                  position: "absolute",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
                 }}
               >
-                <Typography
-                  variant="caption"
-                  component="div"
-                  color="text.secondary"
-                >
-                  {`${Math.round(progress)}%`}
+                <Typography variant="h6" fontWeight="bold">
+                  <FaMoneyBillWave style={{ marginRight: 8 }} />
+                  Payment Status
                 </Typography>
+                {subscription.isPaid ? <FaCheckCircle /> : <FaTimes />}
+              </Box>
+              <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                ${subscription.amount || 0}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {subscription.isPaid ? "Payment Completed" : "Payment Required"}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                Method: {subscription.paymentMethod || "N/A"}
+              </Typography>
+            </CardContent>
+          </PaymentStatusCard>
+
+          {/* Subscription Status */}
+          <StyledPaper>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              <FaCreditCard style={{ marginRight: 8 }} />
+              Subscription Status
+            </Typography>
+
+            <Box sx={{ textAlign: "center", mb: 3 }}>
+              <Box sx={{ position: "relative", display: "inline-flex" }}>
+                <CircularProgress
+                  variant="determinate"
+                  value={getSubscriptionProgress()}
+                  size={120}
+                  thickness={6}
+                  sx={{
+                    color: getSubscriptionStatusColor(subscription.status),
+                    "& .MuiCircularProgress-circle": {
+                      strokeLinecap: "round",
+                    },
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Typography variant="h6" fontWeight="bold">
+                    {Math.round(getSubscriptionProgress())}%
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {getDaysRemaining()} days left
+                  </Typography>
+                </Box>
               </Box>
             </Box>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1">
-                <strong>Plan:</strong> {userData.subscriptionPlan}
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Plan:</strong> {subscription.plan || "Free"}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Status:</strong>
+                <Chip
+                  label={subscription.status || "Unknown"}
+                  size="small"
+                  sx={{
+                    ml: 1,
+                    bgcolor: getSubscriptionStatusColor(subscription.status),
+                    color: "white",
+                  }}
+                />
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Amount:</strong> ${subscription.amount || 0}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Started:</strong> {formatDate(subscription.startDate)}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Expires:</strong> {formatDate(subscription.endDate)}
               </Typography>
               <Typography variant="body1">
-                <strong>Status:</strong> {userData.subscriptionStatus}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Expires:</strong> {userData.subscriptionExpiry}
+                <strong>Active:</strong>
+                <Chip
+                  label={subscription.isActive ? "Yes" : "No"}
+                  size="small"
+                  sx={{
+                    ml: 1,
+                    bgcolor: subscription.isActive ? "#4CAF50" : "#f44336",
+                    color: "white",
+                  }}
+                />
               </Typography>
             </Box>
+
             <Button
               variant="contained"
-              startIcon={<FaCog />}
+              startIcon={
+                subscription.status === "Expired" ? <FaRocket /> : <FaCog />
+              }
               fullWidth
+              size="large"
               sx={{
-                mt: 2,
-                background: "linear-gradient(45deg, #42A1DA, #2980b9)",
-                transition: "all 0.3s ease",
+                background:
+                  subscription.status === "Expired"
+                    ? "linear-gradient(45deg, #FF6B6B, #4ECDC4)"
+                    : "linear-gradient(45deg, #667eea, #764ba2)",
+                borderRadius: "12px",
+                py: 1.5,
+                fontSize: "1.1rem",
+                fontWeight: "bold",
                 "&:hover": {
-                  background: "linear-gradient(45deg, #2980b9, #42A1DA)",
+                  background:
+                    subscription.status === "Expired"
+                      ? "linear-gradient(45deg, #FF5252, #26C6DA)"
+                      : "linear-gradient(45deg, #5a67d8, #6b46c1)",
                   transform: "translateY(-2px)",
-                  boxShadow: "0 4px 10px rgba(66, 161, 218, 0.3)",
+                  boxShadow: "0 8px 25px rgba(255,107,107,0.3)",
                 },
               }}
             >
-              Upgrade Plan
+              {subscription.status === "Expired"
+                ? "Renew Subscription"
+                : "Manage Subscription"}
             </Button>
           </StyledPaper>
 
+          {/* Quick Stats */}
           <StyledPaper>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Usage Analytics
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              <FaChartLine style={{ marginRight: 8 }} />
+              Quick Stats
             </Typography>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2">Storage Utilization</Typography>
-              <LinearProgress
-                variant="determinate"
-                value={userData.usageStats.storageUsed}
-                sx={{ height: 10, borderRadius: 5 }}
-              />
-              <Typography variant="body2" align="right">
-                {userData.usageStats.storageUsed}%
-              </Typography>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="body1">
-              <FaChartLine /> Projects Created:{" "}
-              {userData.usageStats.projectsCreated}
-            </Typography>
-            <Typography variant="body1">
-              <FaUserCog /> Active Users: {userData.usageStats.activeUsers}
-            </Typography>
+
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, #e8f5e8, #c8e6c9)",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    color="success.main"
+                    fontWeight="bold"
+                  >
+                    {tenantInfo.isActive ? "1" : "0"}
+                  </Typography>
+                  <Typography variant="body2">Active Tenants</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, #e3f2fd, #bbdefb)",
+                  }}
+                >
+                  <Typography variant="h4" color="primary" fontWeight="bold">
+                    {userData.status === "active" ? "100" : "0"}%
+                  </Typography>
+                  <Typography variant="body2">Account Health</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, #fff3e0, #ffcc02)",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    color="warning.main"
+                    fontWeight="bold"
+                  >
+                    {getDaysRemaining()}
+                  </Typography>
+                  <Typography variant="body2">Days Remaining</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                    borderRadius: "12px",
+                    background: subscription.isPaid
+                      ? "linear-gradient(135deg, #e8f5e8, #c8e6c9)"
+                      : "linear-gradient(135deg, #ffebee, #ffcdd2)",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    color={subscription.isPaid ? "success.main" : "error.main"}
+                    fontWeight="bold"
+                  >
+                    {subscription.isPaid ? "✓" : "✗"}
+                  </Typography>
+                  <Typography variant="body2">Payment Status</Typography>
+                </Paper>
+              </Grid>
+            </Grid>
           </StyledPaper>
 
+          {/* Quick Actions */}
           <StyledPaper>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
               Quick Actions
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  variant={!subscription.isPaid ? "contained" : "outlined"}
+                  startIcon={<FaCreditCard />}
+                  sx={{
+                    mb: 2,
+                    borderRadius: "12px",
+                    py: 1.5,
+                    ...(!subscription.isPaid && {
+                      background: "linear-gradient(45deg, #f44336, #d32f2f)",
+                      color: "white",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #d32f2f, #b71c1c)",
+                      },
+                    }),
+                  }}
+                >
+                  {subscription.isPaid ? "Payment History" : "Complete Payment"}
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
                 <Button
                   fullWidth
                   variant="outlined"
-                  startIcon={<FaRocket />}
-                  sx={{
-                    borderColor: "#42A1DA",
-                    color: "#42A1DA",
-                    "&:hover": {
-                      backgroundColor: "rgba(66, 161, 218, 0.1)",
-                      borderColor: "#2980b9",
-                    },
-                  }}
+                  startIcon={<FaCog />}
+                  sx={{ mb: 2, borderRadius: "12px", py: 1.5 }}
                 >
-                  New Project
+                  Account Settings
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -526,16 +1149,19 @@ const Profile = () => {
                   fullWidth
                   variant="outlined"
                   startIcon={<FaUserFriends />}
-                  sx={{
-                    borderColor: "#42A1DA",
-                    color: "#42A1DA",
-                    "&:hover": {
-                      backgroundColor: "rgba(66, 161, 218, 0.1)",
-                      borderColor: "#2980b9",
-                    },
-                  }}
+                  sx={{ borderRadius: "12px" }}
                 >
-                  Invite Team
+                  Invite Users
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<FaDatabase />}
+                  sx={{ borderRadius: "12px" }}
+                >
+                  Database
                 </Button>
               </Grid>
             </Grid>

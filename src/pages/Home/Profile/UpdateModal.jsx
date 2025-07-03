@@ -93,18 +93,18 @@ export default function CompanyProfileModal({ open, onClose, initialData }) {
           </IconButton>
         </Box>
       </DialogTitle>
-<GarageForm onSubmit={handleSave} defaultValues={defaultValue}>
-      <DialogContent dividers sx={{ pt: 3, pb: 3 }}>
-        <Alert
-          severity="info"
-          sx={{ mb: 3, borderRadius: 2, bgcolor: "info.light" }}
-        >
-          <Typography variant="body2">
-            <strong>Heads Up:</strong> Set up your company information to appear
-            on all documents and communications.
-          </Typography>
-        </Alert>
-        
+      <GarageForm onSubmit={handleSave} defaultValues={defaultValue}>
+        <DialogContent dividers sx={{ pt: 3, pb: 3 }}>
+          <Alert
+            severity="info"
+            sx={{ mb: 3, borderRadius: 2, bgcolor: "info.light" }}
+          >
+            <Typography variant="body2">
+              <strong>Heads Up:</strong> Set up your company information to
+              appear on all documents and communications.
+            </Typography>
+          </Alert>
+
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
               <Box
@@ -195,25 +195,26 @@ export default function CompanyProfileModal({ open, onClose, initialData }) {
               </Grid>
             </Grid>
           </Grid>
-          <Button variant="contained" startIcon={<SaveIcon />} type="submit">
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            variant="outlined"
+            startIcon={<CancelIcon />}
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            sx={{ color: "#fff" }}
+            variant="contained"
+            startIcon={<SaveIcon />}
+            type="submit"
+          >
             Update
           </Button>
-       
-      </DialogContent>
-
-      <DialogActions sx={{ p: 3 }}>
-        <Button
-          variant="outlined"
-          startIcon={<CancelIcon />}
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button variant="contained" startIcon={<SaveIcon />} type="submit">
-          Update
-        </Button>
-      </DialogActions>
-       </GarageForm>
+        </DialogActions>
+      </GarageForm>
     </Dialog>
   );
 }

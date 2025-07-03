@@ -9,19 +9,15 @@ const userApi = baseApi.injectEndpoints({
           url: '/user',
           method: 'POST',
           body: data,
-        //   headers: {
-        //     'X-Tenant-Domain': tenantDomain,
-        //     'Origin': `https://${tenantDomain}`,
-        //   },
         };
       },
     }),
 
     getAllUser: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
-        url: `/users`,
+      query: ({ tenantDomain ,limit, page, searchTerm }) => ({
+        url: `/user`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["user"],
     }),

@@ -90,7 +90,7 @@ const QuotationList = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
+            
           </div>
           <div className="productHome">
             <span>Dashboard / </span>

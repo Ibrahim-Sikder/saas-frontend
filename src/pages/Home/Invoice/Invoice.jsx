@@ -21,6 +21,7 @@ import InvoiceTable from "./InvoiceTable";
 import { unitOptions } from "../../../utils/options";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const Invoice = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
@@ -54,7 +55,9 @@ const Invoice = () => {
   const [partsTotal, setPartsTotal] = useState(0);
   const [serviceTotal, setServiceTotal] = useState(0);
   const [goOtherButton, setGoOtherButton] = useState("");
-
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const [reload, setReload] = useState(false);
 
   const [items, setItems] = useState([
@@ -707,16 +710,16 @@ const Invoice = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className="flex lg:flex-row columns-1 space-y-3 w-full mt-3 md:mt-5 mb-2 invoiceHeader  ">
           <img
-            src={logo || "/placeholder.svg"}
+            src={CompanyInfoData?.data?.logo}
             alt="logo"
             className="w-[110px] md:w-[210px]"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Softypy Garage{" "}
+              {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="block mt-5">
-              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+              Office: {CompanyInfoData?.data?.address}
             </span>
           </div>
           <TrustAutoAddress />

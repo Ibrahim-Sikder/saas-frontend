@@ -1089,3 +1089,53 @@ export const StyledForm = styled(GarageForm)(({ theme }) => ({
 }))
 
 
+
+
+export const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
+export const GlowingBadge = styled(Box)(({ theme }) => ({
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    background: "linear-gradient(45deg, #ff00ea, #00fffb)",
+    zIndex: -1,
+    filter: "blur(5px)",
+    borderRadius: "50%",
+    animation: "glowing 1.5s linear infinite",
+  },
+  "@keyframes glowing": {
+    "0%": { opacity: 0.5 },
+    "50%": { opacity: 1 },
+    "100%": { opacity: 0.5 },
+  },
+}));
+
+
+export const StatusCard = styled(Card)(({ theme, status }) => ({
+  borderRadius: "16px",
+  marginBottom: theme.spacing(2),
+  background:
+    status === "active"
+      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
+      : status === "expired"
+        ? "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)"
+        : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
+  color: "white",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+}))
+

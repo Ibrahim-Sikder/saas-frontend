@@ -331,7 +331,7 @@ const UpdateCustomer = () => {
             Back
           </Button>
           <div className="flex flex-wrap items-center justify-center">
-            <HiOutlineUserGroup className="invoicIcon" />
+     
             <h3 className="text-sm font-bold md:text-2xl">Update Customer </h3>
           </div>
           <div className="productHome">
@@ -344,7 +344,7 @@ const UpdateCustomer = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-10 ">
               <Box>
-                <h3 className="mb-1 text-xl font-bold">
+                <h3 className="my-3  text-xl font-bold">
                   Customer Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -513,7 +513,7 @@ const UpdateCustomer = () => {
                 </Grid>
               </Box>
               <Box>
-                <h3 className="mb-2 text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3  text-xl font-bold">Vehicle Information </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

@@ -215,7 +215,7 @@ const AddCompany = () => {
   };
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-8 ">
         <div className="productHeadWrap">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -225,7 +225,6 @@ const AddCompany = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <h3 className="text-sm font-bold md:text-2xl"> New Company </h3>
           <div className="productHome">

@@ -290,7 +290,7 @@ const UpdateCompany = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-8">
         <div className="productHeadWrap">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -300,7 +300,6 @@ const UpdateCompany = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <h3 className="text-sm font-bold md:text-2xl"> Update Company </h3>
           <div className="productHome">
@@ -313,7 +312,7 @@ const UpdateCompany = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
               <Box>
-                <h3 className=" text-xl font-bold mb-3">
+                <h3 className=" text-xl font-bold my-3 ">
                   Company Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -478,7 +477,7 @@ const UpdateCompany = () => {
               </Box>
 
               <Box>
-                <h3 className=" text-xl font-bold mb-3">
+                <h3 className=" text-xl font-bold my-3 ">
                   Vehicle Information{" "}
                 </h3>
                 <Grid container spacing={2}>

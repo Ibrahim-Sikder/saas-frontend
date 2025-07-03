@@ -47,6 +47,7 @@ import {
 } from "../../../redux/api/jobCard";
 
 import JobcardTable from "./JobcardTable";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const AddJobCard = () => {
   const location = useLocation();
@@ -90,6 +91,9 @@ const AddJobCard = () => {
   const limit = 10;
   const jobCardLimit = 500000;
   const tenantDomain = window.location.hostname.split(".")[0];
+    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+      tenantDomain,
+    });
   const {
     register,
     handleSubmit,
@@ -565,13 +569,13 @@ const AddJobCard = () => {
     <div className="addJobCardWraps">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
-          <img src={logo} alt="logo" className=" addJobLogoImg" />
+          <img src={CompanyInfoData?.data?.logo} alt="logo" className=" addJobLogoImg" />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Softypy Garage
+             {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+              Office: {CompanyInfoData?.data?.address}
             </span>
           </div>
 

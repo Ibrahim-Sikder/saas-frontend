@@ -20,7 +20,39 @@ const tenantApi = baseApi.injectEndpoints({
       }),
       providesTags: ["tenant"],
     }),
+    getSingleTenant: builder.query({
+      query: ({ id }) => ({
+        url: `/tenants/${id}`,
+        method: "GET"
+      }),
+      providesTags: ["supplier"],
+    }),
+      updateTenant: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/tenants/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["tenant"],
+    }),
+    deleteTenant: builder.mutation({
+      query: ({ id }) => ({
+        url: `/tenants/${id}`,
+        method: "DELETE"
+      }),
+      invalidatesTags: ["tenant"],
+    }),
+     renewSubscription: builder.mutation({
+      query: ({ id, plan }) => ({
+        url: `/tenants/renew-subscription/${id}`,
+        method: "PATCH",
+        body: { plan },
+      }),
+      invalidatesTags: ["tenant"],
+    }),
+
   }),
 });
 
-export const { useCreateTenantMutation, useGetAllTenantQuery } = tenantApi;
+
+export const { useCreateTenantMutation, useGetAllTenantQuery, useUpdateTenantMutation,useGetSingleTenantQuery, useDeleteTenantMutation, useRenewSubscriptionMutation  } = tenantApi;

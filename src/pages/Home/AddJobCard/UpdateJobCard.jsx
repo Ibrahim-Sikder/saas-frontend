@@ -29,6 +29,7 @@ import {
   useGetSingleJobCardQuery,
   useUpdateJobCardMutation,
 } from "../../../redux/api/jobCard";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const UpdateJobCard = () => {
   const [inputValue, setInputValue] = useState("");
@@ -80,7 +81,9 @@ const UpdateJobCard = () => {
 
   const [updateJobCard, { isLoading: updateJobCardLoading }] =
     useUpdateJobCardMutation();
-
+    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+      tenantDomain,
+    });
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const userTypeFromProfile = new URLSearchParams(location.search).get(
@@ -519,16 +522,16 @@ const UpdateJobCard = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src={logo || "/placeholder.svg"}
+            src= {CompanyInfoData?.data?.logo}
             alt="logo"
             className=" addJobLogoImg"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Softypy Garage{" "}
+            {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+          {CompanyInfoData?.data?.address}
             </span>
           </div>
 
