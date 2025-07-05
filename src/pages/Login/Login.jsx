@@ -16,56 +16,108 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
 
+  // const handleSubmit = async (data) => {
+  //   setLoading(true);
+  //   setError("");
+
+  //   try {
+  //     const res = await tenantLogin(data).unwrap();
+
+  //     if (res.success) {
+  //       const accessToken = res?.data?.accessToken;
+  //       const user = res?.data?.user;
+
+  //       // Set token cookie here if you want it local (optional)
+  //       Cookies.set("token", accessToken, { expires: 7 });
+
+  //       try {
+  //         localStorage.setItem("user", JSON.stringify(user));
+  //       } catch (e) {
+  //         console.error("Failed to save user to localStorage:", e);
+  //       }
+
+  //       toast.success(res.message || "Login successful!");
+
+  //       const tenantDomain = user?.tenantDomain || data.tenantDomain;
+  //       const isLocalhost = window.location.hostname.includes("localhost");
+
+  //       if (tenantDomain) {
+  //         if (isLocalhost) {
+  //           const redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
+
+  //           setTimeout(() => {
+  //             window.location.href = redirectURL;
+  //           }, 100);
+  //         } else {
+  //           // Live site redirect directly to dashboard (assuming cookies set on domain)
+  //           const redirectURL = `https://${tenantDomain}/dashboard`;
+  //           window.location.href = redirectURL;
+  //         }
+  //       } else {
+  //         navigate("/dashboard");
+  //       }
+  //     } else {
+  //       toast.error(res.message || "Invalid username or password!");
+  //     }
+  //   } catch (err) {
+  //     toast.error(err?.data?.message || "Login failed. Please try again.");
+  //     setError("Invalid email or password. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (data) => {
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await tenantLogin(data).unwrap();
+  try {
+    const res = await tenantLogin(data).unwrap();
 
-      if (res.success) {
-        const accessToken = res?.data?.accessToken;
-        const user = res?.data?.user;
+    if (res.success) {
+      const accessToken = res?.data?.accessToken;
+      const user = res?.data?.user;
 
-        // Set token cookie here if you want it local (optional)
-        Cookies.set("token", accessToken, { expires: 7 });
-
-        try {
-          localStorage.setItem("user", JSON.stringify(user));
-        } catch (e) {
-          console.error("Failed to save user to localStorage:", e);
-        }
-
-        toast.success(res.message || "Login successful!");
-
-        const tenantDomain = user?.tenantDomain || data.tenantDomain;
-        const isLocalhost = window.location.hostname.includes("localhost");
-
-        if (tenantDomain) {
-          if (isLocalhost) {
-            const redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
-
-            setTimeout(() => {
-              window.location.href = redirectURL;
-            }, 100);
-          } else {
-            // Live site redirect directly to dashboard (assuming cookies set on domain)
-            const redirectURL = `https://${tenantDomain}/dashboard`;
-            window.location.href = redirectURL;
-          }
-        } else {
-          navigate("/dashboard");
-        }
-      } else {
-        toast.error(res.message || "Invalid username or password!");
+      // Set cookie and localStorage
+      Cookies.set("token", accessToken, { expires: 7 });
+      try {
+        localStorage.setItem("user", JSON.stringify(user));
+      } catch (e) {
+        console.error("Failed to save user to localStorage:", e);
       }
-    } catch (err) {
-      toast.error(err?.data?.message || "Login failed. Please try again.");
-      setError("Invalid email or password. Please try again.");
-    } finally {
-      setLoading(false);
+
+      toast.success(res.message || "Login successful!");
+
+      const tenantKey = user?.tenantKey || data.tenantDomain || user?.tenantDomain;
+      const isLocalhost = window.location.hostname.includes("localhost");
+
+      if (tenantKey) {
+        let redirectURL;
+
+        if (isLocalhost) {
+          // Localhost example: http://localhost:5173/trustautosolution/dashboard
+          redirectURL = `http://localhost:5173/${tenantKey}/dashboard`;
+        } else {
+          // Production: https://your-main-domain.com/trustautosolution/dashboard
+          redirectURL = `https://${window.location.hostname}/${tenantKey}/dashboard`;
+        }
+
+        setTimeout(() => {
+          window.location.href = redirectURL;
+        }, 100);
+      } else {
+        navigate("/dashboard");
+      }
+    } else {
+      toast.error(res.message || "Invalid username or password!");
     }
-  };
+  } catch (err) {
+    toast.error(err?.data?.message || "Login failed. Please try again.");
+    setError("Invalid email or password. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <AuthLayout
