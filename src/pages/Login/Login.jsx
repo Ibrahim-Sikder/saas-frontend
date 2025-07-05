@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -67,7 +68,7 @@ const Login = () => {
   //   }
   // };
 
-  const handleSubmit = async (data) => {
+const handleSubmit = async (data) => {
   setLoading(true);
   setError("");
 
@@ -78,8 +79,8 @@ const Login = () => {
       const accessToken = res?.data?.accessToken;
       const user = res?.data?.user;
 
-      // Set cookie and localStorage
       Cookies.set("token", accessToken, { expires: 7 });
+
       try {
         localStorage.setItem("user", JSON.stringify(user));
       } catch (e) {
@@ -88,26 +89,25 @@ const Login = () => {
 
       toast.success(res.message || "Login successful!");
 
-      const tenantKey = user?.tenantKey || data.tenantDomain || user?.tenantDomain;
+      const tenantKey = user?.tenantDomain || data.tenantDomain;
       const isLocalhost = window.location.hostname.includes("localhost");
 
-      if (tenantKey) {
-        let redirectURL;
+      let redirectURL;
 
-        if (isLocalhost) {
-          // Localhost example: http://localhost:5173/trustautosolution/dashboard
-          redirectURL = `http://localhost:5173/${tenantKey}/dashboard`;
-        } else {
-          // Production: https://your-main-domain.com/trustautosolution/dashboard
-          redirectURL = `https://${window.location.hostname}/${tenantKey}/dashboard`;
-        }
-
-        setTimeout(() => {
-          window.location.href = redirectURL;
-        }, 100);
+      if (isLocalhost) {
+        // ✅ In localhost, include tenant name in path
+        redirectURL = `http://localhost:5173/dashboard`;
       } else {
-        navigate("/dashboard");
+        // ✅ In live, use subdomain only — no extra path
+        const currentHost = window.location.hostname;
+        const protocol = window.location.protocol;
+
+        redirectURL = `${protocol}//${currentHost}/dashboard`;
       }
+
+      setTimeout(() => {
+        window.location.href = redirectURL;
+      }, 100);
     } else {
       toast.error(res.message || "Invalid username or password!");
     }
@@ -118,6 +118,7 @@ const Login = () => {
     setLoading(false);
   }
 };
+
 
   return (
     <AuthLayout
