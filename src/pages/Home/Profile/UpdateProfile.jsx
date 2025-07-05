@@ -28,7 +28,7 @@ import {
   Launch as LaunchIcon,
 } from "@mui/icons-material";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
-import CompanyProfileModal from "./UpdateModal";
+import CompanyProfileModal from "./CreateCompanyProfileModal";
 import Loading from "../../../components/Loading/Loading";
 
 export default function CompanyProfileDisplay() {
@@ -37,6 +37,7 @@ export default function CompanyProfileDisplay() {
   const { data, isLoading, refetch } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
   const [modalOpen, setModalOpen] = useState(false);
 
   const profileData = data?.data;
@@ -135,7 +136,7 @@ export default function CompanyProfileDisplay() {
                 color: "#fff",
               }}
             >
-              {isFirstTime ? "Set Up Profile" : "Edit Profile"}
+              Crate Profile
             </Button>
           </Box>
 
@@ -295,7 +296,6 @@ export default function CompanyProfileDisplay() {
         open={modalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveProfile}
-        initialData={data?.data}
       />
     </Box>
   );

@@ -13,6 +13,7 @@ const companyProfileApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["companyProfile"],
     }),
+
     getCompanyProfile: builder.query({
       query: ({ tenantDomain }) => ({
         url: `/company-profile`,

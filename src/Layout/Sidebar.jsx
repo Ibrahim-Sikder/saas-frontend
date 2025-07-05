@@ -112,6 +112,11 @@ const Sidebar = ({ toggle }) => {
     navigate("/");
   };
 
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+
+  console.log("user info this ", user);
+
   return (
     <aside className="flex ">
       <div
@@ -774,14 +779,16 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
 
-        <div className="pl-4 space-y-3 mt-3 ">
-          <Link to="/dashboard/all-tenant-list">
-            <div className="flex items-center dashboardItems cursor-pointer">
-              <Logout size={22} />
-              <span className="ml-2">All Tenant List</span>
-            </div>
-          </Link>
-        </div>
+        {user.role === "superadmin" && (
+          <div className="pl-4 space-y-3 mt-3 ">
+            <Link to="/dashboard/all-tenant-list">
+              <div className="flex items-center dashboardItems cursor-pointer">
+                <Logout size={22} />
+                <span className="ml-2">All Tenant List</span>
+              </div>
+            </Link>
+          </div>
+        )}
         <div className="pl-4 space-y-3 mt-3 ">
           <Link to="/dashboard/all-tenant-list">
             <div className="flex items-center dashboardItems cursor-pointer">

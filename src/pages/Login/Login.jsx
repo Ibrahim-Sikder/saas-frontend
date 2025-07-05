@@ -94,15 +94,24 @@ const handleSubmit = async (data) => {
 
       let redirectURL;
 
-      if (isLocalhost) {
-        // ✅ In localhost, include tenant name in path
-        redirectURL = `http://localhost:5173/dashboard`;
+      // ✅ Check if superadmin is logging in
+      if (tenantKey === "superadmin") {
+        if (isLocalhost) {
+          // Superadmin panel in local development
+          redirectURL = "http://localhost:5173/admin/dashboard";
+        } else {
+          // Superadmin panel in live (example: admin.garagemanagement.com)
+          redirectURL = `https://admin.garagemanagement.com/admin/dashboard`;
+        }
       } else {
-        // ✅ In live, use subdomain only — no extra path
-        const currentHost = window.location.hostname;
-        const protocol = window.location.protocol;
-
-        redirectURL = `${protocol}//${currentHost}/dashboard`;
+        // ✅ Normal tenant login
+        if (isLocalhost) {
+          redirectURL = `http://localhost:5173/dashboard`;
+        } else {
+          const currentHost = window.location.hostname;
+          const protocol = window.location.protocol;
+          redirectURL = `${protocol}//${currentHost}/dashboard`;
+        }
       }
 
       setTimeout(() => {
@@ -113,11 +122,12 @@ const handleSubmit = async (data) => {
     }
   } catch (err) {
     toast.error(err?.data?.message || "Login failed. Please try again.");
-    setError("Invalid email or password. Please try again.");
+    setError("Invalid username or password. Please try again.");
   } finally {
     setLoading(false);
   }
 };
+
 
 
   return (

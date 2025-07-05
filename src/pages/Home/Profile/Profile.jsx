@@ -49,6 +49,7 @@ import { styled } from "@mui/material/styles";
 import { useGetAllUserQuery } from "../../../redux/api/userApi";
 import { GlowingBadge, GradientCard, PaymentStatusCard, VisuallyHiddenInput } from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
+import { useGetAllTenantQuery } from "../../../redux/api/tenantApi";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -62,12 +63,11 @@ const Profile = () => {
     typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
-
   // Extract user data from API response
   const userData = data?.data?.[0] || {};
   const tenantInfo = userData.tenantInfo || {};
   const subscription = tenantInfo.subscription || {};
-
+console.log('tenant data for profile', data)
   // Format dates
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

@@ -23,7 +23,7 @@ import {
   Language as WebsiteIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import { useUpdateCompanyProfileMutation } from "../../../redux/api/companyProfile";
+import { useCreateCompanyProfileMutation } from "../../../redux/api/companyProfile";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
@@ -33,47 +33,27 @@ export default function CompanyProfileModal({ open, onClose, initialData }) {
   const tenantDomain =
     typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
-  const [updateCompanyProfile] = useUpdateCompanyProfileMutation();
-  const handleSave = async (data) => {
-    try {
-      const { _id, ...rest } = {
-        ...initialData,
-        ...data,
-      };
+  const [createCompanyProfile] = useCreateCompanyProfileMutation();
+const handleSave = async (formData) => {
+  try {
+    const res = await createCompanyProfile({
+      tenantDomain,
+      data: formData, 
+    }).unwrap();
 
-      if (!_id) {
-        toast.error("Missing company profile ID");
-        return;
-      }
-
-      const res = await updateCompanyProfile({
-        tenantDomain,
-        id: _id,
-        data: rest,
-      }).unwrap();
-
-      if (res.success) {
-        toast.success("Updated successfully!");
-        onClose();
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update profile");
+    if(res.success){
+      toast.success("Profile Update successfully!");
+      onClose();
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to create profile");
+  }
+};
 
   const handleClose = () => onClose();
 
-  const defaultValue = {
-    companyName: initialData?.companyName || "",
-    email: initialData?.email || "",
-    whatsapp: initialData?.whatsapp || "",
-    description: initialData?.description || "",
-    website: initialData?.website || "",
-    phone: initialData?.phone || "",
-    logo: initialData?.logo || "",
-    address: initialData?.address || "",
-  };
+
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
@@ -92,7 +72,7 @@ export default function CompanyProfileModal({ open, onClose, initialData }) {
           </IconButton>
         </Box>
       </DialogTitle>
-      <GarageForm onSubmit={handleSave} defaultValues={defaultValue}>
+      <GarageForm onSubmit={handleSave}>
         <DialogContent dividers sx={{ pt: 3, pb: 3 }}>
           <Alert
             severity="info"
