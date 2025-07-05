@@ -32,14 +32,11 @@ const tenantDomain = window.location.hostname.split(".")[0];
     try {
       const imageUrl =
         data.image && data.image.length > 0 ? data.image[0] : data?.data?.image;
-
-      console.log(data);
       const res = await createCategory({
         ...data,
         image: imageUrl,
         tenantDomain
       }).unwrap();
-      console.log(res);
 
       if (res.success) {
         toast.success("Category create successfully!");

@@ -153,7 +153,7 @@ const CustomerListTable = () => {
                     </thead>
                     <tbody>
                       {customerData?.data?.customers?.map((card, index) => {
-                        console.log(card);
+                   
                         const lastVehicle = card?.vehicles
                           ? [...card.vehicles].sort(
                               (a, b) =>

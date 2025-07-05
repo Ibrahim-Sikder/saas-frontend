@@ -125,7 +125,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
     refetch,
   } = useGetAllIProductQuery(queryParams);
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
-  console.log(productData);
+ 
   // Process products to add expiry status
   const processedProducts = useMemo(() => {
     if (!productData?.data?.products) return [];

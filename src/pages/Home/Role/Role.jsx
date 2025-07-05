@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client"
 
 import { useState } from "react"
@@ -407,8 +408,7 @@ export default function RoleList() {
 
   // Handle edit role
   const handleEditRole = (role) => {
-    // Navigate to edit page or open edit modal
-    console.log("Edit role:", role)
+
     handleActionClose()
   }
 
@@ -593,7 +593,6 @@ export default function RoleList() {
                 <Button
                   variant="contained"
                   startIcon={<Add />}
-                  onClick={() => console.log("Add new role")}
                   sx={{
                     background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
                     boxShadow: "0 3px 5px 2px rgba(33, 150, 243, .3)",
@@ -858,10 +857,10 @@ export default function RoleList() {
           <Divider />
 
           <Box sx={{ display: "flex", justifyContent: "space-between", p: 2, bgcolor: "grey.50" }}>
-            <Button variant="outlined" startIcon={<Download />} onClick={() => console.log("Export roles")}>
+            <Button variant="outlined" startIcon={<Download />} >
               Export
             </Button>
-            <Button variant="outlined" startIcon={<Print />} onClick={() => console.log("Print roles")}>
+            <Button variant="outlined" startIcon={<Print />}>
               Print
             </Button>
           </Box>

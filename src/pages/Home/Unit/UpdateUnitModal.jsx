@@ -67,7 +67,7 @@ export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
         id: unitId,
         tenantDomain,
       }).unwrap();
-      console.log(res);
+
       if (res.success) {
         toast.success("Unit updated successfully!");
         setOpen();

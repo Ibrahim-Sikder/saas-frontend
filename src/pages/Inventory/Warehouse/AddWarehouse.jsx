@@ -61,11 +61,7 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
       city: data.city[0],
       division: data.division[0],
     };
-    console.log({
-      tenantDomain,
-      id: warehouseId,
-      ...modifiedData,
-    });
+  
 
     try {
       if (warehouseId) {

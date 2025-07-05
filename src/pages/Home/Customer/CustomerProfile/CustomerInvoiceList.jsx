@@ -45,7 +45,6 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
       searchTerm: filterType,
       isRecycled: false,
     });
-  console.log(allInvoices);
   const handleMoveToRecycledbin = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",

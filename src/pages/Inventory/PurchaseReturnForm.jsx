@@ -106,10 +106,8 @@ export default function PurchaseReturnForm({ id }) {
     id,
   });
 
-  console.log(singlePurchaseReturn);
   useEffect(() => {
     if (stockData && stockData.data && stockData.data.length > 0) {
-      // Keep track of previously selected items
       const selectedItemsMap = {};
       if (returnItems.length > 0) {
         returnItems.forEach((item) => {

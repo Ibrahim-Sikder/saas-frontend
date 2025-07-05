@@ -20,8 +20,6 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
     reset,
     setValue,
   } = useForm();
-console.log('single leave', data, )
-console.log('single leave id console this ', id)
 
   const [createLeaveRequest] = useCreateLeaveRequestMutation();
   const [updateLeaveRequest] = useUpdateLeaveRequestMutation();
@@ -41,8 +39,7 @@ console.log('single leave id console this ', id)
       fromDate: data.fromDate,
       toDate: data.toDate,
       reason: data.reason,
-    };
-    console.log(modifyData)
+    }
 
     try {
       const res = await createLeaveRequest({tenantDomain, ...modifyData}).unwrap();

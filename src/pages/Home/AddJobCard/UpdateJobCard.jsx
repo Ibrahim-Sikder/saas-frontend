@@ -94,7 +94,6 @@ const UpdateJobCard = () => {
   const { data, isLoading, refetch } = useGetSingleJobCardQuery({tenantDomain,id});
 
   const singleCard = data?.data;
-  console.log("single jobcard", singleCard);
 
   useEffect(() => {
     if (singleCard?.user_type === "customer") {

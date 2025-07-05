@@ -83,8 +83,7 @@ export default function EmployeeOvertime() {
     limit: 10,
     page: currentPage,
     searchTerm: search,
-  });
-  console.log('overtime data this ',data)
+  })
 
   const [deleteEmployeeOvertime] = useDeleteEmployeeOvertimeMutation();
 

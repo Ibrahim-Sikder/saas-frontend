@@ -29,8 +29,7 @@ const PreviewJobCard = () => {
     content: () => componentRef.current,
   });
 
-  const previewData = data?.data;
-  console.log("preivew data this ", previewData);
+  const previewData = data?.data
 
   const extractTextFromHTML = (htmlString) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
@@ -79,8 +78,6 @@ const PreviewJobCard = () => {
 
   const urlToShare = window.location.href;
   const title = "Check this out!";
-
-  console.log("company info data", CompanyInfoData);
 
   return (
     <main className="jobCardViewWrap">

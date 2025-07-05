@@ -774,45 +774,19 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel15"}
-          onChange={handleChange("panel15")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel6a-content"
-            id="panel6a-header"
-          >
-            <Typography>
-              <span className="flex items-center justify-center ">
-                <Storage />
-                <span className="ml-2"> Database Backup </span>
-              </span>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <BackupTable className="mr-2" />
-                <NavLink to="/dashboard/backup">Backup Database </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <RestorePage className="mr-2" />
-                <NavLink to="/dashboard/restore">Restore Database </NavLink>
-              </div>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
         <div className="pl-4 space-y-3 mt-3 ">
           <Link to="/dashboard/all-tenant-list">
             <div className="flex items-center dashboardItems cursor-pointer">
               <Logout size={22} />
               <span className="ml-2">All Tenant List</span>
+            </div>
+          </Link>
+        </div>
+        <div className="pl-4 space-y-3 mt-3 ">
+          <Link to="/dashboard/all-tenant-list">
+            <div className="flex items-center dashboardItems cursor-pointer">
+              <Logout size={22} />
+              <span className="ml-2">All User List</span>
             </div>
           </Link>
         </div>
@@ -911,7 +885,40 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel15"}
+          onChange={handleChange("panel15")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel6a-content"
+            id="panel6a-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center ">
+                <Storage />
+                <span className="ml-2"> Database Backup </span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <BackupTable className="mr-2" />
+                <NavLink to="/dashboard/backup">Backup Database </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <RestorePage className="mr-2" />
+                <NavLink to="/dashboard/restore">Restore Database </NavLink>
+              </div>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
         {/* Logout */}
         <div className="pl-4 space-y-3 mt-3  mb-20 ">
           <div

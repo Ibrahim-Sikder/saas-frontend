@@ -132,6 +132,7 @@ import AdminUserListPage from "../pages/Home/Profile/AllUserList";
 import UserProfilePage from "../pages/Home/Profile/Profile";
 import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
 import AllTenantList from "../pages/Home/Tenant/AllTenantList";
+import AllUserList from "../pages/Home/Tenant/AllUserList";
 
 export const router = createBrowserRouter([
   {
@@ -162,7 +163,7 @@ export const router = createBrowserRouter([
         path: "tenant",
         element: <TenantRegistrationPage />,
       },
-    
+
       {
         path: "subscription",
         element: <SubscriptionManagement />,
@@ -685,15 +686,19 @@ export const router = createBrowserRouter([
       },
       {
         path: "all-user",
-        element: <UserProfilePage/>,
+        element: <UserProfilePage />,
       },
       {
         path: "profile-update",
-        element: <UpdateProfile/>,
+        element: <UpdateProfile />,
       },
       {
         path: "all-tenant-list",
-        element: <AllTenantList/>,
+        element: <AllTenantList />,
+      },
+      {
+        path: "all-user-list",
+        element: <AllUserList />,
       },
       {
         path: "backup",

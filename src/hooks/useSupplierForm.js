@@ -231,9 +231,7 @@ export const useSupplierForm = (id) => {
         tenantDomain,
       }).unwrap();
 
-      console.log(response);
       if (response.success) {
-        // Clear sessionStorage after successful submission
 
         toast.success(response.message);
         navigate("/dashboard/supplier-list");

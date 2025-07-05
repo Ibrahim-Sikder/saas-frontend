@@ -596,7 +596,6 @@ const UpdateQuotation = () => {
 
   // Fixed handleSelectSuggestion function
   const handleSelectSuggestion = (product) => {
-    console.log("Selected product:", product); // For debugging
 
     if (!product) return;
 
@@ -887,7 +886,6 @@ const UpdateQuotation = () => {
 
       if (removeButton === "") {
         const res = await updateQuotation(newValue).unwrap();
-        console.log("response ", res);
         if (res.success) {
           setReload(!reload);
         }
@@ -949,7 +947,6 @@ const UpdateQuotation = () => {
 
   // Function to handle suggestion item click with direct event handling
   const handleSuggestionClick = (product) => {
-    console.log("Suggestion clicked:", product);
     handleSelectSuggestion(product);
   };
 

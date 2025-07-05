@@ -1190,7 +1190,6 @@ export default function InventoryDashboardPage() {
                       <TableBody>
                         {processedData.topSellingProducts.map(
                           (product, index) => {
-                            console.log("product data is ", product);
                             return (
                               <StyledTableRow key={index}>
                                 <TableCell>

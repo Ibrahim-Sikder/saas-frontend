@@ -28,7 +28,6 @@ const ProfitOverView = () => {
 
   const { data: donationData, isLoading } =
     useGetAllDonationQuery();
-  console.log("donation data", donationData);
   const {
     data: expenseData,
     error: expenseError,
@@ -48,9 +47,6 @@ const ProfitOverView = () => {
     limit: 900000000000,
     page: 1,
   });
-
-  console.log("incomedata", incomeData);
-  console.log("expense data", expenseData);
 
   if (expenseLoading || incomeLoading) return <Loading />;
   if (expenseError || incomeError)

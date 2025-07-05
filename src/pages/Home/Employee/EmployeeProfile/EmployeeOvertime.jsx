@@ -19,7 +19,6 @@ const EmployeeOvertime = ({ tenantDomain, id }) => {
   if (isLoading) {
     return <Loading />;
   }
-  console.log(data);
   const overtimeData = [
     { day: "Saturday", date: "10-05-2024", hours: 3 },
     { day: "Sunday", date: "11-05-2024", hours: 2 },

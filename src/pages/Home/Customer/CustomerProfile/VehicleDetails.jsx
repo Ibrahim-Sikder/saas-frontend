@@ -50,8 +50,6 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
     isRecycled: false,
   });
 
-  console.log('all vehicle ', allVehicle)
-
   const [deleteVehicle, { isLoading: deleteLoading, error: deleteError }] =
     useDeleteVehicleMutation();
 

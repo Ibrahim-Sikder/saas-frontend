@@ -91,8 +91,6 @@ const ExpenseForm = ({ id }) => {
     id,
   })
 
-  console.log(singleExpense)
-
   const [createExpense, { isLoading: createLoading }] = useCreateExpenseMutation()
   const [updateExpense] = useUpdateExpenseMutation()
 

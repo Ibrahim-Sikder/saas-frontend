@@ -28,8 +28,7 @@ const Detail = () => {
     content: () => componentRef.current,
   });
 
-  const [quotationPreview, setQuotationPreview] = useState({});
-  console.log("quotation preview", quotationPreview);
+  const [quotationPreview, setQuotationPreview] = useState({})
   const [loading, setLoading] = useState(false);
   const { data } = useGetSingleQuotationQuery({
     tenantDomain,

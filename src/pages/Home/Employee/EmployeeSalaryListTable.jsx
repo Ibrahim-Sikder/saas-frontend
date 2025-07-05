@@ -79,8 +79,6 @@ const EnhancedEmployeeSalaryListTable = ({tenantDomain}) => {
     searchTerm: filterType,
   })
 
-  console.log("salary ", getAllSalary)
-
   const handleChange = (event) => {
     setFilterType(event.target.value)
   }
@@ -118,9 +116,6 @@ const EnhancedEmployeeSalaryListTable = ({tenantDomain}) => {
   }
 
   const handleOpenPaymentHistory = (salary) => {
-    console.log("Opening payment history for:", salary)
-    console.log("Payment history data:", salary.payment_history)
-
     setSelectedPaymentHistory({
       paymentHistory: salary.payment_history || [],
       employeeName: salary.full_name,

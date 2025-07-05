@@ -483,7 +483,7 @@ const AllTenantList = () => {
                 variant="outlined"
                 startIcon={<FaDownload />}
                 sx={{ borderRadius: "12px" }}
-                onClick={() => console.log("Export data")}
+                
               >
                 Export
               </Button>

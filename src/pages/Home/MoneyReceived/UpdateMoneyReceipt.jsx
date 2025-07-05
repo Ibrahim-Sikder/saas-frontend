@@ -37,8 +37,7 @@ const UpdateMoneyReceipt = () => {
   const { data: singleMoneyReceipt, refetch } = useGetSingleMoneyReceiptQuery({
     tenantDomain,
     id,
-  });
-  console.log("single money", singleMoneyReceipt);
+  })
 
   const [updateMoneyReceipt, { isLoading: updateLoading, error: updateError }] =
     useUpdateMoneyReceiptMutation();

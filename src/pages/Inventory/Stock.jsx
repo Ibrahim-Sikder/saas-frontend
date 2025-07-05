@@ -106,7 +106,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
     isFetching,
     refetch,
   } = useGetAllStocksQuery(queryParams);
-  console.log(stockData);
+
   useEffect(() => {
     if (stockData && stockData.success && stockData.data) {
       const processed = stockData.data.map((stock) => {

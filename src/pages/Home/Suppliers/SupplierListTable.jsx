@@ -178,12 +178,9 @@ const WorldClassSupplierList = () => {
     page: currentPage,
   })
 
-  console.log("All suppliers data:", allSuppliers)
-
   // Effect to update suppliers when data is fetched
   useEffect(() => {
     if (allSuppliers?.success && allSuppliers?.data?.suppliers) {
-      console.log("API Response:", allSuppliers.data.suppliers)
       const apiSuppliers = allSuppliers.data.suppliers
       setSuppliers(apiSuppliers)
     }
@@ -218,13 +215,12 @@ const WorldClassSupplierList = () => {
   }
 
   const handleDeleteSupplier = (id) => {
-    console.log("Deleting supplier with ID:", id)
+   
     setSuppliers(suppliers.filter((supplier) => supplier._id !== id))
     showSnackbar("Supplier moved to recycle bin", "success")
   }
 
   const handleRowSelect = (id) => {
-    console.log("Selecting row with ID:", id)
     setSelectedRows((prev) => {
       if (prev.includes(id)) {
         return prev.filter((rowId) => rowId !== id)
@@ -467,7 +463,6 @@ const WorldClassSupplierList = () => {
                 </thead>
                 <tbody>
                   {sortedSuppliers.map((supplier) => {
-                    console.log("Rendering supplier:", supplier._id, supplier)
                     return (
                       <tr
                         key={supplier._id}

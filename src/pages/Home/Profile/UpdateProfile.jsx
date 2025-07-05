@@ -41,7 +41,6 @@ export default function CompanyProfileDisplay() {
 
   const profileData = data?.data;
   const isFirstTime = !data?.data;
-  console.log('profile data console this  ',profileData)
 
   const handleOpenModal = () => {
     setModalOpen(true);

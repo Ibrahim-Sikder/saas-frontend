@@ -159,7 +159,6 @@ const Profile = () => {
     typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
-  console.log("data", data);
 
   // Extract user data from API response
   const userData = data?.data?.[0] || {};

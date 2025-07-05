@@ -37,9 +37,9 @@ import { useCreateUserMutation } from "../../redux/api/userApi";
 import { useGetAllTenantQuery } from "../../redux/api/tenantApi";
 
 const mockRoles = [
-  { id: "role1", name: "Admin" },
-  { id: "role2", name: "Manager" },
-  { id: "role3", name: "Employee" },
+  { id: "admin", name: "admin" },
+  { id: "manager", name: "manager" },
+  { id: "employee", name: "employee" },
 ];
 
 const SignupPage = () => {
@@ -140,7 +140,7 @@ const SignupPage = () => {
         status: "active",
         tenantDomain: formData.tenantDomain,
       };
-      console.log("submit data", submitData);
+     
       const result = await createUser(submitData).unwrap();
 
       if (result.success) {

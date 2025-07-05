@@ -110,8 +110,6 @@ if (isLocalhost) {
   tenantDomain = window.location.hostname.split(".")[0];
 }
 
-console.log("Tenant Domain:", tenantDomain);
-
 
   const {
     register,

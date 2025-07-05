@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 "use client";
@@ -43,8 +44,6 @@ const PartialPaymentModal = ({
   const [note, setNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [error, setError] = useState("");
-  console.log("for partial employee salary", employee);
-  console.log("for partial employee salary reqord", salaryRecord);
   const [partialyPayment, { isLoading }] = usePartialyPaymentMutation();
 
   const handleSubmit = async () => {
@@ -69,8 +68,6 @@ const PartialPaymentModal = ({
           payment_method: paymentMethod,
         },
       }).unwrap();
-
-      console.log(result);
       toast.success("Payment added successfully!");
       setPaymentAmount("");
       setNote("");

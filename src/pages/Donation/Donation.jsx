@@ -98,7 +98,6 @@ export default function DonationForm() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000))
       toast.success("Donation submitted successfully! Thank you for your generosity.")
-      console.log("Donation data:", data)
     } catch (error) {
       toast.error("Failed to submit donation. Please try again.")
     }

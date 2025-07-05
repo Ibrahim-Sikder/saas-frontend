@@ -73,7 +73,7 @@ const CompanyAccount = ({
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )[0]
       : null;
-  console.log(lastMoneyReceipt);
+
 
   const beforeLastMoneyReceipt =
     profileData?.data?.moneyReceipts?.length > 0
@@ -81,7 +81,6 @@ const CompanyAccount = ({
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )[1]
       : null;
-  console.log("before mone", beforeLastMoneyReceipt);
 
   return (
     <div className="customerProfileWrap">

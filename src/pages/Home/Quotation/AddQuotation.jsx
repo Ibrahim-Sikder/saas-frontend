@@ -113,8 +113,6 @@ const AddQuotation = () => {
     jobNo: orderNumber,
   });
 
-  console.log("jobdata order number", orderNumber);
-
   useEffect(() => {
     if (jobCardData?.data?.date) {
       setSelectedDate(jobCardData?.data?.date);
@@ -579,7 +577,7 @@ const AddQuotation = () => {
     };
     try {
       const res = await createQuotation(values).unwrap();
-      console.log("response", res);
+
       if (res.success) {
         toast.success(res.message);
 

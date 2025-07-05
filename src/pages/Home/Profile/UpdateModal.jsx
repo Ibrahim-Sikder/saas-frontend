@@ -35,7 +35,6 @@ export default function CompanyProfileModal({ open, onClose, initialData }) {
 
   const [updateCompanyProfile] = useUpdateCompanyProfileMutation();
   const handleSave = async (data) => {
-    console.log("reaw data ", data);
     try {
       const { _id, ...rest } = {
         ...initialData,

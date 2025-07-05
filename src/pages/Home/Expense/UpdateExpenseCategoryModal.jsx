@@ -16,7 +16,6 @@ const UpdateExpenseCategoryModal = ({ open, setOpen, categoryId }) => {
     tenantDomain,
     id: categoryId,
   });
-  console.log("single expense ", data);
   const [updateCategory] = useUpdateExpenseCategoryMutation();
 
   const handleSubmit = async (data, reset) => {

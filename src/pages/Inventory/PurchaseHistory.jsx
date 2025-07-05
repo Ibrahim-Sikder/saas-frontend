@@ -208,18 +208,15 @@ export default function PurchaseHistoryPage() {
     setDownloadDialogOpen(true)
   }
 
-  // Handle download dialog close
   const handleDownloadDialogClose = () => {
     setDownloadDialogOpen(false)
     setDownloadFormat("")
   }
 
-  // Handle download format selection
   const handleFormatSelect = (format) => {
     setDownloadFormat(format)
   }
 
-  // Handle download confirmation
   const handleDownloadConfirm = async () => {
     if (!downloadFormat) {
       setSnackbar({
@@ -233,7 +230,6 @@ export default function PurchaseHistoryPage() {
     setIsDownloading(true)
 
     try {
-      // Prepare data for export
       const dataToExport = filteredPurchases.map((purchase) => ({
         "Invoice No": purchase.referenceNo,
         Date: purchase.date,
@@ -244,15 +240,9 @@ export default function PurchaseHistoryPage() {
         "Total Items": purchase.products?.length || 0,
       }))
 
-      // Simulate download delay
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
       if (downloadFormat === "pdf") {
-        // PDF download logic would go here
-        // In a real implementation, you would use a library like jsPDF
-        console.log("Downloading PDF:", dataToExport)
-
-        // Simulate PDF generation
         const fileName = `purchase_history_${new Date().toISOString().split("T")[0]}.pdf`
 
         setSnackbar({
@@ -261,11 +251,6 @@ export default function PurchaseHistoryPage() {
           severity: "success",
         })
       } else if (downloadFormat === "excel") {
-        // Excel download logic would go here
-        // In a real implementation, you would use a library like xlsx
-        console.log("Downloading Excel:", dataToExport)
-
-        // Simulate Excel generation
         const fileName = `purchase_history_${new Date().toISOString().split("T")[0]}.xlsx`
 
         setSnackbar({
@@ -274,11 +259,6 @@ export default function PurchaseHistoryPage() {
           severity: "success",
         })
       } else if (downloadFormat === "csv") {
-        // CSV download logic would go here
-        // In a real implementation, you would generate a CSV string
-        console.log("Downloading CSV:", dataToExport)
-
-        // Simulate CSV generation
         const fileName = `purchase_history_${new Date().toISOString().split("T")[0]}.csv`
 
         setSnackbar({

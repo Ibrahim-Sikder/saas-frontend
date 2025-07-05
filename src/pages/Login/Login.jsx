@@ -5,7 +5,7 @@ import { Button, Box, Typography, Link, Divider, Alert } from "@mui/material";
 import { Lock, Google, Facebook, Person } from "@mui/icons-material";
 import AuthLayout from "../../auth/AuthLayout";
 import { useTenantLoginMutation } from "../../redux/api/authApi";
-
+import Cookies from "js-cookie";
 import GarageForm from "../../components/form/Form";
 import TASInput from "../../components/form/Input";
 import { toast } from "react-toastify";
@@ -15,6 +15,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
+
   const handleSubmit = async (data) => {
     setLoading(true);
     setError("");
@@ -23,22 +24,35 @@ const Login = () => {
       const res = await tenantLogin(data).unwrap();
 
       if (res.success) {
+        const accessToken = res?.data?.accessToken;
+        const user = res?.data?.user;
+
+        // Set token cookie here if you want it local (optional)
+        Cookies.set("token", accessToken, { expires: 7 });
+
+        try {
+          localStorage.setItem("user", JSON.stringify(user));
+        } catch (e) {
+          console.error("Failed to save user to localStorage:", e);
+        }
+
         toast.success(res.message || "Login successful!");
-        const tenantDomain = res?.user?.tenantDomain || data.tenantDomain;
+
+        const tenantDomain = user?.tenantDomain || data.tenantDomain;
         const isLocalhost = window.location.hostname.includes("localhost");
 
         if (tenantDomain) {
-          let redirectURL;
-
           if (isLocalhost) {
-            // ✅ Localhost subdomain with custom domain
-            redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
-          } else {
-            // ✅ Live site
-            redirectURL = `https://${tenantDomain}/dashboard`;
-          }
+            const redirectURL = `http://${tenantDomain}.localhost:5173/dashboard`;
 
-          window.location.href = redirectURL;
+            setTimeout(() => {
+              window.location.href = redirectURL;
+            }, 100);
+          } else {
+            // Live site redirect directly to dashboard (assuming cookies set on domain)
+            const redirectURL = `https://${tenantDomain}/dashboard`;
+            window.location.href = redirectURL;
+          }
         } else {
           navigate("/dashboard");
         }

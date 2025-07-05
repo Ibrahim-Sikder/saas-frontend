@@ -75,7 +75,7 @@ const AddAdjustmentForm = () => {
   const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
 
   const { data: stockData, isLoading } = useGetAllStocksQuery(queryParams)
-  console.log(stockData)
+
   const wareHouseOptions = useMemo(() => {
     if (!warehouseData?.data?.warehouses) return []
     return warehouseData.data.warehouses.map((warehouse) => ({

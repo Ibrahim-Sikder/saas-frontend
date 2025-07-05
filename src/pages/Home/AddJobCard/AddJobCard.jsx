@@ -135,8 +135,7 @@ const AddJobCard = () => {
       tenantDomain: tenantDomain,
       id: userId,
       userType: newId,
-    });
-  console.log(userDetails);
+    })
 
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({

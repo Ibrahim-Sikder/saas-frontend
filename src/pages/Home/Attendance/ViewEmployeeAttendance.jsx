@@ -39,7 +39,6 @@ const ViewEmployeeAttendance = () => {
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: "Employee Attendance Report",
-    onAfterPrint: () => console.log("Print completed"),
   });
 
   // Prepare data for CSV and PDF

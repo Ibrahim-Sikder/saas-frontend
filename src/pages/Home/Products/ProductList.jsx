@@ -660,7 +660,7 @@ export default function ProductList() {
   // Handle search
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    console.log(search);
+
   };
 
   // Handle pagination

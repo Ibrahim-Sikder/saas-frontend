@@ -599,7 +599,7 @@ export default function PurchaseReturnList() {
             </TableHead>
             <TableBody>
               {purchaseReturnData?.data?.returns?.map((ret) => {
-                console.log("for id ", ret);
+
                 return (
                   <TableRow
                     key={ret._id}

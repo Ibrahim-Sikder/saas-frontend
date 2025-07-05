@@ -201,10 +201,6 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
           ? employees.findIndex((emp) => emp._id === targetEmployeeId)
           : -1;
 
-        console.log(
-          `Processing salary for employee ID: ${targetEmployeeId}, index: ${targetEmployeeIndex}`
-        );
-
         // Set the specific employee's data if found
         if (targetEmployeeIndex !== -1) {
           monthArray[targetEmployeeIndex] =
@@ -228,10 +224,6 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
             salaryData.due_amount || salaryData.due || 0;
           paidArray[targetEmployeeIndex] =
             salaryData.payment_status === "completed";
-
-          console.log(
-            `Successfully populated data for employee at index: ${targetEmployeeIndex}`
-          );
         } else {
           console.warn(`Employee not found for salary data:`, salaryData);
         }
@@ -251,8 +243,6 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
       setPay(payArray);
       setDue(dueArray);
       setPaid(paidArray);
-
-      console.log("Successfully initialized all salary data");
     } catch (error) {
       console.error("Error initializing with salary data:", error);
       toast.error("Error loading salary data");

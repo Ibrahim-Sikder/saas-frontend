@@ -94,14 +94,13 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
   // Process stock data when it's loaded
   useEffect(() => {
     if (stockData && stockData.data) {
-      console.log("Processing stock data:", stockData.data)
       // Group stocks by warehouse
       const stocksByWarehouse = {}
 
       stockData.data.forEach((stockItem) => {
         // Check if stockItem has the required structure
         if (!stockItem.warehouse || !stockItem.product) {
-          console.log("Skipping invalid stock item:", stockItem)
+
           return
         }
 
@@ -128,26 +127,18 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
         }
       })
 
-      console.log("Processed warehouse stocks:", stocksByWarehouse)
       setWarehouseStocks(stocksByWarehouse)
     }
   }, [stockData])
 
   // Update available products when fromLocation changes
   useEffect(() => {
-    console.log("From location changed:", formData.fromLocation)
-    console.log("Available warehouse stocks:", warehouseStocks)
 
     if (formData.fromLocation && warehouseStocks[formData.fromLocation]) {
       const products = []
       const warehouseProducts = warehouseStocks[formData.fromLocation].products
-
-      console.log("Warehouse products:", warehouseProducts)
-
       Object.keys(warehouseProducts).forEach((productId) => {
         const product = warehouseProducts[productId]
-        console.log("Processing product:", product)
-
         if (product.currentStock > 0) {
           products.push({
             _id: productId,
@@ -165,14 +156,11 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
           })
         }
       })
-
-      console.log("Available products:", products)
       setAvailableProducts(products)
 
       // Reset transfer items when location changes
       setTransferItems([{ id: 1, product: null, quantity: 1, note: "" }])
     } else {
-      console.log("No products available or warehouse not selected")
       setAvailableProducts([])
     }
   }, [formData.fromLocation, warehouseStocks])

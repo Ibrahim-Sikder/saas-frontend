@@ -364,8 +364,7 @@ const Purchasform = () => {
       totalTax,
       totalShipping,
       grandTotal,
-    };
-    console.log("modify data ", modifyData);
+    }
 
     try {
       setShowSuccessAnimation(true);

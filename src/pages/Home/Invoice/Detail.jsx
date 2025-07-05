@@ -27,8 +27,7 @@ const Detail = () => {
     content: () => componentRef.current,
   });
 
-  const [invoicePreview, setInvoicePreview] = useState({});
-  console.log("invoice", invoicePreview);
+  const [invoicePreview, setInvoicePreview] = useState({})
   const [loading, setLoading] = useState(false);
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
