@@ -1139,3 +1139,26 @@ export const StatusCard = styled(Card)(({ theme, status }) => ({
   boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
 }))
 
+export const PaymentStatusCard = styled(Card)(({ theme, ispaid }) => ({
+  background:
+    ispaid === "true"
+      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
+      : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
+  color: "white",
+  borderRadius: "16px",
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+  animation: ispaid === "false" ? "pulse 2s infinite" : "none",
+  "@keyframes pulse": {
+    "0%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
+    "50%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.4)",
+    },
+    "100%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
+  },
+}));

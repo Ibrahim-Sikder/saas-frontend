@@ -156,7 +156,7 @@ const AddJobCard = () => {
       ? Number(lastJobCard.job_no)
       : 0) + 1;
 
-  const paddedJobNumber = jobNumber.toString().padStart(4, "0");
+  const paddedJobNumber = jobNumber?.toString().padStart(4, "0");
 
   useEffect(() => {
     if (userDetails?.data && newId === "customer") {
@@ -522,8 +522,8 @@ const AddJobCard = () => {
 
   useEffect(() => {
     const parsedDate = new Date();
-    const day = parsedDate.getDate().toString().padStart(2, "0");
-    const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
+    const day = parsedDate.getDate()?.toString().padStart(2, "0");
+    const month = (parsedDate.getMonth() + 1)?.toString().padStart(2, "0");
     const year = parsedDate.getFullYear();
     const currentDate = `${day}-${month}-${year}`;
     setFormattedDate(currentDate);

@@ -485,7 +485,7 @@ const PaybillForm = ({ id }) => {
 
       // Explicitly set the amount field
       if (data.amount !== undefined) {
-        setValue("amount", data.amount.toString());
+        setValue("amount", data.amount?.toString());
       }
 
       // Set UI state based on loaded data

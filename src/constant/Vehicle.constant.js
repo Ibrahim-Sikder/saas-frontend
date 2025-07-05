@@ -74,7 +74,7 @@ export const vehicleTypes = [
 export const vehicleModels = [];
 
 for (let year = 1920; year <= 2024; year++) {
-  vehicleModels.push({ label: year.toString(), value: year.toString() });
+  vehicleModels.push({ label: year?.toString(), value: year?.toString() });
 }
 
 export const fuelType = [

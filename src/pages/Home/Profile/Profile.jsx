@@ -47,105 +47,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { styled } from "@mui/material/styles";
 import { useGetAllUserQuery } from "../../../redux/api/userApi";
-
-const GlowingBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
-  },
-}));
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  borderRadius: "20px",
-  background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
-  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-  border: "1px solid rgba(255,255,255,0.2)",
-  backdropFilter: "blur(10px)",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-  },
-}));
-
-const GradientCard = styled(Card)(({ theme }) => ({
-  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  color: "white",
-  borderRadius: "20px",
-  overflow: "hidden",
-  position: "relative",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background:
-      "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
-    pointerEvents: "none",
-  },
-}));
-
-const PaymentStatusCard = styled(Card)(({ theme, ispaid }) => ({
-  background:
-    ispaid === "true"
-      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
-      : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
-  color: "white",
-  borderRadius: "16px",
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-  animation: ispaid === "false" ? "pulse 2s infinite" : "none",
-  "@keyframes pulse": {
-    "0%": {
-      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
-    },
-    "50%": {
-      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.4)",
-    },
-    "100%": {
-      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
-    },
-  },
-}));
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+import { GlowingBadge, GradientCard, PaymentStatusCard, VisuallyHiddenInput } from "../../../utils/customStyle";
+import { StyledPaper } from "../../../utils";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -350,7 +253,7 @@ const Profile = () => {
                   >
                     <Avatar
                       src={profileImage}
-                      alt={userData.name}
+                      alt={userData?.name}
                       sx={{
                         width: 140,
                         height: 140,
@@ -374,11 +277,11 @@ const Profile = () => {
                       textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                     }}
                   >
-                    {userData.name || "User Name"}
+                    {userData?.name || "User Name"}
                     <Tooltip title="Verified Account">
                       <FaCheckCircle style={{ color: "#4CAF50" }} />
                     </Tooltip>
-                    {!subscription.isPaid && (
+                    {!subscription?.isPaid && (
                       <Tooltip title="Payment Required">
                         <FaExclamationTriangle style={{ color: "#FF9800" }} />
                       </Tooltip>
@@ -397,7 +300,7 @@ const Profile = () => {
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                     <Chip
                       icon={<FaCrown />}
-                      label={`${subscription.plan || "Free"} Plan`}
+                      label={`${subscription?.plan || "Free"} Plan`}
                       sx={{
                         background: "linear-gradient(45deg, #FFD700, #FFA500)",
                         color: "black",
@@ -408,16 +311,16 @@ const Profile = () => {
 
                     <Chip
                       icon={
-                        subscription.status === "Expired" ? (
+                        subscription?.status === "Expired" ? (
                           <FaExclamationTriangle />
                         ) : (
                           <FaCalendarAlt />
                         )
                       }
-                      label={`${subscription.status || "Unknown"}`}
+                      label={`${subscription?.status || "Unknown"}`}
                       sx={{
                         bgcolor: getSubscriptionStatusColor(
-                          subscription.status
+                          subscription?.status
                         ),
                         color: "white",
                         fontWeight: "bold",
@@ -425,13 +328,13 @@ const Profile = () => {
                     />
 
                     <Chip
-                      icon={subscription.isPaid ? <FaUnlock /> : <FaLock />}
-                      label={subscription.isPaid ? "Paid" : "Unpaid"}
+                      icon={subscription?.isPaid ? <FaUnlock /> : <FaLock />}
+                      label={subscription?.isPaid ? "Paid" : "Unpaid"}
                       sx={{
-                        bgcolor: subscription.isPaid ? "#4CAF50" : "#f44336",
+                        bgcolor: subscription?.isPaid ? "#4CAF50" : "#f44336",
                         color: "white",
                         fontWeight: "bold",
-                        animation: !subscription.isPaid
+                        animation: !subscription?.isPaid
                           ? "pulse 2s infinite"
                           : "none",
                       }}
@@ -439,7 +342,7 @@ const Profile = () => {
 
                     <Chip
                       icon={<FaGlobe />}
-                      label={`${tenantInfo.domain || "domain"}.app`}
+                      label={`${tenantInfo?.domain || "domain"}.app`}
                       color="secondary"
                       variant="outlined"
                       sx={{
@@ -505,7 +408,7 @@ const Profile = () => {
             }}
           >
             Payment Required: Your subscription payment of $
-            {subscription.amount} is pending. Please complete payment to
+            {subscription?.amount} is pending. Please complete payment to
             continue using all features.
           </Alert>
         </Fade>
@@ -523,7 +426,7 @@ const Profile = () => {
               "& .MuiAlert-message": { fontSize: "1.1rem" },
             }}
           >
-            Your subscription has expired on {formatDate(subscription.endDate)}.
+            Your subscription has expired on {formatDate(subscription?.endDate)}.
             Please renew to continue using all features.
           </Alert>
         </Fade>
@@ -571,7 +474,7 @@ const Profile = () => {
                             <TextField
                               fullWidth
                               label="Name"
-                              defaultValue={userData.name}
+                              defaultValue={userData?.name}
                               variant="outlined"
                             />
                           </Grid>
@@ -579,7 +482,7 @@ const Profile = () => {
                             <TextField
                               fullWidth
                               label="Email"
-                              defaultValue={userData.email}
+                              defaultValue={userData?.email}
                               variant="outlined"
                             />
                           </Grid>
@@ -637,7 +540,7 @@ const Profile = () => {
                               Account Details
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
-                              <strong>User ID:</strong> {userData._id}
+                              <strong>User ID:</strong> {userData?._id}
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
                               <strong>Status:</strong>
@@ -655,16 +558,16 @@ const Profile = () => {
                               />
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
-                              <strong>Role:</strong> {userData.role}
+                              <strong>Role:</strong> {userData?.role}
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
                               <strong>Created:</strong>{" "}
-                              {formatDate(userData.createdAt)}
+                              {formatDate(userData?.createdAt)}
                             </Typography>
                             <Typography>
                               <strong>Last Login:</strong>{" "}
                               {userData.lastLogin
-                                ? formatDate(userData.lastLogin)
+                                ? formatDate(userData?.lastLogin)
                                 : "Never"}
                             </Typography>
                           </Paper>
@@ -688,13 +591,13 @@ const Profile = () => {
                               Organization
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
-                              <strong>Name:</strong> {tenantInfo.name}
+                              <strong>Name:</strong> {tenantInfo?.name}
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
-                              <strong>Domain:</strong> {tenantInfo.domain}
+                              <strong>Domain:</strong> {tenantInfo?.domain}
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
-                              <strong>Type:</strong> {tenantInfo.businessType}
+                              <strong>Type:</strong> {tenantInfo?.businessType}
                             </Typography>
                             <Typography sx={{ mb: 1 }}>
                               <strong>Active:</strong>
@@ -703,7 +606,7 @@ const Profile = () => {
                                 size="small"
                                 sx={{
                                   ml: 1,
-                                  bgcolor: tenantInfo.isActive
+                                  bgcolor: tenantInfo?.isActive
                                     ? "#4CAF50"
                                     : "#f44336",
                                   color: "white",
@@ -738,20 +641,20 @@ const Profile = () => {
                                 height: "100%",
                                 borderRadius: "16px",
                                 background: achievement.earned
-                                  ? `linear-gradient(135deg, ${achievement.color}15, ${achievement.color}05)`
+                                  ? `linear-gradient(135deg, ${achievement?.color}15, ${achievement?.color}05)`
                                   : "linear-gradient(135deg, #f5f5f5, #eeeeee)",
                                 border: `2px solid ${
-                                  achievement.earned
-                                    ? achievement.color + "30"
+                                  achievement?.earned
+                                    ? achievement?.color + "30"
                                     : "#e0e0e0"
                                 }`,
                                 transition: "all 0.3s ease",
-                                opacity: achievement.earned ? 1 : 0.6,
+                                opacity: achievement?.earned ? 1 : 0.6,
                                 "&:hover": {
                                   transform: "translateY(-5px)",
                                   boxShadow: `0 10px 30px ${
                                     achievement.earned
-                                      ? achievement.color + "30"
+                                      ? achievement?.color + "30"
                                       : "#00000020"
                                   }`,
                                 },
@@ -763,14 +666,14 @@ const Profile = () => {
                                     display: "inline-flex",
                                     p: 2,
                                     borderRadius: "50%",
-                                    bgcolor: achievement.earned
-                                      ? achievement.color
+                                    bgcolor: achievement?.earned
+                                      ? achievement?.color
                                       : "#bdbdbd",
                                     color: "white",
                                     mb: 2,
                                   }}
                                 >
-                                  {React.cloneElement(achievement.icon, {
+                                  {React.cloneElement(achievement?.icon, {
                                     size: 24,
                                   })}
                                 </Box>
@@ -779,8 +682,8 @@ const Profile = () => {
                                   fontWeight="bold"
                                   gutterBottom
                                 >
-                                  {achievement.title}
-                                  {achievement.earned && (
+                                  {achievement?.title}
+                                  {achievement?.earned && (
                                     <FaCheckCircle
                                       style={{
                                         marginLeft: 8,
@@ -825,7 +728,7 @@ const Profile = () => {
                             alignItems: "center",
                             transition: "all 0.3s ease",
                             borderLeft: `4px solid ${getActivityStatusColor(
-                              activity.status
+                              activity?.status
                             )}`,
                             "&:hover": {
                               transform: "translateX(10px)",
@@ -841,26 +744,26 @@ const Profile = () => {
                               width: 48,
                               height: 48,
                               borderRadius: "12px",
-                              bgcolor: getActivityStatusColor(activity.status),
+                              bgcolor: getActivityStatusColor(activity?.status),
                               color: "white",
                               mr: 3,
                             }}
                           >
-                            {activity.icon}
+                            {activity?.icon}
                           </Box>
                           <Box sx={{ flexGrow: 1 }}>
                             <Typography variant="h6" fontWeight="600">
-                              {activity.action}
+                              {activity?.action}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {activity.date}
+                              {activity?.date}
                             </Typography>
                           </Box>
                           <Chip
-                            label={activity.status}
+                            label={activity?.status}
                             size="small"
                             sx={{
-                              bgcolor: getActivityStatusColor(activity.status),
+                              bgcolor: getActivityStatusColor(activity?.status),
                               color: "white",
                               fontWeight: "bold",
                             }}
@@ -878,7 +781,7 @@ const Profile = () => {
         {/* Right Column */}
         <Grid item xs={12} lg={4}>
           {/* Payment Status Card */}
-          <PaymentStatusCard ispaid={subscription.isPaid.toString()}>
+          <PaymentStatusCard ispaid={subscription?.isPaid?.toString()}>
             <CardContent>
               <Box
                 sx={{
@@ -892,16 +795,16 @@ const Profile = () => {
                   <FaMoneyBillWave style={{ marginRight: 8 }} />
                   Payment Status
                 </Typography>
-                {subscription.isPaid ? <FaCheckCircle /> : <FaTimes />}
+                {subscription?.isPaid ? <FaCheckCircle /> : <FaTimes />}
               </Box>
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                ${subscription.amount || 0}
+                ${subscription?.amount || 0}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {subscription.isPaid ? "Payment Completed" : "Payment Required"}
+                {subscription?.isPaid ? "Payment Completed" : "Payment Required"}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Method: {subscription.paymentMethod || "N/A"}
+                Method: {subscription?.paymentMethod || "N/A"}
               </Typography>
             </CardContent>
           </PaymentStatusCard>
@@ -921,7 +824,7 @@ const Profile = () => {
                   size={120}
                   thickness={6}
                   sx={{
-                    color: getSubscriptionStatusColor(subscription.status),
+                    color: getSubscriptionStatusColor(subscription?.status),
                     "& .MuiCircularProgress-circle": {
                       strokeLinecap: "round",
                     },
@@ -952,37 +855,37 @@ const Profile = () => {
 
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                <strong>Plan:</strong> {subscription.plan || "Free"}
+                <strong>Plan:</strong> {subscription?.plan || "Free"}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <strong>Status:</strong>
                 <Chip
-                  label={subscription.status || "Unknown"}
+                  label={subscription?.status || "Unknown"}
                   size="small"
                   sx={{
                     ml: 1,
-                    bgcolor: getSubscriptionStatusColor(subscription.status),
+                    bgcolor: getSubscriptionStatusColor(subscription?.status),
                     color: "white",
                   }}
                 />
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                <strong>Amount:</strong> ${subscription.amount || 0}
+                <strong>Amount:</strong> ${subscription?.amount || 0}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                <strong>Started:</strong> {formatDate(subscription.startDate)}
+                <strong>Started:</strong> {formatDate(subscription?.startDate)}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                <strong>Expires:</strong> {formatDate(subscription.endDate)}
+                <strong>Expires:</strong> {formatDate(subscription?.endDate)}
               </Typography>
               <Typography variant="body1">
                 <strong>Active:</strong>
                 <Chip
-                  label={subscription.isActive ? "Yes" : "No"}
+                  label={subscription?.isActive ? "Yes" : "No"}
                   size="small"
                   sx={{
                     ml: 1,
-                    bgcolor: subscription.isActive ? "#4CAF50" : "#f44336",
+                    bgcolor: subscription?.isActive ? "#4CAF50" : "#f44336",
                     color: "white",
                   }}
                 />
@@ -992,13 +895,13 @@ const Profile = () => {
             <Button
               variant="contained"
               startIcon={
-                subscription.status === "Expired" ? <FaRocket /> : <FaCog />
+                subscription?.status === "Expired" ? <FaRocket /> : <FaCog />
               }
               fullWidth
               size="large"
               sx={{
                 background:
-                  subscription.status === "Expired"
+                  subscription?.status === "Expired"
                     ? "linear-gradient(45deg, #FF6B6B, #4ECDC4)"
                     : "linear-gradient(45deg, #667eea, #764ba2)",
                 borderRadius: "12px",
@@ -1007,7 +910,7 @@ const Profile = () => {
                 fontWeight: "bold",
                 "&:hover": {
                   background:
-                    subscription.status === "Expired"
+                    subscription?.status === "Expired"
                       ? "linear-gradient(45deg, #FF5252, #26C6DA)"
                       : "linear-gradient(45deg, #5a67d8, #6b46c1)",
                   transform: "translateY(-2px)",
@@ -1015,7 +918,7 @@ const Profile = () => {
                 },
               }}
             >
-              {subscription.status === "Expired"
+              {subscription?.status === "Expired"
                 ? "Renew Subscription"
                 : "Manage Subscription"}
             </Button>
@@ -1043,7 +946,7 @@ const Profile = () => {
                     color="success.main"
                     fontWeight="bold"
                   >
-                    {tenantInfo.isActive ? "1" : "0"}
+                    {tenantInfo?.isActive ? "1" : "0"}
                   </Typography>
                   <Typography variant="body2">Active Tenants</Typography>
                 </Paper>
@@ -1058,7 +961,7 @@ const Profile = () => {
                   }}
                 >
                   <Typography variant="h4" color="primary" fontWeight="bold">
-                    {userData.status === "active" ? "100" : "0"}%
+                    {userData?.status === "active" ? "100" : "0"}%
                   </Typography>
                   <Typography variant="body2">Account Health</Typography>
                 </Paper>
@@ -1088,17 +991,17 @@ const Profile = () => {
                     p: 2,
                     textAlign: "center",
                     borderRadius: "12px",
-                    background: subscription.isPaid
+                    background: subscription?.isPaid
                       ? "linear-gradient(135deg, #e8f5e8, #c8e6c9)"
                       : "linear-gradient(135deg, #ffebee, #ffcdd2)",
                   }}
                 >
                   <Typography
                     variant="h4"
-                    color={subscription.isPaid ? "success.main" : "error.main"}
+                    color={subscription?.isPaid ? "success.main" : "error.main"}
                     fontWeight="bold"
                   >
-                    {subscription.isPaid ? "✓" : "✗"}
+                    {subscription?.isPaid ? "✓" : "✗"}
                   </Typography>
                   <Typography variant="body2">Payment Status</Typography>
                 </Paper>
@@ -1115,22 +1018,22 @@ const Profile = () => {
               <Grid item xs={12}>
                 <Button
                   fullWidth
-                  variant={!subscription.isPaid ? "contained" : "outlined"}
+                  variant={!subscription?.isPaid ? "contained" : "outlined"}
                   startIcon={<FaCreditCard />}
                   sx={{
                     mb: 2,
                     borderRadius: "12px",
                     py: 1.5,
-                    ...(!subscription.isPaid && {
+                    ...(!subscription?.isPaid && {
                       background: "linear-gradient(45deg, #f44336, #d32f2f)",
                       color: "white",
                       "&:hover": {
-                        background: "linear-gradient(45deg, #d32f2f, #b71c1c)",
+                        background: "-gradient(45deg, #d32f2f, #b71c1c)",
                       },
                     }),
                   }}
                 >
-                  {subscription.isPaid ? "Payment History" : "Complete Payment"}
+                  {subscription?.isPaid ? "Payment History" : "Complete Payment"}
                 </Button>
               </Grid>
               <Grid item xs={12}>
