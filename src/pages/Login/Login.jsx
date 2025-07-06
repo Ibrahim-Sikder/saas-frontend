@@ -94,17 +94,16 @@ const handleSubmit = async (data) => {
 
       let redirectURL;
 
-      // ✅ Check if superadmin is logging in
+
       if (tenantKey === "superadmin") {
         if (isLocalhost) {
-          // Superadmin panel in local development
-          redirectURL = "http://localhost:5173/admin/dashboard";
+          redirectURL = "http://localhost:5173/dashboard";
         } else {
-          // Superadmin panel in live (example: admin.garagemanagement.com)
-          redirectURL = `https://admin.garagemanagement.com/admin/dashboard`;
+
+          redirectURL = `https://trustautosolution/dashboard`;
         }
       } else {
-        // ✅ Normal tenant login
+
         if (isLocalhost) {
           redirectURL = `http://localhost:5173/dashboard`;
         } else {
