@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
 import "./Home.css";
 import MonthlyBarChart from "../../components/Chart/MonthlyBarChart";
 import YearlyIncomeChart from "../../components/Chart/YearlyIncomeChart";
@@ -23,7 +22,6 @@ const Home = () => {
       </div>
       <AllServices />
 
-
       <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />
         <YearlyIncomeChart />
@@ -43,7 +41,6 @@ const Home = () => {
         <RecentClient />
         <RecentProject />
       </div>
-      
 
       <div className="xl:flex gap-5 justify-between mt-[30px]">
         <RcentQuotation />

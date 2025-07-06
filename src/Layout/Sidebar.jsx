@@ -790,7 +790,7 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
           </div>
         )}
         <div className="pl-4 space-y-3 mt-3 ">
-          <Link to="/dashboard/all-tenant-list">
+          <Link to="/dashboard/all-user-list">
             <div className="flex items-center dashboardItems cursor-pointer">
               <Logout size={22} />
               <span className="ml-2">All User List</span>

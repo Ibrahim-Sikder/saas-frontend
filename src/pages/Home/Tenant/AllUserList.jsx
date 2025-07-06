@@ -16,59 +16,86 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  Paper,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
-import { FaTrash, FaUsers, FaCheckCircle, FaLock, FaUserShield } from "react-icons/fa";
+import {
+  FaTrash,
+  FaUsers,
+  FaCheckCircle,
+  FaLock,
+  FaUserShield,
+} from "react-icons/fa";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { useDeleteUserMutation, useGetAllUserQuery } from "../../../redux/api/userApi";
+import Swal from "sweetalert2";
+import AddUserModal from "./AddUserModal";
+import {
+  useDeleteUserMutation,
+  useGetAllUserQuery,
+} from "../../../redux/api/userApi";
 import { StatusChip, StyledTableContainer } from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
 
 const AllUserList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   const tenantDomain = window.location.hostname.split(".")[0];
-
   const {
     data: userData,
     isLoading,
     refetch,
   } = useGetAllUserQuery({ tenantDomain });
-
   const [deleteUser, { isLoading: deleteLoading }] = useDeleteUserMutation();
-
+  console.log("user data this ", userData);
   const users = userData?.data || [];
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  const filteredUsers = users.filter((user) =>
+    [user.name, user.email].some((field) =>
+      field.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       try {
-        await deleteUser({ tenantDomain, tenantId: userId }).unwrap();
+        await deleteUser({ tenantDomain, id: userId }).unwrap();
         toast.success("User deleted successfully");
         refetch();
-      } catch (error) {
+      } catch {
         toast.error("Failed to delete user");
       }
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const handleChangePage = (e, newPage) => setPage(newPage);
+  const handleChangeRowsPerPage = (e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setPage(0);
   };
+
+  const formatDate = (dateString) =>
+    dateString
+      ? new Date(dateString).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "N/A";
 
   const stats = {
     total: users.length,
@@ -78,93 +105,227 @@ const AllUserList = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <CircularProgress size={60} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxWidth: 1600, margin: "auto", padding: 3 }}>
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" fontWeight="bold" gutterBottom>
-            <FaUserShield style={{ marginRight: 16, color: "#667eea" }} />
-            All Users
-          </Typography>
-        </Box>
+    <Box
+      sx={{
+        maxWidth: 1600,
+        mx: "auto",
+        p: 3,
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        minHeight: "100vh",
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            mb: 4,
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+          }}
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={2}
+          >
+            <Box display="flex" alignItems="center" gap={2}>
+              <FaUserShield size={40} />
+              <Box>
+                <Typography variant="h3" fontWeight="bold" gutterBottom>
+                  User Management
+                </Typography>
+                <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                  Manage your team members and their permissions
+                </Typography>
+              </Box>
+            </Box>
+            <Box>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsAddUserOpen(true)}
+                style={{
+                  background: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "12px",
+                  padding: "12px 24px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                Add User
+              </motion.button>
+            </Box>
+          </Box>
+        </Paper>
       </motion.div>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={4}>
-          <Chip icon={<FaUsers />} label={`Total: ${stats.total}`} color="primary" />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Chip icon={<FaCheckCircle />} label={`Active: ${stats.active}`} sx={{ bgcolor: "#4CAF50", color: "white" }} />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Chip icon={<FaLock />} label={`Blocked: ${stats.blocked}`} sx={{ bgcolor: "#f44336", color: "white" }} />
-        </Grid>
+      <Grid container spacing={3} mb={4}>
+        {[
+          {
+            label: "Total Users",
+            count: stats.total,
+            icon: <FaUsers />,
+            color: "#764ba2",
+          },
+          {
+            label: "Active Users",
+            count: stats.active,
+            icon: <FaCheckCircle />,
+            color: "#45a049",
+          },
+          {
+            label: "Blocked Users",
+            count: stats.blocked,
+            icon: <FaLock />,
+            color: "#d32f2f",
+          },
+        ].map(({ label, count, icon, color }, idx) => (
+          <Grid item xs={12} sm={4} key={idx}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: idx * 0.2 }}
+            >
+              <Paper
+                elevation={4}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  color: "white",
+                  background: color,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <Typography variant="h4" fontWeight="bold">
+                    {count}
+                  </Typography>
+                  <Typography variant="body1">{label}</Typography>
+                </Box>
+                <Box>{icon}</Box>
+              </Paper>
+            </motion.div>
+          </Grid>
+        ))}
       </Grid>
 
-      <StyledPaper>
+      <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+        <TextField
+          fullWidth
+          placeholder="Search users by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Paper>
+
+      <StyledPaper elevation={4} sx={{ borderRadius: 3 }}>
         <StyledTableContainer>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell>Actions</TableCell>
+              <TableRow sx={{ bgcolor: "primary.main" }}>
+                {["Name", "Email", "Role", "Status", "Created", "Actions"].map(
+                  (head, i) => (
+                    <TableCell
+                      key={i}
+                      sx={{ color: "white", fontWeight: "bold" }}
+                    >
+                      {head}
+                    </TableCell>
+                  )
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                <TableRow key={user._id} hover>
-                  <TableCell>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Avatar>{user.name.charAt(0).toUpperCase()}</Avatar>
-                      <Typography>{user.name}</Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <StatusChip
-                      label={user.status === "active" ? "Active" : "Blocked"}
-                      status={user.status}
-                    />
-                  </TableCell>
-                  <TableCell>{formatDate(user.createdAt)}</TableCell>
-                  <TableCell>
-                    <Tooltip title="Delete">
-                      <IconButton
+              {filteredUsers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((user) => (
+                  <TableRow key={user._id} hover>
+                    <TableCell>
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <Avatar sx={{ bgcolor: "primary.main" }}>
+                          {user.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Typography>{user.name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.role}
                         size="small"
-                        onClick={() => handleDeleteUser(user._id)}
-                        sx={{ color: "#f44336" }}
-                        disabled={deleteLoading}
-                      >
-                        <FaTrash />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        sx={{ textTransform: "capitalize" }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <StatusChip
+                        label={user.status === "active" ? "Active" : "Blocked"}
+                        status={user.status}
+                      />
+                    </TableCell>
+                    <TableCell>{formatDate(user.createdAt)}</TableCell>
+                    <TableCell>
+                      <Tooltip title="Delete User">
+                        <IconButton
+                          onClick={() => handleDeleteUser(user._id)}
+                          disabled={deleteLoading}
+                          sx={{ color: "#f44336" }}
+                        >
+                          <FaTrash />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </StyledTableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={users.length}
+          count={filteredUsers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </StyledPaper>
+
+      <AddUserModal
+        open={isAddUserOpen}
+        onClose={() => setIsAddUserOpen(false)}
+        onSuccess={refetch}
+      />
     </Box>
   );
 };

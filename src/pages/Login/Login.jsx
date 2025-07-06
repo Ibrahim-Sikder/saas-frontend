@@ -203,7 +203,7 @@ const Login = () => {
         <Box sx={{ textAlign: "center", mt: 2 }}>
           <Typography variant="body2">
             Don't have an account?{" "}
-            <Link component={RouterLink} to="/signup" variant="body2">
+            <Link component={RouterLink} to="/create-tenant" variant="body2">
               Sign up
             </Link>
           </Typography>
@@ -212,7 +212,7 @@ const Login = () => {
         <Box sx={{ textAlign: "center", mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
             Want to create a new tenant?{" "}
-            <Link component={RouterLink} to="/tenant/register" variant="body2">
+            <Link component={RouterLink} to="/create-tenant" variant="body2">
               Register your business
             </Link>
           </Typography>

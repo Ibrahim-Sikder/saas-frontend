@@ -41,15 +41,17 @@ import {
   Card,
   CardContent,
   Alert,
-  Badge,
   Fade,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { styled } from "@mui/material/styles";
 import { useGetAllUserQuery } from "../../../redux/api/userApi";
-import { GlowingBadge, GradientCard, PaymentStatusCard, VisuallyHiddenInput } from "../../../utils/customStyle";
+import {
+  GlowingBadge,
+  GradientCard,
+  PaymentStatusCard,
+  VisuallyHiddenInput,
+} from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
-import { useGetAllTenantQuery } from "../../../redux/api/tenantApi";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -63,11 +65,10 @@ const Profile = () => {
     typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
-  // Extract user data from API response
+  console.log("user all info", data);
   const userData = data?.data?.[0] || {};
   const tenantInfo = userData.tenantInfo || {};
   const subscription = tenantInfo.subscription || {};
-console.log('tenant data for profile', data)
   // Format dates
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -426,8 +427,8 @@ console.log('tenant data for profile', data)
               "& .MuiAlert-message": { fontSize: "1.1rem" },
             }}
           >
-            Your subscription has expired on {formatDate(subscription?.endDate)}.
-            Please renew to continue using all features.
+            Your subscription has expired on {formatDate(subscription?.endDate)}
+            . Please renew to continue using all features.
           </Alert>
         </Fade>
       )}
@@ -801,7 +802,9 @@ console.log('tenant data for profile', data)
                 ${subscription?.amount || 0}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {subscription?.isPaid ? "Payment Completed" : "Payment Required"}
+                {subscription?.isPaid
+                  ? "Payment Completed"
+                  : "Payment Required"}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>
                 Method: {subscription?.paymentMethod || "N/A"}
@@ -1033,7 +1036,9 @@ console.log('tenant data for profile', data)
                     }),
                   }}
                 >
-                  {subscription?.isPaid ? "Payment History" : "Complete Payment"}
+                  {subscription?.isPaid
+                    ? "Payment History"
+                    : "Complete Payment"}
                 </Button>
               </Grid>
               <Grid item xs={12}>

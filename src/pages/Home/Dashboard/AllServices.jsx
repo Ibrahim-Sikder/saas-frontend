@@ -17,6 +17,7 @@ import { AssuredWorkload } from "@mui/icons-material";
 const AllServices = () => {
   const tenantDomain = window.location.hostname.split(".")[0];
 
+  
   const {
     data: allMetaData,
     isLoading,

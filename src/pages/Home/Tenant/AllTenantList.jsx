@@ -85,7 +85,6 @@ const AllTenantList = () => {
   });
   const [bulkActionAnchor, setBulkActionAnchor] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-
   const { data: tenantData, isLoading, refetch } = useGetAllTenantQuery({});
   const [updateTenant, { isLoading: updateLoading }] =
     useUpdateTenantMutation();
