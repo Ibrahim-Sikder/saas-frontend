@@ -68,66 +68,59 @@ const Login = () => {
   //   }
   // };
 
-const handleSubmit = async (data) => {
-  setLoading(true);
-  setError("");
+  const handleSubmit = async (data) => {
+    console.log("raw submit data", data);
+    setLoading(true);
+    setError("");
 
-  try {
-    const res = await tenantLogin(data).unwrap();
+    try {
+      const res = await tenantLogin(data).unwrap();
 
-    if (res.success) {
-      const accessToken = res?.data?.accessToken;
-      const user = res?.data?.user;
+      if (res.success) {
+        const accessToken = res?.data?.accessToken;
+        const user = res?.data?.user;
 
-      Cookies.set("token", accessToken, { expires: 7 });
+        Cookies.set("token", accessToken, { expires: 7 });
 
-      try {
-        localStorage.setItem("user", JSON.stringify(user));
-      } catch (e) {
-        console.error("Failed to save user to localStorage:", e);
-      }
-
-      toast.success(res.message || "Login successful!");
-
-      const tenantKey = user?.tenantDomain || data.tenantDomain;
-      const isLocalhost = window.location.hostname.includes("localhost");
-
-      let redirectURL;
-
-
-      if (tenantKey === "superadmin") {
-        if (isLocalhost) {
-          redirectURL = "http://localhost:5173/dashboard";
-        } else {
-
-          redirectURL = `https://trustautosolution/dashboard`;
+        try {
+          localStorage.setItem("user", JSON.stringify(user));
+        } catch (e) {
+          console.error("Failed to save user to localStorage:", e);
         }
+
+        toast.success(res.message || "Login successful!");
+
+        const tenantKey = user?.tenantDomain || data.tenantDomain;
+        const isLocalhost = window.location.hostname.includes("localhost");
+
+        let redirectURL;
+
+        if (tenantKey === "superadmin") {
+          redirectURL = isLocalhost
+            ? "http://localhost:5173/dashboard"
+            : "https://trustautosolution.com/dashboard"
+        } else {
+          if (isLocalhost) {
+            redirectURL = `http://localhost:5173/dashboard`;
+          } else {
+            // redirect to the tenant's custom domain
+            redirectURL = `https://${tenantKey}/dashboard`;
+          }
+        }
+
+        setTimeout(() => {
+          window.location.href = redirectURL;
+        }, 100);
       } else {
-
-        if (isLocalhost) {
-          redirectURL = `http://localhost:5173/dashboard`;
-        } else {
-          const currentHost = window.location.hostname;
-          const protocol = window.location.protocol;
-          redirectURL = `${protocol}//${currentHost}/dashboard`;
-        }
+        toast.error(res.message || "Invalid username or password!");
       }
-
-      setTimeout(() => {
-        window.location.href = redirectURL;
-      }, 100);
-    } else {
-      toast.error(res.message || "Invalid username or password!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Login failed. Please try again.");
+      setError("Invalid username or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    toast.error(err?.data?.message || "Login failed. Please try again.");
-    setError("Invalid username or password. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   return (
     <AuthLayout
