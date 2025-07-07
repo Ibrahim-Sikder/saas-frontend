@@ -783,7 +783,6 @@ const tenantDomain = useTenantDomain();
   ];
 
   const onSubmit = async (data) => {
-    const tenantDomain = getTenantName();
     setRemoveButton("");
     try {
       const customer = {

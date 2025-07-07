@@ -489,7 +489,7 @@ const AddQuotation = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Quotation...");
-    const tenantDomain = getTenantName();
+ 
     const customer = {
       company_name: data.company_name,
 
