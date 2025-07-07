@@ -61,8 +61,21 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const tenantDomain = typeof window !== "undefined" ? window.location.hostname : "";
+  // const tenantDomain = typeof window !== "undefined" ? window.location.hostname : "";
   // const tenantDomain = typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
+const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  function getTenantDomain(hostname) {
+  const parts = hostname.split(".");
+  if (parts.length > 2) {
+    return parts[0];
+  }
+  return hostname;
+}
+
+// Usage in React
+
+const tenantDomain = getTenantDomain(hostname);
+
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
   console.log("user all info", data);
