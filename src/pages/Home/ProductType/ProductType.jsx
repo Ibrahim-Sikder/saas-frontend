@@ -55,7 +55,7 @@ const ProductTypeForm = () => {
   const [productType, { isLoading }] = useCreateProductTypeMutation();
   const [formValue, setFormValue] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const handleSubmit = async (data) => {
     try {

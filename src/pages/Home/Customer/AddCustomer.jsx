@@ -19,6 +19,7 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 import { useCreateCustomerMutation } from "../../../redux/api/customerApi";
 import CustomerListTable from "./CustomerListTable";
 import { ArrowBack } from "@mui/icons-material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddCustomer = () => {
   const [registrationError, setRegistrationError] = useState("");
@@ -97,19 +98,19 @@ const AddCustomer = () => {
     });
   };
 
-  const isLocalhost = window.location.hostname.includes("localhost");
+  //   const isLocalhost = window.location.hostname.includes("localhost");
 
-let tenantDomain = "";
+  // let tenantDomain = "";
 
-if (isLocalhost) {
-  // For fashions.com.localhost → ['fashions', 'com', 'localhost']
-  tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
-} else {
-  // For live (like rahim.trustautosolution.com)
-  // → tenant = 'rahim'
-  tenantDomain = window.location.hostname.split(".")[0];
-}
-
+  // if (isLocalhost) {
+  //   // For fashions.com.localhost → ['fashions', 'com', 'localhost']
+  //   tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
+  // } else {
+  //   // For live (like rahim.trustautosolution.com)
+  //   // → tenant = 'rahim'
+  //   tenantDomain = window.location.hostname.split(".")[0];
+  // }
+  const tenantDomain = useTenantDomain();
 
   const {
     register,
@@ -132,7 +133,7 @@ if (isLocalhost) {
     //   return host.split(".")[0];
     // };
     // const tenantDomain = getTenantName();
-    
+
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -154,7 +155,6 @@ if (isLocalhost) {
 
     data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
-
 
     const vehicle = {
       carReg_no: data.carReg_no,
@@ -254,7 +254,6 @@ if (isLocalhost) {
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center">
-           
             <div className="ml-2">
               <h3 className="text-sm font-bold md:text-2xl">
                 {" "}

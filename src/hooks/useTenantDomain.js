@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getTenantDomain } from "../utils/getTenantDomain";
-
 export function useTenantDomain() {
   const [tenantDomain, setTenantDomain] = useState("");
 
