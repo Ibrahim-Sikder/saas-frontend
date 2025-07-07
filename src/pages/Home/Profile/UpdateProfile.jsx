@@ -30,10 +30,11 @@ import {
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import CompanyProfileModal from "./CreateCompanyProfileModal";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function CompanyProfileDisplay() {
-  const tenantDomain =
-    typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
+const tenantDomain = useTenantDomain();
+
   const { data, isLoading, refetch } = useGetCompanyProfileQuery({
     tenantDomain,
   });

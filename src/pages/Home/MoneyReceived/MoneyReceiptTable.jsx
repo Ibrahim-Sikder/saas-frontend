@@ -9,6 +9,7 @@ import {
 } from "../../../redux/api/money-receipt";
 import { Pagination } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const MoneyReceiptTable = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const MoneyReceiptTable = () => {
   const limit = 10;
   const navigate = useNavigate();
   const textInputRef = useRef(null);
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   useEffect(() => {
     if (search) {

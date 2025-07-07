@@ -23,11 +23,13 @@ import { useCreateCategoryMutation } from "../../../redux/api/categoryApi";
 import GarageForm from "../../../components/form/Form";
 import ImageUpload from "../../../components/form/ImageUpload";
 import TASInput from "../../../components/form/Input";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const CreateCategoryModal = ({ open, setOpen, categoryId }) => {
   const [createCategory, { isLoading, isSuccess }] =
     useCreateCategoryMutation();
-const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const handleSubmit = async (data) => {
     try {
       const imageUrl =

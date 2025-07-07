@@ -61,8 +61,7 @@ const Profile = () => {
   );
   const [activeTab, setActiveTab] = useState(0);
   const [progress, setProgress] = useState(0);
-  const tenantDomain = useTenantDomain();
-
+const tenantDomain = useTenantDomain();
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
   console.log("user all info", data);

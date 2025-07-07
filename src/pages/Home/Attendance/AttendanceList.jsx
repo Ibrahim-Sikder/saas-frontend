@@ -9,10 +9,12 @@ import { Link } from "react-router-dom"
 import { Calendar, Edit, Eye, Trash2, Users, Clock, UserX, Search, RefreshCw, FileText } from "lucide-react"
 import { useDeleteAttendanceMutation, useGetAllAttendancesQuery } from "../../../redux/api/attendance"
 import Loading from "../../../components/Loading/Loading"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 const AttendanceList = () => {
   const [filterType, setFilterType] = useState("")
-  const tenantDomain = window.location.hostname.split(".")[0];
+    const tenantDomain = useTenantDomain();
+
   const currentPage = 1
   const allAttendanceLimit = 31
 

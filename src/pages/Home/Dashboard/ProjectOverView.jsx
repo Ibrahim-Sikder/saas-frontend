@@ -8,9 +8,11 @@ import { Link } from "react-router-dom";
 import ExpanseIncomeChart from "../../../components/Chart/ExpanseIncomeChart";
 import Loading from "../../../components/Loading/Loading";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const ProjectOverView = () => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data: allMetaData, isLoading } = useGetAllMetaQuery({ tenantDomain });
   if (isLoading) return <Loading />;
 

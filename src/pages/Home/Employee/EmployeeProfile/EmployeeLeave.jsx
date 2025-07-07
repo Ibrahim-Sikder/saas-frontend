@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGetAllELeaveRequestQuery } from "../../../../redux/api/leaveRequestApi";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const leaveData = [
   {
@@ -75,8 +76,11 @@ const leaveData = [
 ];
 const EmployeeLeave = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [search, SetSearch] = useState("");
+  const [search, SetSearch] = useState("")
+    const tenantDomain = useTenantDomain();
+
   const { data, isLoading } = useGetAllELeaveRequestQuery({
+    tenantDomain, 
     limit: 10,
     page: currentPage,
     searchTerm: search,

@@ -21,6 +21,7 @@ import { useForm } from "react-hook-form";
 import { ArrowBack } from "@mui/icons-material";
 import { useCreateCompanyMutation } from "../../../redux/api/companyApi";
 import CompanyListTable from "./CompanyListTable";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddCompany = () => {
   const [registrationError, setRegistrationError] = useState("");
@@ -31,6 +32,7 @@ const AddCompany = () => {
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [driverCountryCode, setDriverCountryCode] = useState(countries[0]);
+  const tenantDomain = useTenantDomain();
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [driverPhoneNumber, setDriverPhoneNumber] = useState("");
@@ -133,17 +135,7 @@ const AddCompany = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Company...");
-      const getTenantName = () => {
-      const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-
-    const tenantDomain = getTenantName();
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -185,7 +177,7 @@ const AddCompany = () => {
     };
 
     const newData = {
-       tenantDomain,
+      tenantDomain,
       company,
       vehicle,
     };

@@ -25,10 +25,11 @@ import {
   useGetSingleBrandQuery,
   useUpdateBrandMutation,
 } from "../../../redux/api/brandApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const UpdateBrand = ({ open, setOpen, brandId }) => {
   const [updateBrand, { isSuccess, isLoading: isUpdating }] = useUpdateBrandMutation();
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading } = useGetSingleBrandQuery({ tenantDomain, id: brandId });
   const [formData, setFormData] = useState({ brand: "", image: "" });

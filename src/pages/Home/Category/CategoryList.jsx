@@ -47,6 +47,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import { CreateCategoryModal } from "./CreateCategoryModal";
 import { UpdateCategoryModal } from "./UpdateCategoryModal";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 export default function CategoryList() {
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(null);
@@ -58,7 +59,8 @@ export default function CategoryList() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data, isLoading, refetch } = useGetAllICategoryQuery({
     tenantDomain,
     limit: 10,

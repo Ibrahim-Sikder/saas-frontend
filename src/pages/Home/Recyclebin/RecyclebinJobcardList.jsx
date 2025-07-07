@@ -13,6 +13,7 @@ import {
 import { Pagination } from "@mui/material";
 import { HiOutlineSearch } from "react-icons/hi";
 import "./Recyclebin.css";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const RecyclebinJobcardList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
@@ -22,10 +23,11 @@ const RecyclebinJobcardList = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
-        tenantDomain:domain, 
+        tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -66,7 +68,7 @@ const RecyclebinJobcardList = () => {
 
     if (result === "restore") {
       try {
-        await restorefromRecyclebinJobCard({ tenantDomain: domain, id }).unwrap();
+        await restorefromRecyclebinJobCard({ tenantDomain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Job card has been restored successfully.",
@@ -83,7 +85,7 @@ const RecyclebinJobcardList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanentlyDeleteJobCard({ tenantDomain: domain, id }).unwrap();
+        await permanentlyDeleteJobCard({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Job card has been permanently deleted.",

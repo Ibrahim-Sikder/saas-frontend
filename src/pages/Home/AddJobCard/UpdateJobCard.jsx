@@ -30,6 +30,7 @@ import {
   useUpdateJobCardMutation,
 } from "../../../redux/api/jobCard";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateJobCard = () => {
   const [inputValue, setInputValue] = useState("");
@@ -66,7 +67,7 @@ const UpdateJobCard = () => {
 
   const [dateChange, setDateChange] = useState(false);
   const [techDateChange, setTechDateChange] = useState(false);
- const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const formRef = useRef();
   const navigate = useNavigate();

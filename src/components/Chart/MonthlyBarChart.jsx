@@ -13,6 +13,7 @@ import { useGetAllExpensesQuery } from "../../redux/api/expense";
 import { useGetAllIncomesQuery } from "../../redux/api/income";
 import Loading from "../Loading/Loading";
 import { Box, Typography } from "@mui/material";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const monthNames = [
   "January",
@@ -30,7 +31,7 @@ const monthNames = [
 ];
 
 export default function StackBars() {
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const { data: expenseData, isLoading: expenseLoading } = useGetAllExpensesQuery({
     tenantDomain,

@@ -66,9 +66,11 @@ import {
 import { useFormOptions } from "../../hooks/useFormOption";
 import { useIncomeForm } from "../../hooks/useIncomeForm";
 import FormTextArea from "../../components/form/FormTextArea";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const IncomeForm = ({ id }) => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
+
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();

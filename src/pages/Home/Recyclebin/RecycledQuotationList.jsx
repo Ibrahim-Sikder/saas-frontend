@@ -12,6 +12,7 @@ import {
   usePermanantlyDeleteQuotationMutation,
   useRestoreFromRecycledQuotationMutation,
 } from "../../../redux/api/quotation";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const RecycledQuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
@@ -23,7 +24,7 @@ const RecycledQuotationList = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);

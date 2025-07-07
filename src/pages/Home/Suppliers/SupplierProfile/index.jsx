@@ -79,6 +79,7 @@ import {
 } from "./supplier"
 import { useGetSupplierWithBillPayQuery } from "../../../../redux/api/supplier"
 import SupplierBillPay from "./SupplierBillPay"
+import { useTenantDomain } from "../../../../hooks/useTenantDomain"
 
 export default function EnhancedSupplierProfile() {
   const theme = useTheme()
@@ -93,7 +94,9 @@ export default function EnhancedSupplierProfile() {
   const [expandedAccordion, setExpandedAccordion] = useState(false)
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null)
   const id = new URLSearchParams(location.search).get("id")
-  const { data: supplierWithBillPay } = useGetSupplierWithBillPayQuery(id)
+  const tenantDomain = useTenantDomain();
+
+  const { data: supplierWithBillPay } = useGetSupplierWithBillPayQuery({tenantDomain, id})
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue)

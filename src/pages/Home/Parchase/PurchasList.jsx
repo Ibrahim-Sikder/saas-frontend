@@ -63,6 +63,7 @@ import {
 import { Link, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { useDeletePurchaseMutation, useGetAllPurchasesQuery } from "../../../redux/api/purchaseApi"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 // Status chip colors
 const statusColors = {
@@ -96,7 +97,7 @@ export default function PurchaseList() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
 
   const { data, isLoading, refetch } = useGetAllPurchasesQuery({

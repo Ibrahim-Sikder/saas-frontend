@@ -13,6 +13,7 @@ import { Divider } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Detail = () => {
   const componentRef = useRef();
@@ -20,7 +21,8 @@ const Detail = () => {
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });

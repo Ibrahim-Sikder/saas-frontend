@@ -32,8 +32,7 @@ import {
 } from "../../../redux/api/brandApi";
 import { CreateBrandModal } from "./CreateBrandModal";
 import { UpdateBrand } from "./UpdateBrand";
-
-const MotionBox = motion(Box);
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function BrandList() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,8 +42,8 @@ export default function BrandList() {
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const tenantDomain = useTenantDomain();
 
-  const tenantDomain = window.location.hostname.split(".")[0];
 
   const { data, isLoading, refetch } = useGetAllIBrandQuery({
     tenantDomain,

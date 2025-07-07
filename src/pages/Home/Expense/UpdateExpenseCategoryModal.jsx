@@ -8,10 +8,11 @@ import {
   useGetSingleExpenseCategoryQuery,
   useUpdateExpenseCategoryMutation,
 } from "../../../redux/api/expense";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateExpenseCategoryModal = ({ open, setOpen, categoryId }) => {
-  const tenantDomain = window.location.hostname.split(".")[0];
-
+ const tenantDomain = useTenantDomain();
+ 
   const { data, isLoading } = useGetSingleExpenseCategoryQuery({
     tenantDomain,
     id: categoryId,

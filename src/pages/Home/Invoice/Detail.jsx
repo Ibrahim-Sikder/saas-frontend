@@ -9,14 +9,15 @@ import { Link, useLocation } from "react-router-dom";
 import { Button, Divider } from "@mui/material";
 import { usePDF } from "react-to-pdf";
 import { formatNumber } from "../../../utils/formateSemicolon";
-import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetSingleInvoiceQuery } from "../../../redux/api/invoice";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Detail = () => {
   const componentRef = useRef();
   const { targetRef } = usePDF({ filename: "page.pdf" });
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });

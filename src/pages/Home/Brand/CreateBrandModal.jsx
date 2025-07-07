@@ -23,10 +23,11 @@ import {
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import { useCreateBrandMutation } from "../../../redux/api/brandApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const CreateBrandModal = ({ open, setOpen, categoryId }) => {
   const [createBrand, { isLoading, isSuccess }] = useCreateBrandMutation();
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const handleSubmit = async (data) => {
 

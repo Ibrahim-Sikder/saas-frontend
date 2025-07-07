@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import Loading from "../../../components/Loading/Loading";
 import { useMoveRecycledCustomerMutation } from "../../../redux/api/customerApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AllCustomerList = () => {
   const textInputRef = useRef(null);
@@ -22,7 +23,8 @@ const AllCustomerList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const ITEMS_PER_PAGE = 10;
-const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const searchParam = new URLSearchParams(location.search).get("search");
   const [
     moveRecycledCustomer,
@@ -34,7 +36,9 @@ const tenantDomain = window.location.hostname.split(".")[0];
     setError(null);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/meta/allcustomer?tenantDomain=${tenantDomain}`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/meta/allcustomer?tenantDomain=${tenantDomain}`,
         {
           params: {
             limit: ITEMS_PER_PAGE,
@@ -99,7 +103,7 @@ const tenantDomain = window.location.hostname.split(".")[0];
 
     if (willDelete) {
       try {
-        await moveRecycledCustomer({tenantDomain, id}).unwrap();
+        await moveRecycledCustomer({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

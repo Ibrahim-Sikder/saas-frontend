@@ -7,13 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { HiOutlineSearch } from "react-icons/hi";
-import { Chip, Pagination, Tooltip } from "@mui/material";
+import { Pagination } from "@mui/material";
 import {
   useGetAllCustomersQuery,
   useMoveRecycledCustomerMutation,
 } from "../../../redux/api/customerApi";
 import { toast } from "react-toastify";
 import EmptyData from "../../../components/EmptyData/EmptyData";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const CustomerListTable = () => {
   const textInputRef = useRef(null);
   const location = useLocation();
@@ -25,15 +26,8 @@ const CustomerListTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const tenantDomain = useTenantDomain();
 
-  const tenantDomain = window.location.hostname.split(".")[0];
-  const isLocalhost = window.location.hostname.includes("localhost");
-  // let tenantDomain = "";
-  // if (isLocalhost) {
-  //   tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
-  // } else {
-  //   tenantDomain = window.location.hostname.split(".")[0];
-  // }
   const {
     data: customerData,
     isLoading: customerLoading,
@@ -153,7 +147,6 @@ const CustomerListTable = () => {
                     </thead>
                     <tbody>
                       {customerData?.data?.customers?.map((card, index) => {
-                   
                         const lastVehicle = card?.vehicles
                           ? [...card.vehicles].sort(
                               (a, b) =>

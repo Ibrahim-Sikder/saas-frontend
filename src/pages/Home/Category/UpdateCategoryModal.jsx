@@ -28,9 +28,11 @@ import {
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+    const tenantDomain = useTenantDomain();
+
   const { data, isLoading } = useGetSingleCategoryQuery({
     tenantDomain,
     id:categoryId,

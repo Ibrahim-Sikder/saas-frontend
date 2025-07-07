@@ -1,39 +1,52 @@
 /* eslint-disable react/prop-types */
-import { Box, Grid, Typography, TextField, MenuItem, Divider } from "@mui/material"
+import {
+  Box,
+  Grid,
+  Typography,
+  TextField,
+  MenuItem,
+  Divider,
+} from "@mui/material";
 
-import TASInput from "../../../components/form/Input"
-import { toast } from "react-toastify"
-import { useCreateExpenseCategoryMutation } from "../../../redux/api/expense"
-import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material"
-import { StyledForm, StyledModal } from "../../../utils/customStyle"
-import { StyledButton } from "../../../utils"
-
+import TASInput from "../../../components/form/Input";
+import { toast } from "react-toastify";
+import { useCreateExpenseCategoryMutation } from "../../../redux/api/expense";
+import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material";
+import { StyledForm, StyledModal } from "../../../utils/customStyle";
+import { StyledButton } from "../../../utils";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const CreateExpenseCategoryModal = ({ open, setOpen }) => {
-  const [createExpenseCategory] = useCreateExpenseCategoryMutation()
- const tenantDomain = window.location.hostname.split(".")[0];
+  const [createExpenseCategory] = useCreateExpenseCategoryMutation();
+  const tenantDomain = useTenantDomain();
 
   const handleSubmit = async (data, reset) => {
-  const toastId = toast.loading("Creating expense category...");
-  try {
-    const res = await createExpenseCategory({
-      tenantDomain,
-      expenseInfo: data,
-    }).unwrap();
+    const toastId = toast.loading("Creating expense category...");
+    try {
+      const res = await createExpenseCategory({
+        tenantDomain,
+        expenseInfo: data,
+      }).unwrap();
 
-    toast.success(res.message || "Expense Category created successfully!");
-    reset();
-    setOpen(false);
-  } catch (error) {
-    toast.error("Error creating category: " + (error.message || "Something went wrong!"));
-  } finally {
-    toast.dismiss(toastId);
-  }
-};
-
+      toast.success(res.message || "Expense Category created successfully!");
+      reset();
+      setOpen(false);
+    } catch (error) {
+      toast.error(
+        "Error creating category: " + (error.message || "Something went wrong!")
+      );
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
 
   return (
-    <StyledModal open={open} setOpen={setOpen} width="500px" title="Create Expense Category">
+    <StyledModal
+      open={open}
+      setOpen={setOpen}
+      width="500px"
+      title="Create Expense Category"
+    >
       <Box padding="24px">
         <StyledForm onSubmit={handleSubmit}>
           <Grid container spacing={3}>
@@ -58,14 +71,28 @@ const CreateExpenseCategoryModal = ({ open, setOpen }) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField select fullWidth name="type" label="Category Type" defaultValue="expense" required>
+              <TextField
+                select
+                fullWidth
+                name="type"
+                label="Category Type"
+                defaultValue="expense"
+                required
+              >
                 <MenuItem value="expense">Expense</MenuItem>
                 <MenuItem value="income">Income</MenuItem>
                 <MenuItem value="transfer">Transfer</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField select fullWidth name="status" label="Status" defaultValue="active" required>
+              <TextField
+                select
+                fullWidth
+                name="status"
+                label="Status"
+                defaultValue="active"
+                required
+              >
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="inactive">Inactive</MenuItem>
               </TextField>
@@ -100,7 +127,13 @@ const CreateExpenseCategoryModal = ({ open, setOpen }) => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField select fullWidth name="icon" label="Category Icon" defaultValue="default">
+              <TextField
+                select
+                fullWidth
+                name="icon"
+                label="Category Icon"
+                defaultValue="default"
+              >
                 <MenuItem value="default">Default</MenuItem>
                 <MenuItem value="food">Food</MenuItem>
                 <MenuItem value="transport">Transport</MenuItem>
@@ -118,7 +151,12 @@ const CreateExpenseCategoryModal = ({ open, setOpen }) => {
                 >
                   Cancel
                 </StyledButton>
-                <StyledButton type="submit" variant="contained" color="primary" startIcon={<SaveIcon />}>
+                <StyledButton
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<SaveIcon />}
+                >
                   Create Category
                 </StyledButton>
               </Box>
@@ -127,8 +165,7 @@ const CreateExpenseCategoryModal = ({ open, setOpen }) => {
         </StyledForm>
       </Box>
     </StyledModal>
-  )
-}
+  );
+};
 
-export default CreateExpenseCategoryModal
-
+export default CreateExpenseCategoryModal;

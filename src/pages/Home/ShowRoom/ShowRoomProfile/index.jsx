@@ -18,11 +18,12 @@ import CustomerInvoiceList from "../../Customer/CustomerProfile/CustomerInvoiceL
 import CustomerMoneyList from "../../Customer/CustomerProfile/CustomerMoneyList";
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const ShowRoomProfile = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
- const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const { data: profileData, isLoading } = useGetSingleShowRoomQuery({tenantDomain, id});
 

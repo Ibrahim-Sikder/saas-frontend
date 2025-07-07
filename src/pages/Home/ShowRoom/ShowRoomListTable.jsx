@@ -14,6 +14,7 @@ import {
   useMoveRecycledShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
 import EmptyData from "../../../components/EmptyData/EmptyData";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const ShowRoomListTable = () => {
   const textInputRef = useRef(null);
   const [filterType, setFilterType] = useState("");
@@ -22,7 +23,8 @@ const ShowRoomListTable = () => {
 
   const navigate = useNavigate();
   const limit = 10;
-   const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data: showRoomData, isLoading: loading } = useGetAllShowRoomsQuery({
     tenantDomain, 
     limit,

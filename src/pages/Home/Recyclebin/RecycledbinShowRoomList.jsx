@@ -13,6 +13,7 @@ import {
   useRestoreFromRecycledShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
 import { Pagination } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const RecycledbinShowRoomList = () => {
   const textInputRef = useRef(null);
   const [filterType, setFilterType] = useState("");
@@ -21,10 +22,11 @@ const RecycledbinShowRoomList = () => {
 
   const navigate = useNavigate();
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const { data: showRoomData, isLoading: showroomLoading } =
     useGetAllShowRoomsQuery({
-      tenantDomain: domain,
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -66,7 +68,7 @@ const RecycledbinShowRoomList = () => {
     if (result === "restore") {
       try {
         await restoreFromRecycledShowRoom({
-          tenantDomain: domain,
+          tenantDomain,
           id,
         }).unwrap();
         swal({
@@ -85,7 +87,7 @@ const RecycledbinShowRoomList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteShowRoom({ tenantDomain: domain, id }).unwrap();
+        await permanantlyDeleteShowRoom({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Show Room has been permanently deleted.",

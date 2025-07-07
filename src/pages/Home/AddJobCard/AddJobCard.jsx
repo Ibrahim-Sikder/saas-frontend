@@ -48,8 +48,11 @@ import {
 
 import JobcardTable from "./JobcardTable";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddJobCard = () => {
+    const tenantDomain = useTenantDomain();
+
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const user = new URLSearchParams(location.search).get("user_type");
@@ -90,10 +93,9 @@ const AddJobCard = () => {
   const navigate = useNavigate();
   const limit = 10;
   const jobCardLimit = 500000;
-  const tenantDomain = window.location.hostname.split(".")[0];
-    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
-      tenantDomain,
-    });
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const {
     register,
     handleSubmit,
@@ -135,7 +137,7 @@ const AddJobCard = () => {
       tenantDomain: tenantDomain,
       id: userId,
       userType: newId,
-    })
+    });
 
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
@@ -568,10 +570,14 @@ const AddJobCard = () => {
     <div className="addJobCardWraps">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
-          <img src={CompanyInfoData?.data?.logo} alt="logo" className=" addJobLogoImg" />
+          <img
+            src={CompanyInfoData?.data?.logo}
+            alt="logo"
+            className=" addJobLogoImg"
+          />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-             {CompanyInfoData?.data?.companyName}
+              {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
               Office: {CompanyInfoData?.data?.address}

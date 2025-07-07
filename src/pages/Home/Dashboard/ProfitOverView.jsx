@@ -7,6 +7,7 @@ import { useGetAllExpensesQuery } from "../../../redux/api/expense";
 import { useGetAllIncomesQuery } from "../../../redux/api/income";
 import { useGetAllDonationQuery } from "../../../redux/api/donationApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
   height: 10,
@@ -23,7 +24,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
 }));
 
 const ProfitOverView = () => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
 
   const { data: donationData, isLoading } =

@@ -14,6 +14,7 @@ import {
 } from "../../../redux/api/companyApi";
 import EmptyData from "../../../components/EmptyData/EmptyData";
 import { mileageStyle } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const CompanyListTable = () => {
   const textInputRef = useRef(null);
@@ -27,7 +28,8 @@ const CompanyListTable = () => {
   };
 
   const limit = 10;
-  const tenantDomain = window.location.hostname.split(".")[0];
+   const tenantDomain = useTenantDomain();
+
   const { data: companyData, isLoading: companyLoading } =
     useGetAllCompaniesQuery({
       tenantDomain, 

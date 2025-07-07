@@ -33,6 +33,7 @@ import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
 import { getTenantName } from "../../../utils/getTenantName";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 // Function to format numbers with thousand separators
 const formatNumber = (num) => {
   if (num === undefined || num === null || num === "") return "";
@@ -60,7 +61,8 @@ const UpdateQuotation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });

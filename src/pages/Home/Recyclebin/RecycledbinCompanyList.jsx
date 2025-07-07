@@ -12,6 +12,7 @@ import {
   usePermanantlyDeleteCompanyMutation,
   useRestoreFromRecycledCompanyMutation,
 } from "../../../redux/api/companyApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RecycledbinCompanyList = () => {
   const textInputRef = useRef(null);
@@ -25,13 +26,14 @@ const RecycledbinCompanyList = () => {
   };
 
   const limit = 10;
-const domain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const {
     data: companyData,
     isLoading: companyLoading,
     refetch,
   } = useGetAllCompaniesQuery({
-    tenantDomain:domain,
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -68,7 +70,7 @@ const domain = window.location.hostname.split(".")[0];
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledCompany({ tenantDomain: domain, id }).unwrap();
+        await restoreFromRecycledCompany({ tenantDomain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Company has been restored successfully.",
@@ -85,7 +87,7 @@ const domain = window.location.hostname.split(".")[0];
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteCompany({ tenantDomain: domain, id }).unwrap();
+        await permanantlyDeleteCompany({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Company has been permanently deleted.",

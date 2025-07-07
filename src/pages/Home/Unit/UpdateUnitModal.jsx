@@ -30,12 +30,14 @@ import {
   useGetSingleUnitQuery,
   useUpdateUnitMutation,
 } from "../../../redux/api/unitApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
   const location = useLocation();
   //   const id = new URLSearchParams(location.search).get("id");
   const [updateUnit, { isSuccess }] = useUpdateUnitMutation();
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+ 
   const { data, isLoading } = useGetSingleUnitQuery({tenantDomain, id:unitId});
 
   const [formData, setFormData] = useState({

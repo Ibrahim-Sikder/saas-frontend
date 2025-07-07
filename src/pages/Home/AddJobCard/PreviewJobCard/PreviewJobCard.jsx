@@ -12,12 +12,13 @@ import { Button, Link } from "@mui/material";
 import { WhatsApp } from "@mui/icons-material";
 import { WhatsappShareButton } from "react-share";
 import { useGetCompanyProfileQuery } from "../../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 const PreviewJobCard = () => {
   const { componentRef, targetRef } = useContext(PrintContext);
   const [vehicleInterior, setVehicleInterior] = useState("");
   const [reportedDefect, setReportedDefect] = useState("");
   const [reportedAction, setReportedAction] = useState("");
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");

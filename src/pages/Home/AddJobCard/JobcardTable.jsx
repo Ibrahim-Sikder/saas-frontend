@@ -25,6 +25,7 @@ import {
   Divider,
 } from "@mui/material";
 import { HiOutlineSearch } from "react-icons/hi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const JobcardTable = () => {
   const location = useLocation();
@@ -36,15 +37,9 @@ const JobcardTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
-  // const isLocalhost = window.location.hostname.includes("localhost");
-  // let tenantDomain = "";
-  // if (isLocalhost) {
-  //   tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
-  // } else {
-  //   tenantDomain = window.location.hostname.split(".")[0];
-  // }
+
 
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({

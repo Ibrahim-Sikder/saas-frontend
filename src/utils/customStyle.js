@@ -30,6 +30,7 @@ import { StyledTab } from ".";
 import { DataGrid } from "@mui/x-data-grid";
 import TASRightSideModal from "../components/Share/Modal/Modal";
 import GarageForm from "../components/form/Form";
+import { CalendarMonth } from "@mui/icons-material";
 
 export const tabStyles = {
   width: 115,
@@ -1162,3 +1163,57 @@ export const PaymentStatusCard = styled(Card)(({ theme, ispaid }) => ({
     },
   },
 }));
+
+
+
+
+export const GradientBorder = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 4,
+  background: "linear-gradient(90deg, #42A1DA, #F77F00, #42A1DA)",
+  backgroundSize: "200% 100%",
+  animation: "gradientMove 5s ease infinite",
+}))
+
+export const StyledCalendar = styled(CalendarMonth)(({ theme }) => ({
+  "& .rbc-today": {
+    backgroundColor: theme.palette.primary.light,
+  },
+  "& .rbc-event": {
+    backgroundColor: theme.palette.secondary.main,
+  },
+  "& .rbc-header": {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+  },
+}))
+
+
+export const StyledChip = styled(Chip)(({ theme }) => ({
+  borderRadius: 4,
+  fontWeight: "bold",
+  "&.in-stock": {
+    backgroundColor: alpha(theme.palette.success.main, 0.1),
+    color: theme.palette.success.dark,
+  },
+  "&.low-stock": {
+    backgroundColor: alpha(theme.palette.warning.main, 0.1),
+    color: theme.palette.warning.dark,
+  },
+  "&.out-of-stock": {
+    backgroundColor: alpha(theme.palette.error.main, 0.1),
+    color: theme.palette.error.dark,
+  },
+}));
+
+export const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  },
+}));
+
+

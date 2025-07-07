@@ -45,6 +45,7 @@ import {
   CircularProgress,
   Chip,
 } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const columns = [
   "SL No",
@@ -65,7 +66,8 @@ const AddAttendance = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const limit = 9999;
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const {
     data: getAllEmployee,
     isLoading: employeesLoading,

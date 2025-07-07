@@ -42,6 +42,7 @@ import {
   useGetAllIUnitQuery,
 } from "../../../redux/api/unitApi";
 import { UpdateUnitModal } from "./UpdateUnitModal";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UnitTable = ({ handleUpdateOpen }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +51,7 @@ const UnitTable = ({ handleUpdateOpen }) => {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [viewDetailsModal, setViewDetailsModal] = useState(false);
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
 
   const { data, isLoading, refetch } = useGetAllIUnitQuery({
     tenantDomain,

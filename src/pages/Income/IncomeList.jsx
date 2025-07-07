@@ -40,6 +40,7 @@ import {
 import Loading from "../../components/Loading/Loading";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteIconStyle, editIconStyle } from "../../style/tableStyle";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 // Payment status colors
 const statusColors = {
@@ -71,7 +72,7 @@ const IncomeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const limit = 15;
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
 
   const { data: allIncomes, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,

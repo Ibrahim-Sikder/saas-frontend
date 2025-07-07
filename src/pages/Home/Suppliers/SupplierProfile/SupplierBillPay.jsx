@@ -63,51 +63,8 @@ import {
   Visibility,
 } from "@mui/icons-material"
 import { styled } from "@mui/material/styles"
+import { GradientCard, StatusChip } from "../../../../utils/customStyle"
 
-// Styled components
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    right: -3,
-    top: 13,
-    border: `2px solid ${theme.palette.background.paper}`,
-    padding: "0 4px",
-  },
-}))
-
-const GradientCard = styled(Card)(({ theme }) => ({
-  background: "linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)",
-  color: "white",
-  borderRadius: 16,
-  boxShadow: "0 8px 16px rgba(107, 115, 255, 0.2)",
-  transition: "transform 0.3s ease-in-out",
-  "&:hover": {
-    transform: "translateY(-5px)",
-  },
-}))
-
-const StatusChip = styled(Chip)(({ theme, statuscolor }) => ({
-  borderRadius: 16,
-  fontWeight: 600,
-  backgroundColor:
-    statuscolor === "green"
-      ? "rgba(76, 175, 80, 0.1)"
-      : statuscolor === "orange"
-        ? "rgba(255, 152, 0, 0.1)"
-        : statuscolor === "red"
-          ? "rgba(244, 67, 54, 0.1)"
-          : "rgba(33, 150, 243, 0.1)",
-  color:
-    statuscolor === "green"
-      ? "#4CAF50"
-      : statuscolor === "orange"
-        ? "#FF9800"
-        : statuscolor === "red"
-          ? "#F44336"
-          : "#2196F3",
-  "& .MuiChip-icon": {
-    color: "inherit",
-  },
-}))
 
 const PaymentMethodIcon = ({ method }) => {
   switch (method?.toLowerCase()) {

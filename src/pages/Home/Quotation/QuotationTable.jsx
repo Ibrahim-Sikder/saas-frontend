@@ -17,6 +17,7 @@ import {
   useMoveRecycledQuotationMutation,
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 
 const QuotationTable = () => {
@@ -29,7 +30,7 @@ const QuotationTable = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
-const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);

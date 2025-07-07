@@ -14,16 +14,15 @@ import Loading from "../../../components/Loading/Loading";
 import "./AllService.css";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
 import { AssuredWorkload } from "@mui/icons-material";
-const AllServices = () => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+import { useTenantDomain } from "../../../../src/hooks/useTenantDomain";
 
-  
+const AllServices = () => {
+  const tenantDomain = useTenantDomain();
   const {
     data: allMetaData,
     isLoading,
     isError,
-  } = useGetAllMetaQuery({tenantDomain});
-
+  } = useGetAllMetaQuery({ tenantDomain });
 
   if (isLoading) return <Loading />;
 

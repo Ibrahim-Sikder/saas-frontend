@@ -30,6 +30,7 @@ import {
 import { unitOptions } from "../../../utils/options";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateInvoice = () => {
   const [specificInvoice, setSpecificInvoice] = useState({});
@@ -38,7 +39,7 @@ const UpdateInvoice = () => {
   const [serviceTotal, setServiceTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const [discount, setDiscount] = useState("");
   const [vat, setVAT] = useState("");

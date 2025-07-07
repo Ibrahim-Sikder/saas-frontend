@@ -8,19 +8,22 @@ import { Link } from "react-router-dom";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { useGetAllEmployeesQuery } from "../../../redux/api/employee";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const EmployeeStatistics = () => {
+  const tenantDomain = useTenantDomain();
   const {
     data: employeeData,
     error,
     isLoading,
   } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit: 10,
     page: 1,
   });
 
-  if(isLoading){
-    return <Loading/>
+  if (isLoading) {
+    return <Loading />;
   }
 
   // total employee calculate
@@ -68,7 +71,7 @@ const EmployeeStatistics = () => {
     },
     0
   );
-  
+
   const advanceSalaryPercentage = Math.ceil(
     advanceSalary > 0 ? (advanceSalary / totalSalary) * 100 : 0
   );
@@ -102,7 +105,6 @@ const EmployeeStatistics = () => {
   );
   const absentEmployeePercentage =
     totalEmployee > 0 ? (AbsentEmployeeCount / totalEmployee) * 100 : 0;
-
 
   return (
     <>

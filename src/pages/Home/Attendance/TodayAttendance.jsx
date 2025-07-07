@@ -17,17 +17,20 @@ import {
   useGetTodayAttendanceQuery,
 } from "../../../redux/api/attendance";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const TodayAttendance = () => {
   const [currentPage] = useState(1);
   const limit = 999;
   const allAttendanceLimit = 31;
+  const tenantDomain = useTenantDomain();
 
   const {
     data: getAllEmployee,
     isLoading: employeesLoading,
     error: employeesError,
   } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
   });
@@ -37,13 +40,14 @@ const TodayAttendance = () => {
     isLoading: todayLoading,
     error: todayError,
     refetch,
-  } = useGetTodayAttendanceQuery();
+  } = useGetTodayAttendanceQuery(tenantDomain);
 
   const {
     data: allAttendance,
     isLoading: allAttendanceLoading,
     error: allAttendanceError,
   } = useGetAllAttendancesQuery({
+    tenantDomain,
     limit: allAttendanceLimit,
     page: currentPage,
   });
@@ -59,7 +63,7 @@ const TodayAttendance = () => {
 
   const handleDeleteAttendance = async (date) => {
     try {
-      const response = await deleteAttendance({ date }).unwrap();
+      const response = await deleteAttendance({ tenantDomain, date }).unwrap();
       if (response.success) {
         toast.success(response.message);
         refetch();

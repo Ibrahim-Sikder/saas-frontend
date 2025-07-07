@@ -9,6 +9,7 @@ import {
   useMoveRecycledInvoiceMutation,
 } from "../../../redux/api/invoice";
 import { Pagination } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const InvoiceTable = () => {
   const location = useLocation();
@@ -16,7 +17,7 @@ const InvoiceTable = () => {
   const [filterType, setFilterType] = useState("");
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
 
   const navigate = useNavigate();

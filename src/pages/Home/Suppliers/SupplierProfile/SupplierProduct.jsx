@@ -43,50 +43,10 @@ import {
   Star,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+import { StyledIconButton } from "@mui/joy/IconButton/IconButton";
+import { StyledChip, StyledTableContainer } from "../../../../utils/customStyle";
 
-// Styled components for unique design
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  borderRadius: 16,
-  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.1)",
-  overflow: "hidden",
-  "& .MuiTableCell-head": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-    color: theme.palette.primary.main,
-    fontWeight: "bold",
-  },
-  "& .MuiTableRow-root": {
-    "&:nth-of-type(odd)": {
-      backgroundColor: alpha(theme.palette.background.default, 0.04),
-    },
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.primary.main, 0.04),
-    },
-  },
-}));
 
-const StyledChip = styled(Chip)(({ theme }) => ({
-  borderRadius: 4,
-  fontWeight: "bold",
-  "&.in-stock": {
-    backgroundColor: alpha(theme.palette.success.main, 0.1),
-    color: theme.palette.success.dark,
-  },
-  "&.low-stock": {
-    backgroundColor: alpha(theme.palette.warning.main, 0.1),
-    color: theme.palette.warning.dark,
-  },
-  "&.out-of-stock": {
-    backgroundColor: alpha(theme.palette.error.main, 0.1),
-    color: theme.palette.error.dark,
-  },
-}));
-
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  },
-}));
 
 // Mock data for supplier products
 const mockProducts = [

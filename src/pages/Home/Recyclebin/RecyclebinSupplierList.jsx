@@ -12,11 +12,13 @@ import {
 } from "../../../redux/api/supplier";
 import Loading from "../../../components/Loading/Loading";
 import { Pagination } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RecyclebinSupplierList = () => {
   const [filterType, setFilterType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
+const tenantDomain = useTenantDomain();
 
   const textInputRef = useRef(null);
 
@@ -27,6 +29,7 @@ const RecyclebinSupplierList = () => {
 
   const { data: suppliersData, isLoading: suppliersLoading } =
     useGetAllSuppliersQuery({
+      tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -56,7 +59,7 @@ const RecyclebinSupplierList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledSupplier(id).unwrap();
+        await restoreFromRecycledSupplier({tenantDomain, id}).unwrap();
         swal({
           title: "Restored!",
           text: "Supplier has been restored successfully.",

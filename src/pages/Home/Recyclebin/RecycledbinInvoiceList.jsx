@@ -12,12 +12,13 @@ import {
 } from "../../../redux/api/invoice";
 import { Box, Chip, Pagination, Tooltip, Typography } from "@mui/material";
 import { History } from "lucide-react";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const InvoiceTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);

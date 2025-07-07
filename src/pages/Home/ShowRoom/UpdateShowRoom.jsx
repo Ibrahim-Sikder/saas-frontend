@@ -23,6 +23,7 @@ import {
   useUpdateShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateShowRoom = () => {
   const location = useLocation();
@@ -38,9 +39,8 @@ const UpdateShowRoom = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
-  const domain = window.location.hostname.split(".")[0];
-
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+const tenantDomain = useTenantDomain();
 
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
@@ -72,7 +72,7 @@ const UpdateShowRoom = () => {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleShowRoomQuery({ tenantDomain: domain, id });
+  } = useGetSingleShowRoomQuery({ tenantDomain, id });
   const [updateShowroom, { isLoading: updateLoading, error }] =
     useUpdateShowRoomMutation();
 
@@ -125,16 +125,7 @@ const UpdateShowRoom = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
-     const getTenantName = () => {
-      const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-    const tenantDomain = getTenantName();
     const showroom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,

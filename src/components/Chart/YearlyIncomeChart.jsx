@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useGetAllIncomesQuery } from "../../redux/api/income";
 import Loading from "../Loading/Loading";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const monthNames = [
   "January",
@@ -25,8 +26,8 @@ export default function YearlyIncomeChart() {
   const [radius, setRadius] = React.useState(50);
   const [itemNb, setItemNb] = React.useState(12);
   const [skipAnimation, setSkipAnimation] = React.useState(false);
-  const tenantDomain = window.location.hostname.split(".")[0];
-
+   const tenantDomain = useTenantDomain();
+ 
   const { data: incomeData, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,
     limit: 10,

@@ -49,6 +49,7 @@ import UpdateExpenseCategoryModal from "./UpdateExpenseCategoryModal";
 import { styled } from "@mui/material/styles";
 import { ActionButton, StyledDataGrid } from "../../../utils/customStyle";
 import { StyledCard } from "../../../utils";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 
 
@@ -64,7 +65,7 @@ export default function ExpenseCategoryList() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
-const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   // Fetch data
   const { data, isLoading, refetch } = useGetAllICategoryQuery({

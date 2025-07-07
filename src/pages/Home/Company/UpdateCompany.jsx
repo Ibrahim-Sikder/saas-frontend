@@ -23,6 +23,7 @@ import {
   useUpdateCompanyMutation,
 } from "../../../redux/api/companyApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateCompany = () => {
   const [filteredVehicles, setFilteredVehicles] = useState([]);
@@ -43,7 +44,7 @@ const UpdateCompany = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const handleBrandChange = (event, newValue) => {
     const filtered = vehicleName.filter(
@@ -54,8 +55,7 @@ const UpdateCompany = () => {
 
 
   const handleYearSelectInput = (event) => {
-    const value = event.target.value;
-    // Check if the input is a number and does not exceed 4 digits
+    const value = event.target.value
     if (/^\d{0,4}$/.test(value)) {
       setYearSelectInput(value);
       const filtered = vehicleModels?.filter((option) =>
@@ -113,7 +113,7 @@ const UpdateCompany = () => {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCompanyQuery({ tenantDomain: domain, id });
+  } = useGetSingleCompanyQuery({ tenantDomain, id });
 
   const [updateCompany] =
     useUpdateCompanyMutation();

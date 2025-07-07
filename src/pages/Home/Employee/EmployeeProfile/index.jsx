@@ -46,6 +46,7 @@ import {
   tabStyles,
 } from "../../../../utils/customStyle";
 import { GlassmorphicBox, StyledPaper } from "../../../../utils";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -68,7 +69,8 @@ const EmployeeProfile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
+
   const { data, isLoading, error } = useGetSingleEmployeeQuery({
     tenantDomain,
     id,

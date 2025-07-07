@@ -20,6 +20,7 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 import { ArrowBack } from "@mui/icons-material";
 import { useCreateShowRoomMutation } from "../../../redux/api/showRoomApi";
 import ShowRoomListTable from "./ShowRoomListTable";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddShowRoom = () => {
   const [registrationError, setRegistrationError] = useState("");
@@ -38,6 +39,7 @@ const AddShowRoom = () => {
     countries[0]
   );
   const [ownerPhoneNumber, setOwnerPhoneNumber] = useState("");
+const tenantDomain = useTenantDomain();
 
   const navigate = useNavigate();
   const limit = 10;
@@ -128,17 +130,7 @@ const AddShowRoom = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Show Room...");
-      const getTenantName = () => {
-      const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-
-    const tenantDomain = getTenantName();
     const showroom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,

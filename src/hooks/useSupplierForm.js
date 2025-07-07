@@ -15,6 +15,7 @@ import {
 } from "../redux/api/supplier";
 import { countries } from "../constant";
 import { useTheme } from "@mui/material";
+import { useTenantDomain } from "./useTenantDomain";
 
 // Define the Zod validation schema
 const supplierValidationSchema = z.object({
@@ -114,7 +115,7 @@ export const useSupplierForm = (id) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const theme = useTheme();
   const navigate = useNavigate();
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const { data: singleSupplier, isLoading } = useGetSingleSupplierQuery({
     tenantDomain,

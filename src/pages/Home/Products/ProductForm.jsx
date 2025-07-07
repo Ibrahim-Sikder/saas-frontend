@@ -81,6 +81,7 @@ import AddWarehouseModal from "../../Inventory/Warehouse/AddWarehouse";
 import { CreateProductTypeModal } from "../ProductType/CreateProductTypeModal";
 import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ export default function ProductForm({ id }) {
   const handleSupplierClose = () => setSupplierOpen(false);
   const handleUnitOpen = () => setUnitOpen(true);
   const handleUnitClose = () => setUnitOpen(false);
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const { data: singleProduct, isLoading: singleProductLoading } =
     useGetSingleProductQuery({ tenantDomain, id });

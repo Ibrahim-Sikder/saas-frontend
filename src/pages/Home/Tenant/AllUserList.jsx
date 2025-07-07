@@ -38,6 +38,7 @@ import {
 } from "../../../redux/api/userApi";
 import { StatusChip, StyledTableContainer } from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AllUserList = () => {
   const [page, setPage] = useState(0);
@@ -45,7 +46,8 @@ const AllUserList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
+
   const {
     data: userData,
     isLoading,

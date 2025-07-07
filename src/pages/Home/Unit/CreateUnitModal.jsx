@@ -21,11 +21,12 @@ import {
 import { useCreateUnitMutation } from "../../../redux/api/unitApi";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const CreateUnitModal = ({ open, setOpen }) => {
   const [createUnit, { isLoading, isSuccess }] = useCreateUnitMutation();
-  const tenantDomain = window.location.hostname.split(".")[0];
-
+  const tenantDomain = useTenantDomain();
+ 
   const handleSubmit = async (formData) => {
     try {
       

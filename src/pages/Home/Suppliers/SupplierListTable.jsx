@@ -17,9 +17,7 @@ import {
   Alert,
   LinearProgress,
   Checkbox,
-  Card,
-  CardContent,
-  Chip,
+
 } from "@mui/material"
 
 import {
@@ -41,114 +39,10 @@ import {
 
 import { Link } from "react-router-dom"
 import { useGetAllSuppliersQuery } from "../../../redux/api/supplier"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
+import { AnimatedIconButton, GlassCard, GradientButton, StatusChip, SupplierAvatar } from "../../../utils/customStyle"
 
 // Custom styled components
-const GlassCard = ({ children, ...props }) => (
-  <Card
-    {...props}
-    sx={{
-      background: alpha("#ffffff", 0.9),
-      backdropFilter: "blur(10px)",
-      border: "1px solid rgba(255, 255, 255, 0.2)",
-      borderRadius: 2,
-      p: 3,
-      ...props.sx,
-    }}
-  >
-    <CardContent>{children}</CardContent>
-  </Card>
-)
-
-const GradientButton = ({ children, ...props }) => (
-  <Button
-    {...props}
-    sx={{
-      background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-      color: "white",
-      borderRadius: 2,
-      px: 3,
-      py: 1,
-      "&:hover": {
-        background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-      },
-      ...props.sx,
-    }}
-  >
-    {children}
-  </Button>
-)
-
-const StatusChip = ({ status, ...props }) => {
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return { backgroundColor: "#e8f5e8", color: "#2e7d32" }
-      case "inactive":
-        return { backgroundColor: "#ffebee", color: "#c62828" }
-      case "pending":
-        return { backgroundColor: "#fff3e0", color: "#ef6c00" }
-      default:
-        return { backgroundColor: "#f5f5f5", color: "#666" }
-    }
-  }
-
-  return (
-    <Chip
-      {...props}
-      sx={{
-        ...getStatusColor(status),
-        fontWeight: "medium",
-        fontSize: "0.75rem",
-        ...props.sx,
-      }}
-    />
-  )
-}
-
-const SupplierAvatar = ({ src, children, ...props }) => (
-  <Box
-    {...props}
-    sx={{
-      width: 40,
-      height: 40,
-      borderRadius: "50%",
-      backgroundColor: "#1976d2",
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1rem",
-      fontWeight: "bold",
-      backgroundImage: src ? `url(${src})` : "none",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      ...props.sx,
-    }}
-  >
-    {!src && children}
-  </Box>
-)
-
-const AnimatedIconButton = ({ children, ...props }) => (
-  <Button
-    {...props}
-    sx={{
-      minWidth: "auto",
-      width: 40,
-      height: 40,
-      borderRadius: "50%",
-      transition: "all 0.2s",
-      "&:hover": {
-        transform: "scale(1.1)",
-        backgroundColor: alpha("#1976d2", 0.1),
-      },
-      // eslint-disable-next-line react/prop-types
-      ...props.sx,
-    }}
-  >
-    {children}
-  </Button>
-)
 
 const WorldClassSupplierList = () => {
   const theme = useTheme()
@@ -165,7 +59,7 @@ const WorldClassSupplierList = () => {
 
   const itemsPerPage = 5
   const limit = 15
-  const tenantDomain = typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "default"
+const tenantDomain = useTenantDomain();
 
   const {
     data: allSuppliers,

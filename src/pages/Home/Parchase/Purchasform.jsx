@@ -71,6 +71,7 @@ import {
 } from "../../../utils/customStyle";
 import { formatCurrency } from "../../../utils/formatter";
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const MotionCard = motion(Card);
 
 const Purchasform = () => {
@@ -89,9 +90,7 @@ const Purchasform = () => {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [expandedSummary, setExpandedSummary] = useState(true);
   const productSearchRef = useRef(null);
-
-  const tenantDomain = window.location.hostname.split(".")[0];
-
+  const tenantDomain = useTenantDomain();
   const [updatePurchase] = useUpdatePurchaseMutation();
   const {
     data: productsData,
@@ -364,23 +363,26 @@ const Purchasform = () => {
       totalTax,
       totalShipping,
       grandTotal,
-    }
+    };
 
     try {
       setShowSuccessAnimation(true);
       if (id) {
-     const res = await updatePurchase({
-  tenantDomain,
-  id,
-  ...modifyData,
-}).unwrap();
+        const res = await updatePurchase({
+          tenantDomain,
+          id,
+          ...modifyData,
+        }).unwrap();
 
         if (res.success) {
           toast.success(res.message || "Purchase update successfully!");
           navigate("/dashboard/purchase-list");
         }
       } else {
-      const res = await createPurchase({ tenantDomain, ...modifyData }).unwrap();
+        const res = await createPurchase({
+          tenantDomain,
+          ...modifyData,
+        }).unwrap();
         if (res.success) {
           toast.success(res.message || "Purchase create successfully!");
           navigate("/dashboard/purchase-list");

@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { HiOutlineArrowNarrowRight, HiOutlineEye } from "react-icons/hi";
 import { useGetAllJobCardsQuery } from "../../../redux/api/jobCard";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
   height: 10,
@@ -23,7 +24,8 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
 }));
 
 const RecentProject = () => {
-    const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data, error, isLoading } = useGetAllJobCardsQuery({
     tenantDomain,
     limit: 5,

@@ -12,9 +12,10 @@ import {
   useDeleteExpenseMutation,
   useGetAllExpensesQuery,
 } from "../../../redux/api/expense";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function ExpenseList() {
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [search, SetSearch] = useState("");

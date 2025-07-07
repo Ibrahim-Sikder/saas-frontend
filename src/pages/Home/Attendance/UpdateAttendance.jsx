@@ -44,12 +44,14 @@ import {
 } from "../../../redux/api/attendance";
 import Loading from "../../../components/Loading/Loading";
 import { columns } from "./AddAttendance";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateAttendance = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const date = new URLSearchParams(location.search).get("date");
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [error, setError] = useState("");
   const [presentState, setPresentState] = useState(

@@ -2,9 +2,13 @@ import { HiOutlineArrowNarrowRight } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useGetAllQuotationsQuery } from "../../../redux/api/quotation";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RcentQuotation = () => {
+    const tenantDomain = useTenantDomain();
+  
   const { data, error, isLoading } = useGetAllQuotationsQuery({
+    tenantDomain, 
     limit: 5,
     page: 1,
   });

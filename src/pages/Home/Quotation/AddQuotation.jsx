@@ -27,6 +27,7 @@ import { suggestionStyles } from "../../../utils/customStyle";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { getTenantName } from "../../../utils/getTenantName";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddQuotation = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
@@ -82,7 +83,7 @@ const AddQuotation = () => {
   const [activeInputIndex, setActiveInputIndex] = useState(null);
 
   const limit = 10;
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
 
   const {
     register,

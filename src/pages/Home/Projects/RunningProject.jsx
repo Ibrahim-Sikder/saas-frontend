@@ -13,10 +13,11 @@ import {
 } from "../../../redux/api/quotation";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { backBtnStyle } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const QuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [filterType, setFilterType] = useState("");
 

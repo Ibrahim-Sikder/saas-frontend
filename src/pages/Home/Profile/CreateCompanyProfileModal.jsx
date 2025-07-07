@@ -28,10 +28,11 @@ import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
 import { toast } from "react-toastify";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function CompanyProfileModal({ open, onClose, initialData }) {
-  const tenantDomain =
-    typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
+  const tenantDomain = useTenantDomain();
+
 
   const [createCompanyProfile] = useCreateCompanyProfileMutation();
 const handleSave = async (formData) => {

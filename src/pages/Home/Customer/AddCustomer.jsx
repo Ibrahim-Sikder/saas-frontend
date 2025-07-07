@@ -15,7 +15,6 @@ import {
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import { useCreateCustomerMutation } from "../../../redux/api/customerApi";
 import CustomerListTable from "./CustomerListTable";
 import { ArrowBack } from "@mui/icons-material";
@@ -98,19 +97,8 @@ const AddCustomer = () => {
     });
   };
 
-  //   const isLocalhost = window.location.hostname.includes("localhost");
-
-  // let tenantDomain = "";
-
-  // if (isLocalhost) {
-  //   // For fashions.com.localhost → ['fashions', 'com', 'localhost']
-  //   tenantDomain = window.location.hostname.split(".").slice(0, 2).join(".");
-  // } else {
-  //   // For live (like rahim.trustautosolution.com)
-  //   // → tenant = 'rahim'
-  //   tenantDomain = window.location.hostname.split(".")[0];
-  // }
   const tenantDomain = useTenantDomain();
+
 
   const {
     register,

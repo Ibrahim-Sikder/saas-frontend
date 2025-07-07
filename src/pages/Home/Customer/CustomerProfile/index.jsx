@@ -18,6 +18,7 @@ import { useGetSingleCustomerQuery } from "../../../../redux/api/customerApi";
 import Loading from "../../../../components/Loading/Loading";
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const CustomerProfile = () => {
   const location = useLocation();
@@ -37,10 +38,7 @@ const CustomerProfile = () => {
     localStorage.setItem(`customer-tab-${id}`, value.toString());
   }, [value, id]);
 
-  const tenantDomain =
-    typeof window !== "undefined"
-      ? window.location.hostname.split(".")[0]
-      : "default";
+  const tenantDomain = useTenantDomain();
 
   const {
     data: profileData,

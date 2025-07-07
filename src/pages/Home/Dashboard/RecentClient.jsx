@@ -2,8 +2,10 @@ import { HiOutlineArrowNarrowRight, } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useGetAllCustomersQuery } from "../../../redux/api/customerApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const RecentClient = () => {
-    const tenantDomain = window.location.hostname.split(".")[0];
+    const tenantDomain = useTenantDomain();
+  
   const {
     data: customerData,
     error,

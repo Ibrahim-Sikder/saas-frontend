@@ -11,6 +11,7 @@ import {
 import { Pagination } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
 import { ArrowForwardIos } from "@mui/icons-material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const DuemoneyReceiptList = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const DuemoneyReceiptList = () => {
   const limit = 10;
   const navigate = useNavigate();
   const textInputRef = useRef(null);
+  const tenantDomain = useTenantDomain();
 
   useEffect(() => {
     if (search) {
@@ -29,6 +31,7 @@ const DuemoneyReceiptList = () => {
 
   const { data: allMoneyReceipts, isLoading: moneyReceiptLoading } =
     useDueAllMoneyReceiptsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -52,7 +55,7 @@ const DuemoneyReceiptList = () => {
 
     if (willDelete) {
       try {
-        await deleteMoneyReceipt(id).unwrap();
+        await deleteMoneyReceipt({tenantDomain, id}).unwrap();
         swal("Deleted!", "Money receipt deleted successfully.", "success");
       } catch (error) {
         swal("Error", "Money receipt data not found.", "error");

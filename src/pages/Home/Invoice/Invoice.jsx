@@ -22,8 +22,11 @@ import { unitOptions } from "../../../utils/options";
 import { formatNumber } from "../../../utils/formateSemicolon";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Invoice = () => {
+    const tenantDomain = useTenantDomain();
+  
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
   const [specificQuotation, setSpecificQuotation] = useState({});
   const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no);
@@ -36,8 +39,6 @@ const Invoice = () => {
   const location = useLocation();
   const job_no = new URLSearchParams(location.search).get("order_no");
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
-
   const [orderNumber, setOrderNumber] = useState(job_no);
 
   const navigate = useNavigate();

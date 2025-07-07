@@ -39,10 +39,14 @@ import InfoIcon from "@mui/icons-material/Info"
 import { useGetAllStocksQuery, useStockTransperMutation } from "../../../redux/api/stocksApi"
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi"
 import toast from "react-hot-toast"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 export default function StockTransferModal({ open, onClose, onSubmit, employees }) {
-    const tenantDomain = window.location.hostname.split(".")[0];
-  const theme = useTheme()
+     
+
+  const theme = useTheme() 
+  const tenantDomain = useTenantDomain();
+
   const [formSubmitting, setFormSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],

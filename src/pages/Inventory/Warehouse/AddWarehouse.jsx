@@ -40,9 +40,10 @@ import {
   useUpdateWarehouseMutation,
 } from "../../../redux/api/warehouseApi";
 import { toast } from "react-toastify";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
 
   const theme = useTheme();
   const [createWarehouse] = useCreateWarehouseMutation();

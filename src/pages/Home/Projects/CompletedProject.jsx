@@ -12,12 +12,13 @@ import { Button, Pagination } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { backBtnStyle } from "../../../utils/customStyle";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const InvoiceTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
- const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);

@@ -23,6 +23,7 @@ import {
   useUpdateCustomerMutation,
 } from "../../../redux/api/customerApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateCustomer = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
@@ -43,8 +44,6 @@ const UpdateCustomer = () => {
       (vehicle) => vehicle.label === newValue
     );
     setFilteredVehicles(filtered);
-
-    // Update vehicle brand while preserving other data
     if (newValue) {
       setGetDataWithChassisNo((prev) => ({
         ...prev,
@@ -71,14 +70,13 @@ const UpdateCustomer = () => {
     setYearSelectInput(option.label);
     setFilteredOptions([]);
   };
-
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCustomerQuery({ tenantDomain: domain, id });
+  } = useGetSingleCustomerQuery({ tenantDomain, id });
 
   const [updateCustomer, { isLoading: updateLoading, error }] =
     useUpdateCustomerMutation();

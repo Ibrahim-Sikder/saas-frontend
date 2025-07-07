@@ -9,14 +9,16 @@ import {
   useUpdateCategoryMutation,
 } from "../../../redux/api/categoryApi";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const CategoryUpdate = () => {
-    const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const { data, isLoading } = useGetSingleCategoryQuery({tenantDomain, id});
+  const { data, isLoading } = useGetSingleCategoryQuery({ tenantDomain, id });
   const [updateCategory] = useUpdateCategoryMutation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (formData) => {
     try {
@@ -33,7 +35,7 @@ const CategoryUpdate = () => {
 
       if (res.success) {
         toast.success("Category updated successfully!");
-        navigate('/dashboard/category')
+        navigate("/dashboard/category");
       }
     } catch (error) {
       toast.error(
@@ -49,7 +51,7 @@ const CategoryUpdate = () => {
   const defaultValues = {
     main_category: data?.data?.main_category || "",
     sub_category: data?.data?.sub_category || "",
-    image: data?.data?.image ? data.data.image : '',
+    image: data?.data?.image ? data.data.image : "",
   };
 
   return (
@@ -64,7 +66,12 @@ const CategoryUpdate = () => {
             <TASForm onSubmit={handleSubmit} defaultValues={defaultValues}>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                <TAFileupload   defaultValues={data?.data?.image} fullWidth name="image" label="Upload Category Image" />
+                  <TAFileupload
+                    defaultValues={data?.data?.image}
+                    fullWidth
+                    name="image"
+                    label="Upload Category Image"
+                  />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Typography fontWeight="semi-bold" mb={1}>
