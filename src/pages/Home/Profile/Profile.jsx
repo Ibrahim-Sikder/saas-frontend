@@ -61,8 +61,8 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const tenantDomain =
-    typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
+  const tenantDomain = typeof window !== "undefined" ? window.location.hostname : "";
+  // const tenantDomain = typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
   console.log("user all info", data);
