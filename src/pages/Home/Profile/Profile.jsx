@@ -52,6 +52,7 @@ import {
   VisuallyHiddenInput,
 } from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -60,21 +61,7 @@ const Profile = () => {
   );
   const [activeTab, setActiveTab] = useState(0);
   const [progress, setProgress] = useState(0);
-
-  // const tenantDomain = typeof window !== "undefined" ? window.location.hostname : "";
-  // const tenantDomain = typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
-const hostname = typeof window !== "undefined" ? window.location.hostname : "";
-  function getTenantDomain(hostname) {
-  const parts = hostname.split(".");
-  if (parts.length > 2) {
-    return parts[0];
-  }
-  return hostname;
-}
-
-// Usage in React
-
-const tenantDomain = getTenantDomain(hostname);
+  const tenantDomain = useTenantDomain();
 
 
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });

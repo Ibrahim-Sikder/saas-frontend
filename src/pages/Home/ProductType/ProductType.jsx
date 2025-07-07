@@ -48,13 +48,14 @@ import {
 } from "../../../redux/api/productTypeApi";
 import TASForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 // Enhanced ProductTypeForm component
 const ProductTypeForm = () => {
   const [productType, { isLoading }] = useCreateProductTypeMutation();
   const [formValue, setFormValue] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const handleSubmit = async (data) => {
     try {
