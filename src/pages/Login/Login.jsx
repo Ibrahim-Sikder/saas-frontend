@@ -98,7 +98,7 @@ const Login = () => {
         if (tenantKey === "superadmin") {
           redirectURL = isLocalhost
             ? "http://localhost:5173/dashboard"
-            : "https://trustautosolution.com/dashboard"
+            : "https://garage.trustautosolution.com/dashboard"
         } else {
           if (isLocalhost) {
             redirectURL = `http://localhost:5173/dashboard`;
