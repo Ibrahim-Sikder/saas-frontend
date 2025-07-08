@@ -188,4 +188,5 @@ const SingleEmployeeLeaveList = ({ tenantDomain, id }) => {
   );
 };
 
+
 export default SingleEmployeeLeaveList;

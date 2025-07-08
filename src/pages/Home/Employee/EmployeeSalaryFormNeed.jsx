@@ -90,7 +90,6 @@
 //   } = useGetSingleSalaryQuery(id, {
 //     skip: !id,
 //   });
-
 //   const [createSalary, { isLoading: createLoading, error: createError }] =
 //     useCreateSalaryMutation();
 //   const [updateSalary, { isLoading: updateLoading, error: updateError }] =

@@ -40,7 +40,7 @@ const TodayAttendance = () => {
     isLoading: todayLoading,
     error: todayError,
     refetch,
-  } = useGetTodayAttendanceQuery(tenantDomain);
+  } = useGetTodayAttendanceQuery({tenantDomain});
 
   const {
     data: allAttendance,

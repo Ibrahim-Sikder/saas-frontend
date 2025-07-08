@@ -76,15 +76,16 @@ const leaveData = [
 ];
 const EmployeeLeave = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [search, SetSearch] = useState("")
-    const tenantDomain = useTenantDomain();
+  const [search, SetSearch] = useState("");
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading } = useGetAllELeaveRequestQuery({
-    tenantDomain, 
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
   });
+  console.log("leave request data this ", data);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -186,7 +187,13 @@ const EmployeeLeave = () => {
           </div>
         </div>
       </div>
-      <EmployeeLeaveTable ncurrentPage={currentPage} data={data} SetSearch={SetSearch} setCurrentPage={setCurrentPage} isLoading={isLoading}/>
+      <EmployeeLeaveTable
+        ncurrentPage={currentPage}
+        data={data}
+        SetSearch={SetSearch}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

@@ -33,7 +33,7 @@ const tenantDomain = useTenantDomain();
     searchTerm: filterType,
   });
 
-  const [moveRecycledEmployee] = useMoveRecycledEmployeeMutation(tenantDomain);
+  const [moveRecycledEmployee] = useMoveRecycledEmployeeMutation();
 
   const deleteEmployee = async (id) => {
     const willDelete = await swal({

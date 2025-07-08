@@ -68,6 +68,7 @@ const initialSelectedOption = allMonths[new Date().getMonth()];
 const currentYear = new Date().getFullYear().toString();
 
 const EmployeeSalaryForm = ({ tenantDomain }) => {
+  console.log('tenant ', tenantDomain)
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
@@ -83,6 +84,7 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
 
   const { data: getAllEmployee, isLoading: employeesLoading } =
     useGetAllEmployeesQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: searchTerm,
@@ -960,7 +962,7 @@ const handleCreateSalary = async () => {
                     <TableCell sx={tableCellStyle}>Employee ID</TableCell>
                     <TableCell sx={tableCellStyle}>Month of Salary</TableCell>
                     <TableCell sx={tableCellStyle}>Year</TableCell>
-                    <TableCell sx={tableCellStyle}>Salary Amount</TableCell>
+                    <TableCell sx={tableCellStyle}>Basic Amount</TableCell>
                     <TableCell sx={tableCellStyle}>Bonus</TableCell>
                     <TableCell sx={tableCellStyle}>Overtime Hours</TableCell>
                     <TableCell sx={tableCellStyle}>

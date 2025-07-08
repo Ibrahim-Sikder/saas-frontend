@@ -63,7 +63,7 @@ const RecycledbinEmployeeList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledEmployee(id).unwrap();
+        await restoreFromRecycledEmployee({tenantDomain, id}).unwrap();
         swal({
           title: "Restored!",
           text: "Employee has been restored successfully.",

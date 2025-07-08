@@ -12,9 +12,10 @@ const attendanceApi = baseApi.injectEndpoints({
     }),
 
     getTodayAttendance: builder.query({
-      query: () => ({
+      query: ({tenantDomain}) => ({
         url: `/attendances/today`,
         method: "GET",
+        params:{tenantDomain}
       }),
       providesTags: ["attendance"],
     }),

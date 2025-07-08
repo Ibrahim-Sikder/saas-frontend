@@ -23,7 +23,6 @@ import { useCreateEmployeeMutation } from "../../../redux/api/employee";
 import uploadFile from "../../../helper/uploadFile";
 import EmployeeTable from "./EmployeeTable";
 import { ArrowBack } from "@mui/icons-material";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -121,7 +120,7 @@ const AddEmployee = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-10 ">
         <div className="productHeadWrap gap-3 ">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -131,7 +130,6 @@ const AddEmployee = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <div className="flex items-center justify-center ">
             <FaUsers size={70} className="invoicIcon" />
