@@ -14,6 +14,7 @@ import { btnStyle, btnStyle2 } from "../utils/customStyle";
 import { useGetAllMetaQuery } from "../redux/api/meta.api";
 import { useTenantDomain } from "../hooks/useTenantDomain";
 import Loading from "../components/Loading/Loading";
+import { useGetCompanyProfileQuery } from "../redux/api/companyProfile";
 
 const Appbar = ({ toggle, navRef, toggleSideBar }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,6 +25,9 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
     isError,
   } = useGetAllMetaQuery({ tenantDomain });
 
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   if (isLoading) return <Loading />;
 
   const toggleMenu = () => {
@@ -48,7 +52,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/dashboard">
               <h3 className="ml-5 text-xl lg:text-2xl font-semibold text-white hidden xl:block">
-                Garage Master
+               {CompanyInfoData?.data?.companyName}
               </h3>
             </Link>
             <Box
@@ -87,11 +91,6 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
 
           {/* Original navigation items - visible on lg screens */}
           <div className="hidden lg:flex items-center space-x-5 flex-end">
-            <TopSearchbar />
-            <Link to="/dashboard/holiday">
-              <FaCalendarDays size={20} className="text-[#fff]" />
-            </Link>
-            <UserProfile />
             {allMetaData?.data?.subscriptionInfo?.daysRemaining && (
               <Tooltip
                 title={`Your subscription has ${allMetaData.data.subscriptionInfo.daysRemaining} day(s) remaining`}
@@ -102,10 +101,10 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
                   sx={{
                     backgroundColor:
                       allMetaData.data.subscriptionInfo.daysRemaining < 15
-                        ? "#f44336" // red
+                        ? "#f44336" 
                         : allMetaData.data.subscriptionInfo.daysRemaining < 60
-                        ? "#ff9800" // amber
-                        : "#4caf50", // green
+                        ? "#ff9800" 
+                        : "#4caf50", 
                     color: "#fff",
                     fontWeight: 600,
                     borderRadius: "8px",
@@ -123,6 +122,12 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
                 />
               </Tooltip>
             )}
+            <TopSearchbar />
+            <Link to="/dashboard/holiday">
+              <FaCalendarDays size={20} className="text-[#fff]" />
+            </Link>
+            <UserProfile />
+            
           </div>
         </div>
 
