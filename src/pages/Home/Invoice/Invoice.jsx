@@ -723,6 +723,17 @@ const Invoice = () => {
     setGetDataWithChassisNo(jobCardData?.data?.vehicle);
   }, [jobCardData?.data?.vehicle]);
 
+  // for mileage defalutvalue show 
+  useEffect(() => {
+  if (jobCardData?.data?.mileage) {
+    reset({
+      mileage: jobCardData.data.mileage,
+    });
+    setCurrentMileage(jobCardData.data.mileage);
+  }
+}, [jobCardData, reset]);
+
+
   return (
     <div className="md:px-5 py-5 lg:py-10">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
@@ -1044,6 +1055,7 @@ const Invoice = () => {
                     type="number"
                     focused={jobCardData?.data?.mileage || ""}
                     defaultValue={jobCardData?.data?.mileage || ""}
+
                     onChange={(e) => {
                       const newMileage = e.target.value;
                       setCurrentMileage(newMileage);
@@ -1061,6 +1073,10 @@ const Invoice = () => {
                     error={!!errors.mileage}
                     helperText={errors.mileage?.message}
                   />
+
+
+
+
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mb-2">
