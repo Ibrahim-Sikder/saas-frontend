@@ -52,7 +52,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/dashboard">
               <h3 className="ml-5 text-xl lg:text-2xl font-semibold text-white hidden xl:block">
-               {CompanyInfoData?.data?.companyName}
+                {CompanyInfoData?.data?.companyName}
               </h3>
             </Link>
             <Box
@@ -91,43 +91,70 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
 
           {/* Original navigation items - visible on lg screens */}
           <div className="hidden lg:flex items-center space-x-5 flex-end">
-            {allMetaData?.data?.subscriptionInfo?.daysRemaining && (
-              <Tooltip
-                title={`Your subscription has ${allMetaData.data.subscriptionInfo.daysRemaining} day(s) remaining`}
-                arrow
-              >
-                <Chip
-                  label={`${allMetaData.data.subscriptionInfo.daysRemaining} Days Left`}
-                  sx={{
-                    backgroundColor:
-                      allMetaData.data.subscriptionInfo.daysRemaining < 15
-                        ? "#f44336" 
-                        : allMetaData.data.subscriptionInfo.daysRemaining < 60
-                        ? "#ff9800" 
-                        : "#4caf50", 
-                    color: "#fff",
-                    fontWeight: 600,
-                    borderRadius: "8px",
-                    px: 1.5,
-                    py: 0.5,
-                    fontSize: "0.875rem",
-                    animation:
-                      allMetaData.data.subscriptionInfo.daysRemaining < 15
-                        ? "pulseRed 2s infinite"
-                        : allMetaData.data.subscriptionInfo.daysRemaining < 60
-                        ? "pulseAmber 2s infinite"
-                        : "pulseGreen 2s infinite",
-                    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-                  }}
-                />
-              </Tooltip>
+            {allMetaData?.data?.subscriptionInfo && (
+              <>
+                {allMetaData.data.subscriptionInfo.daysRemaining > 0 ? (
+                  <Tooltip
+                    title={`Your subscription has ${allMetaData.data.subscriptionInfo.daysRemaining} day(s) remaining`}
+                    arrow
+                  >
+                    <Chip
+                      label={`${allMetaData.data.subscriptionInfo.daysRemaining} Days Left`}
+                      sx={{
+                        backgroundColor:
+                          allMetaData.data.subscriptionInfo.daysRemaining < 15
+                            ? "#f44336"
+                            : allMetaData.data.subscriptionInfo.daysRemaining <
+                              60
+                            ? "#ff9800"
+                            : "#4caf50",
+                        color: "#fff",
+                        fontWeight: 600,
+                        borderRadius: "8px",
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: "0.875rem",
+                        animation:
+                          allMetaData.data.subscriptionInfo.daysRemaining < 15
+                            ? "pulseRed 2s infinite"
+                            : allMetaData.data.subscriptionInfo.daysRemaining <
+                              60
+                            ? "pulseAmber 2s infinite"
+                            : "pulseGreen 2s infinite",
+                        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip
+                    title="Your subscription has expired. Please renew to continue."
+                    arrow
+                  >
+                    <Chip
+                      label="Subscription Expired"
+                      color="error"
+                      sx={{
+                        backgroundColor: "#b71c1c",
+                        color: "#fff",
+                        fontWeight: 600,
+                        borderRadius: "8px",
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: "0.875rem",
+                        animation: "shake 0.6s ease-in-out infinite",
+                        boxShadow: "0 0 12px rgba(244,67,54,0.6)",
+                      }}
+                    />
+                  </Tooltip>
+                )}
+              </>
             )}
+
             <TopSearchbar />
             <Link to="/dashboard/holiday">
               <FaCalendarDays size={20} className="text-[#fff]" />
             </Link>
             <UserProfile />
-            
           </div>
         </div>
 
