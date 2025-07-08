@@ -17,97 +17,45 @@ import { countries } from "../constant";
 import { useTheme } from "@mui/material";
 import { useTenantDomain } from "./useTenantDomain";
 
-// Define the Zod validation schema
 const supplierValidationSchema = z.object({
-  body: z.object({
-    full_name: z.string({ required_error: "Full name is required." }),
-    phone_number: z.string({ required_error: "Phone number is required." }),
-    // country_code: z.string({ required_error: "Country code is required." }),
-    email: z
-      .string({ required_error: "Email is required." })
-      .email("Invalid email format."),
-    vendor: z.string({ required_error: "Vendor name is required." }),
-    shop_name: z.string({ required_error: "Shop name is required." }),
-    business_type: z.string({ required_error: "Business type is required." }),
-    tax_id: z.string({ required_error: "Tax ID is required." }),
-    registration_number: z.string({
-      required_error: "Registration number is required.",
-    }),
-    website: z.string().optional(),
-    country: z.string({ required_error: "Country name is required." }),
-    city: z.string({ required_error: "City name is required." }),
-    state: z.string({ required_error: "State is required." }),
-    postal_code: z.string({ required_error: "Postal code is required." }),
-    street_address: z.string({ required_error: "Street address is required." }),
-    delivery_instructions: z.string().optional(),
-    year_established: z.union([
-      z.number({ required_error: "Year established is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Year established must be a valid number.",
-      }),
-    ]),
-    number_of_employees: z.union([
-      z.number({ required_error: "Number of employees is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Number of employees is required.",
-      }),
-    ]),
-
-    annual_revenue: z.union([
-      z.number({ required_error: "Annual revenue is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Annual revenue is required.",
-      }),
-    ]),
-
-    business_description: z.string().optional(),
-    bank_name: z.string({ required_error: "Bank name is required." }),
-    account_number: z.string({ required_error: "Account number is required." }),
-    swift_code: z.string({ required_error: "SWIFT code is required." }),
-    tax_exempt: z.boolean().default(false),
-    tax_exemption_number: z.string().optional(),
-    credit_terms: z.boolean().default(false),
-    payment_terms: z.string({ required_error: "Payment terms are required." }),
-    credit_limit: z.union([
-      z.number(),
-      z
-        .string()
-        .refine((val) => !isNaN(Number(val)))
-        .optional(),
-    ]),
-
-    delivery_terms: z.string({
-      required_error: "Delivery terms are required.",
-    }),
-    minimum_order_value: z.union([
-      z.number({ required_error: "Minimum order value is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Minimum order value is required.",
-      }),
-    ]),
-
-    lead_time: z.union([
-      z.number({ required_error: "Lead time is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Lead time is required.",
-      }),
-    ]),
-
-    shipping_method: z.string().optional(),
-    supply_chain_notes: z.string().optional(),
-    supplier_rating: z
-      .number({ required_error: "Supplier rating is required." })
-      .min(0, "Rating must be at least 0")
-      .max(5, "Rating cannot exceed 5"),
-
-    supplier_status: z.enum(["active", "pending", "inactive"], {
-      required_error: "Supplier status is required.",
-    }),
-    quality_certification: z.string().optional(),
-    notes: z.string().optional(),
-  }),
+  full_name: z.string().min(1, "Full name is required"),
+  phone_number: z.string().min(1, "Phone number is required"),
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  vendor: z.string().optional(),
+  shop_name: z.string().optional(),
+  business_type: z.string().optional(),
+  tax_id: z.string().optional(),
+  registration_number: z.string().optional(),
+  website: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+  street_address: z.string().optional(),
+  delivery_instructions: z.string().optional(),
+  year_established: z.coerce.number().optional().nullable(),
+  number_of_employees: z.coerce.number().optional().nullable(),
+  annual_revenue: z.coerce.number().optional().nullable(),
+  business_description: z.string().optional(),
+  bank_name: z.string().optional(),
+  account_number: z.string().optional(),
+  swift_code: z.string().optional(),
+  tax_exempt: z.boolean().optional(),
+  tax_exemption_number: z.string().optional(),
+  credit_terms: z.boolean().optional(),
+  payment_terms: z.string().optional(),
+  credit_limit: z.coerce.number().optional().nullable(),
+  delivery_terms: z.string().optional(),
+  minimum_order_value: z.coerce.number().optional().nullable(),
+  lead_time: z.coerce.number().optional().nullable(),
+  shipping_method: z.string().optional(),
+  supply_chain_notes: z.string().optional(),
+  // supplier_rating: z.number().min(0).max(5).optional().nullable(),
+  supplier_status: z.enum(["active", "pending", "inactive"]).optional(),
+  quality_certification: z.string().optional(),
+  notes: z.string().optional(),
+  supplier_photo: z.string().optional(),
 });
-
 export const useSupplierForm = (id) => {
   const [loading, setLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
@@ -345,23 +293,6 @@ const tenantDomain = useTenantDomain();
       supplier_photo: data.supplier_photo || "",
     });
   };
-
-  // Load saved form data on component mount
-  useEffect(() => {
-    if (!id) {
-      const savedFormData = sessionStorage.getItem("supplierFormData");
-      if (savedFormData) {
-        try {
-          const parsedData = JSON.parse(savedFormData);
-          if (Object.keys(parsedData).length > 0) {
-            methods.reset(parsedData);
-          }
-        } catch (e) {
-          console.error("Error parsing saved form data", e);
-        }
-      }
-    }
-  }, [id, methods]);
 
   return {
     methods,

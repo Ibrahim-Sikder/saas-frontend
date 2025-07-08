@@ -3,9 +3,10 @@ import { useState, useMemo } from "react";
 import { useAllCustomerQuery } from "../redux/api/meta.api";
 import { useGetAllInvoicesQuery } from "../redux/api/invoice";
 import { useGetAllJobCardsQuery } from "../redux/api/jobCard";
+import { useTenantDomain } from "./useTenantDomain";
 
 export const useFormOptions = (initialFilterType = "") => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
   const [filterType, setFilterType] = useState(initialFilterType);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;

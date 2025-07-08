@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { formatDate } from "../utils/formateDate"
 import { useCreateIncomeMutation, useUpdateIncomeMutation } from "../redux/api/income"
+import { useTenantDomain } from "./useTenantDomain"
 
 export const defaultIncomeValues = {
   receipt_number: "",
@@ -28,7 +29,7 @@ export const defaultIncomeValues = {
 
 export const useIncomeForm = (id) => {
   const navigate = useNavigate()
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
   const [createIncome, { isLoading: createLoading }] = useCreateIncomeMutation()
   const [updateIncome, { isLoading: updateLoading }] = useUpdateIncomeMutation()
 

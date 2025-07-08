@@ -14,13 +14,14 @@ import {
 } from "../../../redux/api/employee";
 import Loading from "../../../components/Loading/Loading";
 import { Pagination } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const EmployeeList = () => {
   const [filterType, setFilterType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const textInputRef = useRef(null);
   const limit = 20;
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
   const {
     data: employeeData,
     isLoading: employeesLoading,

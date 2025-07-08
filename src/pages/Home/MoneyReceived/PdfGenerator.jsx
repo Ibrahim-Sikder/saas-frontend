@@ -11,10 +11,12 @@ import { useGetSingleMoneyReceiptQuery } from "../../../redux/api/money-receipt"
 import Loading from "../../../components/Loading/Loading";
 import { Button } from "@mui/material";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const PdfGenerator = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
+  
+  const tenantDomain = useTenantDomain();
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });

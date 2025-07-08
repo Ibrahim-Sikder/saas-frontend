@@ -29,11 +29,12 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { ArrowBack } from "@mui/icons-material";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateEmployee = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [guardianCountryCode, setGuardianCountryCode] = useState(countries[0]);
   const [phoneNumber, setPhoneNumber] = useState("");

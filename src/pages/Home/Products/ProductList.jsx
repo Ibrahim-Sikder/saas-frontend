@@ -68,6 +68,7 @@ import {
   useDeleteProductMutation,
   useGetAllIProductQuery,
 } from "../../../redux/api/productApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 // Status component with appropriate colors
 const StatusChip = ({ status }) => {
@@ -570,7 +571,7 @@ export default function ProductList() {
   // const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
   // Query parameters
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const queryParams = {
     tenantDomain,

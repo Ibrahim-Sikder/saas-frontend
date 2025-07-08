@@ -64,6 +64,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import { useNavigate } from "react-router-dom"
 import { useGetAllPurchasesQuery } from "../../redux/api/purchaseApi"
 import { useReactToPrint } from "react-to-print"
+import { useTenantDomain } from "../../hooks/useTenantDomain"
 
 export default function PurchaseHistoryPage() {
   const theme = useTheme()
@@ -81,7 +82,7 @@ export default function PurchaseHistoryPage() {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadFormat, setDownloadFormat] = useState("")
-   const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [snackbar, setSnackbar] = useState({
     open: false,

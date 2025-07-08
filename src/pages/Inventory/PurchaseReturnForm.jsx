@@ -53,6 +53,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useGetAllStocksQuery } from "../../redux/api/stocksApi";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const warehouseOptions = [
   { value: "main", label: "Main Warehouse" },
@@ -68,7 +69,7 @@ export default function PurchaseReturnForm({ id }) {
   const [activeStep, setActiveStep] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const {
     control,

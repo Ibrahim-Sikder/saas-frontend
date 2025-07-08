@@ -173,7 +173,7 @@ const ProductTypeForm = () => {
 
 // Enhanced ProductTypeTable component
 const ProductTypeTable = () => {
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
   const [deleteProductType, { isLoading: isDeleting }] =
     useDeleteProductTypeMutation();
   const { isLoading, data, refetch } = useGetAllIProductTypeQuery({

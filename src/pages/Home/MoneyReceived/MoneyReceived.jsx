@@ -24,6 +24,7 @@ import { useCreateMoneyReceiptMutation } from "../../../redux/api/money-receipt"
 import MoneyReceiptTable from "./MoneyReceiptTable";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const formatBangladeshiNumber = (num) => {
   if (!num) return "";
@@ -74,7 +75,7 @@ const MoneyReceiptView = () => {
   const location = useLocation();
   const jobNo = new URLSearchParams(location.search).get("order_no");
   const net_total = new URLSearchParams(location.search).get("net_total");
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const parsedDate = new Date();
   const day = parsedDate.getDate().toString().padStart(2, "0");

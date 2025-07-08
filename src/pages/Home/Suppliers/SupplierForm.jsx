@@ -1,24 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-"use client";
-
-import { useState, useEffect } from "react";
+"use client"
+import { useState, useEffect } from "react"
 import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Grid,
   Tabs,
   Typography,
   useTheme,
-  Avatar,
-  Stepper,
   Step,
   StepLabel,
   StepContent,
-  Card,
   CardContent,
   IconButton,
   Tooltip,
@@ -37,7 +32,7 @@ import {
   LinearProgress,
   Backdrop,
   Snackbar,
-} from "@mui/material";        
+} from "@mui/material"
 import {
   FaUsers,
   FaBuilding,
@@ -53,9 +48,8 @@ import {
   FaShippingFast,
   FaUserTie,
   FaFileContract,
-  FaHandshake,
   FaCheck,
-} from "react-icons/fa";
+} from "react-icons/fa"
 import {
   MdBusiness,
   MdCategory,
@@ -68,23 +62,16 @@ import {
   MdAccessTime,
   MdClose,
   MdOutlineWarning,
-} from "react-icons/md";
-import { FormProvider } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-
-import SupplierListTable from "./SupplierListTable";
-import SupplierHeader from "./SupplierHeader";
-import TASInput from "../../../components/form/Input";
-import CountryCodeAutocomplete from "../../../components/form/CountryCodeAutoComplete";
-import {
-  DeliveryTermsOption,
-  PaymentTermsOption,
-  SupplierStatusOption,
-  VendorCategoriesOption,
-} from "../../../options";
-import FormSelect from "../../../components/form/FormSelect";
-import TASFileupload from "../../../components/form/Fileupload";
-import { SectionTitle, StyledTab } from "../../../../src/utils";
+} from "react-icons/md"
+import { FormProvider } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
+import SupplierListTable from "./SupplierListTable"
+import SupplierHeader from "./SupplierHeader"
+import TASInput from "../../../components/form/Input"
+import CountryCodeAutocomplete from "../../../components/form/CountryCodeAutoComplete"
+import { DeliveryTermsOption, PaymentTermsOption, VendorCategoriesOption } from "../../../options"
+import FormSelect from "../../../components/form/FormSelect"
+import TASFileupload from "../../../components/form/Fileupload"
 import {
   Cabin,
   CloudUpload,
@@ -100,23 +87,33 @@ import {
   Save,
   Cancel,
   Visibility,
-} from "@mui/icons-material";
-import FormTextArea from "../../../components/form/FormTextArea";
-import TASSwitch from "../../../components/form/switch";
-import FormRating from "../../../components/form/FormRating";
-
+} from "@mui/icons-material"
+import FormTextArea from "../../../components/form/FormTextArea"
+import TASSwitch from "../../../components/form/switch"
+import FormRating from "../../../components/form/FormRating"
 import { useSupplierForm } from "../../../hooks/useSupplierForm"
 import { countries } from "../../../constant"
-import { AnimatedAvatar, AnimatedTab, EnhancedDivider, EnhancedSectionTitle, EnhancedStepper, FormSection, GlassBox, GradientButton, GradientCard, ProgressIndicator } from "../../../utils/customStyle"
-
-
+import {
+  AnimatedAvatar,
+  AnimatedTab,
+  EnhancedDivider,
+  EnhancedSectionTitle,
+  EnhancedStepper,
+  FormSection,
+  GlassBox,
+  GradientButton,
+  GradientCard,
+  ProgressIndicator,
+} from "../../../utils/customStyle"
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const SupplierForm = ({ id }) => {
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
- 
+  const navigate = useNavigate()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"))
+
   const {
     methods,
     formSubmit,
@@ -134,74 +131,74 @@ const SupplierForm = ({ id }) => {
     taxExempt,
     errors,
     isEditing,
-  } = useSupplierForm(id);
-
+  } = useSupplierForm(id)
 
   // Enhanced state
-  const [formProgress, setFormProgress] = useState(0);
-  const [showStepper, setShowStepper] = useState(!isMobile && !isTablet);
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [formProgress, setFormProgress] = useState(0)
+  const [showStepper, setShowStepper] = useState(!isMobile && !isTablet)
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
-  });
-  const [formTouched, setFormTouched] = useState(false);
-  const [showHelpTips, setShowHelpTips] = useState(true);
-  const [loadingEffect, setLoadingEffect] = useState(false);
+  })
+  const [formTouched, setFormTouched] = useState(false)
+  const [showHelpTips, setShowHelpTips] = useState(true)
+  const [loadingEffect, setLoadingEffect] = useState(false)
 
   // Calculate form progress
   useEffect(() => {
-    const progressPercentage = ((currentTab + 1) / 6) * 100;
-    setFormProgress(progressPercentage);
-  }, [currentTab]);
+    const progressPercentage = ((currentTab + 1) / 6) * 100
+    setFormProgress(progressPercentage)
+  }, [currentTab])
 
   // Simulate loading effect when switching tabs
   const handleTabChangeWithEffect = (event, newValue) => {
-    setLoadingEffect(true);
+    setLoadingEffect(true)
     setTimeout(() => {
-      handleTabChange(event, newValue);
-      setLoadingEffect(false);
-    }, 300);
-  };
+      handleTabChange(event, newValue)
+      setLoadingEffect(false)
+    }, 300)
+  }
 
-  // Handle form submission with enhanced UX
-  const handleEnhancedSubmit = (data) => {
-    setSaveDialogOpen(true);
-  };
+  // Simplified form submission - directly call the submit functions
+  const handleFormSubmit = async (data) => {
+    console.log("Form submitted with data:", data)
 
-  const confirmSubmit = () => {
-    setSaveDialogOpen(false);
-    setLoadingEffect(true);
+    // Validate required fields
+    if (!data.full_name || !data.phone_number) {
+      toast.error("Please fill in all required fields (Full Name and Phone Number)")
+      return
+    }
 
-    setTimeout(() => {
+    try {
       if (isEditing) {
-        onSubmit(methods.getValues());
+        await onSubmit(data)
       } else {
-        formSubmit(methods.getValues());
+        await formSubmit(data)
       }
-
-      setLoadingEffect(false);
-    }, 1500);
-  };
+    } catch (error) {
+      console.error("Form submission error:", error)
+    }
+  }
 
   const handleCancel = () => {
     if (formTouched) {
-      setCancelDialogOpen(true);
+      setCancelDialogOpen(true)
     } else {
-      navigate("/dashboard/supplier-list");
+      navigate("/dashboard/supplier-list")
     }
-  };
+  }
 
   const confirmCancel = () => {
-    setCancelDialogOpen(false);
-    navigate("/dashboard/supplier-list");
-  };
+    setCancelDialogOpen(false)
+    navigate("/dashboard/supplier-list")
+  }
 
   const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+    setSnackbar({ ...snackbar, open: false })
+  }
 
   // Steps for the stepper
   const steps = [
@@ -211,18 +208,51 @@ const SupplierForm = ({ id }) => {
     { label: "Financial Info", icon: <MdPayment /> },
     { label: "Supply Chain", icon: <MdLocalShipping /> },
     { label: "Evaluation", icon: <MdVerified /> },
-  ];
+  ]
+
+  const inputProps = {
+    sx: {
+      borderRadius: 2,
+      "&:hover": {
+        boxShadow: `0 0 0 1px ${alpha(theme.palette.primary.main, 0.3)}`,
+      },
+      "&.Mui-focused": {
+        boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.3)}`,
+      },
+    },
+  }
+
+  const switchStyle = {
+    "& .MuiSwitch-switchBase.Mui-checked": {
+      color: theme.palette.primary.main,
+      "&:hover": {
+        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+      },
+    },
+    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+      backgroundColor: theme.palette.primary.main,
+    },
+  }
+
+  const selectProps = {
+    sx: {
+      borderRadius: 2,
+      "&:hover": {
+        boxShadow: `0 0 0 1px ${alpha(theme.palette.primary.main, 0.3)}`,
+      },
+      "&.Mui-focused": {
+        boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.3)}`,
+      },
+    },
+  }
 
   return (
     <section
       className="md:py-0"
       style={{
-        background: `linear-gradient(135deg, ${alpha(
-          theme.palette.background.default,
-          0.9
-        )}, ${alpha(
+        background: `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.9)}, ${alpha(
           theme.palette.background.paper,
-          0.8
+          0.8,
         )}), url('/placeholder.svg?height=1080&width=1920') no-repeat center center`,
         backgroundSize: "cover",
         minHeight: "100vh",
@@ -230,7 +260,7 @@ const SupplierForm = ({ id }) => {
     >
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loadingEffect}
+        open={loadingEffect || loading || createLoading || updateLoading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -243,7 +273,6 @@ const SupplierForm = ({ id }) => {
               <h2 className=" md:text-3xl font-[600] text-[#2980b9] block">
                 {isEditing ? "Edit Supplier" : "+ Add New Supplier"}
               </h2>
-
               <div className="flex gap-2">
                 <Tooltip title="Toggle help tips">
                   <IconButton
@@ -258,7 +287,6 @@ const SupplierForm = ({ id }) => {
                     <Help />
                   </IconButton>
                 </Tooltip>
-
                 <Tooltip title="Toggle stepper view">
                   <IconButton
                     onClick={() => setShowStepper(!showStepper)}
@@ -283,26 +311,17 @@ const SupplierForm = ({ id }) => {
                   sx={{
                     mb: 3,
                     borderRadius: 2,
-                    boxShadow: `0 4px 12px ${alpha(
-                      theme.palette.info.main,
-                      0.2
-                    )}`,
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.info.main, 0.2)}`,
                   }}
                   action={
-                    <IconButton
-                      color="inherit"
-                      size="small"
-                      onClick={() => setShowHelpTips(false)}
-                    >
+                    <IconButton color="inherit" size="small" onClick={() => setShowHelpTips(false)}>
                       <MdClose />
                     </IconButton>
                   }
                 >
                   <AlertTitle>Form Completion Tips</AlertTitle>
-                  Complete all required fields in each tab. Use the
-                  Next/Previous buttons or tab navigation to move between
-                  sections. Your progress is automatically saved as you
-                  navigate.
+                  Only <strong>Full Name</strong> and <strong>Phone Number</strong> are required. All other fields are
+                  optional. Complete the required fields and click submit to save the supplier.
                 </Alert>
               </Collapse>
             )}
@@ -314,17 +333,10 @@ const SupplierForm = ({ id }) => {
                 <Grid item xs={12} md={3}>
                   <Zoom in={true} style={{ transitionDelay: "200ms" }}>
                     <GlassBox>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{ fontWeight: 600, mb: 3 }}
-                      >
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                         Form Progress
                       </Typography>
-                      <EnhancedStepper
-                        activeStep={currentTab}
-                        orientation="vertical"
-                      >
+                      <EnhancedStepper activeStep={currentTab} orientation="vertical">
                         {steps.map((step, index) => (
                           <Step key={step.label}>
                             <StepLabel
@@ -355,51 +367,34 @@ const SupplierForm = ({ id }) => {
                                   )}
                                 </AnimatedAvatar>
                               )}
-                              onClick={() =>
-                                handleTabChangeWithEffect(null, index)
-                              }
+                              onClick={() => handleTabChangeWithEffect(null, index)}
                               sx={{ cursor: "pointer" }}
                             >
                               <Typography
                                 variant="subtitle1"
                                 sx={{
                                   fontWeight: currentTab === index ? 700 : 500,
-                                  color:
-                                    currentTab === index
-                                      ? theme.palette.primary.main
-                                      : "inherit",
+                                  color: currentTab === index ? theme.palette.primary.main : "inherit",
                                 }}
                               >
                                 {step.label}
                               </Typography>
                             </StepLabel>
                             <StepContent>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {index === 0 &&
-                                  "Enter basic supplier information and contact details."}
-                                {index === 1 &&
-                                  "Provide complete address and location information."}
-                                {index === 2 &&
-                                  "Add business details, size, and description."}
-                                {index === 3 &&
-                                  "Enter financial and payment information."}
-                                {index === 4 &&
-                                  "Specify supply chain and delivery details."}
-                                {index === 5 &&
-                                  "Rate and evaluate the supplier."}
+                              <Typography variant="body2" color="text.secondary">
+                                {index === 0 && "Enter basic supplier information and contact details."}
+                                {index === 1 && "Provide complete address and location information."}
+                                {index === 2 && "Add business details, size, and description."}
+                                {index === 3 && "Enter financial and payment information."}
+                                {index === 4 && "Specify supply chain and delivery details."}
+                                {index === 5 && "Rate and evaluate the supplier."}
                               </Typography>
                             </StepContent>
                           </Step>
                         ))}
                       </EnhancedStepper>
-
                       <div className="mt-16">
-                        <p className="text-sm text-gray-500 mb-1">
-                          Form Completion
-                        </p>
+                        <p className="text-sm text-gray-500 mb-1">Form Completion</p>
                         <div className="flex items-center">
                           <div className="flex-grow mr-4">
                             <LinearProgress
@@ -428,9 +423,7 @@ const SupplierForm = ({ id }) => {
               <Grid item xs={12} md={showStepper ? 9 : 12}>
                 <GradientCard>
                   <CardContent sx={{ p: 0 }}>
-                    <Box
-                      sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}
-                    >
+                    <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
                       <Tabs
                         value={currentTab}
                         onChange={handleTabChangeWithEffect}
@@ -445,52 +438,22 @@ const SupplierForm = ({ id }) => {
                         }}
                         sx={{
                           "& .MuiTabs-flexContainer": {
-                            borderBottom: `1px solid ${alpha(
-                              theme.palette.divider,
-                              0.1
-                            )}`,
+                            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                           },
                         }}
                       >
-                        <AnimatedTab
-                          icon={<FaUserTie />}
-                          iconPosition="start"
-                          label="Basic Info"
-                        />
-                        <AnimatedTab
-                          icon={<MdLocationOn />}
-                          iconPosition="start"
-                          label="Address"
-                        />
-                        <AnimatedTab
-                          icon={<MdBusiness />}
-                          iconPosition="start"
-                          label="Business Details"
-                        />
-                        <AnimatedTab
-                          icon={<MdPayment />}
-                          iconPosition="start"
-                          label="Financial Info"
-                        />
-                        <AnimatedTab
-                          icon={<MdLocalShipping />}
-                          iconPosition="start"
-                          label="Supply Chain"
-                        />
-                        <AnimatedTab
-                          icon={<MdVerified />}
-                          iconPosition="start"
-                          label="Evaluation"
-                        />
+                        <AnimatedTab icon={<FaUserTie />} iconPosition="start" label="Basic Info" />
+                        <AnimatedTab icon={<MdLocationOn />} iconPosition="start" label="Address" />
+                        <AnimatedTab icon={<MdBusiness />} iconPosition="start" label="Business Details" />
+                        <AnimatedTab icon={<MdPayment />} iconPosition="start" label="Financial Info" />
+                        <AnimatedTab icon={<MdLocalShipping />} iconPosition="start" label="Supply Chain" />
+                        <AnimatedTab icon={<MdVerified />} iconPosition="start" label="Evaluation" />
                       </Tabs>
                     </Box>
 
-                    <Box sx={{ px: {xs:1 , md:3}, pb: 3 }}>
+                    <Box sx={{ px: { xs: 1, md: 3 }, pb: 3 }}>
                       <FormProvider {...methods}>
-                        <form
-                          onChange={() => setFormTouched(true)}
-                          onSubmit={methods.handleSubmit(handleEnhancedSubmit)}
-                        >
+                        <form onChange={() => setFormTouched(true)} onSubmit={methods.handleSubmit(handleFormSubmit)}>
                           {/* Tab 1: Basic Information */}
                           {currentTab === 0 && (
                             <Fade in={true} timeout={500}>
@@ -502,7 +465,6 @@ const SupplierForm = ({ id }) => {
                                       Basic Information
                                     </EnhancedSectionTitle>
                                   </Grid>
-
                                   <Grid
                                     item
                                     xs={12}
@@ -514,20 +476,13 @@ const SupplierForm = ({ id }) => {
                                   >
                                     <Box sx={{ textAlign: "center" }}>
                                       <TASFileupload
-                                        uploadBoxStyles={{                                          
-                                          border: `2px dashed ${alpha(
-                                            theme.palette.primary.main,
-                                            0.3
-                                          )}`,
+                                        uploadBoxStyles={{
+                                          border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
                                           borderRadius: 4,
                                           transition: "all 0.3s ease",
                                           "&:hover": {
-                                            borderColor:
-                                              theme.palette.primary.main,
-                                            backgroundColor: alpha(
-                                              theme.palette.primary.main,
-                                              0.05
-                                            ),
+                                            borderColor: theme.palette.primary.main,
+                                            backgroundColor: alpha(theme.palette.primary.main, 0.05),
                                           },
                                         }}
                                         name="supplier_photo"
@@ -552,63 +507,43 @@ const SupplierForm = ({ id }) => {
                                       </Typography>
                                     </Box>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <Grid container spacing={1}>
                                       <Grid item xs={12}>
                                         <TASInput
                                           name="full_name"
-                                          label="Full Name"
+                                          label={
+                                            <>
+                                              Full Name
+                                              <span
+                                                style={{
+                                                  color: "red",
+                                                  fontSize: "25px",
+                                                }}
+                                              >
+                                                {" "}
+                                                *
+                                              </span>
+                                            </>
+                                          }
                                           icon={FaUserTie}
                                           iconPosition="start"
-                                          InputProps={{
-                                            sx: {
-                                              borderRadius: 2,
-                                              "&:hover": {
-                                                boxShadow: `0 0 0 1px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                              "&.Mui-focused": {
-                                                boxShadow: `0 0 0 2px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                            },
-                                          }}
+                                          InputProps={inputProps}
+                                          error={!!errors.full_name}
+                                          helperText={errors.full_name?.message}
                                         />
                                       </Grid>
-
                                       <Grid item xs={12}>
                                         <TASInput
                                           name="shop_name"
                                           label="Shop/Company Name"
                                           icon={FaBuilding}
                                           iconPosition="start"
-                                          InputProps={{
-                                            sx: {
-                                              borderRadius: 2,
-                                              "&:hover": {
-                                                boxShadow: `0 0 0 1px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                              "&.Mui-focused": {
-                                                boxShadow: `0 0 0 2px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                            },
-                                          }}
+                                          InputProps={inputProps}
                                         />
                                       </Grid>
                                     </Grid>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <Grid container spacing={1}>
                                       <Grid item xs={4}>
@@ -616,46 +551,36 @@ const SupplierForm = ({ id }) => {
                                           name="country_code"
                                           options={countries}
                                           defaultValue={countryCode}
-                                          error={!!errors.country_code}
-                                          helperText={
-                                            errors.country_code?.message
-                                          }
                                         />
                                       </Grid>
                                       <Grid item xs={8}>
                                         <TASInput
                                           name="phone_number"
-                                          label="Phone Number"
+                                          label={
+                                            <>
+                                              Phone Number
+                                              <span
+                                                style={{
+                                                  color: "red",
+                                                  fontSize: "25px",
+                                                }}
+                                              >
+                                                {" "}
+                                                *
+                                              </span>
+                                            </>
+                                          }
                                           value={phoneNumber}
                                           icon={FaPhone}
                                           iconPosition="start"
                                           onChange={handlePhoneNumberChange}
+                                          InputProps={inputProps}
                                           error={!!errors.phone_number}
-                                          helperText={
-                                            errors.phone_number?.message
-                                          }
-                                          InputProps={{
-                                            sx: {
-                                              borderRadius: 2,
-                                              "&:hover": {
-                                                boxShadow: `0 0 0 1px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                              "&.Mui-focused": {
-                                                boxShadow: `0 0 0 2px ${alpha(
-                                                  theme.palette.primary.main,
-                                                  0.3
-                                                )}`,
-                                              },
-                                            },
-                                          }}
+                                          helperText={errors.phone_number?.message}
                                         />
                                       </Grid>
                                     </Grid>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="email"
@@ -663,139 +588,45 @@ const SupplierForm = ({ id }) => {
                                       type="email"
                                       icon={FaEnvelope}
                                       iconPosition="start"
+                                      InputProps={inputProps}
                                       error={!!errors.email}
                                       helperText={errors.email?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="website"
                                       label="Website"
                                       icon={FaGlobe}
                                       iconPosition="start"
-                                      error={!!errors.website}
-                                      helperText={errors.website?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <FormSelect
                                       name="vendor"
                                       label="Vendor Categories"
                                       options={VendorCategoriesOption}
                                       icon={MdCategory}
-                                      error={!!errors.vendor}
-                                      helperText={errors.vendor?.message}
-                                      SelectProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      SelectProps={selectProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="tax_id"
                                       label="Tax ID/VAT Number"
                                       icon={FaIdCard}
                                       iconPosition="start"
-                                      error={!!errors.tax_id}
-                                      helperText={errors.tax_id?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="registration_number"
                                       label="Business Registration Number"
                                       icon={FaFileContract}
                                       iconPosition="start"
-                                      error={!!errors.registration_number}
-                                      helperText={
-                                        errors.registration_number?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
                                 </Grid>
@@ -814,176 +645,58 @@ const SupplierForm = ({ id }) => {
                                       Address Information
                                     </EnhancedSectionTitle>
                                   </Grid>
-
                                   <Grid item xs={12}>
                                     <FormTextArea
                                       name="street_address"
                                       label="Street Address"
                                       placeholder="Street address..."
                                       minRows={4}
-                                      error={!!errors.street_address}
-                                      helperText={
-                                        errors.street_address?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="country"
                                       label="Country"
                                       icon={Language}
                                       iconPosition="start"
-                                      error={!!errors.country}
-                                      helperText={errors.country?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="state"
                                       label="State/Province"
                                       icon={Cabin}
                                       iconPosition="start"
-                                      error={!!errors.state}
-                                      helperText={errors.state?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="city"
                                       label="City"
                                       icon={LocationCity}
                                       iconPosition="start"
-                                      error={!!errors.city}
-                                      helperText={errors.city?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="postal_code"
                                       label="Postal/ZIP Code"
                                       icon={FolderZip}
                                       iconPosition="start"
-                                      error={!!errors.postal_code}
-                                      helperText={errors.postal_code?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12}>
                                     <TASInput
                                       name="delivery_instructions"
                                       label="Delivery Instructions"
                                       icon={DeliveryDining}
                                       iconPosition="start"
-                                      error={!!errors.delivery_instructions}
-                                      helperText={
-                                        errors.delivery_instructions?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
                                 </Grid>
@@ -1002,7 +715,6 @@ const SupplierForm = ({ id }) => {
                                       Business Details
                                     </EnhancedSectionTitle>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="year_established"
@@ -1010,26 +722,9 @@ const SupplierForm = ({ id }) => {
                                       type="number"
                                       icon={FaBuilding}
                                       iconPosition="start"
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="number_of_employees"
@@ -1037,30 +732,9 @@ const SupplierForm = ({ id }) => {
                                       type="number"
                                       icon={FaUsers}
                                       iconPosition="start"
-                                      error={!!errors.number_of_employees}
-                                      helperText={
-                                        errors.number_of_employees?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="annual_revenue"
@@ -1068,85 +742,25 @@ const SupplierForm = ({ id }) => {
                                       type="number"
                                       icon={FaMoneyBillWave}
                                       iconPosition="start"
-                                      error={!!errors.annual_revenue}
-                                      helperText={
-                                        errors.annual_revenue?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <FormSelect
                                       name="business_type"
                                       label="Business Type"
                                       options={VendorCategoriesOption}
                                       icon={MdCategory}
-                                      error={!!errors.business_type}
-                                      helperText={errors.business_type?.message}
-                                      SelectProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      SelectProps={selectProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12}>
                                     <FormTextArea
                                       name="business_description"
                                       label="Business Description"
                                       placeholder="Business Description..."
                                       minRows={4}
-                                      error={!!errors.business_description}
-                                      helperText={
-                                        errors.business_description?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
                                 </Grid>
@@ -1165,145 +779,50 @@ const SupplierForm = ({ id }) => {
                                       Financial Information
                                     </EnhancedSectionTitle>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="bank_name"
                                       label="Bank Name"
                                       icon={FaCreditCard}
                                       iconPosition="start"
-                                      error={!!errors.bank_name}
-                                      helperText={errors.bank_name?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="account_number"
                                       label="Account Number"
                                       icon={FaFileInvoiceDollar}
                                       iconPosition="start"
-                                      error={!!errors.account_number}
-                                      helperText={
-                                        errors.account_number?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="swift_code"
                                       label="SWIFT/BIC Code"
                                       icon={FaMoneyBillWave}
                                       iconPosition="start"
-                                      error={!!errors.swift_code}
-                                      helperText={errors.swift_code?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <FormSelect
                                       name="payment_terms"
                                       label="Payment Terms"
                                       options={PaymentTermsOption}
                                       icon={MdCategory}
-                                      error={!!errors.payment_terms}
-                                      helperText={errors.payment_terms?.message}
-                                      SelectProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      SelectProps={selectProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASSwitch
                                       name="credit_terms"
                                       label="Credit Terms Available"
                                       defaultChecked={false}
-                                      sx={{
-                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                          color: theme.palette.primary.main,
-                                          "&:hover": {
-                                            backgroundColor: alpha(
-                                              theme.palette.primary.main,
-                                              0.1
-                                            ),
-                                          },
-                                        },
-                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                          {
-                                            backgroundColor:
-                                              theme.palette.primary.main,
-                                          },
-                                      }}
+                                      sx={switchStyle}
                                     />
                                   </Grid>
-
                                   {creditTerms && (
                                     <Grid item xs={12} md={6}>
                                       <TASInput
@@ -1312,56 +831,19 @@ const SupplierForm = ({ id }) => {
                                         type="number"
                                         icon={MdAttachMoney}
                                         iconPosition="start"
-                                        error={!!errors.credit_limit}
-                                        helperText={
-                                          errors.credit_limit?.message
-                                        }
-                                        InputProps={{
-                                          sx: {
-                                            borderRadius: 2,
-                                            "&:hover": {
-                                              boxShadow: `0 0 0 1px ${alpha(
-                                                theme.palette.primary.main,
-                                                0.3
-                                              )}`,
-                                            },
-                                            "&.Mui-focused": {
-                                              boxShadow: `0 0 0 2px ${alpha(
-                                                theme.palette.primary.main,
-                                                0.3
-                                              )}`,
-                                            },
-                                          },
-                                        }}
+                                        InputProps={inputProps}
                                       />
                                     </Grid>
                                   )}
-
                                   <Grid item xs={12} md={6}>
                                     <TASSwitch
                                       color="primary"
                                       name="tax_exempt"
                                       label="Tax Exempt"
                                       defaultChecked={false}
-                                      sx={{
-                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                          color: theme.palette.primary.main,
-                                          "&:hover": {
-                                            backgroundColor: alpha(
-                                              theme.palette.primary.main,
-                                              0.1
-                                            ),
-                                          },
-                                        },
-                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                          {
-                                            backgroundColor:
-                                              theme.palette.primary.main,
-                                          },
-                                      }}
+                                      sx={switchStyle}
                                     />
                                   </Grid>
-
                                   {taxExempt && (
                                     <Grid item xs={12} md={6}>
                                       <TASInput
@@ -1369,27 +851,7 @@ const SupplierForm = ({ id }) => {
                                         label="Tax Exemption Number"
                                         icon={FaPercentage}
                                         iconPosition="start"
-                                        error={!!errors.tax_exemption_number}
-                                        helperText={
-                                          errors.tax_exemption_number?.message
-                                        }
-                                        InputProps={{
-                                          sx: {
-                                            borderRadius: 2,
-                                            "&:hover": {
-                                              boxShadow: `0 0 0 1px ${alpha(
-                                                theme.palette.primary.main,
-                                                0.3
-                                              )}`,
-                                            },
-                                            "&.Mui-focused": {
-                                              boxShadow: `0 0 0 2px ${alpha(
-                                                theme.palette.primary.main,
-                                                0.3
-                                              )}`,
-                                            },
-                                          },
-                                        }}
+                                        InputProps={inputProps}
                                       />
                                     </Grid>
                                   )}
@@ -1409,37 +871,15 @@ const SupplierForm = ({ id }) => {
                                       Supply Chain Information
                                     </EnhancedSectionTitle>
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <FormSelect
                                       name="delivery_terms"
                                       label="Delivery Terms"
                                       options={DeliveryTermsOption}
                                       icon={MdCategory}
-                                      error={!!errors.delivery_terms}
-                                      helperText={
-                                        errors.delivery_terms?.message
-                                      }
-                                      SelectProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      SelectProps={selectProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="minimum_order_value"
@@ -1447,30 +887,9 @@ const SupplierForm = ({ id }) => {
                                       type="number"
                                       icon={FaBoxOpen}
                                       iconPosition="start"
-                                      error={!!errors.minimum_order_value}
-                                      helperText={
-                                        errors.minimum_order_value?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="lead_time"
@@ -1478,85 +897,25 @@ const SupplierForm = ({ id }) => {
                                       type="number"
                                       icon={MdAccessTime}
                                       iconPosition="start"
-                                      error={!!errors.lead_time}
-                                      helperText={errors.lead_time?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="shipping_method"
                                       label="Shipping Method"
                                       icon={FaShippingFast}
                                       iconPosition="start"
-                                      error={!!errors.shipping_method}
-                                      helperText={
-                                        errors.shipping_method?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12}>
                                     <TASInput
                                       name="supply_chain_notes"
                                       label="Supply Chain Notes"
                                       icon={MdDescription}
                                       iconPosition="start"
-                                      error={!!errors.supply_chain_notes}
-                                      helperText={
-                                        errors.supply_chain_notes?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
                                 </Grid>
@@ -1575,63 +934,20 @@ const SupplierForm = ({ id }) => {
                                       Supplier Evaluation
                                     </EnhancedSectionTitle>
                                   </Grid>
-
-                                  <Grid item xs={12} md={6}>
-                                    <FormSelect
-                                      name="supplier_status"
-                                      label="Supplier Status"
-                                      options={SupplierStatusOption}
-                                      icon={MdCategory}
-                                      error={!!errors.supplier_status}
-                                      helperText={
-                                        errors.supplier_status?.message
-                                      }
-                                      SelectProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
-                                    />
-                                  </Grid>
-
-                                  <Grid item xs={12} md={6}>
+                                  {/* <Grid item xs={12} md={6}>
                                     <Box
                                       sx={{
                                         p: 2,
                                         borderRadius: 2,
-                                        border: `1px solid ${alpha(
-                                          theme.palette.divider,
-                                          0.1
-                                        )}`,
-                                        bgcolor: alpha(
-                                          theme.palette.background.paper,
-                                          0.5
-                                        ),
+                                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                        bgcolor: alpha(theme.palette.background.paper, 0.5),
                                         transition: "all 0.3s ease",
                                         "&:hover": {
-                                          boxShadow: `0 4px 20px ${alpha(
-                                            theme.palette.primary.main,
-                                            0.1
-                                          )}`,
+                                          boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
                                         },
                                       }}
                                     >
-                                      <Typography
-                                        variant="subtitle1"
-                                        gutterBottom
-                                      >
+                                      <Typography variant="subtitle1" gutterBottom>
                                         Supplier Rating
                                       </Typography>
                                       <FormRating
@@ -1648,8 +964,7 @@ const SupplierForm = ({ id }) => {
                                         }}
                                       />
                                     </Box>
-                                  </Grid>
-
+                                  </Grid> */}
                                   <Grid item xs={12} md={6}>
                                     <TASInput
                                       name="quality_certification"
@@ -1657,55 +972,16 @@ const SupplierForm = ({ id }) => {
                                       icon={WorkspacePremium}
                                       iconPosition="start"
                                       placeholder="e.g., ISO 9001, ISO 14001"
-                                      error={!!errors.quality_certification}
-                                      helperText={
-                                        errors.quality_certification?.message
-                                      }
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
-
                                   <Grid item xs={12}>
                                     <FormTextArea
                                       name="notes"
                                       label="Evaluation Notes"
                                       placeholder="Enter evaluation notes, performance history, etc."
                                       minRows={4}
-                                      error={!!errors.notes}
-                                      helperText={errors.notes?.message}
-                                      InputProps={{
-                                        sx: {
-                                          borderRadius: 2,
-                                          "&:hover": {
-                                            boxShadow: `0 0 0 1px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                          "&.Mui-focused": {
-                                            boxShadow: `0 0 0 2px ${alpha(
-                                              theme.palette.primary.main,
-                                              0.3
-                                            )}`,
-                                          },
-                                        },
-                                      }}
+                                      InputProps={inputProps}
                                     />
                                   </Grid>
                                 </Grid>
@@ -1713,7 +989,7 @@ const SupplierForm = ({ id }) => {
                             </Fade>
                           )}
 
-                          <EnhancedDivider/>
+                          <EnhancedDivider />
 
                           {/* Form Actions */}
                           <Box
@@ -1728,14 +1004,12 @@ const SupplierForm = ({ id }) => {
                             <GradientButton
                               variant="outlined"
                               color="secondary"
-                              startIcon={
-                                currentTab > 0 ? <ArrowBack /> : <Cancel />
-                              }
+                              startIcon={currentTab > 0 ? <ArrowBack /> : <Cancel />}
                               onClick={() => {
                                 if (currentTab > 0) {
-                                  setCurrentTab(currentTab - 1);
+                                  setCurrentTab(currentTab - 1)
                                 } else {
-                                  handleCancel();
+                                  handleCancel()
                                 }
                               }}
                               sx={{
@@ -1743,10 +1017,7 @@ const SupplierForm = ({ id }) => {
                                 border: `2px solid ${theme.palette.secondary.main}`,
                                 color: theme.palette.secondary.main,
                                 "&:hover": {
-                                  background: alpha(
-                                    theme.palette.secondary.main,
-                                    0.1
-                                  ),
+                                  background: alpha(theme.palette.secondary.main, 0.1),
                                   borderColor: theme.palette.secondary.dark,
                                 },
                               }}
@@ -1765,27 +1036,18 @@ const SupplierForm = ({ id }) => {
                             ) : (
                               <GradientButton
                                 type="submit"
-                                disabled={
-                                  loading || createLoading || updateLoading
-                                }
+                                disabled={loading || createLoading || updateLoading}
                                 startIcon={
                                   createLoading || updateLoading ? (
-                                    <CircularProgress
-                                      size={20}
-                                      color="inherit"
-                                    />
+                                    <CircularProgress size={20} color="inherit" />
                                   ) : (
-                                    <FaHandshake />
+                                    <Save />
                                   )
                                 }
                               >
                                 {createLoading || updateLoading
                                   ? "Processing..."
-                                  : `${
-                                      isEditing
-                                        ? "Update Supplier"
-                                        : "Add Supplier"
-                                    }`}
+                                  : `${isEditing ? "Update Supplier" : "Add Supplier"}`}
                               </GradientButton>
                             )}
                           </Box>
@@ -1799,57 +1061,6 @@ const SupplierForm = ({ id }) => {
           </div>
         </Fade>
       </div>
-
-      {/* Save Confirmation Dialog */}
-      <Dialog
-        open={saveDialogOpen}
-        onClose={() => setSaveDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.2)}`,
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-            color: theme.palette.common.white,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <FaHandshake /> {isEditing ? "Update Supplier" : "Add New Supplier"}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2, minWidth: 400 }}>
-          <Typography variant="body1" gutterBottom>
-            Are you sure you want to {isEditing ? "update" : "add"} this
-            supplier?
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Please review all information before confirming.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={() => setSaveDialogOpen(false)}
-            sx={{
-              borderColor: alpha(theme.palette.text.primary, 0.3),
-              "&:hover": {
-                borderColor: alpha(theme.palette.text.primary, 0.5),
-                backgroundColor: alpha(theme.palette.text.primary, 0.05),
-              },
-            }}
-          >
-            Cancel
-          </Button>
-          <GradientButton onClick={confirmSubmit} startIcon={<Save />}>
-            Confirm
-          </GradientButton>
-        </DialogActions>
-      </Dialog>
 
       {/* Cancel Confirmation Dialog */}
       <Dialog
@@ -1930,7 +1141,7 @@ const SupplierForm = ({ id }) => {
 
       <SupplierListTable />
     </section>
-  );
-};
+  )
+}
 
-export default SupplierForm;
+export default SupplierForm

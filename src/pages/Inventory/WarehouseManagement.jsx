@@ -59,6 +59,7 @@ import {
 import swal from "sweetalert";
 import ViewWarehouseDetails from "./Warehouse/WarehouseDetailsModal";
 import AddWarehouseModal from "./Warehouse/AddWarehouse";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const warehouseTypes = [
   { value: "primary", label: "Primary Warehouse" },
@@ -78,7 +79,7 @@ export default function WarehouseManagementBangladesh() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-    const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const { data: warehouseData, isLoading: isDataLoading } =
     useGetAllWarehousesQuery({tenantDomain});

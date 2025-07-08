@@ -53,6 +53,7 @@ import {
   useGetAllStockTransfersQuery,
 } from "../../redux/api/stocktransferApi";
 import Swal from "sweetalert2";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const employees = [
   "John Smith",
@@ -71,7 +72,7 @@ export default function StockTransferPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
   const queryParams = {
     tenantDomain,
     page: currentPage,

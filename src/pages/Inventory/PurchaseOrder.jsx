@@ -66,6 +66,7 @@ import {
   useGetAllPurchaseOrdersQuery,
 } from "../../redux/api/purchaseOrderApi";
 import UpdatePurchaseOrderModal from "./UpdatePurchaseOrderModal";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 
 export default function PurchaseOrdersPage() {
@@ -79,7 +80,7 @@ export default function PurchaseOrdersPage() {
   const [receiveDate, setReceiveDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-   const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [search, setSearch] = useState("");
   const [receiveStatus, setReceiveStatus] = useState("received");

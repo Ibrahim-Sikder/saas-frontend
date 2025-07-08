@@ -77,6 +77,7 @@ import { StockDetailsDialog } from "./StockManagement/StockDetailsDialog";
 import { StockMovementDialog } from "./StockManagement/StockMovementDialog";
 import { StockHistoryDialog } from "./StockManagement/StockHistoryDialog";
 import { useGetAllStocksQuery } from "../../redux/api/stocksApi";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 export default function StockManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,7 +97,7 @@ export default function StockManagement() {
   const [processedProducts, setProcessedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const theme = useTheme();
-const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const queryParams = { tenantDomain ,page: currentPage, limit: 100, searchTerm: searchTerm };
 

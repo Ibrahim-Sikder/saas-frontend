@@ -37,13 +37,14 @@ import { toast } from "react-toastify";
 import TASDateCalendar from "../../../components/form/datecalender";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveCalendarContainer } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function OvertimeForm({ overtimeId }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
   const [createEmployeeOvertime] = useCreateEmployeeOvertimeMutation();
   const [updateEmployeeOvertime] = useUpdateEmployeeOvertimeMutation();
   const {

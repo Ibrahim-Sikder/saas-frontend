@@ -45,6 +45,7 @@ import {
   useGetAllEmployeeOvertimesQuery,
 } from "../../../redux/api/overtimeApi";
 import dayjs from "dayjs";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const getStatusColor = (status) => {
   switch (status) {
     case "Approved":
@@ -59,7 +60,7 @@ const getStatusColor = (status) => {
 };
 
 export default function EmployeeOvertime() {
-  const tenantDomain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
   const [open, setOpen] = useState(false);
   const [leaveRequestId, setLeaveRequestId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);

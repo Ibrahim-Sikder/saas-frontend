@@ -23,11 +23,12 @@ import {
 } from "../../../redux/api/money-receipt";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateMoneyReceipt = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const tenantDomain = window.location.hostname.split(".")[0];
+ const tenantDomain = useTenantDomain();
 
   const userTypeFromProfile = new URLSearchParams(location.search).get(
     "user_type"

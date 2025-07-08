@@ -55,6 +55,7 @@ import {
   useDeletePurchaseReturnMutation,
   useGetAllPurchaseReturnsQuery,
 } from "../../redux/api/purchaseReturnApi";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 export default function PurchaseReturnList() {
   const theme = useTheme();
@@ -71,7 +72,7 @@ export default function PurchaseReturnList() {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
-  const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const [search, setSearch] = useState("");
   const [deletePurchaseReturn] = useDeletePurchaseReturnMutation();

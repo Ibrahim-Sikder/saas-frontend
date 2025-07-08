@@ -76,6 +76,7 @@ import {
   useGetAllIProductQuery,
 } from "../../redux/api/productApi";
 import { AnimatedChip, GlassCard, GradientBreadcrumbs, GradientButton, StyledDialogTitle, StyledTableHead, StyledTableRow } from "../../utils/customStyle";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 // Styled components for enhanced UI
 
@@ -108,7 +109,7 @@ export default function ExpiredProductsPage() {
   const [disposalSuccess, setDisposalSuccess] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
-const tenantDomain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   // Query parameters for API
   const queryParams = {

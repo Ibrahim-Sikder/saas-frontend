@@ -2,9 +2,10 @@ import { Email, WhatsApp } from '@mui/icons-material';
 import { FaGlobe } from 'react-icons/fa';
 import { useGetCompanyProfileQuery } from '../../redux/api/companyProfile';
 import Loading from '../Loading/Loading';
+import { useTenantDomain } from '../../hooks/useTenantDomain';
 
 const TrustAutoAddress = () => {
-    const tenantDomain = window.location.hostname.split(".")[0];
+   const tenantDomain = useTenantDomain();
     const { data: CompanyInfoData, isLoading } = useGetCompanyProfileQuery({
     tenantDomain,
   });
