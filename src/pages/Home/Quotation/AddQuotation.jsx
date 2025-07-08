@@ -101,6 +101,7 @@ const AddQuotation = () => {
   };
 
   const { data: stockData } = useGetAllStocksQuery(queryParams);
+  console.log("stock data", stockData);
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
@@ -427,11 +428,60 @@ const AddQuotation = () => {
     }
   };
 
+  const findMatchingUnit = (productUnit) => {
+    if (!productUnit) return "Pcs"; // Default fallback
+
+    // Check if productUnit has unit property (object case)
+    const unitValue =
+      typeof productUnit === "object" ? productUnit.unit : productUnit;
+    const shortName =
+      typeof productUnit === "object" ? productUnit.short_name : null;
+
+    console.log("Product unit data:", { unitValue, shortName, productUnit });
+
+    // Try to find exact match first
+    const exactMatch = unitOptions.find(
+      (option) =>
+        option.value === unitValue ||
+        option.label === unitValue ||
+        (shortName &&
+          (option.value === shortName || option.label === shortName))
+    );
+
+    if (exactMatch) {
+      console.log("Found exact match:", exactMatch.value);
+      return exactMatch.value;
+    }
+
+    // Try case-insensitive match
+    const caseInsensitiveMatch = unitOptions.find(
+      (option) =>
+        option.value.toLowerCase() === unitValue?.toLowerCase() ||
+        option.label.toLowerCase() === unitValue?.toLowerCase() ||
+        (shortName &&
+          (option.value.toLowerCase() === shortName.toLowerCase() ||
+            option.label.toLowerCase() === shortName.toLowerCase()))
+    );
+
+    if (caseInsensitiveMatch) {
+      console.log("Found case-insensitive match:", caseInsensitiveMatch.value);
+      return caseInsensitiveMatch.value;
+    }
+
+    // If no match found, return default
+    console.log("No match found, using default: Pcs");
+    return "Pcs";
+  };
+
   const handleSelectSuggestion = (product) => {
+    console.log("selected product", product);
+
     if (activeInputType === "service") {
       const newItems = [...serviceItems];
+      const matchingUnit = findMatchingUnit(product.product.unit);
+
       newItems[activeInputIndex].description = product.product.product_name;
-      newItems[activeInputIndex].unit = product.product.unit?.unit || "Pcs";
+      newItems[activeInputIndex].unit = matchingUnit;
       newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
       newItems[activeInputIndex].quantity =
         product.product.product_quantity || 0;
@@ -449,11 +499,14 @@ const AddQuotation = () => {
         newItems[activeInputIndex].total.toFixed(2)
       );
 
+      console.log("Service item updated:", newItems[activeInputIndex]);
       setServiceItems(newItems);
     } else if (activeInputType === "parts") {
       const newItems = [...items];
+      const matchingUnit = findMatchingUnit(product.product.unit);
+
       newItems[activeInputIndex].description = product.product.product_name;
-      newItems[activeInputIndex].unit = product.product.unit?.unit || "Pcs";
+      newItems[activeInputIndex].unit = matchingUnit;
       newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
       newItems[activeInputIndex].quantity =
         product.product.product_quantity || 0;
@@ -471,6 +524,7 @@ const AddQuotation = () => {
         newItems[activeInputIndex].total.toFixed(2)
       );
 
+      console.log("Parts item updated:", newItems[activeInputIndex]);
       setItems(newItems);
     }
 
@@ -1108,7 +1162,21 @@ const AddQuotation = () => {
                                         suggestionStyles.suggestionItemPrice
                                       }
                                     >
-                                      ${product.product.sellingPrice}
+                                      {product.product.product_quantity}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      {product.product.unit?.short_name}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      {product.product?.sellingPrice}
                                     </span>
                                   </div>
                                 </div>
@@ -1271,7 +1339,17 @@ const AddQuotation = () => {
                                   <span
                                     style={suggestionStyles.suggestionItemPrice}
                                   >
-                                    ${product.product.sellingPrice}
+                                    {product.product.product_quantity}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    {product.product.unit?.short_name}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    {product.product?.sellingPrice}
                                   </span>
                                 </div>
                               </div>

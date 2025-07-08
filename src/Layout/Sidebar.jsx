@@ -516,12 +516,12 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
 
           <AccordionDetails>
             <div className="accordionTypoGrapy">
-              <div className="flex items-center mb-2">
+              {/* <div className="flex items-center mb-2">
                 <Dashboard className="mr-2" />
                 <NavLink to="/dashboard/inventory-dashboard">
                   Inventory Dashboard
                 </NavLink>
-              </div>
+              </div> */}
               {[
                 {
                   icon: <Inventory2 />,
