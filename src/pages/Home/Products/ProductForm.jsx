@@ -83,6 +83,7 @@ import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
+
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);

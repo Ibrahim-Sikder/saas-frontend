@@ -60,10 +60,10 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 // Validation schema
 const expenseValidationSchema = z.object({
   date: z.string({ required_error: "Date is required" }),
-  warehouse: z.string({ required_error: "Warehouse is required" }),
+  warehouse: z.string().optional(),
   category: z.array(z.string()).optional(),
-  voucher_no: z.string({ required_error: "Voucher number is required" }),
-  tax: z.string({ required_error: "Tax is required" }),
+  voucher_no: z.string().optional(),
+  tax: z.string().optional(),
   expense_note: z.string().optional(),
   amount: z.union([z.number(), z.string()]),
   payment_individual_markup: z.string().optional(),
@@ -390,7 +390,15 @@ const ExpenseForm = ({ id }) => {
                         size="medium"
                         fullWidth
                         name="date"
-                        label="Date"
+                        label={
+                          <>
+                            Select Date
+                            <span style={{ color: "red", fontSize: "25px" }}>
+                              {" "}
+                              *
+                            </span>
+                          </>
+                        }
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -441,7 +449,15 @@ const ExpenseForm = ({ id }) => {
                         size="medium"
                         fullWidth
                         name="category"
-                        label="Category"
+                        label={
+                          <>
+                            Select Category
+                            <span style={{ color: "red", fontSize: "25px" }}>
+                              {" "}
+                              *
+                            </span>
+                          </>
+                        }
                       />
                     </Grid>
                   </Grid>
@@ -517,7 +533,15 @@ const ExpenseForm = ({ id }) => {
                         size="medium"
                         fullWidth
                         name="amount"
-                        label="Amount"
+                        label={
+                        <>
+                          Enter Amount
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                         startAdornment={
                           <AttachMoney fontSize="small" color="action" />
                         }
@@ -552,7 +576,15 @@ const ExpenseForm = ({ id }) => {
                         fullWidth
                         name="payment_method"
                         onChange={handlePaymentChange}
-                        label="Payment Method"
+                        label={
+                        <>
+                          Payment Method
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                         startAdornment={
                           <Payment fontSize="small" color="action" />
                         }

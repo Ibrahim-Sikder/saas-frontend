@@ -69,14 +69,14 @@ import FormTextArea from "../../components/form/FormTextArea";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 const IncomeForm = ({ id }) => {
- const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
 
   const { data: singleIncome, isLoading: incomeLoading } =
-    useGetSingleIncomeQuery({tenantDomain, id});
+    useGetSingleIncomeQuery({ tenantDomain, id });
 
   const { invoiceOption, jobcardOption, customerOption, vehicleOptions } =
     useFormOptions();
@@ -95,7 +95,6 @@ const IncomeForm = ({ id }) => {
     taxRate,
   } = useIncomeForm(id);
 
-  
   const { handleSubmit } = methods;
 
   // Update form when singleIncome data is loaded
@@ -125,7 +124,6 @@ const IncomeForm = ({ id }) => {
     );
   }
 
-  
   return (
     <section className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -218,8 +216,16 @@ const IncomeForm = ({ id }) => {
                     </Box>
 
                     <FormAutocomplete
+                      label={
+                        <>
+                          Select Invoice
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       name="invoice_number"
-                      label="Select Invoice"
                       options={invoiceOption}
                     />
                   </Grid>
@@ -231,8 +237,16 @@ const IncomeForm = ({ id }) => {
                       </Typography>
                     </Box>
                     <FormAutocomplete
+                      label={
+                        <>
+                          Income Categories
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       name="category"
-                      label="Select Categories"
                       options={IncomeCategoriesOption}
                     />
                   </Grid>
@@ -247,7 +261,15 @@ const IncomeForm = ({ id }) => {
 
                     <TASInput
                       name="income_name"
-                      label="Enter Income Name"
+                      label={
+                        <>
+                          Income Name
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       placeholder="e.g., Service Fee, Parts Sale"
                       fullWidth
                     />
@@ -261,7 +283,15 @@ const IncomeForm = ({ id }) => {
                       </Typography>
                     </Box>
                     <TASDatepicker
-                      label="Select Date"
+                      label={
+                        <>
+                          Select Date
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       name="date"
                       fullWidth={true}
                     />
@@ -295,7 +325,7 @@ const IncomeForm = ({ id }) => {
                       name="description"
                       label="Description"
                       placeholder="Add additional details about this income transaction..."
-                      required={true}
+                
                       minRows={4}
                     />
                   </Grid>
@@ -321,9 +351,17 @@ const IncomeForm = ({ id }) => {
                     </Box>
 
                     <FormAutocomplete
+                      label={
+                        <>
+                          Select Customer
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       name="customer"
                       labelId="customer-label"
-                      label="Select Customer"
                       options={customerOption}
                     />
                   </Grid>
@@ -339,7 +377,15 @@ const IncomeForm = ({ id }) => {
                     <FormAutocomplete
                       name="job_card"
                       labelId="jobcard-label"
-                      label="Select Job Card"
+                      label={
+                        <>
+                          Select Job Card
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       options={jobcardOption}
                     />
                   </Grid>
@@ -360,9 +406,17 @@ const IncomeForm = ({ id }) => {
                     </Box>
 
                     <FormAutocomplete
+                      label={
+                        <>
+                          Select Vehicle
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       name="vehicle"
                       labelId="vehicle-label"
-                      label="Select Vehicle"
                       options={vehicleOptions}
                     />
                   </Grid>
@@ -404,7 +458,15 @@ const IncomeForm = ({ id }) => {
 
                     <TASInput
                       name="amount"
-                      label="Enter Amount"
+                     label={
+                        <>
+                       Enter Amount
+                          <span style={{ color: "red", fontSize: "25px" }}>
+                            {" "}
+                            *
+                          </span>
+                        </>
+                      }
                       placeholder="e.g., 1500.00"
                       fullWidth
                       type="number"
@@ -624,7 +686,7 @@ const IncomeForm = ({ id }) => {
                     <FormTextArea
                       name="document_notes"
                       placeholder="Add notes about the attached documents..."
-                      required={true}
+                 
                       minRows={4}
                     />
                   </Grid>

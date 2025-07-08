@@ -22,18 +22,26 @@ const AllCustomerList = () => {
   const [allCustomerData, setAllCustomerData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const searchParam = new URLSearchParams(location.search).get("search");
   const ITEMS_PER_PAGE = 10;
   const tenantDomain = useTenantDomain();
 
-  const searchParam = new URLSearchParams(location.search).get("search");
-  const [
-    moveRecycledCustomer,
-    { isLoading: customerDeleteLoading, error: deleteError },
-  ] = useMoveRecycledCustomerMutation();
+  useEffect(() => {
+    if (!tenantDomain) {
+      console.warn("Tenant domain not ready yet");
+      return;
+    }
 
-  const fetchCustomerData = async () => {
+    console.log("Fetching with tenant domain:", tenantDomain);
+    fetchCustomerData(tenantDomain);
+  }, [tenantDomain, currentPage, filterType]);
+
+  console.log("tenant custo", tenantDomain);
+
+  const fetchCustomerData = async (domain) => {
     setIsLoading(true);
     setError(null);
+
     try {
       const response = await axios.get(
         `${
@@ -41,6 +49,7 @@ const AllCustomerList = () => {
         }/meta/allcustomer?tenantDomain=${tenantDomain}`,
         {
           params: {
+           
             limit: ITEMS_PER_PAGE,
             page: currentPage,
             searchTerm: filterType,
@@ -56,6 +65,11 @@ const AllCustomerList = () => {
       setIsLoading(false);
     }
   };
+
+  const [
+    moveRecycledCustomer,
+    { isLoading: customerDeleteLoading, error: deleteError },
+  ] = useMoveRecycledCustomerMutation();
 
   const totalCount = allCustomerData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
