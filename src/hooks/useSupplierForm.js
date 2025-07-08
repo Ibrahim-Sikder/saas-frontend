@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 "use client";
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -16,7 +15,6 @@ import {
 import { countries } from "../constant";
 import { useTheme } from "@mui/material";
 import { useTenantDomain } from "./useTenantDomain";
-
 const supplierValidationSchema = z.object({
   full_name: z.string().min(1, "Full name is required"),
   phone_number: z.string().min(1, "Phone number is required"),
@@ -56,6 +54,7 @@ const supplierValidationSchema = z.object({
   notes: z.string().optional(),
   supplier_photo: z.string().optional(),
 });
+
 export const useSupplierForm = (id) => {
   const [loading, setLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
@@ -64,22 +63,29 @@ export const useSupplierForm = (id) => {
   const theme = useTheme();
   const navigate = useNavigate();
 const tenantDomain = useTenantDomain();
-
   const { data: singleSupplier, isLoading } = useGetSingleSupplierQuery({
     tenantDomain,
     id,
   });
-  const [updateSupplier, { isLoading: updateLoading }] =
+  const [updateSupplier, { isLoading: updateLoading, error: updateError }] =
     useUpdateSupplierMutation();
+
+  const [createSupplier, { isLoading: createLoading }] =
+    useCreateSupplierMutation();
+
   const defaultSupplierValues = {
-    // Basic Information
+    // Basic Information - Required
     full_name: "",
+    phone_number: "",
+
+    // Basic Information - Optional
     shop_name: "",
     email: "",
     website: "",
     tax_id: "",
     registration_number: "",
     vendor: "",
+
     // Address Information
     street_address: "",
     country: "",
@@ -89,59 +95,52 @@ const tenantDomain = useTenantDomain();
     delivery_instructions: "",
 
     // Business Details
-    year_established: new Date().getFullYear() - 5,
-    number_of_employees: 10,
-    annual_revenue: 100000,
-    business_type: "new_parts",
+    year_established: null,
+    number_of_employees: null,
+    annual_revenue: null,
+    business_type: "",
     business_description: "",
 
     // Financial Information
     bank_name: "",
     account_number: "",
     swift_code: "",
-    payment_terms: "net_30",
+    payment_terms: "",
     credit_terms: false,
-    credit_limit: 10000,
+    credit_limit: null,
     tax_exempt: false,
     tax_exemption_number: "",
 
     // Supply Chain Information
-    delivery_terms: "ex_works",
-    minimum_order_value: 100,
-    lead_time: 7,
+    delivery_terms: "",
+    minimum_order_value: null,
+    lead_time: null,
     shipping_method: "",
     supply_chain_notes: "",
-    supplier_rating: "",
+
     // Evaluation
-    supplier_status: "",
+    // supplier_rating: null,
+    supplier_status: "active",
     quality_certification: "",
     notes: "",
     supplier_photo: "",
   };
 
-  // Modify the schema to match the form structure
-  const formSchema = supplierValidationSchema.shape.body;
-
   const methods = useForm({
     defaultValues: defaultSupplierValues,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(supplierValidationSchema),
     mode: "onChange",
   });
 
-  const { watch, formState } = methods;
+  const { watch, formState, reset, getValues } = methods;
   const { errors } = formState;
-
   const creditTerms = watch("credit_terms", false);
   const taxExempt = watch("tax_exempt", false);
 
-  const [createSupplier, { isLoading: createLoading }] =
-    useCreateSupplierMutation();
-
   const handleTabChange = (event, newValue) => {
-    const formData = methods.getValues();
-    sessionStorage.setItem("supplierFormData", JSON.stringify(formData));
-
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
     setCurrentTab(newValue);
   };
 
@@ -157,6 +156,51 @@ const tenantDomain = useTenantDomain();
       setPhoneNumber(newPhoneNumber);
       methods.setValue("phone_number", newPhoneNumber);
     }
+  };
+
+  const prepareFormData = (data) => {
+    // Clean up the data and convert types properly
+    const cleanedData = {
+      ...data,
+      country_code: countryCode.code,
+      phone_number: phoneNumber || data.phone_number,
+
+      // Convert numbers properly, handle empty strings
+      year_established: data.year_established
+        ? Number(data.year_established)
+        : null,
+      number_of_employees: data.number_of_employees
+        ? Number(data.number_of_employees)
+        : null,
+      annual_revenue: data.annual_revenue ? Number(data.annual_revenue) : null,
+      credit_limit: data.credit_limit ? Number(data.credit_limit) : null,
+      minimum_order_value: data.minimum_order_value
+        ? Number(data.minimum_order_value)
+        : null,
+      lead_time: data.lead_time ? Number(data.lead_time) : null,
+      // supplier_rating: data.supplier_rating
+      //   ? Number(data.supplier_rating)
+      //   : null,
+
+      // Ensure booleans
+      tax_exempt: Boolean(taxExempt),
+      credit_terms: Boolean(creditTerms),
+    };
+
+    // Remove null/undefined values for optional fields
+    Object.keys(cleanedData).forEach((key) => {
+      if (
+        cleanedData[key] === null ||
+        cleanedData[key] === undefined ||
+        cleanedData[key] === ""
+      ) {
+        if (key !== "full_name" && key !== "phone_number") {
+          delete cleanedData[key];
+        }
+      }
+    });
+
+    return cleanedData;
   };
 
   const formSubmit = async (data) => {
@@ -220,7 +264,7 @@ const tenantDomain = useTenantDomain();
     }
   };
 
-  // Update form when singleIncome data is loaded
+  // Update form when singleSupplier data is loaded
   useEffect(() => {
     if (id && singleSupplier?.data) {
       populateForm(singleSupplier);
@@ -229,9 +273,10 @@ const tenantDomain = useTenantDomain();
 
   const populateForm = (supplierData) => {
     if (!supplierData) return;
-
     const data = supplierData?.data;
     if (!data) return;
+
+    console.log("Populating form with data:", data);
 
     // Find the country code in the countries array
     const countryCodeObj =
@@ -262,31 +307,31 @@ const tenantDomain = useTenantDomain();
       delivery_instructions: data.delivery_instructions || "",
 
       // Business Details
-      year_established: data.year_established || new Date().getFullYear() - 5,
-      number_of_employees: data.number_of_employees || 10,
-      annual_revenue: data.annual_revenue || 100000,
-      business_type: data.business_type || "new_parts",
+      year_established: data.year_established || null,
+      number_of_employees: data.number_of_employees || null,
+      annual_revenue: data.annual_revenue || null,
+      business_type: data.business_type || "",
       business_description: data.business_description || "",
 
       // Financial Information
       bank_name: data.bank_name || "",
       account_number: data.account_number || "",
       swift_code: data.swift_code || "",
-      payment_terms: data.payment_terms || "net_30",
+      payment_terms: data.payment_terms || "",
       credit_terms: data.credit_terms || false,
-      credit_limit: data.credit_limit || 10000,
+      credit_limit: data.credit_limit || null,
       tax_exempt: data.tax_exempt || false,
       tax_exemption_number: data.tax_exemption_number || "",
 
       // Supply Chain Information
-      delivery_terms: data.delivery_terms || "ex_works",
-      minimum_order_value: data.minimum_order_value || 100,
-      lead_time: data.lead_time || 7,
+      delivery_terms: data.delivery_terms || "",
+      minimum_order_value: data.minimum_order_value || null,
+      lead_time: data.lead_time || null,
       shipping_method: data.shipping_method || "",
       supply_chain_notes: data.supply_chain_notes || "",
 
       // Evaluation
-      supplier_rating: data.supplier_rating || 3,
+      // supplier_rating: data.supplier_rating || null,
       supplier_status: data.supplier_status || "active",
       quality_certification: data.quality_certification || "",
       notes: data.notes || "",

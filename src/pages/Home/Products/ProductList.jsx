@@ -69,6 +69,7 @@ import {
   useGetAllIProductQuery,
 } from "../../../redux/api/productApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import Loading from "../../../components/Loading/Loading";
 
 // Status component with appropriate colors
 const StatusChip = ({ status }) => {
@@ -120,6 +121,7 @@ const StatusChip = ({ status }) => {
 
 // Product card component for grid view
 const ProductCard = ({ product, onEdit, onDelete, onFavorite, isFavorite }) => {
+  console.log("product console this ", product);
   const [elevation, setElevation] = useState(1);
 
   return (
@@ -293,7 +295,7 @@ const ProductCard = ({ product, onEdit, onDelete, onFavorite, isFavorite }) => {
           }}
         >
           <Typography variant="h6" color="#6a1b9a" fontWeight={600}>
-            {product.product_price}
+            ৳ {product?.purchasePrice}
           </Typography>
           <StatusChip status={product.status || "active"} />
         </Box>
@@ -596,17 +598,7 @@ export default function ProductList() {
     "Transmission",
   ];
 
-  // Mock statuses for filter
   const statuses = ["active", "low_stock", "out_of_stock", "discontinued"];
-
-  // Handle menu open/close
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   // Handle filter menu
   const handleFilterMenuOpen = (event) => {
@@ -661,7 +653,6 @@ export default function ProductList() {
   // Handle search
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-
   };
 
   // Handle pagination
@@ -750,67 +741,6 @@ export default function ProductList() {
     }
     return true;
   });
-
-  const renderSkeletons = () => {
-    return Array(6)
-      .fill(0)
-      .map((_, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
-          <Card sx={{ borderRadius: 2, height: "100%" }}>
-            <Skeleton variant="rectangular" height={140} />
-            <CardContent>
-              <Skeleton variant="text" width="80%" height={30} />
-              <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-              >
-                <Skeleton variant="text" width="40%" height={20} />
-                <Skeleton variant="text" width="30%" height={20} />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Skeleton variant="text" width="30%" height={30} />
-                <Skeleton
-                  variant="rectangular"
-                  width={60}
-                  height={24}
-                  sx={{ borderRadius: 1 }}
-                />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mt: 2,
-                }}
-              >
-                <Skeleton variant="text" width="40%" height={20} />
-                <Box>
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block", mr: 1 }}
-                  />
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block" }}
-                  />
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ));
-  };
 
   return (
     <Box
@@ -956,41 +886,6 @@ export default function ProductList() {
                     Add Product
                   </Button>
                 </div>
-                {/*
-                 <Tooltip title="More Actions">
-                  <IconButton
-                    onClick={handleMenuOpen}
-                    sx={{
-                      bgcolor: "white",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      "&:hover": {
-                        bgcolor: "white",
-                      },
-                    }}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    },
-                  }}
-                >
-                  <Divider />
-                  <MenuItem onClick={() => setSelectedProducts([])}>
-                    <ListItemIcon>
-                      <ClearIcon fontSize="small" sx={{ color: "#d32f2f" }} />
-                    </ListItemIcon>
-                    Clear Selection
-                  </MenuItem>
-                </Menu>
-                */}
               </Stack>
             </Grid>
           </Grid>
@@ -1332,9 +1227,9 @@ export default function ProductList() {
         {/* Product List */}
         <Box sx={{ mb: 4 }}>
           {isLoading ? (
-            <Grid container spacing={3}>
-              {renderSkeletons()}
-            </Grid>
+            <>
+              <Loading />
+            </>
           ) : filteredProducts.length === 0 ? (
             <Paper
               elevation={0}

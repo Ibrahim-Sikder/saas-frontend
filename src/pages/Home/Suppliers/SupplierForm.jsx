@@ -548,6 +548,20 @@ const SupplierForm = ({ id }) => {
                                     <Grid container spacing={1}>
                                       <Grid item xs={4}>
                                         <CountryCodeAutocomplete
+                                        label={
+                                            <>
+                                           Contry Code
+                                              <span
+                                                style={{
+                                                  color: "red",
+                                                  fontSize: "25px",
+                                                }}
+                                              >
+                                                {" "}
+                                                *
+                                              </span>
+                                            </>
+                                          }
                                           name="country_code"
                                           options={countries}
                                           defaultValue={countryCode}
