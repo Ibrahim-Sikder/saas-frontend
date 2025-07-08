@@ -1217,3 +1217,37 @@ export const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 
+  export const btnStyle = {
+    background: "rgba(255, 255, 255, 0.9)",
+    color: "#0B1F3A",
+    fontWeight: 600,
+    fontSize: {
+      xs: "13px",
+      sm: "15px",
+    },
+    width: "70%",
+    padding: "0px",
+    margin:'0 auto',
+    borderRadius: "12px",
+    border: "1px solid rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    textTransform: "none",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#42A1DA",
+      borderColor: "#42A1DA",
+      transform: "scale(1.02)",
+    },
+  };
+  export const btnStyle2 = {
+    background: "#fff",
+    width: "125px",
+    padding: "0px",
+    height: "35px",
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#42A1DA",
+      border: "1px solid #42A1DA",
+    },
+  };

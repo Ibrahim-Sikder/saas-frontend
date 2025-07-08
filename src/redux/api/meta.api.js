@@ -2,7 +2,6 @@ import { baseApi } from "./baseApi";
 
 const metaApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
- 
 
     getAllMeta: builder.query({
       query: ({tenantDomain}) => ({
