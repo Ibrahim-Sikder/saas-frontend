@@ -40,6 +40,8 @@ const UpdateInvoice = () => {
   const [grandTotal, setGrandTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const tenantDomain = useTenantDomain();
+  const [currentMileage, setCurrentMileage] = useState("")
+  const [mileageChanged, setMileageChanged] = useState(false)
 
   const [discount, setDiscount] = useState("");
   const [vat, setVAT] = useState("");
@@ -629,6 +631,16 @@ const UpdateInvoice = () => {
       toast.success(res.message);
     }
   };
+    // Fixed function to handle mileage history deletion
+  const handleMileageHistoryDelete = (indexToDelete) => {
+    setSpecificInvoice((prevState) => ({
+      ...prevState,
+      vehicle: {
+        ...prevState.vehicle,
+        mileageHistory: prevState.vehicle?.mileageHistory?.filter((_, index) => index !== indexToDelete) || [],
+      },
+    }))
+  }
 
   const input_data = [
     ...(specificInvoice?.input_data || []),
@@ -688,23 +700,29 @@ const UpdateInvoice = () => {
         company_address: data.company_address,
       };
 
-      // Get the current mileage value
+      // Fixed mileage history logic
+      data.mileage = Number(data.mileage);
       const newMileageValue = Number(data.mileage);
 
-      // Check if we need to add a new mileage entry
-      const updatedMileageHistory = [...(specificInvoice.mileageHistory || [])];
+      // Get existing mileage history or initialize empty array
+      const existingMileageHistory =
+        specificInvoice?.vehicle?.mileageHistory || [];
+      const updatedMileageHistory = [...existingMileageHistory];
 
-      // Only add a new entry if it's a valid number and not already in the history
+      // Only add new mileage to history if it's valid and different from the last entry
       if (!isNaN(newMileageValue) && newMileageValue > 0) {
-        const mileageExists = updatedMileageHistory.some(
-          (entry) => entry.mileage === newMileageValue
-        );
+        const lastMileage =
+          updatedMileageHistory.length > 0
+            ? updatedMileageHistory[updatedMileageHistory.length - 1].mileage
+            : null;
 
-        if (!mileageExists) {
-          updatedMileageHistory.push({
+        // Only add if it's different from the last mileage entry
+        if (lastMileage !== newMileageValue) {
+          const newMileageEntry = {
             mileage: newMileageValue,
             date: new Date().toISOString(),
-          });
+          };
+          updatedMileageHistory.push(newMileageEntry);
         }
       }
       const vehicle = {
@@ -714,13 +732,8 @@ const UpdateInvoice = () => {
         engine_no: data.engine_no,
         vehicle_brand: data.vehicle_brand,
         vehicle_name: data.vehicle_name,
-        mileage:
-          specificInvoice?.vehicle?.mileageHistory?.length > 0
-            ? specificInvoice?.vehicle?.mileageHistory[
-                specificInvoice?.vehicle?.mileageHistory.length - 1
-              ].mileage
-            : Number(data.mileage),
-        mileageHistory: specificInvoice?.vehicle?.mileageHistory || [],
+        mileage: newMileageValue,
+        mileageHistory: updatedMileageHistory,
       };
 
       const invoice = {
@@ -1156,177 +1169,63 @@ const UpdateInvoice = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <Autocomplete
-                    multiple
-                    id="tags-filled"
-                    options={
-                      specificInvoice?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    value={
-                      specificInvoice?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    freeSolo
-                    disableClearable
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.stopPropagation();
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    focused={specificInvoice?.mileage || ""}
+                    defaultValue={specificInvoice?.mileage || ""}
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        specificInvoice?.vehicle?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
                       }
                     }}
-                    onChange={(event, newValue) => {
-                      const currentHistory = [
-                        ...(specificInvoice?.vehicle?.mileageHistory || []),
-                      ];
-
-                      // Handle deletion
-                      if (newValue.length === 0) {
-                        const updatedHistory = currentHistory.slice(0, -1);
-                        setSpecificInvoice((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                        return;
-                      }
-
-                      // Handle addition
-                      const newEntry = newValue[newValue.length - 1];
-                      const mileageMatch = newEntry.match(/^(\d+)/);
-                      const newMileage = mileageMatch
-                        ? Number.parseInt(mileageMatch[1])
-                        : 0;
-                      const lastEntry =
-                        currentHistory[currentHistory.length - 1];
-
-                      if (!lastEntry || lastEntry.mileage !== newMileage) {
-                        const updatedHistory = [
-                          ...currentHistory,
-                          {
-                            mileage: newMileage,
-                            date: new Date().toISOString(),
-                          },
-                        ];
-
-                        setSpecificInvoice((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                      }
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          key={index}
-                          {...getTagProps({ index })}
-                          onDelete={(e) => {
-                            const currentHistory = [
-                              ...(specificInvoice?.vehicle?.mileageHistory ||
-                                []),
-                            ];
-                            const updatedHistory = currentHistory.slice(0, -1);
-
-                            setSpecificInvoice((prev) => ({
-                              ...prev,
-                              vehicle: {
-                                ...prev.vehicle,
-                                mileageHistory: updatedHistory,
-                              },
-                            }));
-                          }}
-                          className="bg-gray-100 border-gray-300 text-gray-800"
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Mileage History"
-                        placeholder="Add new mileage"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {params.InputProps.endAdornment}
-                              <button
-                                type="button"
-                                className="sm:hidden absolute right-8 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  const input = document
-                                    .getElementById("tags-filled")
-                                    ?.querySelector("input");
-                                  const inputValue = input?.value || "";
-
-                                  if (inputValue) {
-                                    const currentHistory = [
-                                      ...(specificInvoice?.vehicle
-                                        ?.mileageHistory || []),
-                                    ];
-                                    const mileageMatch =
-                                      inputValue.match(/^(\d+)/);
-                                    const newMileage = mileageMatch
-                                      ? Number.parseInt(mileageMatch[1])
-                                      : 0;
-                                    const lastEntry =
-                                      currentHistory[currentHistory.length - 1];
-
-                                    if (
-                                      !lastEntry ||
-                                      lastEntry.mileage !== newMileage
-                                    ) {
-                                      const updatedHistory = [
-                                        ...currentHistory,
-                                        {
-                                          mileage: newMileage,
-                                          date: new Date().toISOString(),
-                                        },
-                                      ];
-
-                                      setSpecificInvoice((prev) => ({
-                                        ...prev,
-                                        vehicle: {
-                                          ...prev.vehicle,
-                                          mileageHistory: updatedHistory,
-                                        },
-                                      }));
-
-                                      if (input) input.value = "";
-                                    }
-                                  }
-                                }}
-                              >
-                                Add
-                              </button>
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mb-2">
+                    <strong>Mileage History:</strong>
+                    {specificInvoice?.vehicle?.mileageHistory?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {specificInvoice?.vehicle?.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => handleMileageHistoryDelete(index)}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
+                    )}
+                  </div>
                 </Grid>
               </Grid>
             </Box>

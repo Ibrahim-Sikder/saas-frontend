@@ -62,6 +62,8 @@ const UpdateJobCard = () => {
   const [vehicleInterior, setVehicleInterior] = useState("");
   const [reportedDefect, setReportedDefect] = useState("");
   const [reportedAction, setReportedAction] = useState("");
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
 
   const [clickControl, setClickControl] = useState(null);
 
@@ -82,9 +84,9 @@ const UpdateJobCard = () => {
 
   const [updateJobCard, { isLoading: updateJobCardLoading }] =
     useUpdateJobCardMutation();
-    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
-      tenantDomain,
-    });
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const userTypeFromProfile = new URLSearchParams(location.search).get(
@@ -92,7 +94,10 @@ const UpdateJobCard = () => {
   );
   const userFromProfile = new URLSearchParams(location.search).get("user");
 
-  const { data, isLoading, refetch } = useGetSingleJobCardQuery({tenantDomain,id});
+  const { data, isLoading, refetch } = useGetSingleJobCardQuery({
+    tenantDomain,
+    id,
+  });
 
   const singleCard = data?.data;
 
@@ -346,22 +351,24 @@ const UpdateJobCard = () => {
     // Get the current mileage value
     const newMileageValue = Number(data.mileage);
 
-    // Check if we need to add a new mileage entry
-    const updatedMileageHistory = [
-      ...(getDataWithChassisNo?.mileageHistory || []),
-    ];
+    // Get existing mileage history
+    const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
+    const updatedMileageHistory = [...existingMileageHistory];
 
-    // Only add a new entry if it's a valid number and not already in the history
-    if (!isNaN(newMileageValue) && newMileageValue > 0) {
+    // Only add current mileage to history if it has changed
+    if (mileageChanged && currentMileage) {
+      const newMileageEntry = {
+        mileage: Number(currentMileage),
+        date: new Date().toISOString(),
+      };
+
+      // Check if this mileage value already exists in history
       const mileageExists = updatedMileageHistory.some(
-        (entry) => entry.mileage === newMileageValue
+        (entry) => entry.mileage === Number(currentMileage)
       );
 
       if (!mileageExists) {
-        updatedMileageHistory.push({
-          mileage: newMileageValue,
-          date: new Date().toISOString(),
-        });
+        updatedMileageHistory.push(newMileageEntry);
       }
     }
     // Extract vehicle information - use the existing mileage history without modification
@@ -394,6 +401,7 @@ const UpdateJobCard = () => {
       technician_signature: data.technician_signature,
       technician_date: data.technician_date,
       vehicle_owner: data.vehicle_owner,
+      mileage: data.mileage,
     };
     const newCard = {
       customer,
@@ -522,16 +530,16 @@ const UpdateJobCard = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src= {CompanyInfoData?.data?.logo}
+            src={logo || "/placeholder.svg"}
             alt="logo"
             className=" addJobLogoImg"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            {CompanyInfoData?.data?.companyName}
+              Trust Auto Solution{" "}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-          {CompanyInfoData?.data?.address}
+              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
             </span>
           </div>
 
@@ -1189,115 +1197,77 @@ const UpdateJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <Box sx={{ mb: 2 }}>
-                    <Autocomplete
-                      multiple
-                      id="tags-filled"
-                      options={
-                        getDataWithChassisNo?.mileageHistory
-                          ?.slice(-1)
-                          .map(
-                            (option) =>
-                              `${option.mileage} km (${new Date(
-                                option.date
-                              ).toLocaleDateString()})`
-                          ) || []
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    // value={currentMileage || getDataWithChassisNo?.mileage || ""}
+                    focused={currentMileage || singleCard?.mileage || ""}
+                    defaultValue={currentMileage || singleCard?.mileage || ""}
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+
+                      // Check if mileage has changed from the last recorded value
+                      const lastMileage =
+                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
                       }
-                      value={
-                        getDataWithChassisNo?.mileageHistory
-                          ?.slice(-1)
-                          .map(
-                            (option) =>
-                              `${option.mileage} km (${new Date(
-                                option.date
-                              ).toLocaleDateString()})`
-                          ) || []
-                      }
-                      freeSolo
-                      disableClearable
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.stopPropagation();
-                        }
-                      }}
-                      onChange={(event, newValue) => {
-                        const currentHistory = [
-                          ...(getDataWithChassisNo?.mileageHistory || []),
-                        ];
+                    }}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
+                  />
+                </Grid>
 
-                        // Handle deletion of last entry
-                        if (newValue.length === 0) {
-                          const updatedHistory = currentHistory.slice(0, -1);
-                          setGetDataWithChassisNo((prevState) => ({
-                            ...prevState,
-                            mileageHistory: updatedHistory,
-                          }));
-                          return;
-                        }
-
-                        // Handle new entry addition
-                        const newEntry = newValue[newValue.length - 1];
-                        const mileageMatch = newEntry.match(/^(\d+)/);
-                        const newMileage = mileageMatch
-                          ? Number.parseInt(mileageMatch[1])
-                          : 0;
-                        const lastEntry =
-                          currentHistory[currentHistory.length - 1];
-
-                        // Only add if different from last entry
-                        if (!lastEntry || lastEntry.mileage !== newMileage) {
-                          const updatedHistory = [
-                            ...currentHistory,
-                            {
-                              mileage: newMileage,
-                              date: new Date().toISOString(),
-                            },
-                          ];
-
-                          setGetDataWithChassisNo((prevState) => ({
-                            ...prevState,
-                            mileageHistory: updatedHistory,
-                          }));
-                        }
-                      }}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            variant="outlined"
-                            label={option}
-                            key={index}
-                            {...getTagProps({ index })}
-                            onDelete={(e) => {
-                              // Handle chip delete specifically
-                              const currentHistory = [
-                                ...(getDataWithChassisNo?.mileageHistory || []),
-                              ];
-                              const updatedHistory = currentHistory.slice(
-                                0,
-                                -1
-                              );
-
-                              setGetDataWithChassisNo((prevState) => ({
-                                ...prevState,
-                                mileageHistory: updatedHistory,
-                              }));
-                            }}
-                            className="bg-gray-100 border-gray-300 text-gray-800"
-                          />
-                        ))
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          label="Mileage History"
-                          placeholder="Add new mileage"
-                          size="medium"
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      )}
-                    />
-                  </Box>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mb-2">
+                    <strong>Mileage History:</strong>
+                    {getDataWithChassisNo?.mileageHistory?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {getDataWithChassisNo.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => {
+                                // Remove the specific entry from mileage history
+                                const updatedHistory =
+                                  getDataWithChassisNo.mileageHistory.filter(
+                                    (_, i) => i !== index
+                                  );
+                                setGetDataWithChassisNo((prevState) => ({
+                                  ...prevState,
+                                  mileageHistory: updatedHistory,
+                                }));
+                              }}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
+                    )}
+                  </div>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Autocomplete

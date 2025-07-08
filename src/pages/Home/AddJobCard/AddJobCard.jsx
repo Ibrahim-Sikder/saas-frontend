@@ -51,7 +51,7 @@ import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddJobCard = () => {
-    const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
@@ -86,6 +86,8 @@ const AddJobCard = () => {
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [formattedDate, setFormattedDate] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
 
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState("");
   const formRef = useRef();
@@ -372,22 +374,24 @@ const AddJobCard = () => {
     data.mileage = Number(data.mileage);
 
     const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
+    const updatedMileageHistory = [...existingMileageHistory];
 
-    // Get new mileage entries from form state
-    const newMileageEntries = localMileageEntries; // Use your state variable name
+    // Only add current mileage to history if it has changed
+    if (mileageChanged && currentMileage) {
+      const newMileageEntry = {
+        mileage: Number(currentMileage),
+        date: new Date().toISOString(),
+      };
 
-    // Combine existing history with new entries
-    const combinedMileageHistory = [
-      ...existingMileageHistory,
-      ...newMileageEntries,
-    ];
+      // Check if this mileage value already exists in history
+      const mileageExists = updatedMileageHistory.some(
+        (entry) => entry.mileage === Number(currentMileage)
+      );
 
-    // Remove duplicate mileage entries based on value
-    const uniqueMileageHistory = combinedMileageHistory.filter(
-      (entry, index, self) =>
-        index === self.findIndex((t) => t.mileage === entry.mileage)
-    );
-    // Extract vehicle information
+      if (!mileageExists) {
+        updatedMileageHistory.push(newMileageEntry);
+      }
+    }
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -398,7 +402,7 @@ const AddJobCard = () => {
       vehicle_model: data.vehicle_model,
       vehicle_category: data.vehicle_category,
       color_code: data.color_code,
-      mileageHistory: uniqueMileageHistory,
+      mileageHistory: updatedMileageHistory,
       fuel_type: data.fuel_type,
     };
 
@@ -416,6 +420,7 @@ const AddJobCard = () => {
       technician_signature: data.technician_signature,
       technician_date: data.technician_date,
       vehicle_owner: data.vehicle_owner,
+      mileage: data.mileage,
     };
 
     const newCard = {
@@ -571,16 +576,16 @@ const AddJobCard = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src={CompanyInfoData?.data?.logo}
+            src={logo || "/placeholder.svg"}
             alt="logo"
             className=" addJobLogoImg"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              {CompanyInfoData?.data?.companyName}
+              Trust Auto Solution
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-              Office: {CompanyInfoData?.data?.address}
+              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
             </span>
           </div>
 
@@ -1358,110 +1363,64 @@ const AddJobCard = () => {
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <Autocomplete
-                    multiple
-                    id="tags-filled"
-                    options={
-                      getDataWithChassisNo?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
                     value={
-                      getDataWithChassisNo?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
+                      currentMileage ||
+                      (getDataWithChassisNo?.mileageHistory?.length > 0
+                        ? getDataWithChassisNo.mileageHistory[
+                            getDataWithChassisNo.mileageHistory.length - 1
+                          ].mileage
+                        : getDataWithChassisNo?.mileage || "")
                     }
-                    freeSolo
-                    disableClearable
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.stopPropagation();
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
                       }
                     }}
-                    onChange={(event, newValue) => {
-                      const currentHistory = [
-                        ...(getDataWithChassisNo?.mileageHistory || []),
-                      ];
-
-                      // Handle deletion of last entry
-                      if (newValue.length === 0) {
-                        const updatedHistory = currentHistory.slice(0, -1);
-                        setGetDataWithChassisNo((prevState) => ({
-                          ...prevState,
-                          mileageHistory: updatedHistory,
-                        }));
-                        return;
-                      }
-
-                      // Handle new entry addition
-                      const newEntry = newValue[newValue.length - 1];
-                      const mileageMatch = newEntry.match(/^(\d+)/);
-                      const newMileage = mileageMatch
-                        ? Number.parseInt(mileageMatch[1])
-                        : 0;
-                      const lastEntry =
-                        currentHistory[currentHistory.length - 1];
-
-                      // Only add if different from last entry
-                      if (!lastEntry || lastEntry.mileage !== newMileage) {
-                        const updatedHistory = [
-                          ...currentHistory,
-                          {
-                            mileage: newMileage,
-                            date: new Date().toISOString(),
-                          },
-                        ];
-
-                        setGetDataWithChassisNo((prevState) => ({
-                          ...prevState,
-                          mileageHistory: updatedHistory,
-                        }));
-                      }
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          key={index}
-                          {...getTagProps({ index })}
-                          onDelete={(e) => {
-                            // Handle chip delete specifically
-                            const currentHistory = [
-                              ...(getDataWithChassisNo?.mileageHistory || []),
-                            ];
-                            const updatedHistory = currentHistory.slice(0, -1);
-
-                            setGetDataWithChassisNo((prevState) => ({
-                              ...prevState,
-                              mileageHistory: updatedHistory,
-                            }));
-                          }}
-                          className="bg-gray-100 border-gray-300 text-gray-800"
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Mileage History"
-                        placeholder="Add new mileage"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                      />
-                    )}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mb-2">
+                    <strong>Mileage History:</strong>
+                    {getDataWithChassisNo?.mileageHistory?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {getDataWithChassisNo.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                            />
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
+                    )}
+                  </div>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Autocomplete
@@ -1589,7 +1548,7 @@ const AddJobCard = () => {
                 Vehicle Body Report (Mark with X where damage )
               </b>
               <div className="mt-2 imgWrap">
-                <img src={car} alt="car" />
+                <img src={car || "/placeholder.svg"} alt="car" />
               </div>
               <div className="mt-3">
                 <b className="block mb-1 "> Note </b>

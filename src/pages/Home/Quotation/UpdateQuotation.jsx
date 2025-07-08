@@ -61,7 +61,7 @@ const UpdateQuotation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
@@ -92,11 +92,14 @@ const tenantDomain = useTenantDomain();
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
   const [activeInputType, setActiveInputType] = useState(null);
   const [activeInputIndex, setActiveInputIndex] = useState(null);
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue: setFormValue,
     formState: { errors },
   } = useForm();
 
@@ -598,7 +601,6 @@ const tenantDomain = useTenantDomain();
 
   // Fixed handleSelectSuggestion function
   const handleSelectSuggestion = (product) => {
-
     if (!product) return;
 
     // Extract product details correctly based on the data structure
@@ -817,13 +819,14 @@ const tenantDomain = useTenantDomain();
       // Get the current mileage value
       const newMileageValue = Number(data.mileage);
 
-      // Check if we need to add a new mileage entry
-      const updatedMileageHistory = [
-        ...(specificQuotation?.mileageHistory || []),
-      ];
+      // Get existing mileage history from the correct path
+      const existingMileageHistory =
+        specificQuotation?.vehicle?.mileageHistory || [];
+      const updatedMileageHistory = [...existingMileageHistory];
 
-      // Only add a new entry if it's a valid number and not already in the history
-      if (!isNaN(newMileageValue) && newMileageValue > 0) {
+      // Only add new mileage to history if it has changed and is valid
+      if (mileageChanged && !isNaN(newMileageValue) && newMileageValue > 0) {
+        // Check if this mileage value already exists in history
         const mileageExists = updatedMileageHistory.some(
           (entry) => entry.mileage === newMileageValue
         );
@@ -842,13 +845,8 @@ const tenantDomain = useTenantDomain();
         engine_no: data.engine_no,
         vehicle_brand: data.vehicle_brand,
         vehicle_name: data.vehicle_name,
-        mileage:
-          specificQuotation?.vehicle?.mileageHistory?.length > 0
-            ? specificQuotation?.vehicle?.mileageHistory[
-                specificQuotation?.vehicle?.mileageHistory.length - 1
-              ].mileage
-            : Number(data.mileage),
-        mileageHistory: specificQuotation?.vehicle?.mileageHistory || [],
+        mileage: newMileageValue,
+        mileageHistory: updatedMileageHistory,
       };
       const quotation = {
         user_type: specificQuotation?.user_type,
@@ -950,6 +948,13 @@ const tenantDomain = useTenantDomain();
   const handleSuggestionClick = (product) => {
     handleSelectSuggestion(product);
   };
+
+  useEffect(() => {
+    if (specificQuotation?.vehicle?.mileage) {
+      setFormValue("mileage", specificQuotation.vehicle.mileage);
+      setCurrentMileage(specificQuotation.vehicle.mileage.toString());
+    }
+  }, [specificQuotation?.vehicle?.mileage, setFormValue]);
 
   return (
     <div className="px-5 py-10">
@@ -1300,177 +1305,75 @@ const tenantDomain = useTenantDomain();
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <Autocomplete
-                    multiple
-                    id="tags-filled"
-                    options={
-                      specificQuotation?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    value={
-                      specificQuotation?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    freeSolo
-                    disableClearable
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.stopPropagation();
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    value={currentMileage || specificQuotation?.mileage || ""}
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      setFormValue("mileage", newMileage);
+                      const lastMileage =
+                        specificQuotation?.vehicle?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
                       }
                     }}
-                    onChange={(event, newValue) => {
-                      const currentHistory = [
-                        ...(specificQuotation?.vehicle?.mileageHistory || []),
-                      ];
-
-                      // Handle deletion
-                      if (newValue.length === 0) {
-                        const updatedHistory = currentHistory.slice(0, -1);
-                        setSpecificQuotation((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                        return;
-                      }
-
-                      // Handle addition
-                      const newEntry = newValue[newValue.length - 1];
-                      const mileageMatch = newEntry.match(/^(\d+)/);
-                      const newMileage = mileageMatch
-                        ? Number.parseInt(mileageMatch[1])
-                        : 0;
-                      const lastEntry =
-                        currentHistory[currentHistory.length - 1];
-
-                      if (!lastEntry || lastEntry.mileage !== newMileage) {
-                        const updatedHistory = [
-                          ...currentHistory,
-                          {
-                            mileage: newMileage,
-                            date: new Date().toISOString(),
-                          },
-                        ];
-
-                        setSpecificQuotation((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                      }
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          key={index}
-                          {...getTagProps({ index })}
-                          onDelete={(e) => {
-                            const currentHistory = [
-                              ...(specificQuotation?.vehicle?.mileageHistory ||
-                                []),
-                            ];
-                            const updatedHistory = currentHistory.slice(0, -1);
-
-                            setSpecificQuotation((prev) => ({
-                              ...prev,
-                              vehicle: {
-                                ...prev.vehicle,
-                                mileageHistory: updatedHistory,
-                              },
-                            }));
-                          }}
-                          className="bg-gray-100 border-gray-300 text-gray-800"
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Mileage History"
-                        placeholder="Add new mileage"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {params.InputProps.endAdornment}
-                              <button
-                                type="button"
-                                className="sm:hidden absolute right-8 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  const input = document
-                                    .getElementById("tags-filled")
-                                    ?.querySelector("input");
-                                  const inputValue = input?.value || "";
-
-                                  if (inputValue) {
-                                    const currentHistory = [
-                                      ...(specificQuotation?.vehicle
-                                        ?.mileageHistory || []),
-                                    ];
-                                    const mileageMatch =
-                                      inputValue.match(/^(\d+)/);
-                                    const newMileage = mileageMatch
-                                      ? Number.parseInt(mileageMatch[1])
-                                      : 0;
-                                    const lastEntry =
-                                      currentHistory[currentHistory.length - 1];
-
-                                    if (
-                                      !lastEntry ||
-                                      lastEntry.mileage !== newMileage
-                                    ) {
-                                      const updatedHistory = [
-                                        ...currentHistory,
-                                        {
-                                          mileage: newMileage,
-                                          date: new Date().toISOString(),
-                                        },
-                                      ];
-
-                                      setSpecificQuotation((prev) => ({
-                                        ...prev,
-                                        vehicle: {
-                                          ...prev.vehicle,
-                                          mileageHistory: updatedHistory,
-                                        },
-                                      }));
-
-                                      if (input) input.value = "";
-                                    }
-                                  }
-                                }}
-                              >
-                                Add
-                              </button>
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mb-2">
+                    <strong>Mileage History:</strong>
+                    {specificQuotation?.vehicle?.mileageHistory?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {specificQuotation.vehicle?.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => {
+                                const updatedHistory =
+                                  specificQuotation?.vehicle?.mileageHistory.filter(
+                                    (_, i) => i !== index
+                                  );
+                                setSpecificQuotation((prevState) => ({
+                                  ...prevState,
+                                  vehicle: {
+                                    ...prevState.vehicle,
+                                    mileageHistory: updatedHistory,
+                                  },
+                                }));
+                              }}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
+                    )}
+                  </div>
                 </Grid>
               </Grid>
             </Box>
