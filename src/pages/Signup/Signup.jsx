@@ -183,7 +183,7 @@ const SignupPage = () => {
                   component="div"
                   sx={{ fontWeight: "bold" }}
                 >
-                  Garage ERP
+                  Garage Master
                 </Typography>
               </Box>
               <Typography

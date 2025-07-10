@@ -810,7 +810,7 @@ const TenantRegisterPage = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
                 <Build sx={{ fontSize: 40, mr: 2 }} />
                 <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
-                  Garage ERP
+                  Garage Master
                 </Typography>
               </Box>
               <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
