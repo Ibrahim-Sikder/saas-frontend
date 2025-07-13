@@ -223,7 +223,7 @@ const tenantDomain = useTenantDomain();
   };
   const handleOptionClick = (option) => {
     setYearSelectInput(option.label);
-    setFilteredOptions([]); // This assumes option.label is the value you want to set in the input
+    setFilteredOptions([]);
   };
 
   const handleChassisChange = (_, newValue) => {
@@ -245,7 +245,7 @@ const tenantDomain = useTenantDomain();
   };
   return (
     <section>
-      <div className=" addProductWraps mt-8 ">
+      <div className=" addProductWraps my-10 ">
         <div className="productHeadWrap">
           <div className="flex items-center justify-center ">
             <Button

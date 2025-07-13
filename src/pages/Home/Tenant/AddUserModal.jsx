@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -22,7 +22,7 @@ import {
   Alert,
   Grid,
   CircularProgress,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Add as AddIcon,
   Close as CloseIcon,
@@ -30,23 +30,24 @@ import {
   VisibilityOff,
   Email,
   Person,
-  Lock
-} from "@mui/icons-material"
-import { useState, forwardRef } from "react"
-import Slide from "@mui/material/Slide"
-import { useCreateUserMutation } from "../../../redux/api/userApi"
-import { useGetAllTenantQuery } from "../../../redux/api/tenantApi"
-import { toast } from "react-toastify"
+  Lock,
+} from "@mui/icons-material";
+import { useState, forwardRef, useEffect } from "react";
+import Slide from "@mui/material/Slide";
+import { useCreateUserMutation } from "../../../redux/api/userApi";
+import { useGetAllTenantQuery } from "../../../redux/api/tenantApi";
+import { toast } from "react-toastify";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />
-})
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const mockRoles = [
   { id: "admin", name: "admin" },
   { id: "manager", name: "manager" },
   { id: "employee", name: "employee" },
-]
+];
 
 const defaultFormData = {
   name: "",
@@ -56,54 +57,73 @@ const defaultFormData = {
   tenantDomain: "",
   role: "",
   agreeTerms: false,
-}
+};
 
 const AddUserModal = ({ open, onClose, onSuccess }) => {
-  const [formData, setFormData] = useState(defaultFormData)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [apiError, setApiError] = useState("")
+  const currentTenantDomain = useTenantDomain();
+  const [formData, setFormData] = useState(defaultFormData);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
 
-  const [createUser, { isLoading }] = useCreateUserMutation()
-  const { data: tenantData, isLoading: isTenantLoading } = useGetAllTenantQuery()
+  const [createUser, { isLoading }] = useCreateUserMutation();
+  const { data: tenantData, isLoading: isTenantLoading } =
+    useGetAllTenantQuery();
+
+  // Reset form and set tenant domain when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        ...defaultFormData,
+        tenantDomain: currentTenantDomain || "",
+      });
+      setErrors({});
+      setApiError("");
+    }
+  }, [open, currentTenantDomain]);
 
   const handleChange = (e) => {
-    const { name, value, checked, type } = e.target
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value })
+    const { name, value, checked, type } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" })
+      setErrors({ ...errors, [name]: "" });
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Name is required"
-    else if (formData.name.length < 3) newErrors.name = "Name must be at least 3 characters"
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    else if (formData.name.length < 3)
+      newErrors.name = "Name must be at least 3 characters";
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!formData.email) newErrors.email = "Email is required"
-    else if (!emailRegex.test(formData.email)) newErrors.email = "Invalid email"
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(formData.email))
+      newErrors.email = "Invalid email";
 
-    if (!formData.password) newErrors.password = "Password is required"
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match"
+    if (!formData.password) newErrors.password = "Password is required";
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
 
-    if (!formData.tenantDomain) newErrors.tenantDomain = "Please select a tenant"
-    if (!formData.role) newErrors.role = "Please select a role"
-    if (!formData.agreeTerms) newErrors.agreeTerms = "You must agree to the terms"
+    if (!formData.tenantDomain)
+      newErrors.tenantDomain = "Please select a tenant";
+    if (!formData.role) newErrors.role = "Please select a role";
+    if (!formData.agreeTerms)
+      newErrors.agreeTerms = "You must agree to the terms";
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setApiError("")
+    e.preventDefault();
+    setApiError("");
 
     if (!validateForm()) {
-      toast.error("Please fix the form errors")
-      return
+      toast.error("Please fix the form errors");
+      return;
     }
 
     try {
@@ -115,21 +135,19 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
         createdBy: "system",
         status: "active",
         tenantDomain: formData.tenantDomain,
-      }).unwrap()
+      }).unwrap();
 
       if (result.success) {
-        toast.success("User created successfully")
-        onSuccess?.()
-        onClose()
-        setFormData(defaultFormData)
-        setErrors({})
+        toast.success("User created successfully");
+        onSuccess?.();
+        onClose();
       }
     } catch (error) {
-      const message = error?.data?.message || "Failed to create user"
-      setApiError(message)
-      toast.error(message)
+      const message = error?.data?.message || "Failed to create user";
+      setApiError(message);
+      toast.error(message);
     }
-  }
+  };
 
   return (
     <Dialog
@@ -160,8 +178,16 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
       <Divider />
 
       <DialogContent sx={{ pt: 3 }}>
-        {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
-        {isTenantLoading && <Alert severity="info" sx={{ mb: 2 }}>Loading tenant data...</Alert>}
+        {apiError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {apiError}
+          </Alert>
+        )}
+        {isTenantLoading && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Loading tenant data...
+          </Alert>
+        )}
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
@@ -211,6 +237,7 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
                   value={formData.tenantDomain}
                   onChange={handleChange}
                   label="Select Tenant"
+                  disabled
                 >
                   {tenantData?.data?.tenants?.map((tenant) => (
                     <MenuItem key={tenant._id} value={tenant.domain}>
@@ -228,7 +255,12 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
             <Grid item xs={12} md={6}>
               <FormControl fullWidth required error={!!errors.role}>
                 <InputLabel>Select Role</InputLabel>
-                <Select name="role" value={formData.role} onChange={handleChange} label="Select Role">
+                <Select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  label="Select Role"
+                >
                   {mockRoles.map((role) => (
                     <MenuItem key={role.id} value={role.id}>
                       {role.name}
@@ -261,7 +293,10 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -288,8 +323,17 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -299,7 +343,12 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
             <Grid item xs={12}>
               <FormControlLabel
                 control={
-                  <Checkbox name="agreeTerms" checked={formData.agreeTerms} onChange={handleChange} color="primary" />
+                  <Checkbox
+                    name="agreeTerms"
+                    checked={formData.agreeTerms}
+                    onChange={handleChange}
+                    color="primary"
+                  />
                 }
                 label={
                   <Typography variant="body2">
@@ -329,12 +378,21 @@ const AddUserModal = ({ open, onClose, onSuccess }) => {
         <Button onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={isLoading} sx={{ minWidth: 140 }}>
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : "Create User"}
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={isLoading}
+          sx={{ minWidth: 140 }}
+        >
+          {isLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Create User"
+          )}
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AddUserModal
+export default AddUserModal;

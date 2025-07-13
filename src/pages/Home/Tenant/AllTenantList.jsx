@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-
 "use client";
 
 import { useState, useEffect } from "react";
-
 import {
   FaUsers,
   FaSearch,
@@ -17,10 +15,9 @@ import {
   FaCheckCircle,
   FaUserShield,
   FaDownload,
-  FaPlus,
   FaSync,
+  FaPlus,
 } from "react-icons/fa";
-
 import {
   Box,
   Typography,
@@ -51,21 +48,20 @@ import {
   ListItemText,
   CircularProgress,
 } from "@mui/material";
-
 import { motion } from "framer-motion";
-
 import {
   useDeleteTenantMutation,
   useGetAllTenantQuery,
   useRenewSubscriptionMutation,
   useUpdateTenantMutation,
 } from "../../../redux/api/tenantApi";
-
 import { StatusChip, StyledTableContainer } from "../../../utils/customStyle";
 import { StyledPaper } from "../../../utils";
 import ViewDetailsModal from "./ViewTenantModal";
-import EditTenantModal from "./UpdateTenantModal";
 import { toast } from "react-toastify";
+import UpdateTenantModal from "./UpdateTenantModal";
+import CreateTenantModal from "./CreateTenantModal";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const AllTenantList = () => {
   const [filteredTenants, setFilteredTenants] = useState([]);
@@ -77,6 +73,7 @@ const AllTenantList = () => {
   const [selectedTenants, setSelectedTenants] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -85,6 +82,7 @@ const AllTenantList = () => {
   });
   const [bulkActionAnchor, setBulkActionAnchor] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+
   const { data: tenantData, isLoading, refetch } = useGetAllTenantQuery({});
   const [updateTenant, { isLoading: updateLoading }] =
     useUpdateTenantMutation();
@@ -115,7 +113,6 @@ const AllTenantList = () => {
 
       return matchesSearch && matchesStatus && matchesPayment;
     });
-
     setFilteredTenants(filtered);
     setPage(0);
   }, [searchTerm, filterStatus, filterPayment, tenants]);
@@ -152,13 +149,11 @@ const AllTenantList = () => {
         id: tenantId,
         data: { isActive: !block },
       }).unwrap();
-
       setSnackbar({
         open: true,
         message: `Tenant ${block ? "blocked" : "unblocked"} successfully`,
         severity: "success",
       });
-
       refetch();
     } catch (error) {
       setSnackbar({
@@ -185,7 +180,6 @@ const AllTenantList = () => {
         id: updatedTenant._id,
         data: updatedTenant,
       }).unwrap();
-
       setSnackbar({
         open: true,
         message: "Tenant updated successfully",
@@ -208,13 +202,11 @@ const AllTenantList = () => {
         id: tenantId,
         plan: plan,
       }).unwrap();
-
       if (result) {
         toast.success(
           `🎉 Subscription renewed successfully! New ${plan} plan is now active.`
         );
       }
-
       // Close the view modal and refresh data
       setViewModalOpen(false);
       refetch();
@@ -231,28 +223,30 @@ const AllTenantList = () => {
   };
 
   const handleDeleteTenant = async (tenantId) => {
-    if (window.confirm("Are you sure you want to delete this tenant?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       try {
-        await deleteTenant(tenantId).unwrap();
-        setSnackbar({
-          open: true,
-          message: "Tenant deleted successfully",
-          severity: "success",
-        });
+        await deleteTenant({ id: tenantId }).unwrap();
+        Swal.fire("Deleted!", "Your tenant has been deleted.", "success");
         refetch();
       } catch (error) {
-        setSnackbar({
-          open: true,
-          message: "Failed to delete tenant",
-          severity: "error",
-        });
+        const errorMessage = error?.data?.message || "Failed to delete tenant.";
+        Swal.fire("Error!", errorMessage, "error");
       }
     }
   };
 
   const handleBulkAction = async (action) => {
     setBulkActionAnchor(null);
-
     try {
       if (action === "block") {
         await Promise.all(
@@ -273,32 +267,57 @@ const AllTenantList = () => {
           )
         );
       } else if (action === "delete") {
-        if (
-          window.confirm(
-            `Are you sure you want to delete ${selectedTenants.length} tenants?`
-          )
-        ) {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: `You are about to delete ${selectedTenants.length} tenants. This action cannot be undone!`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete them!",
+        });
+
+        if (result.isConfirmed) {
           await Promise.all(
             selectedTenants.map((id) => deleteTenant(id).unwrap())
           );
+          Swal.fire(
+            "Deleted!",
+            "Selected tenants have been deleted.",
+            "success"
+          );
+        } else {
+          return; // Do not proceed with bulk action if cancelled
         }
       }
-
       setSnackbar({
         open: true,
         message: `Bulk ${action} applied to ${selectedTenants.length} tenants`,
         severity: "success",
       });
-
       setSelectedTenants([]);
       refetch();
     } catch (error) {
+      const errorMessage =
+        error?.data?.message || `Failed to apply bulk ${action}`;
       setSnackbar({
         open: true,
-        message: `Failed to apply bulk ${action}`,
+        message: errorMessage,
         severity: "error",
       });
     }
+  };
+
+  const handleUserCreated = (newUser) => {
+    // Optionally refresh tenant data or show success message
+    refetch();
+    toast.success(`User ${newUser.name} created successfully!`);
+  };
+
+  const handleTenantCreated = (newTenant) => {
+    // Refresh tenant data and show success message
+    refetch();
+    toast.success(`Tenant ${newTenant.name} created successfully!`);
   };
 
   const formatDate = (dateString) => {
@@ -312,6 +331,40 @@ const AllTenantList = () => {
 
   const getStatusColor = (isActive) => {
     return isActive ? "#4CAF50" : "#f44336";
+  };
+
+  const getExpiryInfo = (endDateString) => {
+    if (!endDateString) return { text: "N/A", color: "text.secondary" };
+
+    const endDate = new Date(endDateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to start of day
+    endDate.setHours(0, 0, 0, 0); // Normalize end date to start of day
+
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let text = "";
+    let color = "text.secondary";
+
+    if (diffDays < 0) {
+      text = `Expired ${Math.abs(diffDays)} days ago`;
+      color = "#f44336"; // Red
+    } else if (diffDays === 0) {
+      text = "Expires today!";
+      color = "#f44336"; // Red
+    } else if (diffDays <= 7) {
+      text = `Expires in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
+      color = "#f44336"; // Red
+    } else if (diffDays <= 30) {
+      text = `Expires in ${diffDays} days`;
+      color = "#FFC107"; // Yellow
+    } else {
+      text = `Expires in ${diffDays} days`;
+      color = "#4CAF50"; // Green
+    }
+
+    return { text, color };
   };
 
   const stats = {
@@ -474,7 +527,9 @@ const AllTenantList = () => {
                 sx={{
                   borderRadius: "12px",
                   background: "linear-gradient(45deg, #667eea, #764ba2)",
+                  color: "#fff",
                 }}
+                onClick={() => setCreateTenantModalOpen(true)}
               >
                 Add Tenant
               </Button>
@@ -482,7 +537,6 @@ const AllTenantList = () => {
                 variant="outlined"
                 startIcon={<FaDownload />}
                 sx={{ borderRadius: "12px" }}
-                
               >
                 Export
               </Button>
@@ -540,152 +594,166 @@ const AllTenantList = () => {
             <TableBody>
               {filteredTenants
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((tenant) => (
-                  <TableRow key={tenant._id} hover>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedTenants.includes(tenant._id)}
-                        onChange={() => handleSelectTenant(tenant._id)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <Avatar
-                          sx={{ bgcolor: getStatusColor(tenant.isActive) }}
+                .map((tenant) => {
+                  const expiryInfo = getExpiryInfo(
+                    tenant.subscription?.endDate
+                  );
+                  return (
+                    <TableRow key={tenant._id} hover>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedTenants.includes(tenant._id)}
+                          onChange={() => handleSelectTenant(tenant._id)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
                         >
-                          {tenant.name.charAt(0).toUpperCase()}
-                        </Avatar>
+                          <Avatar
+                            sx={{ bgcolor: getStatusColor(tenant.isActive) }}
+                          >
+                            {tenant.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" fontWeight="bold">
+                              {tenant.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {tenant.businessType || "N/A"}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
                         <Box>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            {tenant.name}
+                          <Typography variant="body2" fontWeight="bold">
+                            {tenant.domain}.app
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {tenant.businessType || "N/A"}
+                          <Typography variant="caption" color="text.secondary">
+                            Database:{" "}
+                            {tenant.dbUri ? "Connected" : "Not Connected"}
                           </Typography>
                         </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {tenant.domain}.app
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Database:{" "}
-                          {tenant.dbUri ? "Connected" : "Not Connected"}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {tenant.subscription?.plan || "No Plan"} - $
-                          {tenant.subscription?.amount || 0}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Expires: {formatDate(tenant.subscription?.endDate)}
-                        </Typography>
-                        <br />
-                        <StatusChip
-                          label={tenant.subscription?.status || "No Status"}
-                          size="small"
-                          status={
-                            tenant.subscription?.status?.toLowerCase() ||
-                            "pending"
-                          }
-                          sx={{ mt: 0.5 }}
-                        />
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        {tenant.subscription?.isPaid ? (
-                          <Chip
-                            icon={<FaCheckCircle />}
-                            label="Paid"
-                            size="small"
-                            sx={{ bgcolor: "#4CAF50", color: "white" }}
-                          />
-                        ) : (
-                          <Chip
-                            icon={<FaExclamationTriangle />}
-                            label="Unpaid"
-                            size="small"
-                            sx={{ bgcolor: "#f44336", color: "white" }}
-                          />
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <StatusChip
-                        label={tenant.isActive ? "Active" : "Blocked"}
-                        size="small"
-                        status={tenant.isActive ? "active" : "blocked"}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {formatDate(
-                          tenant.subscription?.createdAt || tenant.createdAt
-                        )}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip title="Edit Tenant">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditTenant(tenant)}
-                            sx={{ color: "#2196F3" }}
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" fontWeight="bold">
+                            {tenant.subscription?.plan || "No Plan"} - $
+                            {tenant.subscription?.amount || 0}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Expires: {formatDate(tenant.subscription?.endDate)}
+                          </Typography>
+                          <br />
+                          <Typography
+                            variant="caption"
+                            sx={{ color: expiryInfo.color, fontWeight: "bold" }}
                           >
-                            <FaEdit />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={
-                            tenant.isActive ? "Block Tenant" : "Unblock Tenant"
-                          }
-                        >
-                          <IconButton
+                            {expiryInfo.text}
+                          </Typography>
+                          <br />
+                          <StatusChip
+                            label={tenant.subscription?.status || "No Status"}
                             size="small"
-                            onClick={() =>
-                              handleBlockTenant(tenant._id, tenant.isActive)
+                            status={
+                              tenant.subscription?.status?.toLowerCase() ||
+                              "pending"
                             }
-                            sx={{
-                              color: tenant.isActive ? "#f44336" : "#4CAF50",
-                            }}
-                            disabled={updateLoading}
+                            sx={{ mt: 0.5 }}
+                          />
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          {tenant.subscription?.isPaid ? (
+                            <Chip
+                              icon={<FaCheckCircle />}
+                              label="Paid"
+                              size="small"
+                              sx={{ bgcolor: "#4CAF50", color: "white" }}
+                            />
+                          ) : (
+                            <Chip
+                              icon={<FaExclamationTriangle />}
+                              label="Unpaid"
+                              size="small"
+                              sx={{ bgcolor: "#f44336", color: "white" }}
+                            />
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <StatusChip
+                          label={tenant.isActive ? "Active" : "Blocked"}
+                          size="small"
+                          status={tenant.isActive ? "active" : "blocked"}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {formatDate(
+                            tenant.subscription?.createdAt || tenant.createdAt
+                          )}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Tooltip title="Edit Tenant">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEditTenant(tenant)}
+                              sx={{ color: "#2196F3" }}
+                            >
+                              <FaEdit />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip
+                            title={
+                              tenant.isActive
+                                ? "Block Tenant"
+                                : "Unblock Tenant"
+                            }
                           >
-                            {tenant.isActive ? <FaLock /> : <FaUnlock />}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Tenant">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteTenant(tenant._id)}
-                            sx={{ color: "#f44336" }}
-                            disabled={deleteLoading}
-                          >
-                            <FaTrash />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="View Details">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewTenant(tenant)}
-                            sx={{ color: "#FF9800" }}
-                          >
-                            <FaEye />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                handleBlockTenant(tenant._id, tenant.isActive)
+                              }
+                              sx={{
+                                color: tenant.isActive ? "#f44336" : "#4CAF50",
+                              }}
+                              disabled={updateLoading}
+                            >
+                              {tenant.isActive ? <FaLock /> : <FaUnlock />}
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Tenant">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteTenant(tenant._id)}
+                              sx={{ color: "#f44336" }}
+                              disabled={deleteLoading}
+                            >
+                              <FaTrash />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="View Details">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleViewTenant(tenant)}
+                              sx={{ color: "#FF9800" }}
+                            >
+                              <FaEye />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </StyledTableContainer>
@@ -701,7 +769,7 @@ const AllTenantList = () => {
       </StyledPaper>
 
       {/* Edit Tenant Modal */}
-      <EditTenantModal
+      <UpdateTenantModal
         open={editModalOpen}
         tenant={selectedTenant}
         onClose={() => setEditModalOpen(false)}
@@ -759,6 +827,13 @@ const AllTenantList = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Create Tenant Modal */}
+      <CreateTenantModal
+        open={createTenantModalOpen}
+        onClose={() => setCreateTenantModalOpen(false)}
+        onTenantCreated={handleTenantCreated}
+      />
     </Box>
   );
 };

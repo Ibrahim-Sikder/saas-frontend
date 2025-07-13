@@ -26,7 +26,7 @@ import {
   Tab,
 } from "@mui/material";
 
-const EditTenantModal = ({
+const UpdateTenantModal = ({
   open,
   tenant,
   onClose,
@@ -310,4 +310,4 @@ const EditTenantModal = ({
   );
 };
 
-export default EditTenantModal;
+export default UpdateTenantModal;

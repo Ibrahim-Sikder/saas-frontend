@@ -179,17 +179,8 @@ const UpdateCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
 
-      return host.split(".")[0];
-    };
-
-    const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -319,7 +310,7 @@ const UpdateCustomer = () => {
   }
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-10 ">
         <div className="productHeadWrap">
           <Button
             onClick={handleBack}

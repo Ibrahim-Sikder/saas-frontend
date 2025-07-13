@@ -90,6 +90,8 @@ const ViewDetailsModal = ({
 
   if (!tenant) return null;
 
+  console.log("tenant mainj", tenant);
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>

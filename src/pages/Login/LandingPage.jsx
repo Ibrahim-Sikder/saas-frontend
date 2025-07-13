@@ -1176,12 +1176,7 @@ export default function GarageLandingPage() {
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              color="text.secondary"
-              gutterBottom
-            >
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
               Trusted by 2,500+ Garage Owners Worldwide
             </Typography>
           </Box>
@@ -1829,6 +1824,7 @@ export default function GarageLandingPage() {
                                   variant: "body2",
                                   fontWeight: 600,
                                   fontSize: "1rem",
+                                  color: "#fff",
                                 }}
                               />
                             </ListItem>
@@ -2016,6 +2012,7 @@ export default function GarageLandingPage() {
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                           backgroundClip: "text",
+                          color: "#fff",
                         }}
                       >
                         {plan.name}
@@ -2643,6 +2640,7 @@ export default function GarageLandingPage() {
                             primaryTypographyProps={{
                               variant: "body1",
                               fontWeight: 600,
+                              color: "#fff",
                             }}
                           />
                         </ListItem>

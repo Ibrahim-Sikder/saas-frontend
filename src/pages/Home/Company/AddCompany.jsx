@@ -250,11 +250,8 @@ const AddCompany = () => {
                       fullWidth
                       onC
                       label="Vehicle User Name (T)"
-                      {...register("vehicle_username", {
-                        required: "Vehicle user name is required!",
-                      })}
-                      error={!!errors.vehicle_username}
-                      helperText={errors.vehicle_username?.message}
+                      {...register("vehicle_username")}
+                   
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -262,7 +259,12 @@ const AddCompany = () => {
                       fullWidth
                       on
                       label="Company Address (T)"
-                      {...register("company_address")}
+                      
+                      {...register("company_address", {
+                        required: "Company address is required!",
+                      })}
+                      error={!!errors.company_address}
+                      helperText={errors.company_address?.message}
                     />
                   </Grid>
 
@@ -394,7 +396,19 @@ const AddCompany = () => {
                             <TextField
                               fullWidth
                               {...params}
-                              label="Car Reg No"
+                              label={
+                                <>
+                                  Car Reg No
+                                  <span
+                                    style={{
+                                      color: "red",
+                                      fontSize: "25px",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                </>
+                              }
                               {...register("carReg_no", {
                                 required: "Car reg no is required",
                               })}
@@ -407,7 +421,19 @@ const AddCompany = () => {
                       <Grid item lg={9} md={8} sm={12} xs={12}>
                         <TextField
                           fullWidth
-                          label="Car R (N)"
+                          label={
+                            <>
+                              Car R (N)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           {...register("car_registration_no", {
                             pattern: {
                               value: /^[\d-]+$/,
@@ -431,7 +457,19 @@ const AddCompany = () => {
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
                       fullWidth
-                      label="Chassis No (T&N)"
+                      label={
+                        <>
+                          Chassis No (T&N)
+                          <span
+                            style={{
+                              color: "red",
+                              fontSize: "25px",
+                            }}
+                          >
+                            *
+                          </span>
+                        </>
+                      }
                       {...register("chassis_no", {
                         required: "Chassis no number is required!",
                       })}
@@ -443,11 +481,7 @@ const AddCompany = () => {
                     <TextField
                       fullWidth
                       label="ENGINE NO & CC (T&N) "
-                      {...register("engine_no", {
-                        required: "Engin number is required!",
-                      })}
-                      error={!!errors.engine_no}
-                      helperText={errors.engine_no?.message}
+                      {...register("engine_no")}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -462,11 +496,7 @@ const AddCompany = () => {
                         <TextField
                           {...params}
                           label="Vehicle Brand"
-                          {...register("vehicle_brand", {
-                            required: "Vehicle brand is required!",
-                          })}
-                          error={!!errors.vehicle_brand}
-                          helperText={errors.vehicle_brand?.message}
+                          {...register("vehicle_brand")}
                         />
                       )}
                     />
@@ -482,15 +512,10 @@ const AddCompany = () => {
                         <TextField
                           {...params}
                           label="Vehicle Name "
-                          {...register("vehicle_name", {
-                            required: "Vehicle name is required! ",
-                          })}
-                          error={!!errors.vehicle_name}
-                          helperText={errors.vehicle_name?.message}
+                          {...register("vehicle_name")}
                         />
                       )}
                       getOptionLabel={(option) => option || ""}
-                      // disabled={!selectedBrand}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -534,11 +559,7 @@ const AddCompany = () => {
                           fullWidth
                           {...params}
                           label=" Vehicle Categories "
-                          {...register("vehicle_category", {
-                            required: "Vechile categories is required!",
-                          })}
-                          error={!!errors.vehicle_category}
-                          helperText={errors.vehicle_category?.message}
+                          {...register("vehicle_category")}
                         />
                       )}
                     />
@@ -548,11 +569,7 @@ const AddCompany = () => {
                       freeSolo
                       fullWidth
                       label="Color & Code (T&N) "
-                      {...register("color_code", {
-                        required: "Color code is required!",
-                      })}
-                      error={!!errors.color_code}
-                      helperText={errors.color_code?.message}
+                      {...register("color_code")}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -561,7 +578,7 @@ const AddCompany = () => {
                       label="Mileage (N)"
                       {...register(
                         "mileage",
-                        { required: "Mileage is required!" },
+
                         {
                           pattern: {
                             value: /^\d+$/,
@@ -569,8 +586,6 @@ const AddCompany = () => {
                           },
                         }
                       )}
-                      error={!!errors.mileage}
-                      helperText={errors.mileage?.message}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -584,21 +599,32 @@ const AddCompany = () => {
                         <TextField
                           {...params}
                           label=" Fuel Type"
-                          {...register("fuel_type", {
-                            required: "Fuel type is required!",
-                          })}
-                          error={!!errors.fuel_type}
-                          helperText={errors.fuel_type?.message}
+                          {...register("fuel_type")}
                         />
                       )}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
+                      label={
+                        <>
+                          Driver Name (T)
+                          <span
+                            style={{
+                              color: "red",
+                              fontSize: "25px",
+                            }}
+                          >
+                            *
+                          </span>
+                        </>
+                      }
                       fullWidth
-                      o
-                      label="Driver Name (T)"
-                      {...register("driver_name")}
+                      {...register("driver_name", {
+                        required: "Driver Name is required",
+                      })}
+                      error={!!errors.driver_name}
+                      helperText={errors.driver_name?.message}
                     />
                   </Grid>
 
@@ -613,12 +639,24 @@ const AddCompany = () => {
                           value={driverCountryCode}
                           onChange={(event, newValue) => {
                             setDriverCountryCode(newValue);
-                            // setPhoneNumber("");
                           }}
                           renderInput={(params) => (
                             <TextField
+                              fullWidth
                               {...params}
-                              label="Select Country Code"
+                              label={
+                                <>
+                                  Select Country Code
+                                  <span
+                                    style={{
+                                      color: "red",
+                                      fontSize: "25px",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                </>
+                              }
                               variant="outlined"
                             />
                           )}
@@ -626,10 +664,26 @@ const AddCompany = () => {
                       </Grid>
                       <Grid item lg={9} md={8} sm={12} xs={12}>
                         <TextField
-                          {...register("driver_contact")}
-                          fullWidth
-                          label="Driver Contact No (N)"
+                          {...register("driver_contact", {
+                            required: "Driver contact number is required",
+                          })}
+                          error={!!errors.driver_name}
+                          helperText={errors.driver_name?.message}
+                          label={
+                            <>
+                              Driver Contact No (N)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           variant="outlined"
+                          fullWidth
                           type="tel"
                           value={driverPhoneNumber}
                           onChange={handleDriverPhoneNumberChange}

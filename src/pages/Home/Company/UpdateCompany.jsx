@@ -177,16 +177,6 @@ const UpdateCompany = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Company...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
-
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-    const tenantDomain = getTenantName();
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,

@@ -1,20 +1,11 @@
 "use client";
-
 /* eslint-disable no-unused-vars */
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../../../public/assets/logo.png";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import InputMask from "react-input-mask";
-import Loading from "../../../components/Loading/Loading";
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Chip,
-  Grid,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Box, Chip, Grid, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
 import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
@@ -25,38 +16,28 @@ import { unitOptions } from "../../../utils/options";
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 import { suggestionStyles } from "../../../utils/customStyle";
 import { formatNumber } from "../../../utils/formateSemicolon";
-import { getTenantName } from "../../../utils/getTenantName";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddQuotation = () => {
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
-
   const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no);
   const parsedDate = new Date();
   const day = parsedDate.getDate().toString().padStart(2, "0");
   const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
   const year = parsedDate.getFullYear();
   const formattedDate = `${day}-${month}-${year}`;
-
   const location = useLocation();
   const job_no = new URLSearchParams(location.search).get("order_no");
-
   const [orderNumber, setOrderNumber] = useState(job_no);
-
   const navigate = useNavigate();
   const textInputRef = useRef(null);
-
   const [filterType, setFilterType] = useState("");
-
   const [goOtherButton, setGoOtherButton] = useState("");
-
   const [selectedDate, setSelectedDate] = useState("");
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
-
   const [grandTotal, setGrandTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [vat, setVAT] = useState(0);
@@ -64,9 +45,15 @@ const AddQuotation = () => {
   const [serviceTotal, setServiceTotal] = useState(0);
   const [currentMileage, setCurrentMileage] = useState("");
   const [mileageChanged, setMileageChanged] = useState(false);
-
   const [items, setItems] = useState([
-    { description: "", unit: "", quantity: "", rate: "", total: "" },
+    {
+      description: "",
+      unit: "",
+      quantity: "",
+      rate: "",
+      rateDisplay: "",
+      total: "",
+    },
   ]);
   const [serviceItems, setServiceItems] = useState([
     {
@@ -74,16 +61,15 @@ const AddQuotation = () => {
       quantity: "",
       unit: "",
       rate: "",
+      rateDisplay: "",
       total: "",
     },
   ]);
-
   const [productSuggestions, setProductSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
   const [activeInputType, setActiveInputType] = useState(null);
   const [activeInputIndex, setActiveInputIndex] = useState(null);
-
   const limit = 10;
   const tenantDomain = useTenantDomain();
 
@@ -93,6 +79,7 @@ const AddQuotation = () => {
     reset,
     formState: { errors },
   } = useForm();
+
   const queryParams = {
     tenantDomain,
     page: currentPage,
@@ -102,9 +89,11 @@ const AddQuotation = () => {
 
   const { data: stockData } = useGetAllStocksQuery(queryParams);
   console.log("stock data", stockData);
+
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
   const [createQuotation, { isLoading: createLoading }] =
     useCreateQuotationMutation();
 
@@ -131,21 +120,17 @@ const AddQuotation = () => {
         job_no: jobCardData?.data?.job_no,
         Id: jobCardData?.data?.Id,
         company_name: jobCardData?.data?.customer?.company_name,
-
         customer_name: jobCardData?.data?.customer?.customer_name,
         customer_country_code:
           jobCardData?.data?.customer?.customer_country_code,
         customer_contact: jobCardData?.data?.customer?.customer_contact,
-
         customer_address: jobCardData?.data?.customer?.customer_address,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
       });
     }
@@ -160,14 +145,12 @@ const AddQuotation = () => {
         company_country_code: jobCardData?.data?.company?.company_country_code,
         company_email: jobCardData?.data?.company?.company_email,
         customer_address: jobCardData?.data?.company?.customer_address,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
       });
     }
@@ -182,14 +165,12 @@ const AddQuotation = () => {
         company_contact:
           phoneNumber || jobCardData?.data?.showRoom?.company_contact,
         company_country_code: jobCardData?.data?.showRoom?.company_country_code,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
       });
     }
@@ -229,14 +210,28 @@ const AddQuotation = () => {
   const handleAddClick = () => {
     setItems([
       ...items,
-      { description: "", unit: "", quantity: "", rate: "", total: "" },
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
     ]);
   };
 
   const handleServiceAdd = () => {
     setServiceItems([
       ...serviceItems,
-      { description: "", unit: "", quantity: "", rate: "", total: "" },
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
     ]);
   };
 
@@ -253,7 +248,6 @@ const AddQuotation = () => {
   const handleServiceRemove = (index) => {
     if (!index) {
       const list = [...serviceItems];
-
       setServiceItems(list);
     } else {
       const list = [...serviceItems];
@@ -268,7 +262,6 @@ const AddQuotation = () => {
       (sum, item) => sum + Number(item.total),
       0
     );
-
     const roundedTotalSum = Number.parseFloat(
       totalSum + serviceTotalSum
     ).toFixed(2);
@@ -283,13 +276,11 @@ const AddQuotation = () => {
       setShowSuggestions(false);
       return;
     }
-
     const filteredProducts = stockData.data.filter((stock) =>
       stock.product.product_name
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
     );
-
     setProductSuggestions(filteredProducts);
     setShowSuggestions(filteredProducts.length > 0);
     setActiveSuggestionIndex(0);
@@ -305,9 +296,7 @@ const AddQuotation = () => {
       delete newItems[index].sellingPrice;
       delete newItems[index].batchNumber;
     }
-
     setServiceItems(newItems);
-
     setActiveInputType("service");
     setActiveInputIndex(index);
     filterProductSuggestions(value);
@@ -323,9 +312,7 @@ const AddQuotation = () => {
       delete newItems[index].sellingPrice;
       delete newItems[index].batchNumber;
     }
-
     setItems(newItems);
-
     setActiveInputType("parts");
     setActiveInputIndex(index);
     filterProductSuggestions(value);
@@ -336,62 +323,99 @@ const AddQuotation = () => {
     newItems[index].unit = value;
     setItems(newItems);
   };
+
   const handleServiceUnitChange = (index, value) => {
     const newItems = [...serviceItems];
     newItems[index].unit = value;
     setServiceItems(newItems);
   };
 
+  // Fixed quantity change handlers to allow decimals
   const handleQuantityChange = (index, value) => {
+    // Allow decimal numbers by removing non-numeric characters except decimal point
+    const numericValue = value.replace(/[^0-9.]/g, "");
+
+    // Prevent multiple decimal points
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
+
     const newItems = [...items];
-    const roundedValue = Math.round(value) || 0;
-
-    newItems[index].quantity = roundedValue;
-    newItems[index].total = roundedValue * newItems[index].rate;
+    const parsedValue = Number.parseFloat(cleanValue) || 0;
+    newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+    newItems[index].total =
+      parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
     setItems(newItems);
   };
 
   const handleServiceQuantityChange = (index, value) => {
+    // Allow decimal numbers by removing non-numeric characters except decimal point
+    const numericValue = value.replace(/[^0-9.]/g, "");
+
+    // Prevent multiple decimal points
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
+
     const newItems = [...serviceItems];
-    const roundedValue = Math.round(value) || 0;
-
-    newItems[index].quantity = roundedValue;
-
-    newItems[index].total = roundedValue * newItems[index].rate;
-
+    const parsedValue = Number.parseFloat(cleanValue) || 0;
+    newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+    newItems[index].total =
+      parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
     setServiceItems(newItems);
   };
 
+  // Fixed rate change handlers to properly handle decimals without formatNumber interference
   const handleRateChange = (index, value) => {
+    // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
 
+    // Prevent multiple decimal points
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
+
     const newItems = [...items];
-    newItems[index].rate = Number.parseFloat(numericValue) || 0;
-
-    newItems[index].total = newItems[index].quantity * newItems[index].rate;
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    newItems[index].rate = parsedRate;
+    newItems[index].rateDisplay = cleanValue; // Store raw input for display
+    newItems[index].total =
+      (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
     setItems(newItems);
   };
 
   const handleServiceRateChange = (index, value) => {
+    // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
 
-    const newItems = [...serviceItems];
-    newItems[index].rate = Number.parseFloat(numericValue) || 0;
-    newItems[index].total = newItems[index].quantity * newItems[index].rate;
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+    // Prevent multiple decimal points
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
+    const newItems = [...serviceItems];
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    newItems[index].rate = parsedRate;
+    newItems[index].rateDisplay = cleanValue; // Store raw input for display
+    newItems[index].total =
+      (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
     setServiceItems(newItems);
   };
 
   const handleDiscountChange = (value) => {
     const parsedValue = value === "" ? 0 : Number.parseFloat(value);
-
     if (!isNaN(parsedValue)) {
       setDiscount(parsedValue);
     }
@@ -399,7 +423,6 @@ const AddQuotation = () => {
 
   const handleVATChange = (value) => {
     const parsedValue = value === "" ? 0 : Number.parseFloat(value);
-
     if (!isNaN(parsedValue)) {
       setVAT(parsedValue);
     }
@@ -408,7 +431,6 @@ const AddQuotation = () => {
   const calculateFinalTotal = () => {
     const discountAsPercentage = discount;
     const totalAfterDiscount = grandTotal - discountAsPercentage;
-
     const vatAsPercentage = vat / 100;
     let finalTotal = totalAfterDiscount + totalAfterDiscount * vatAsPercentage;
     finalTotal = Number.parseFloat(finalTotal).toFixed(2);
@@ -430,13 +452,11 @@ const AddQuotation = () => {
 
   const findMatchingUnit = (productUnit) => {
     if (!productUnit) return "Pcs"; // Default fallback
-
     // Check if productUnit has unit property (object case)
     const unitValue =
       typeof productUnit === "object" ? productUnit.unit : productUnit;
     const shortName =
       typeof productUnit === "object" ? productUnit.short_name : null;
-
     console.log("Product unit data:", { unitValue, shortName, productUnit });
 
     // Try to find exact match first
@@ -447,7 +467,6 @@ const AddQuotation = () => {
         (shortName &&
           (option.value === shortName || option.label === shortName))
     );
-
     if (exactMatch) {
       console.log("Found exact match:", exactMatch.value);
       return exactMatch.value;
@@ -462,7 +481,6 @@ const AddQuotation = () => {
           (option.value.toLowerCase() === shortName.toLowerCase() ||
             option.label.toLowerCase() === shortName.toLowerCase()))
     );
-
     if (caseInsensitiveMatch) {
       console.log("Found case-insensitive match:", caseInsensitiveMatch.value);
       return caseInsensitiveMatch.value;
@@ -475,14 +493,15 @@ const AddQuotation = () => {
 
   const handleSelectSuggestion = (product) => {
     console.log("selected product", product);
-
     if (activeInputType === "service") {
       const newItems = [...serviceItems];
       const matchingUnit = findMatchingUnit(product.product.unit);
-
       newItems[activeInputIndex].description = product.product.product_name;
       newItems[activeInputIndex].unit = matchingUnit;
       newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+      newItems[activeInputIndex].rateDisplay = (
+        product.product.sellingPrice || 0
+      ).toString();
       newItems[activeInputIndex].quantity =
         product.product.product_quantity || 0;
       newItems[activeInputIndex].product = product.product._id;
@@ -494,7 +513,8 @@ const AddQuotation = () => {
 
       // Calculate total based on quantity and rate
       newItems[activeInputIndex].total =
-        newItems[activeInputIndex].quantity * newItems[activeInputIndex].rate;
+        (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
+        (Number.parseFloat(newItems[activeInputIndex].rate) || 0);
       newItems[activeInputIndex].total = Number.parseFloat(
         newItems[activeInputIndex].total.toFixed(2)
       );
@@ -504,10 +524,12 @@ const AddQuotation = () => {
     } else if (activeInputType === "parts") {
       const newItems = [...items];
       const matchingUnit = findMatchingUnit(product.product.unit);
-
       newItems[activeInputIndex].description = product.product.product_name;
       newItems[activeInputIndex].unit = matchingUnit;
       newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+      newItems[activeInputIndex].rateDisplay = (
+        product.product.sellingPrice || 0
+      ).toString();
       newItems[activeInputIndex].quantity =
         product.product.product_quantity || 0;
       newItems[activeInputIndex].product = product.product._id;
@@ -519,7 +541,8 @@ const AddQuotation = () => {
 
       // Calculate total based on quantity and rate
       newItems[activeInputIndex].total =
-        newItems[activeInputIndex].quantity * newItems[activeInputIndex].rate;
+        (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
+        (Number.parseFloat(newItems[activeInputIndex].rate) || 0);
       newItems[activeInputIndex].total = Number.parseFloat(
         newItems[activeInputIndex].total.toFixed(2)
       );
@@ -527,7 +550,6 @@ const AddQuotation = () => {
       console.log("Parts item updated:", newItems[activeInputIndex]);
       setItems(newItems);
     }
-
     setShowSuggestions(false);
   };
 
@@ -545,16 +567,14 @@ const AddQuotation = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Quotation...");
-
     const customer = {
       company_name: data.company_name,
-
       customer_name: data.customer_name,
       customer_contact: data.customer_contact,
       customer_country_code: data.company_country_code,
-
       customer_address: data.customer_address,
     };
+
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -562,19 +582,18 @@ const AddQuotation = () => {
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
     };
+
     const showRoom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,
-
       company_name: data.company_name,
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
-
       company_address: data.company_address,
     };
+
     data.mileage = Number(data.mileage);
     const newMileageValue = Number(data.mileage);
-
     const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
     const updatedMileageHistory = [...existingMileageHistory];
 
@@ -584,12 +603,10 @@ const AddQuotation = () => {
         mileage: Number(currentMileage),
         date: new Date().toISOString(),
       };
-
       // Check if this mileage value already exists in history
       const mileageExists = updatedMileageHistory.some(
         (entry) => entry.mileage === Number(currentMileage)
       );
-
       if (!mileageExists) {
         updatedMileageHistory.push(newMileageEntry);
       }
@@ -600,7 +617,6 @@ const AddQuotation = () => {
       const mileageExists = updatedMileageHistory.some(
         (entry) => entry.mileage === newMileageValue
       );
-
       if (!mileageExists) {
         updatedMileageHistory.push({
           mileage: newMileageValue,
@@ -608,6 +624,7 @@ const AddQuotation = () => {
         });
       }
     }
+
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -638,6 +655,7 @@ const AddQuotation = () => {
       logo,
       mileage: data.mileage,
     };
+
     const values = {
       tenantDomain,
       customer,
@@ -646,12 +664,11 @@ const AddQuotation = () => {
       vehicle,
       quotation,
     };
+
     try {
       const res = await createQuotation(values).unwrap();
-
       if (res.success) {
         toast.success(res.message);
-
         if (goOtherButton === "preview") {
           navigate(`/dashboard/quotation-view?id=${res?.data?._id}`);
           setGoOtherButton("");
@@ -664,13 +681,11 @@ const AddQuotation = () => {
           navigate("/dashboard/quotation-list");
           setGoOtherButton("");
         }
-
         refetch();
       }
     } catch (err) {
       const errorMessage =
         err?.data?.message || err?.message || "Failed to create quotation";
-
       toast.error(errorMessage);
     } finally {
       toast.dismiss(toastId);
@@ -687,7 +702,6 @@ const AddQuotation = () => {
         setShowSuggestions(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -699,7 +713,7 @@ const AddQuotation = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src={CompanyInfoData?.data?.logo}
+            src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
             alt="logo"
             className=" addJobLogoImg"
           />
@@ -719,7 +733,6 @@ const AddQuotation = () => {
           <div className="flex md:flex-row flex-col justify-between items-center">
             <div className="hidden"></div>
             <div className="vehicleCard">Create Quotation </div>
-
             <div>
               <input
                 type="date"
@@ -731,7 +744,6 @@ const AddQuotation = () => {
               />
             </div>
           </div>
-
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 my-10">
             <Box>
               <h3 className="text-xl lg:text-3xl font-bold mb-5">
@@ -799,7 +811,6 @@ const AddQuotation = () => {
                     />
                   )}
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={4} sm={12} xs={12}>
@@ -883,7 +894,6 @@ const AddQuotation = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   {!jobCardData?.data && (
                     <TextField
@@ -923,12 +933,10 @@ const AddQuotation = () => {
                 </Grid>
               </Grid>
             </Box>
-
             <Box>
               <h3 className="text-xl lg:text-3xl font-bold mb-5 ">
                 Vehicle Info
               </h3>
-
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -939,7 +947,6 @@ const AddQuotation = () => {
                     required
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={4} sm={12} xs={12}>
@@ -963,7 +970,6 @@ const AddQuotation = () => {
                         )}
                       />
                     </Grid>
-
                     <Grid item lg={9} md={8} sm={12} xs={12}>
                       <InputMask
                         mask="99-9999"
@@ -986,7 +992,6 @@ const AddQuotation = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
@@ -1217,7 +1222,6 @@ const AddQuotation = () => {
                         </select>
                       </div>
                     </div>
-
                     <div className="col-span-12 md:col-span-1">
                       <input
                         className="inputField"
@@ -1226,7 +1230,7 @@ const AddQuotation = () => {
                         onChange={(e) =>
                           handleServiceRateChange(i, e.target.value)
                         }
-                        value={item.rate ? formatNumber(item.rate) : ""}
+                        value={item.rateDisplay || ""}
                         required
                       />
                     </div>
@@ -1265,7 +1269,6 @@ const AddQuotation = () => {
               );
             })}
           </Box>
-
           <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5 ">
             <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
               SL No
@@ -1396,7 +1399,7 @@ const AddQuotation = () => {
                       onChange={(e) => handleRateChange(i, e.target.value)}
                       required
                       type="text"
-                      value={item.rate ? formatNumber(item.rate) : ""}
+                      value={item.rateDisplay || ""}
                     />
                   </div>
                   <div className="col-span-12 md:col-span-1">
@@ -1420,7 +1423,6 @@ const AddQuotation = () => {
                     )}
                   </div>
                 </div>
-
                 <div className="flex justify-end mt-1 ">
                   {items.length - 1 === i && (
                     <button
@@ -1434,7 +1436,6 @@ const AddQuotation = () => {
               </div>
             );
           })}
-
           <div className="discountFieldWrap mt-5 ">
             <div className="flex items-center ">
               <b className="mr-2 hideAmountText"> Total Amount: </b>
@@ -1475,25 +1476,21 @@ const AddQuotation = () => {
               </div>
             </div>
           </div>
-
           <div className="mt-4 md:mt-8  buttonGroup">
             <div className="md:hidden flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
                 Add Quotation{" "}
               </button>
             </div>
-
             <div className="flex">
               <button onClick={() => setGoOtherButton("preview")}>
                 Preview
               </button>
-
               <button>Print </button>
               <button onClick={() => setGoOtherButton("invoice")}>
                 Invoice{" "}
               </button>
             </div>
-
             <div className="hidden  md:flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
                 Add Quotation{" "}

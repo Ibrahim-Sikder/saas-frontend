@@ -1,59 +1,119 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-empty-pattern */
-
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable no-unused-vars */
 "use client"
-
 import { useState, useEffect } from "react"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
 import {
-  TextField,
-  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Box,
   Typography,
-  Link,
+  TextField,
+  Button,
   InputAdornment,
-  Alert,
-  Paper,
+  IconButton,
   Grid,
-  Stepper,
-  Step,
-  StepLabel,
-  FormControlLabel,
   Checkbox,
+  FormControlLabel,
+  CircularProgress,
+  Alert,
+  FormControl,
+  Divider,
+  Chip,
   Card,
   CardContent,
   CardHeader,
+  Step,
+  Stepper,
+  StepLabel,
   Radio,
   RadioGroup,
-  FormControl,
   FormLabel,
-  Container,
-  Divider,
-  Chip,
-  CircularProgress,
+  Paper,
 } from "@mui/material"
 import {
+  Visibility,
+  VisibilityOff,
+  Email,
+  Person,
   Business,
+  Lock,
+  Close,
   Domain,
+  Phone,
+  LocationOn,
+  Build,
   CheckCircle,
   ArrowForward,
   ArrowBack,
-  Build,
   Payment,
   AttachMoney,
-  Person,
-  Email,
-  Lock,
 } from "@mui/icons-material"
-import { subscriptionPlans } from "../../data"
-import { useCreateTenantMutation } from "../../redux/api/tenantApi"
 import { toast } from "react-toastify"
+import { useCreateTenantMutation } from "../../../redux/api/tenantApi"
 
-const TenantRegisterPage = () => {
-  const navigate = useNavigate()
+// Subscription plans data
+const subscriptionPlans = [
+  {
+    id: "Monthly",
+    name: "Monthly Plan",
+    price: "$29.99",
+    period: "per month",
+    recommended: false,
+    features: [
+      "Up to 5 users",
+      "Basic inventory management",
+      "Customer management",
+      "Basic reports",
+      "Email support",
+      "Mobile app access",
+    ],
+  },
+  {
+    id: "HalfYearly",
+    name: "Half Yearly Plan",
+    price: "$149.99",
+    period: "per 6 months",
+    recommended: true,
+    features: [
+      "Up to 15 users",
+      "Advanced inventory management",
+      "CRM integration",
+      "Advanced analytics",
+      "Priority support",
+      "API access",
+      "Custom reports",
+      "Multi-location support",
+    ],
+  },
+  {
+    id: "Yearly",
+    name: "Yearly Plan",
+    price: "$279.99",
+    period: "per year",
+    recommended: false,
+    features: [
+      "Unlimited users",
+      "Full feature access",
+      "White-label options",
+      "Custom integrations",
+      "Dedicated support",
+      "Advanced security",
+      "Data backup & recovery",
+      "Training & onboarding",
+    ],
+  },
+]
+
+const steps = ["Business Info", "User Account", "Choose Plan", "Payment Details", "Review & Confirm"]
+
+const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
+  const [createTenant, { isLoading }] = useCreateTenantMutation()
   const [activeStep, setActiveStep] = useState(0)
   const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [createTenant] = useCreateTenantMutation()
 
   // Form state with all required fields
   const [tenantData, setTenantData] = useState({
@@ -71,9 +131,11 @@ const TenantRegisterPage = () => {
     selectedPlan: "HalfYearly",
     paymentMethod: "Manual",
     amount: 0,
-    // Terms
     agreeToTerms: false,
   })
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const calculateAmount = (planId) => {
     const plan = subscriptionPlans.find((p) => p.id === planId)
@@ -82,13 +144,39 @@ const TenantRegisterPage = () => {
     return priceMatch ? Number.parseFloat(priceMatch[1]) : 0
   }
 
-
   useEffect(() => {
     setTenantData((prev) => ({
       ...prev,
       amount: calculateAmount(prev.selectedPlan),
     }))
   }, [])
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      setTenantData({
+        name: "",
+        domain: "",
+        businessType: "independent",
+        contactEmail: "",
+        phoneNumber: "",
+        address: "",
+        firstName: "",
+        // lastName: "",
+        userEmail: "",
+        password: "",
+        confirmPassword: "",
+        selectedPlan: "HalfYearly",
+        paymentMethod: "Manual",
+        amount: calculateAmount("HalfYearly"),
+        agreeToTerms: false,
+      })
+      setError("")
+      setActiveStep(0)
+      setShowPassword(false)
+      setShowConfirmPassword(false)
+    }
+  }, [open])
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target
@@ -99,11 +187,10 @@ const TenantRegisterPage = () => {
       newValue = value
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9-]/g, "")                        
-        .replace(/^-+|-+$/g, "")      
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/^-+|-+$/g, "")
     }
 
-  
     if (type === "text" || type === "email") {
       newValue = value.trim()
     }
@@ -113,30 +200,27 @@ const TenantRegisterPage = () => {
         ...prev,
         [name]: newValue,
       }
-
       // Auto-calculate amount when plan changes
       if (name === "selectedPlan") {
         updated.amount = calculateAmount(value)
       }
-
       return updated
     })
+
+    if (error) {
+      setError("")
+    }
   }
 
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1)
-  }
+  const handleTogglePassword = () => setShowPassword((prev) => !prev)
+  const handleToggleConfirmPassword = () => setShowConfirmPassword((prev) => !prev)
 
   const validateStep = () => {
     if (activeStep === 0) {
       return (
         tenantData.name.trim() !== "" &&
         tenantData.domain.trim() !== "" &&
-        tenantData.domain.length >= 3 && 
+        tenantData.domain.length >= 3 &&
         tenantData.contactEmail.trim() !== "" &&
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tenantData.contactEmail)
       )
@@ -159,79 +243,91 @@ const TenantRegisterPage = () => {
     return true
   }
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
-
-  try {
-    const startDate = new Date();
-    const endDate = new Date();
-
-    if (tenantData.selectedPlan === "Monthly") {
-      endDate.setMonth(startDate.getMonth() + 1);
-    } else if (tenantData.selectedPlan === "HalfYearly") {
-      endDate.setMonth(startDate.getMonth() + 6);
-    } else if (tenantData.selectedPlan === "Yearly") {
-      endDate.setFullYear(startDate.getFullYear() + 1);
-    }
-
-    const tenantPayload = {
-      name: tenantData.name.trim(),
-      domain: tenantData.domain.trim().toLowerCase(),
-      businessType: tenantData.businessType,
-      contactEmail: tenantData.contactEmail.trim().toLowerCase(),
-      phoneNumber: tenantData.phoneNumber.trim(),
-      address: tenantData.address.trim(),
-      user: {
-        firstName: tenantData.firstName.trim(),
-        // lastName: tenantData.lastName.trim(),
-        email: tenantData.userEmail.trim().toLowerCase(),
-        password: tenantData.password,
-      },
-      subscription: {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        status: "Pending",
-        isPaid: false,
-        isActive: false,
-        paymentMethod: tenantData.paymentMethod,
-        amount: tenantData.amount,
-      },
-    }
-
-    const result = await createTenant({
-      payload: tenantPayload,
-      plan: tenantData.selectedPlan,
-    });
-
-    if ("error" in result) {
-      throw new Error(result.error?.data?.message || "Failed to register tenant.");
-    }
-
-    if (result?.data?.success) {
-      toast.success(result.data.message || "Tenant created successfully!");
-      navigate("/login");
+  const handleNext = () => {
+    if (validateStep()) {
+      setActiveStep((prevStep) => prevStep + 1)
     } else {
-      throw new Error("Unexpected response format from server");
+      toast.error("Please fill in all required fields before proceeding")
     }
-  } catch (err) {
-    setError(err.message || "Failed to register tenant.");
-    toast.error(err.message);
-  } finally {
-    setLoading(false);
   }
-};
 
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1)
+  }
 
-  const steps = ["Business Info", "User Account", "Choose Plan", "Payment Details", "Review & Confirm"]
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
+
+    if (!validateStep()) {
+      toast.error("Please complete all required fields")
+      return
+    }
+
+    try {
+      const startDate = new Date()
+      const endDate = new Date()
+      if (tenantData.selectedPlan === "Monthly") {
+        endDate.setMonth(startDate.getMonth() + 1)
+      } else if (tenantData.selectedPlan === "HalfYearly") {
+        endDate.setMonth(startDate.getMonth() + 6)
+      } else if (tenantData.selectedPlan === "Yearly") {
+        endDate.setFullYear(startDate.getFullYear() + 1)
+      }
+
+      const tenantPayload = {
+        name: tenantData.name.trim(),
+        domain: tenantData.domain.trim().toLowerCase(),
+        businessType: tenantData.businessType,
+        contactEmail: tenantData.contactEmail.trim().toLowerCase(),
+        phoneNumber: tenantData.phoneNumber.trim(),
+        address: tenantData.address.trim(),
+        user: {
+          firstName: tenantData.firstName.trim(),
+          // lastName: tenantData.lastName.trim(),
+          email: tenantData.userEmail.trim().toLowerCase(),
+          password: tenantData.password,
+        },
+        subscription: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          status: "Pending",
+          isPaid: false,
+          isActive: false,
+          paymentMethod: tenantData.paymentMethod,
+          amount: tenantData.amount,
+        },
+      }
+
+      const result = await createTenant({
+        payload: tenantPayload,
+        plan: tenantData.selectedPlan,
+      })
+
+      if ("error" in result) {
+        throw new Error(result.error?.data?.message || "Failed to create tenant.")
+      }
+
+      if (result?.data?.success) {
+        toast.success(result.data.message || "Tenant created successfully!")
+        onTenantCreated && onTenantCreated(result.data.data)
+        onClose()
+      } else {
+        throw new Error("Unexpected response format from server")
+      }
+    } catch (err) {
+      const errorMessage = err.message || "Failed to create tenant."
+      setError(errorMessage)
+      toast.error(errorMessage)
+    }
+  }
 
   const getStepContent = (step) => {
     switch (step) {
       case 0:
         return (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "primary.main", fontWeight: "bold" }}>
               Business Information
             </Typography>
             <TextField
@@ -254,6 +350,7 @@ const TenantRegisterPage = () => {
                   </InputAdornment>
                 ),
               }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -278,6 +375,7 @@ const TenantRegisterPage = () => {
                   </InputAdornment>
                 ),
               }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -300,6 +398,14 @@ const TenantRegisterPage = () => {
                   ? "Valid business contact email is required"
                   : "Primary contact email for your business"
               }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -311,6 +417,14 @@ const TenantRegisterPage = () => {
               autoComplete="tel"
               value={tenantData.phoneNumber}
               onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -322,6 +436,14 @@ const TenantRegisterPage = () => {
               rows={2}
               value={tenantData.address}
               onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LocationOn color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              disabled={isLoading}
             />
             <FormControl component="fieldset" sx={{ mt: 3 }}>
               <FormLabel component="legend">Business Type</FormLabel>
@@ -337,14 +459,13 @@ const TenantRegisterPage = () => {
       case 1:
         return (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "primary.main", fontWeight: "bold" }}>
               Create Admin User Account
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               This will be the main administrator account for your business
             </Typography>
             <TextField
-
                   margin="normal"
                   required
                   fullWidth
@@ -363,6 +484,7 @@ const TenantRegisterPage = () => {
                       </InputAdornment>
                     ),
                   }}
+                  disabled={isLoading}
                 />
             <TextField
               margin="normal"
@@ -391,6 +513,7 @@ const TenantRegisterPage = () => {
                   </InputAdornment>
                 ),
               }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -399,7 +522,7 @@ const TenantRegisterPage = () => {
               id="password"
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               value={tenantData.password}
               onChange={handleChange}
@@ -415,7 +538,15 @@ const TenantRegisterPage = () => {
                     <Lock color="action" />
                   </InputAdornment>
                 ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleTogglePassword} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -424,7 +555,7 @@ const TenantRegisterPage = () => {
               id="confirmPassword"
               label="Confirm Password"
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
               value={tenantData.confirmPassword}
               onChange={handleChange}
@@ -434,6 +565,21 @@ const TenantRegisterPage = () => {
                   ? "Passwords do not match"
                   : ""
               }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleToggleConfirmPassword} edge="end">
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              disabled={isLoading}
             />
           </Box>
         )
@@ -441,7 +587,7 @@ const TenantRegisterPage = () => {
       case 2:
         return (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "primary.main", fontWeight: "bold" }}>
               Select a Subscription Plan
             </Typography>
             <Box sx={{ mt: 2, maxHeight: "400px", overflowY: "auto" }}>
@@ -571,7 +717,7 @@ const TenantRegisterPage = () => {
       case 3:
         return (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "primary.main", fontWeight: "bold" }}>
               Payment Details
             </Typography>
             <Paper variant="outlined" sx={{ p: 3, mt: 2, bgcolor: "grey.50" }}>
@@ -647,7 +793,7 @@ const TenantRegisterPage = () => {
       case 4:
         return (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "primary.main", fontWeight: "bold" }}>
               Review Your Information
             </Typography>
             <Paper variant="outlined" sx={{ p: 3, mt: 2 }}>
@@ -668,7 +814,7 @@ const TenantRegisterPage = () => {
                   <Typography variant="subtitle2" color="text.secondary">
                     Domain
                   </Typography>
-                  <Typography variant="body1">{tenantData.domain}</Typography>
+                  <Typography variant="body1">{tenantData.domain}.ourplatform.com</Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2" color="text.secondary">
@@ -750,19 +896,13 @@ const TenantRegisterPage = () => {
                     checked={tenantData.agreeToTerms}
                     onChange={handleChange}
                     color="primary"
+                    disabled={isLoading}
                   />
                 }
                 label={
                   <Typography variant="body2">
-                    I agree to the{" "}
-                    <Link component={RouterLink} to="/terms">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link component={RouterLink} to="/privacy">
-                      Privacy Policy
-                    </Link>
-                    , and confirm that all information provided is accurate.
+                    I agree to the Terms of Service and Privacy Policy, and confirm that all information provided is
+                    accurate.
                   </Typography>
                 }
               />
@@ -776,136 +916,95 @@ const TenantRegisterPage = () => {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        background: "linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)",
-        py: 4,
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="lg"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          maxHeight: "95vh",
+        },
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={4} justifyContent="center" alignItems="center">
-          <Grid item xs={12} md={6} lg={7} sx={{ display: { xs: "none", md: "block" } }}>
-            <Box sx={{ color: "white", p: 4 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-                <Build sx={{ fontSize: 40, mr: 2 }} />
-                <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
-                  Garage Master
-                </Typography>
-              </Box>
-              <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
-                Start Your Garage Business Journey
+      <DialogTitle>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Build sx={{ fontSize: 32, color: "primary.main" }} />
+            <Box>
+              <Typography variant="h5" fontWeight="bold">
+                Register Your Business
               </Typography>
-              <Typography variant="h6" paragraph>
-                Join thousands of garage owners who trust our platform to manage their operations efficiently and grow
-                their business.
+              <Typography variant="body2" color="text.secondary">
+                Create your tenant account to get started
               </Typography>
-              <Box sx={{ mt: 4 }}>
-                <Typography variant="body1" paragraph>
-                  • Multi-tenant architecture for scalability
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  • Complete business management suite
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  • Advanced reporting and analytics
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  • 24/7 customer support
-                </Typography>
-                <Typography variant="body1">• Secure cloud-based platform</Typography>
-              </Box>
             </Box>
-          </Grid>
-          <Grid item xs={12} md={6} lg={5}>
-            <Paper
-              elevation={6}
-              sx={{
-                p: 4,
-                borderRadius: 2,
-                backdropFilter: "blur(10px)",
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                maxHeight: "85vh",
-                overflowY: "auto",
-              }}
-            >
-              <Box sx={{ mb: 4, textAlign: "center" }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                  Register Your Business
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Create your tenant account to get started
-                </Typography>
-              </Box>
+          </Box>
+          <IconButton onClick={onClose} sx={{ color: "grey.500" }}>
+            <Close />
+          </IconButton>
+        </Box>
+      </DialogTitle>
 
-              {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                  {error}
-                </Alert>
-              )}
+      <Divider />
 
-              <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
+      <DialogContent sx={{ pt: 3 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-              <Box component="form" onSubmit={handleSubmit} noValidate>
-                {getStepContent(activeStep)}
+        {/* Stepper */}
+        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mt: 4,
-                  }}
-                >
-                  <Button disabled={activeStep === 0} onClick={handleBack} startIcon={<ArrowBack />}>
-                    Back
-                  </Button>
+        {/* Step Content */}
+        <Box sx={{ minHeight: 400 }}>{getStepContent(activeStep)}</Box>
+      </DialogContent>
 
-                  {activeStep === steps.length - 1 ? (
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      disabled={loading || !validateStep()}
-                      endIcon={loading ? <CircularProgress size={20} /> : <CheckCircle />}
-                    >
-                      {loading ? "Creating..." : "Complete Registration"}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}
-                      disabled={!validateStep()}
-                      endIcon={<ArrowForward />}
-                    >
-                      Next
-                    </Button>
-                  )}
-                </Box>
-              </Box>
+      <Divider />
 
-              <Box sx={{ textAlign: "center", mt: 4 }}>
-                <Typography variant="body2">
-                  Already have a tenant account?{" "}
-                  <Link component={RouterLink} to="/login" variant="body2">
-                    Sign in
-                  </Link>
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+      <DialogActions sx={{ p: 3, gap: 2 }}>
+        <Button onClick={onClose} variant="outlined" disabled={isLoading}>
+          Cancel
+        </Button>
+
+        <Button disabled={activeStep === 0} onClick={handleBack} startIcon={<ArrowBack />}>
+          Back
+        </Button>
+
+        {activeStep === steps.length - 1 ? (
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            disabled={isLoading || !validateStep()}
+            endIcon={isLoading ? <CircularProgress size={20} /> : <CheckCircle />}
+            sx={{ minWidth: 180 }}
+          >
+            {isLoading ? "Creating..." : "Complete Registration"}
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleNext}
+            disabled={!validateStep()}
+            endIcon={<ArrowForward />}
+          >
+            Next
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   )
 }
 
-export default TenantRegisterPage
+export default CreateTenantModal
