@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 "use client"
+
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
@@ -39,6 +40,7 @@ const UpdateQuotation = () => {
   const [grandTotal, setGrandTotal] = useState(0)
   const [discount, setDiscount] = useState("")
   const [vat, setVAT] = useState("")
+  const [tax, setTax] = useState("") // New state for Tax
   const [error, setError] = useState("")
   const [removeButton, setRemoveButton] = useState("")
   const [reload, setReload] = useState(false)
@@ -53,6 +55,7 @@ const UpdateQuotation = () => {
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   })
+  console.log(specificQuotation)
   const userTypeFromProfile = new URLSearchParams(location.search).get("user_type")
   const userFromProfile = new URLSearchParams(location.search).get("user")
   const [countryCode, setCountryCode] = useState(countries[0])
@@ -76,7 +79,6 @@ const UpdateQuotation = () => {
   const [activeInputIndex, setActiveInputIndex] = useState(null)
   const [currentMileage, setCurrentMileage] = useState("")
   const [mileageChanged, setMileageChanged] = useState(false)
-
   const {
     register,
     handleSubmit,
@@ -84,14 +86,12 @@ const UpdateQuotation = () => {
     setValue: setFormValue,
     formState: { errors },
   } = useForm()
-
   const queryParams = {
     tenantDomain,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   }
-
   const { data: stockData } = useGetAllStocksQuery(queryParams)
   const [updateQuotation, { isLoading: updateLoading, error: updateError }] = useUpdateQuotationMutation()
   const [removeQuotation, { isLoading: removeLoading, error: removeError }] = useRemoveQuotationMutation()
@@ -143,6 +143,10 @@ const UpdateQuotation = () => {
   useEffect(() => {
     if (data?.data) {
       setSpecificQuotation(data.data)
+      // Initialize discount, vat, and tax from specificQuotation if they exist
+      setDiscount(data.data.discount || "")
+      setVAT(data.data.vat || "")
+      setTax(data.data.tax || "") // Initialize tax from fetched data
     }
   }, [data])
 
@@ -240,16 +244,13 @@ const UpdateQuotation = () => {
     const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0)
     const serviceTotalSum = specificQuotation?.service_input_data?.reduce((sum, item) => sum + Number(item.total), 0)
     const serviceTotalSum2 = serviceItems.reduce((sum, item) => sum + Number(item.total), 0)
-
     const newTotalSum = isNaN(totalSum) ? 0 : totalSum
     const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2
     const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum
     const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2
-
     const newGrandTotal = newTotalSum + newTotalSum2
     const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2
     const totalGrand = Number.parseFloat(newGrandTotal + newServiceGrandTotal).toFixed(2)
-
     setPartsTotal(newGrandTotal)
     setServiceTotal(newServiceGrandTotal)
     setGrandTotal(totalGrand)
@@ -361,11 +362,9 @@ const UpdateQuotation = () => {
   const handleQuantityChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     if (!isNaN(cleanValue) && cleanValue !== "") {
       const newItems = [...specificQuotation.input_data]
       const parsedValue = Number.parseFloat(cleanValue) || 0
@@ -382,11 +381,9 @@ const UpdateQuotation = () => {
   const handleQuantityChange2 = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...items]
     const parsedValue = Number.parseFloat(cleanValue) || 0
     newItems[index].quantity = cleanValue // Store as string to preserve decimal input
@@ -398,11 +395,9 @@ const UpdateQuotation = () => {
   const handleServiceQuantityChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     if (!isNaN(cleanValue) && cleanValue !== "") {
       const newItems = [...specificQuotation.service_input_data]
       const parsedValue = Number.parseFloat(cleanValue) || 0
@@ -419,11 +414,9 @@ const UpdateQuotation = () => {
   const handleServiceQuantityChange2 = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...serviceItems]
     const parsedValue = Number.parseFloat(cleanValue) || 0
     newItems[index].quantity = cleanValue // Store as string to preserve decimal input
@@ -436,11 +429,9 @@ const UpdateQuotation = () => {
   const handleRateChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...specificQuotation.input_data]
     const parsedRate = Number.parseFloat(cleanValue) || 0
     newItems[index].rate = parsedRate
@@ -456,11 +447,9 @@ const UpdateQuotation = () => {
   const handleRateChange2 = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...items]
     const parsedRate = Number.parseFloat(cleanValue) || 0
     newItems[index].rate = parsedRate
@@ -473,11 +462,9 @@ const UpdateQuotation = () => {
   const handleServiceRateChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...specificQuotation.service_input_data]
     const parsedRate = Number.parseFloat(cleanValue) || 0
     newItems[index].rate = parsedRate
@@ -493,11 +480,9 @@ const UpdateQuotation = () => {
   const handleServiceRateChange2 = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "")
-
     // Prevent multiple decimal points
     const parts = numericValue.split(".")
     const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
     const newItems = [...serviceItems]
     const parsedRate = Number.parseFloat(cleanValue) || 0
     newItems[index].rate = parsedRate
@@ -521,80 +506,89 @@ const UpdateQuotation = () => {
     }
   }
 
+  const handleTaxChange = (value) => {
+    const parsedValue = Number(value)
+    if (!isNaN(parsedValue)) {
+      setTax(parsedValue)
+    }
+  }
+
   const calculateFinalTotal = () => {
-    let finalTotal
-    let differenceExistAndNewGrandTotal = 0 // Initialize to 0
-    let vatAsPercentage = 0
-    let discountAsPercentage = 0
-    let totalAfterDiscount = 0
+    let currentPartsTotal = partsTotal
+    let currentServiceTotal = serviceTotal
 
-    // Calculate the difference between the grand total and the specific quotation's total amount
-    if (grandTotal !== specificQuotation?.total_amount) {
-      differenceExistAndNewGrandTotal = grandTotal - (Number(specificQuotation?.total_amount) || 0) // Convert to number
+    // If partsTotal or serviceTotal are 0 (e.g., on initial load before items are re-calculated),
+    // use the values from specificQuotation if available.
+    // This ensures the initial calculation uses existing data.
+    if (currentPartsTotal === 0 && specificQuotation?.parts_total) {
+      currentPartsTotal = Number(specificQuotation.parts_total)
+    }
+    if (currentServiceTotal === 0 && specificQuotation?.service_total) {
+      currentServiceTotal = Number(specificQuotation.service_total)
     }
 
-    // Determine the discount percentage
-    if (discount > 0) {
-      discountAsPercentage = discount
-    } else if (discount === 0) {
-      discountAsPercentage = 0 // If it's 0, we assign 0 but ensure it won't reduce the amount
+    const currentGrandTotal = currentPartsTotal + currentServiceTotal
+
+    // Determine the discount value
+    let effectiveDiscount = 0
+    if (discount === 0 || discount > 0) {
+      // If discount is explicitly set (0 or positive number)
+      effectiveDiscount = discount
     } else if (discount === "") {
-      discountAsPercentage = Number(specificQuotation?.discount) || 0
+      // If discount state is empty, use existing specificQuotation discount
+      effectiveDiscount = Number(specificQuotation?.discount) || 0
     }
-
-    // Convert specificQuotation?.total_amount to a number
-    const specificTotalAmount = Number(specificQuotation?.total_amount) || 0 // Ensure it's treated as a number
-    const differenceWithoutDiscount = specificTotalAmount + differenceExistAndNewGrandTotal
 
     // Apply discount
-    if (discountAsPercentage === 0) {
-      totalAfterDiscount = differenceWithoutDiscount
-    } else if (discountAsPercentage === "") {
-      totalAfterDiscount = differenceWithoutDiscount - (Number(specificQuotation?.discount) || 0)
-    } else {
-      totalAfterDiscount = differenceWithoutDiscount - discountAsPercentage
-    }
-
-    // Ensure that if there's no discount, no subtraction happens
-    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount
+    let totalAfterDiscount = currentGrandTotal - effectiveDiscount
+    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount // Ensure total doesn't go negative
 
     // Determine the VAT percentage
-    if (vat > 0) {
-      vatAsPercentage = vat
-    } else if (vat === 0) {
-      vatAsPercentage = 0
+    let effectiveVat = 0
+    if (vat === 0 || vat > 0) {
+      // If vat is explicitly set (0 or positive number)
+      effectiveVat = vat
     } else if (vat === "") {
-      vatAsPercentage = Number(specificQuotation?.vat) || 0
+      // If vat state is empty, use existing specificQuotation vat
+      effectiveVat = Number(specificQuotation?.vat) || 0
     }
 
     // Calculate total after VAT
-    const calculateVat = totalAfterDiscount * (vatAsPercentage / 100)
-    const totalAfterTax = totalAfterDiscount + calculateVat
+    const vatAmount = totalAfterDiscount * (effectiveVat / 100)
+    const totalAfterVat = totalAfterDiscount + vatAmount
+
+    // Determine the Tax percentage (new logic)
+    let effectiveTax = 0
+    if (tax === 0 || tax > 0) {
+      // If tax is explicitly set (0 or positive number)
+      effectiveTax = tax
+    } else if (tax === "") {
+      // If tax state is empty, use existing specificQuotation tax
+      effectiveTax = Number(specificQuotation?.tax) || 0 // Assuming specificQuotation will have a 'tax' field
+    }
+
+    // Apply tax after VAT
+    const taxAmount = totalAfterVat * (effectiveTax / 100)
+    const finalTotal = totalAfterVat + taxAmount
 
     // Final total with 2 decimal precision
-    finalTotal = Number.parseFloat(totalAfterTax).toFixed(2)
-
-    return finalTotal
+    return Number.parseFloat(finalTotal).toFixed(2)
   }
 
   // Fixed handleSelectSuggestion function
   const handleSelectSuggestion = (product) => {
     if (!product) return
-
     // Extract product details correctly based on the data structure
     const productName = product.product?.product_name || ""
     const productPrice = Number(product.product?.sellingPrice) || 0
     const productQuantity = product.product.product_quantity || 1
-
     // Get unit from the unit object
     let productUnit = "Set" // Default unit
     if (product.product?.unit && typeof product.product.unit === "object") {
       productUnit = product.product.unit.unit || "Set"
     }
-
     // Calculate total
     const total = productQuantity * productPrice
-
     if (activeInputType === "service") {
       if (activeInputIndex < (specificQuotation?.service_input_data?.length || 0)) {
         // For existing service items
@@ -664,7 +658,6 @@ const UpdateQuotation = () => {
         setItems([...newItems])
       }
     }
-
     // Close the suggestions dropdown
     setShowSuggestions(false)
   }
@@ -752,15 +745,15 @@ const UpdateQuotation = () => {
         customer_country_code: data.company_country_code,
         customer_address: data.customer_address,
       }
-
       const company = {
         company_name: data.company_name,
         vehicle_username: data.vehicle_username,
         company_address: data.company_address,
         company_contact: data.company_contact,
         company_country_code: data.company_country_code,
+        company_email: data.company_email,
+        customer_address: data.company_address, // This was customer_address in original, but company_address in reset. Keeping company_address for consistency with reset.
       }
-
       const showRoom = {
         showRoom_name: data.showRoom_name,
         vehicle_username: data.vehicle_username,
@@ -769,16 +762,13 @@ const UpdateQuotation = () => {
         company_country_code: data.company_country_code,
         company_address: data.company_address,
       }
-
       data.vehicle_model = Number(data.vehicle_model)
       data.mileage = Number(data.mileage)
-
       // Get the current mileage value
       const newMileageValue = Number(data.mileage)
       // Get existing mileage history from the correct path
       const existingMileageHistory = specificQuotation?.vehicle?.mileageHistory || []
       const updatedMileageHistory = [...existingMileageHistory]
-
       // Only add new mileage to history if it has changed and is valid
       if (mileageChanged && !isNaN(newMileageValue) && newMileageValue > 0) {
         // Check if this mileage value already exists in history
@@ -790,7 +780,6 @@ const UpdateQuotation = () => {
           })
         }
       }
-
       const vehicle = {
         carReg_no: data.carReg_no,
         car_registration_no: data.car_registration_no,
@@ -801,7 +790,6 @@ const UpdateQuotation = () => {
         mileage: newMileageValue,
         mileageHistory: updatedMileageHistory,
       }
-
       const quotation = {
         user_type: specificQuotation?.user_type,
         Id: specificQuotation?.Id,
@@ -812,11 +800,11 @@ const UpdateQuotation = () => {
         total_amount: grandTotal || specificQuotation?.total_amount,
         discount: discount === 0 || discount > 0 ? discount : specificQuotation?.discount,
         vat: vat === 0 || vat > 0 ? vat : specificQuotation?.vat,
+        tax: tax === 0 || tax > 0 ? tax : specificQuotation?.tax, // New: Include tax
         net_total: calculateFinalTotal() || specificQuotation.net_total,
         input_data: input_data,
         service_input_data: service_input_data,
       }
-
       const values = {
         tenantDomain,
         customer,
@@ -825,14 +813,12 @@ const UpdateQuotation = () => {
         vehicle,
         quotation,
       }
-
       const newValue = {
         id: id,
         data: {
           ...values,
         },
       }
-
       if (removeButton === "") {
         const res = await updateQuotation(newValue).unwrap()
         if (res.success) {
@@ -1819,6 +1805,18 @@ const UpdateQuotation = () => {
               type="text"
               placeholder="Vat"
               defaultValue={formatNumber(specificQuotation?.vat)}
+            />
+          </div>
+          {/* New Tax Input Field */}
+          <div>
+            <b>Tax: </b>
+            <input
+              className="text-center"
+              onChange={(e) => handleTaxChange(e.target.value)}
+              autoComplete="off"
+              type="text"
+              placeholder="Tax"
+              defaultValue={formatNumber(specificQuotation?.tax)}
             />
           </div>
           <div>

@@ -308,6 +308,7 @@ const tenantDomain = useTenantDomain();
                       <b>Sub Total </b>
                       {quotationPreview?.discount !== 0 && <b> Discount </b>}
                       {quotationPreview?.vat !== 0 && <b> VAT </b>}
+                      {quotationPreview?.tax !== 0 && <b> Tax </b>}
                       <b> Grand Total </b>
                     </div>
                     <div>
@@ -317,6 +318,9 @@ const tenantDomain = useTenantDomain();
                       )}
                       {quotationPreview?.vat !== 0 && (
                         <small> : {quotationPreview?.vat}%</small>
+                      )}
+                      {quotationPreview?.tax !== 0 && (
+                        <small> : {quotationPreview?.tax}%</small>
                       )}
                       <small> : ৳ {quotationPreview?.net_total}</small>
                     </div>

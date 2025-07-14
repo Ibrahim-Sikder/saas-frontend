@@ -339,6 +339,7 @@ const Detail = () => {
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
                     {invoicePreview.vat !== 0 && <b> VAT </b>}
+                    {invoicePreview.tax !== 0 && <b> Tax </b>}
                     <b> Grand Total </b>
 
                     {advanceAmountNumber !== 0 && (
@@ -359,6 +360,9 @@ const Detail = () => {
                     )}
                     {invoicePreview.vat !== 0 && (
                       <small> : {formatNumber(invoicePreview.vat)}%</small>
+                    )}
+                    {invoicePreview.tax !== 0 && (
+                      <small> : {formatNumber(invoicePreview.tax)}%</small>
                     )}
                     <small>
                       : {formatNumber(invoicePreview.net_total)} &#2547;{" "}

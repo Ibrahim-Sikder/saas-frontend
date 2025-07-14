@@ -1,104 +1,101 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client";
-
+"use client"
 /* eslint-disable no-unused-vars */
-import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../../../../public/assets/logo.png";
-import { useEffect, useState } from "react";
-import "./Invoice.css";
-import { toast } from "react-toastify";
-import { Autocomplete, Box, Chip, Grid, TextField } from "@mui/material";
-import { useForm } from "react-hook-form";
-import InputMask from "react-input-mask";
-
-import { formatDate } from "../../../utils/formateDate";
-import TADatePickers from "../../../components/form/TADatePickers";
-import { cmDmOptions, countries } from "../../../constant";
-import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
-import { useCreateInvoiceMutation } from "../../../redux/api/invoice";
-import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
-import InvoiceTable from "./InvoiceTable";
-import { unitOptions } from "../../../utils/options";
-import { formatNumber } from "../../../utils/formateSemicolon";
-import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
-import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
-import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import "./Invoice.css"
+import { toast } from "react-toastify"
+import { Autocomplete, Box, Chip, Grid, TextField } from "@mui/material"
+import { useForm } from "react-hook-form"
+import InputMask from "react-input-mask"
+import { formatDate } from "../../../utils/formateDate"
+import TADatePickers from "../../../components/form/TADatePickers"
+import { cmDmOptions, countries } from "../../../constant"
+import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress"
+import { useCreateInvoiceMutation } from "../../../redux/api/invoice"
+import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard"
+import InvoiceTable from "./InvoiceTable"
+import { unitOptions } from "../../../utils/options"
+import { formatNumber } from "../../../utils/formateSemicolon"
+import { useGetSingleQuotationQuery } from "../../../redux/api/quotation"
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 const Invoice = () => {
-  const tenantDomain = useTenantDomain();
-
-  const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
-  const [specificQuotation, setSpecificQuotation] = useState({});
-  const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no);
-  const parsedDate = new Date();
-  const day = parsedDate.getDate().toString().padStart(2, "0");
-  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
-  const year = parsedDate.getFullYear();
-  const formattedDate = `${day}-${month}-${year}`;
-
-  const location = useLocation();
-  const job_no = new URLSearchParams(location.search).get("order_no");
-  const id = new URLSearchParams(location.search).get("id");
-  const [orderNumber, setOrderNumber] = useState(job_no);
-
-  const navigate = useNavigate();
-
-  const [selectedDate, setSelectedDate] = useState("");
-
-  const [countryCode, setCountryCode] = useState(countries[0]);
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  const [grandTotal, setGrandTotal] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [vat, setVAT] = useState(0);
-  const [advance, setAdvance] = useState(0);
-  const [currentMileage, setCurrentMileage] = useState("");
-  const [mileageChanged, setMileageChanged] = useState(false);
-
-  const [partsTotal, setPartsTotal] = useState(0);
-  const [serviceTotal, setServiceTotal] = useState(0);
-  const [goOtherButton, setGoOtherButton] = useState("");
+  const tenantDomain = useTenantDomain()
+  const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({})
+  const [specificQuotation, setSpecificQuotation] = useState({})
+  const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no)
+  const parsedDate = new Date()
+  const day = parsedDate.getDate().toString().padStart(2, "0")
+  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0")
+  const year = parsedDate.getFullYear()
+  const formattedDate = `${day}-${month}-${year}`
+  const location = useLocation()
+  const job_no = new URLSearchParams(location.search).get("order_no")
+  const id = new URLSearchParams(location.search).get("id")
+  const [orderNumber, setOrderNumber] = useState(job_no)
+  const navigate = useNavigate()
+  const [selectedDate, setSelectedDate] = useState("")
+  const [countryCode, setCountryCode] = useState(countries[0])
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [grandTotal, setGrandTotal] = useState(0)
+  const [discount, setDiscount] = useState(0)
+  const [vat, setVAT] = useState(0)
+  const [tax, setTax] = useState(0) // New state for Tax
+  const [advance, setAdvance] = useState(0)
+  const [currentMileage, setCurrentMileage] = useState("")
+  const [mileageChanged, setMileageChanged] = useState(false)
+  const [partsTotal, setPartsTotal] = useState(0)
+  const [serviceTotal, setServiceTotal] = useState(0)
+  const [goOtherButton, setGoOtherButton] = useState("")
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
-  });
-  const [reload, setReload] = useState(false);
-
-  const [items, setItems] = useState([
-    { description: "", unit: "", quantity: "", rate: "", total: "" },
-  ]);
-  const [serviceItems, setServiceItems] = useState([
-    { description: "", unit: "", quantity: "", rate: "", total: "" },
-  ]);
-
+  })
+  const [reload, setReload] = useState(false)
+  const [items, setItems] = useState([{ description: "", unit: "", quantity: "", rate: "", total: "" }])
+  const [serviceItems, setServiceItems] = useState([{ description: "", unit: "", quantity: "", rate: "", total: "" }])
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
-
-  const [
-    createInvoice,
-    { isLoading: createLoading, error: createInvoiceError },
-  ] = useCreateInvoiceMutation();
-
+  } = useForm()
+  const [createInvoice, { isLoading: createLoading, error: createInvoiceError }] = useCreateInvoiceMutation()
   const { data: jobCardData, refetch } = useGetSingleJobCardWithJobNoQuery({
     tenantDomain,
     jobNo: orderNumber,
-  });
+  })
+  const {
+    data: quotationResponse,
+    isLoading,
+    error,
+    refetch: singleRefetch,
+  } = useGetSingleQuotationQuery({
+    tenantDomain,
+    id,
+  })
 
   useEffect(() => {
     if (jobCardData?.data?.date) {
-      setSelectedDate(jobCardData?.data?.date);
+      setSelectedDate(jobCardData?.data?.date)
     } else {
-      setSelectedDate(formattedDate);
+      setSelectedDate(formattedDate)
     }
-  }, [formattedDate, jobCardData?.data?.date]);
+  }, [formattedDate, jobCardData?.data?.date])
+
   useEffect(() => {
     if (specificQuotation?.discount !== undefined) {
-      setDiscount(Number(specificQuotation.discount));
+      setDiscount(Number(specificQuotation.discount))
     }
-  }, [specificQuotation]);
+    if (specificQuotation?.vat !== undefined) {
+      setVAT(Number(specificQuotation.vat))
+    }
+    if (specificQuotation?.tax !== undefined) {
+      // Initialize tax from specificQuotation
+      setTax(Number(specificQuotation.tax))
+    }
+  }, [specificQuotation])
 
   useEffect(() => {
     if (jobCardData?.data?.user_type === "customer") {
@@ -106,23 +103,18 @@ const Invoice = () => {
         job_no: jobCardData?.data?.job_no,
         Id: jobCardData?.data?.Id,
         company_name: jobCardData?.data?.customer?.company_name,
-
         customer_name: jobCardData?.data?.customer?.customer_name,
-        customer_country_code:
-          jobCardData?.data?.customer?.customer_country_code,
+        customer_country_code: jobCardData?.data?.customer?.customer_country_code,
         customer_contact: jobCardData?.data?.customer?.customer_contact,
-
         customer_address: jobCardData?.data?.customer?.customer_address,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
-      });
+      })
     }
     if (jobCardData?.data?.user_type === "company") {
       reset({
@@ -135,16 +127,14 @@ const Invoice = () => {
         company_country_code: jobCardData?.data?.company?.company_country_code,
         company_email: jobCardData?.data?.company?.company_email,
         customer_address: jobCardData?.data?.company?.customer_address,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
-      });
+      })
     }
     if (jobCardData?.data?.user_type === "showRoom") {
       reset({
@@ -154,19 +144,16 @@ const Invoice = () => {
         vehicle_username: jobCardData?.data?.showRoom?.vehicle_username,
         showRoom_address: jobCardData?.data?.showRoom?.showRoom_address,
         company_name: jobCardData?.data?.showRoom?.company_name,
-        company_contact:
-          phoneNumber || jobCardData?.data?.showRoom?.company_contact,
+        company_contact: phoneNumber || jobCardData?.data?.showRoom?.company_contact,
         company_country_code: jobCardData?.data?.showRoom?.company_country_code,
-
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
         car_registration_no: getDataWithChassisNo?.car_registration_no,
         engine_no: getDataWithChassisNo?.engine_no,
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
-
         mileage: getDataWithChassisNo?.mileage,
-      });
+      })
     }
   }, [
     getDataWithChassisNo?.carReg_no,
@@ -199,361 +186,298 @@ const Invoice = () => {
     jobCardData?.data?.user_type,
     phoneNumber,
     reset,
-  ]);
+  ])
 
-  const {
-    data: quotationResponse,
-    isLoading,
-    error,
-    refetch: singleRefetch,
-  } = useGetSingleQuotationQuery({
-    tenantDomain,
-    id,
-  });
   useEffect(() => {
     if (quotationResponse?.data) {
-      setSpecificQuotation(quotationResponse.data);
+      setSpecificQuotation(quotationResponse.data)
     }
-  }, [quotationResponse]);
+  }, [quotationResponse])
+
   useEffect(() => {
     if (reload) {
-      singleRefetch();
+      singleRefetch()
     }
-  }, [reload]);
+  }, [reload, singleRefetch])
 
   useEffect(() => {
     if (job_no && id) {
-      setReload(!reload);
+      setReload(!reload)
     }
-  }, [job_no, id]);
+  }, [job_no, id])
 
   useEffect(() => {
-    if (specificQuotation?.discount !== undefined) {
-      setDiscount(Number(specificQuotation.discount));
-    }
-  }, [specificQuotation]);
-
-  useEffect(() => {
-    const totalSum = specificQuotation?.input_data?.reduce(
-      (sum, item) => sum + Number(item.total),
-      0
-    );
-
-    const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0);
-
-    const serviceTotalSum = specificQuotation?.service_input_data?.reduce(
-      (sum, item) => sum + Number(item.total),
-      0
-    );
-
-    const serviceTotalSum2 = serviceItems.reduce(
-      (sum, item) => sum + Number(item.total),
-      0
-    );
-
-    const newTotalSum = isNaN(totalSum) ? 0 : totalSum;
-    const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2;
-    const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum;
-    const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2;
-
-    const newGrandTotal = newTotalSum + newTotalSum2;
-    const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2;
-
-    const totalGrand = Number.parseFloat(
-      newGrandTotal + newServiceGrandTotal
-    ).toFixed(2);
-    setPartsTotal(newGrandTotal);
-    setServiceTotal(newServiceGrandTotal);
-    setGrandTotal(totalGrand);
-  }, [
-    items,
-    serviceItems,
-    specificQuotation?.input_data,
-    specificQuotation?.service_input_data,
-  ]);
+    const totalSum = specificQuotation?.input_data?.reduce((sum, item) => sum + Number(item.total), 0)
+    const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0)
+    const serviceTotalSum = specificQuotation?.service_input_data?.reduce((sum, item) => sum + Number(item.total), 0)
+    const serviceTotalSum2 = serviceItems.reduce((sum, item) => sum + Number(item.total), 0)
+    const newTotalSum = isNaN(totalSum) ? 0 : totalSum
+    const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2 // Fixed: should be totalSum2
+    const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum
+    const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2
+    const newGrandTotal = newTotalSum + newTotalSum2
+    const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2
+    const totalGrand = Number.parseFloat((newGrandTotal + newServiceGrandTotal).toFixed(2)) // Ensure toFixed is called on the sum before parseFloat
+    setPartsTotal(newGrandTotal)
+    setServiceTotal(newServiceGrandTotal)
+    setGrandTotal(totalGrand)
+  }, [items, serviceItems, specificQuotation?.input_data, specificQuotation?.service_input_data])
 
   const handleDateChange = (newDate) => {
-    setSelectedDate(formatDate(newDate));
-  };
+    setSelectedDate(formatDate(newDate))
+  }
 
   const handlePhoneNumberChange = (e) => {
-    const newPhoneNumber = e.target.value;
+    const newPhoneNumber = e.target.value
     if (
       /^\d*$/.test(newPhoneNumber) &&
       newPhoneNumber.length <= 11 &&
-      (newPhoneNumber === "" ||
-        !newPhoneNumber.startsWith("0") ||
-        newPhoneNumber.length > 1)
+      (newPhoneNumber === "" || !newPhoneNumber.startsWith("0") || newPhoneNumber.length > 1)
     ) {
-      setPhoneNumber(newPhoneNumber);
+      setPhoneNumber(newPhoneNumber)
     }
-  };
+  }
 
   const handleRemove = (index) => {
     if (!index) {
-      const list = [...items];
-
-      setItems(list);
+      const list = [...items]
+      setItems(list)
     } else {
-      const list = [...items];
-      list.splice(index, 1);
-      setItems(list);
+      const list = [...items]
+      list.splice(index, 1)
+      setItems(list)
     }
-  };
+  }
+
   const handleServiceDescriptionRemove = (index) => {
     if (!index) {
-      const list = [...serviceItems];
-
-      setServiceItems(list);
+      const list = [...serviceItems]
+      setServiceItems(list)
     } else {
-      const list = [...serviceItems];
-      list.splice(index, 1);
-      setServiceItems(list);
+      const list = [...serviceItems]
+      list.splice(index, 1)
+      setServiceItems(list)
     }
-  };
+  }
 
   const handleAddClick = () => {
-    setItems([
-      ...items,
-      { description: "", unit: "", quantity: "", rate: "", total: "" },
-    ]);
-  };
+    setItems([...items, { description: "", unit: "", quantity: "", rate: "", total: "" }])
+  }
+
   const handleServiceDescriptionAdd = () => {
-    setServiceItems([
-      ...serviceItems,
-      { description: "", unit: "", quantity: "", rate: "", total: "" },
-    ]);
-  };
+    setServiceItems([...serviceItems, { description: "", unit: "", quantity: "", rate: "", total: "" }])
+  }
 
   const handleDescriptionChange = (index, value) => {
-    const newItems = [...items];
-    newItems[index].description = value;
-    setItems(newItems);
-  };
+    const newItems = [...items]
+    newItems[index].description = value
+    setItems(newItems)
+  }
 
   const handleDescriptionChange2 = (index, value) => {
-    const newItems = [...specificQuotation.input_data];
+    const newItems = [...specificQuotation.input_data]
     newItems[index] = {
       ...newItems[index],
       description: value,
-    };
+    }
     setSpecificQuotation((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }));
-  };
+    }))
+  }
 
   const handleServiceDescriptionChange = (index, value) => {
-    const newItems = [...serviceItems];
-    newItems[index].description = value;
-    setServiceItems(newItems);
-  };
+    const newItems = [...serviceItems]
+    newItems[index].description = value
+    setServiceItems(newItems)
+  }
 
   const handleServiceDescriptionChange2 = (index, value) => {
-    const newItems = [...specificQuotation.service_input_data];
+    const newItems = [...specificQuotation.service_input_data]
     newItems[index] = {
       ...newItems[index],
       description: value,
-    };
+    }
     setSpecificQuotation((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }));
-  };
+    }))
+  }
 
   const handleUnitChange = (index, value) => {
-    const newItems = [...serviceItems];
-    newItems[index].unit = value;
-    setServiceItems(newItems);
-  };
+    const newItems = [...serviceItems]
+    newItems[index].unit = value
+    setServiceItems(newItems)
+  }
 
   const handleUnitChange2 = (index, value) => {
-    const newItems = [...specificQuotation.service_input_data];
+    const newItems = [...specificQuotation.service_input_data]
     newItems[index] = {
       ...newItems[index],
       unit: value,
-    };
+    }
     setSpecificQuotation((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }));
-  };
+    }))
+  }
+
   const handleInputUnitChange = (index, value) => {
-    const newItems = [...items];
-    newItems[index].unit = value;
-    setItems(newItems);
-  };
+    const newItems = [...items]
+    newItems[index].unit = value
+    setItems(newItems)
+  }
 
   const handleInputUnitChange2 = (index, value) => {
-    const newItems = [...specificQuotation.input_data];
+    const newItems = [...specificQuotation.input_data]
     newItems[index] = {
       ...newItems[index],
       unit: value,
-    };
+    }
     setSpecificQuotation((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }));
-  };
+    }))
+  }
 
   const handleQuantityChange = (index, value) => {
-    const newItems = [...items];
-    const roundedValue = Math.round(value) || 0;
-    newItems[index].quantity = roundedValue;
+    const newItems = [...items]
+    const roundedValue = Math.round(value) || 0
+    newItems[index].quantity = roundedValue
+    newItems[index].total = roundedValue * newItems[index].rate
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
+    setItems(newItems)
+  }
 
-    newItems[index].total = roundedValue * newItems[index].rate;
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
-    setItems(newItems);
-  };
   const handleQuantityChange2 = (index, value) => {
     if (!isNaN(value)) {
-      const newItems = [...specificQuotation.input_data];
-      const roundedValue = Math.round(value) || 0;
-      newItems[index].quantity = Number(roundedValue);
-
-      newItems[index].total = Number(roundedValue) * newItems[index].rate;
-      newItems[index].total = Number(newItems[index].total.toFixed(2));
+      const newItems = [...specificQuotation.input_data]
+      const roundedValue = Math.round(value) || 0
+      newItems[index].quantity = Number(roundedValue)
+      newItems[index].total = Number(roundedValue) * newItems[index].rate
+      newItems[index].total = Number(newItems[index].total.toFixed(2))
       setSpecificQuotation((prevState) => ({
         ...prevState,
         input_data: newItems,
-      }));
+      }))
     }
-  };
+  }
 
   const handleServiceQuantityChange = (index, value) => {
-    const newItems = [...serviceItems];
-    const roundedValue = Math.round(value) || 0;
+    const newItems = [...serviceItems]
+    const roundedValue = Math.round(value) || 0
+    newItems[index].quantity = roundedValue
+    newItems[index].total = roundedValue * newItems[index].rate
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
+    setServiceItems(newItems)
+  }
 
-    newItems[index].quantity = roundedValue;
-
-    newItems[index].total = roundedValue * newItems[index].rate;
-
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
-    setServiceItems(newItems);
-  };
   const handleServiceQuantityChange2 = (index, value) => {
     if (!isNaN(value)) {
-      const newItems = [...specificQuotation.service_input_data];
-      const roundedValue = Math.round(value) || 0;
-      newItems[index].quantity = Number(roundedValue);
-
-      newItems[index].total = Number(roundedValue) * newItems[index].rate;
-      newItems[index].total = Number(newItems[index].total.toFixed(2));
+      const newItems = [...specificQuotation.service_input_data]
+      const roundedValue = Math.round(value) || 0
+      newItems[index].quantity = Number(roundedValue)
+      newItems[index].total = Number(roundedValue) * newItems[index].rate
+      newItems[index].total = Number(newItems[index].total.toFixed(2))
       setSpecificQuotation((prevState) => ({
         ...prevState,
         service_input_data: newItems,
-      }));
+      }))
     }
-  };
+  }
 
   const handleRateChange = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "");
-
-    const newItems = [...items];
-
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const newItems = [...items]
     // Store the actual numeric value for calculations
-    newItems[index].rate = Number.parseFloat(numericValue) || 0;
-
+    newItems[index].rate = Number.parseFloat(numericValue) || 0
     // Calculate total with the updated rate
-    newItems[index].total = newItems[index].quantity * newItems[index].rate;
-
+    newItems[index].total = newItems[index].quantity * newItems[index].rate
     // Round total to two decimal places
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
-    setItems(newItems);
-  };
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
+    setItems(newItems)
+  }
 
   const handleRateChange2 = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "");
-
-    const newItems = [...specificQuotation.input_data];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const newItems = [...specificQuotation.input_data]
+    newItems[index].rate = Number(numericValue) || 0
+    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
+    newItems[index].total = Number(newItems[index].total.toFixed(2))
     setSpecificQuotation((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }));
-  };
+    }))
+  }
 
   const handleServiceRateChange = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "");
-
-    const newItems = [...serviceItems];
-
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const newItems = [...serviceItems]
     // Store the actual numeric value for calculations
-    newItems[index].rate = Number.parseFloat(numericValue) || 0;
-
+    newItems[index].rate = Number.parseFloat(numericValue) || 0
     // Calculate total with the updated rate
-    newItems[index].total = newItems[index].quantity * newItems[index].rate;
-
+    newItems[index].total = newItems[index].quantity * newItems[index].rate
     // Round total to two decimal places
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
-
-    setServiceItems(newItems);
-  };
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
+    setServiceItems(newItems)
+  }
 
   const handleServiceRateChange2 = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "");
-
-    const newItems = [...specificQuotation.service_input_data];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const newItems = [...specificQuotation.service_input_data]
+    newItems[index].rate = Number(numericValue) || 0
+    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
+    newItems[index].total = Number(newItems[index].total.toFixed(2))
     setSpecificQuotation((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }));
-  };
+    }))
+  }
 
   const handleDiscountChange = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
-
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
     if (!isNaN(parsedValue)) {
-      setDiscount(parsedValue);
+      setDiscount(parsedValue)
     }
-  };
+  }
 
   const handleVATChange = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
-
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
     if (!isNaN(parsedValue)) {
-      setVAT(parsedValue);
+      setVAT(parsedValue)
     }
-  };
+  }
+
+  const handleTaxChange = (value) => {
+    // New handler for Tax
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
+    if (!isNaN(parsedValue)) {
+      setTax(parsedValue)
+    }
+  }
+
   const handleAdvance = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
-
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
     if (!isNaN(parsedValue)) {
-      setAdvance(parsedValue);
+      setAdvance(parsedValue)
     }
-  };
+  }
 
   const calculateFinalTotal = () => {
-    const discountAsPercentage = discount;
-    const totalAfterDiscount = grandTotal - discountAsPercentage;
-
-    const vatAsPercentage = vat / 100;
-    let finalTotal = totalAfterDiscount + totalAfterDiscount * vatAsPercentage;
-    finalTotal = Number.parseFloat(finalTotal.toFixed(2));
-
-    return finalTotal;
-  };
+    const totalAfterDiscount = grandTotal - discount
+    const totalAfterVat = totalAfterDiscount + totalAfterDiscount * (vat / 100)
+    const finalTotalWithTax = totalAfterVat + totalAfterVat * (tax / 100) // Apply tax after VAT
+    return Number.parseFloat(finalTotalWithTax.toFixed(2))
+  }
 
   const calculateDue = () => {
-    const due = calculateFinalTotal() - advance;
-    return Number.parseFloat(due).toFixed(2);
-  };
+    const due = calculateFinalTotal() - advance
+    return Number.parseFloat(due).toFixed(2)
+  }
 
   const inputData = [
     ...(specificQuotation?.input_data || []),
@@ -566,7 +490,8 @@ const Invoice = () => {
         rate: item.rate,
         total: item.total,
       })),
-  ];
+  ]
+
   const serviceInputData = [
     ...(specificQuotation?.service_input_data || []),
     ...serviceItems
@@ -578,77 +503,60 @@ const Invoice = () => {
         rate: item.rate,
         total: item.total,
       })),
-  ];
+  ]
 
   const onSubmit = async (data) => {
-    const toastId = toast.loading("Creating Company...");
+    const toastId = toast.loading("Creating Company...")
     // const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
-
       customer_name: data.customer_name,
       customer_contact: data.customer_contact,
       customer_country_code: data.company_country_code,
-
       customer_address: data.customer_address,
-    };
-
+    }
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
       company_address: data.company_address,
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
-    };
-
+      company_email: data.company_email,
+    }
     const showRoom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,
-
       company_name: data.company_name,
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
-
       company_address: data.company_address,
-    };
-
-    data.mileage = Number(data.mileage);
-    const newMileageValue = Number(data.mileage);
-
-    const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
-    const updatedMileageHistory = [...existingMileageHistory];
-
+    }
+    data.mileage = Number(data.mileage)
+    const newMileageValue = Number(data.mileage)
+    const existingMileageHistory = getDataWithChassisNo?.mileageHistory || []
+    const updatedMileageHistory = [...existingMileageHistory]
     // Only add current mileage to history if it has changed
     if (mileageChanged && currentMileage) {
       const newMileageEntry = {
         mileage: Number(currentMileage),
         date: new Date().toISOString(),
-      };
-
+      }
       // Check if this mileage value already exists in history
-      const mileageExists = updatedMileageHistory.some(
-        (entry) => entry.mileage === Number(currentMileage)
-      );
-
+      const mileageExists = updatedMileageHistory.some((entry) => entry.mileage === Number(currentMileage))
       if (!mileageExists) {
-        updatedMileageHistory.push(newMileageEntry);
+        updatedMileageHistory.push(newMileageEntry)
       }
     }
-
     // Only add a new entry if it's a valid number and not already in the history
     if (!isNaN(newMileageValue) && newMileageValue > 0) {
-      const mileageExists = updatedMileageHistory.some(
-        (entry) => entry.mileage === newMileageValue
-      );
-
+      const mileageExists = updatedMileageHistory.some((entry) => entry.mileage === newMileageValue)
       if (!mileageExists) {
         updatedMileageHistory.push({
           mileage: newMileageValue,
           date: new Date().toISOString(),
-        });
+        })
       }
     }
-
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -657,8 +565,7 @@ const Invoice = () => {
       vehicle_brand: data.vehicle_brand,
       vehicle_name: data.vehicle_name,
       mileageHistory: updatedMileageHistory,
-    };
-
+    }
     const invoice = {
       user_type: jobCardData?.data?.user_type,
       Id: jobCardData?.data?.Id,
@@ -669,14 +576,14 @@ const Invoice = () => {
       total_amount: grandTotal,
       discount: discount,
       vat: vat,
+      tax: tax, // Include tax in the invoice object
       net_total: calculateFinalTotal(),
       input_data: inputData,
       service_input_data: serviceInputData,
       advance: advance,
       due: calculateDue(),
       mileage: data.mileage,
-    };
-
+    }
     const values = {
       tenantDomain,
       customer,
@@ -684,72 +591,56 @@ const Invoice = () => {
       showRoom,
       vehicle,
       invoice,
-    };
-
+    }
     try {
-      const res = await createInvoice(values).unwrap();
-
+      const res = await createInvoice(values).unwrap()
       if (res.success) {
-        toast.success(res.message);
-        setReload(!reload);
-        refetch();
-
+        toast.success(res.message)
+        setReload(!reload)
+        refetch()
         if (goOtherButton === "preview") {
-          navigate(`/dashboard/detail?id=${res?.data?._id}`);
-          setGoOtherButton("");
+          navigate(`/dashboard/detail?id=${res?.data?._id}`)
+          setGoOtherButton("")
         } else if (goOtherButton === "money-receipt") {
           navigate(
-            `/dashboard/money-receive?order_no=${jobCardData?.data?.job_no}&id=${res?.data?._id}&net_total=${res?.net_total}`
-          );
-          setGoOtherButton("");
+            `/dashboard/money-receive?order_no=${jobCardData?.data?.job_no}&id=${res?.data?._id}&net_total=${res?.net_total}`,
+          )
+          setGoOtherButton("")
         } else {
-          navigate("/dashboard/invoice-view");
-          setGoOtherButton("");
+          navigate("/dashboard/invoice-view")
+          setGoOtherButton("")
         }
       }
     } catch (err) {
-      const errorMessage =
-        err?.data?.message || err?.error || "Failed to create invoice!";
-      toast.error(errorMessage);
+      const errorMessage = err?.data?.message || err?.error || "Failed to create invoice!"
+      toast.error(errorMessage)
     } finally {
-      toast.dismiss(toastId);
+      toast.dismiss(toastId)
     }
-  };
-  const handleIconPreview = async (e) => {
-    navigate(`/dashboard/detail?id=${e}`);
-  };
-
-  useEffect(() => {
-    setGetDataWithChassisNo(jobCardData?.data?.vehicle);
-  }, [jobCardData?.data?.vehicle]);
-
-  // for mileage defalutvalue show 
-  useEffect(() => {
-  if (jobCardData?.data?.mileage) {
-    reset({
-      mileage: jobCardData.data.mileage,
-    });
-    setCurrentMileage(jobCardData.data.mileage);
   }
-}, [jobCardData, reset]);
-
-
+  const handleIconPreview = async (e) => {
+    navigate(`/dashboard/detail?id=${e}`)
+  }
+  useEffect(() => {
+    setGetDataWithChassisNo(jobCardData?.data?.vehicle)
+  }, [jobCardData?.data?.vehicle])
+  // for mileage defalutvalue show
+  useEffect(() => {
+    if (jobCardData?.data?.mileage) {
+      reset({
+        mileage: jobCardData.data.mileage,
+      })
+      setCurrentMileage(jobCardData.data.mileage)
+    }
+  }, [jobCardData, reset])
   return (
     <div className="md:px-5 py-5 lg:py-10">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className="flex lg:flex-row columns-1 space-y-3 w-full mt-3 md:mt-5 mb-2 invoiceHeader  ">
-          <img
-            src={CompanyInfoData?.data?.logo}
-            alt="logo"
-            className="w-[110px] md:w-[210px]"
-          />
+          <img src={CompanyInfoData?.data?.logo || "/placeholder.svg"} alt="logo" className="w-[110px] md:w-[210px]" />
           <div>
-            <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              {CompanyInfoData?.data?.companyName}
-            </h2>
-            <span className="block mt-5">
-              Office: {CompanyInfoData?.data?.address}
-            </span>
+            <h2 className=" trustAutoTitle trustAutoTitleQutation">{CompanyInfoData?.data?.companyName}</h2>
+            <span className="block mt-5">Office: {CompanyInfoData?.data?.address}</span>
           </div>
           <TrustAutoAddress />
         </div>
@@ -759,20 +650,13 @@ const Invoice = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="hidden"></div>
             <div className="vehicleCard">Create Invoice </div>
-
             <div>
-              <TADatePickers
-                handleDateChange={handleDateChange}
-                selectedDate={selectedDate}
-              />
+              <TADatePickers handleDateChange={handleDateChange} selectedDate={selectedDate} />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-10 ">
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-3">
-                Customer Info
-              </h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-3">Customer Info</h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -806,7 +690,6 @@ const Invoice = () => {
                     {...register("company_name")}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   {!jobCardData?.data && (
                     <TextField
@@ -824,20 +707,17 @@ const Invoice = () => {
                       {...register("customer_name")}
                     />
                   )}
-                  {(jobCardData?.data?.user_type === "company" ||
-                    jobCardData?.data?.user_type === "showRoom") && (
+                  {(jobCardData?.data?.user_type === "company" || jobCardData?.data?.user_type === "showRoom") && (
                     <TextField
                       fullWidth
                       label="Customer"
                       focused={
-                        jobCardData?.data?.company?.vehicle_username ||
-                        jobCardData?.data?.showRoom?.vehicle_username
+                        jobCardData?.data?.company?.vehicle_username || jobCardData?.data?.showRoom?.vehicle_username
                       }
                       {...register("vehicle_username")}
                     />
                   )}
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={5} sm={12} xs={12}>
@@ -848,8 +728,8 @@ const Invoice = () => {
                         getOptionLabel={(option) => option.label}
                         value={countryCode}
                         onChange={(event, newValue) => {
-                          setCountryCode(newValue);
-                          setPhoneNumber("");
+                          setCountryCode(newValue)
+                          setPhoneNumber("")
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -858,9 +738,7 @@ const Invoice = () => {
                             {...register("customer_country_code")}
                             label="Select Country Code"
                             variant="outlined"
-                            focused={
-                              jobCardData?.data?.customer?.customer_country_code
-                            }
+                            focused={jobCardData?.data?.customer?.customer_country_code}
                           />
                         )}
                       />
@@ -872,11 +750,7 @@ const Invoice = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={
-                            phoneNumber
-                              ? phoneNumber
-                              : jobCardData?.data?.customer?.customer_contact
-                          }
+                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
                         />
@@ -887,50 +761,31 @@ const Invoice = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={
-                            phoneNumber
-                              ? phoneNumber
-                              : jobCardData?.data?.customer?.customer_contact
-                          }
+                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
-                          focused={
-                            jobCardData?.data?.customer?.customer_contact || ""
-                          }
+                          focused={jobCardData?.data?.customer?.customer_contact || ""}
                         />
                       )}
-                      {(jobCardData?.data?.user_type === "company" ||
-                        jobCardData?.data?.user_type === "showRoom") && (
+                      {(jobCardData?.data?.user_type === "company" || jobCardData?.data?.user_type === "showRoom") && (
                         <TextField
                           {...register("company_contact")}
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={
-                            phoneNumber
-                              ? phoneNumber
-                              : jobCardData?.data?.customer?.customer_contact
-                          }
+                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
                           onChange={handlePhoneNumberChange}
                           placeholder="Company Contact No (N)"
                           focused={
-                            jobCardData?.data?.company?.company_contact ||
-                            jobCardData?.data?.showRoom?.company_contact
+                            jobCardData?.data?.company?.company_contact || jobCardData?.data?.showRoom?.company_contact
                           }
                         />
                       )}
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {!jobCardData?.data && (
-                    <TextField
-                      fullWidth
-                      label="Address"
-                      {...register("customer_address")}
-                    />
-                  )}
+                  {!jobCardData?.data && <TextField fullWidth label="Address" {...register("customer_address")} />}
                   {jobCardData?.data?.user_type === "customer" && (
                     <TextField
                       fullWidth
@@ -944,9 +799,7 @@ const Invoice = () => {
                       fullWidth
                       label="Address"
                       {...register("company_address")}
-                      focused={
-                        jobCardData?.data?.company?.company_address || ""
-                      }
+                      focused={jobCardData?.data?.company?.company_address || ""}
                     />
                   )}
                   {jobCardData?.data?.user_type === "showRoom" && (
@@ -954,19 +807,14 @@ const Invoice = () => {
                       fullWidth
                       label="Address"
                       {...register("showRoom_address")}
-                      focused={
-                        jobCardData?.data?.showRoom?.showRoom_address || ""
-                      }
+                      focused={jobCardData?.data?.showRoom?.showRoom_address || ""}
                     />
                   )}
                 </Grid>
               </Grid>
             </Box>
-
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-3 ">
-                Vehicle Info
-              </h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-3 ">Vehicle Info</h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -977,7 +825,6 @@ const Invoice = () => {
                     required
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={5} sm={12} xs={12}>
@@ -994,7 +841,7 @@ const Invoice = () => {
                         options={cmDmOptions.map((option) => option.label)}
                         value={jobCardData?.data?.vehicle?.carReg_no || ""}
                         onChange={(event, newValue) => {
-                          setValue("carReg_no", newValue);
+                          setValue("carReg_no", newValue)
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -1008,27 +855,20 @@ const Invoice = () => {
                       />
                     </Grid>
                     <Grid item lg={9} md={7} sm={12} xs={12}>
-                      <InputMask
-                        mask="99-9999"
-                        maskChar={null}
-                        {...register("car_registration_no")}
-                      >
+                      <InputMask mask="99-9999" maskChar={null} {...register("car_registration_no")}>
                         {(inputProps) => (
                           <TextField
                             {...inputProps}
                             {...register("car_registration_no")}
                             fullWidth
                             label="Car R (N)"
-                            focused={
-                              getDataWithChassisNo?.car_registration_no || ""
-                            }
+                            focused={getDataWithChassisNo?.car_registration_no || ""}
                           />
                         )}
                       </InputMask>
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
@@ -1055,66 +895,48 @@ const Invoice = () => {
                     type="number"
                     focused={jobCardData?.data?.mileage || ""}
                     defaultValue={jobCardData?.data?.mileage || ""}
-
                     onChange={(e) => {
-                      const newMileage = e.target.value;
-                      setCurrentMileage(newMileage);
-                      const lastMileage =
-                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
-                          ?.mileage;
+                      const newMileage = e.target.value
+                      setCurrentMileage(newMileage)
+                      const lastMileage = getDataWithChassisNo?.mileageHistory?.slice(-1)[0]?.mileage
                       if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true);
+                        setMileageChanged(true)
                       } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true);
+                        setMileageChanged(true)
                       } else {
-                        setMileageChanged(false);
+                        setMileageChanged(false)
                       }
                     }}
                     error={!!errors.mileage}
                     helperText={errors.mileage?.message}
                   />
-
-
-
-
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mb-2">
                     <strong>Mileage History:</strong>
                     {getDataWithChassisNo?.mileageHistory?.length > 0 ? (
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {getDataWithChassisNo.mileageHistory.map(
-                          (entry, index) => (
-                            <Chip
-                              key={index}
-                              label={`${entry.mileage} km (${new Date(
-                                entry.date
-                              ).toLocaleDateString()})`}
-                              variant="outlined"
-                              className="bg-gray-100 border-gray-300 text-gray-800"
-                              onDelete={() => {
-                                const updatedHistory =
-                                  getDataWithChassisNo.mileageHistory.filter(
-                                    (_, i) => i !== index
-                                  );
-                                setGetDataWithChassisNo((prevState) => ({
-                                  ...prevState,
-                                  mileageHistory: updatedHistory,
-                                }));
-                              }}
-                              deleteIcon={
-                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
-                                  ×
-                                </span>
-                              }
-                            />
-                          )
-                        )}
+                        {getDataWithChassisNo.mileageHistory.map((entry, index) => (
+                          <Chip
+                            key={index}
+                            label={`${entry.mileage} km (${new Date(entry.date).toLocaleDateString()})`}
+                            variant="outlined"
+                            className="bg-gray-100 border-gray-300 text-gray-800"
+                            onDelete={() => {
+                              const updatedHistory = getDataWithChassisNo.mileageHistory.filter((_, i) => i !== index)
+                              setGetDataWithChassisNo((prevState) => ({
+                                ...prevState,
+                                mileageHistory: updatedHistory,
+                              }))
+                            }}
+                            deleteIcon={
+                              <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">×</span>
+                            }
+                          />
+                        ))}
                       </div>
                     ) : (
-                      <p className="text-gray-500 mt-1">
-                        No previous mileage records
-                      </p>
+                      <p className="text-gray-500 mt-1">No previous mileage records</p>
                     )}
                   </div>
                 </Grid>
@@ -1123,21 +945,11 @@ const Invoice = () => {
           </div>
           <Box>
             <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 ">
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
-                SL No
-              </label>
-              <label className="col-span-12 md:col-span-7 text-center">
-                Services Description
-              </label>
-              <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
-                Qty
-              </label>
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
-                Rate
-              </label>
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
-                Amount
-              </label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
+              <label className="col-span-12 md:col-span-7 text-center">Services Description</label>
+              <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
             </div>
             <div>
               {specificQuotation?.service_input_data?.length > 0 && (
@@ -1152,9 +964,7 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="SL No "
-                              defaultValue={`${
-                                i + 1 < 10 ? `0${i + 1}` : i + 1
-                              }`}
+                              defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
                               required
                             />
                           </div>
@@ -1164,12 +974,7 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Description"
-                              onChange={(e) =>
-                                handleServiceDescriptionChange2(
-                                  i,
-                                  e.target.value
-                                )
-                              }
+                              onChange={(e) => handleServiceDescriptionChange2(i, e.target.value)}
                               value={item.description}
                               required
                             />
@@ -1181,20 +986,13 @@ const Invoice = () => {
                                 autoComplete="off"
                                 type="text"
                                 placeholder="Qty"
-                                onChange={(e) =>
-                                  handleServiceQuantityChange2(
-                                    i,
-                                    e.target.value
-                                  )
-                                }
+                                onChange={(e) => handleServiceQuantityChange2(i, e.target.value)}
                                 required
                                 value={item.quantity}
                               />
                               <select
                                 className="inputField col-span-9"
-                                onChange={(e) =>
-                                  handleUnitChange2(i, e.target.value)
-                                }
+                                onChange={(e) => handleUnitChange2(i, e.target.value)}
                                 value={item.unit || ""}
                                 required
                               >
@@ -1202,10 +1000,7 @@ const Invoice = () => {
                                   Select Unit
                                 </option>
                                 {unitOptions.map((option) => (
-                                  <option
-                                    key={option.value}
-                                    value={option.value}
-                                  >
+                                  <option key={option.value} value={option.value}>
                                     {option.label}
                                   </option>
                                 ))}
@@ -1218,9 +1013,7 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Rate"
-                              onChange={(e) =>
-                                handleServiceRateChange2(i, e.target.value)
-                              }
+                              onChange={(e) => handleServiceRateChange2(i, e.target.value)}
                               required
                               value={formatNumber(item.rate)}
                             />
@@ -1244,7 +1037,7 @@ const Invoice = () => {
                           </div>
                         </div>
                       </div>
-                    );
+                    )
                   })}
                 </>
               )}
@@ -1271,9 +1064,7 @@ const Invoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) =>
-                              handleServiceDescriptionChange(i, e.target.value)
-                            }
+                            onChange={(e) => handleServiceDescriptionChange(i, e.target.value)}
                             value={item.description}
                             required
                           />
@@ -1285,18 +1076,13 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) =>
-                                handleServiceQuantityChange(i, e.target.value)
-                              }
+                              onChange={(e) => handleServiceQuantityChange(i, e.target.value)}
                               value={item.quantity}
                               required
                             />
-
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) =>
-                                handleUnitChange(i, e.target.value)
-                              }
+                              onChange={(e) => handleUnitChange(i, e.target.value)}
                               value={item.unit || ""}
                               required
                             >
@@ -1316,9 +1102,7 @@ const Invoice = () => {
                             className="inputField"
                             autoComplete="off"
                             placeholder="Rate"
-                            onChange={(e) =>
-                              handleServiceRateChange(i, e.target.value)
-                            }
+                            onChange={(e) => handleServiceRateChange(i, e.target.value)}
                             value={formatNumber(item.rate)}
                             required
                           />
@@ -1355,30 +1139,18 @@ const Invoice = () => {
                         )}
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </>
             )}
           </Box>
           <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5  ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
-              SL No
-            </label>
-            <label className="col-span-12 md:col-span-6 text-center">
-              Parts Description
-            </label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
-              Qty
-            </label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
-              Rate
-            </label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
-              Amount
-            </label>
-            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
-              hidden items for responsive
-            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
+            <label className="col-span-12 md:col-span-6 text-center">Parts Description</label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">hidden items for responsive</label>
           </div>
           <div>
             {specificQuotation?.input_data?.length > 0 && (
@@ -1403,9 +1175,7 @@ const Invoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) =>
-                              handleDescriptionChange2(i, e.target.value)
-                            }
+                            onChange={(e) => handleDescriptionChange2(i, e.target.value)}
                             value={item.description}
                             required
                           />
@@ -1417,17 +1187,13 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) =>
-                                handleQuantityChange2(i, e.target.value)
-                              }
+                              onChange={(e) => handleQuantityChange2(i, e.target.value)}
                               required
                               value={item.quantity}
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) =>
-                                handleInputUnitChange2(i, e.target.value)
-                              }
+                              onChange={(e) => handleInputUnitChange2(i, e.target.value)}
                               value={item.unit || ""}
                               required
                             >
@@ -1448,9 +1214,7 @@ const Invoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Rate"
-                            onChange={(e) =>
-                              handleRateChange2(i, e.target.value)
-                            }
+                            onChange={(e) => handleRateChange2(i, e.target.value)}
                             required
                             value={formatNumber(item.rate)}
                           />
@@ -1474,11 +1238,10 @@ const Invoice = () => {
                         </div>
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </>
             )}
-
             {/* Other case */}
             {!specificQuotation && (
               <>
@@ -1502,9 +1265,7 @@ const Invoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) =>
-                              handleDescriptionChange(i, e.target.value)
-                            }
+                            onChange={(e) => handleDescriptionChange(i, e.target.value)}
                             value={item.description}
                             required
                           />
@@ -1516,17 +1277,13 @@ const Invoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) =>
-                                handleQuantityChange(i, e.target.value)
-                              }
+                              onChange={(e) => handleQuantityChange(i, e.target.value)}
                               value={item.quantity}
                               required
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) =>
-                                handleInputUnitChange(i, e.target.value)
-                              }
+                              onChange={(e) => handleInputUnitChange(i, e.target.value)}
                               value={item.unit || ""}
                               required
                             >
@@ -1546,9 +1303,7 @@ const Invoice = () => {
                             className="inputField"
                             autoComplete="off"
                             placeholder="Rate"
-                            onChange={(e) =>
-                              handleRateChange(i, e.target.value)
-                            }
+                            onChange={(e) => handleRateChange(i, e.target.value)}
                             value={formatNumber(item.rate)}
                             required
                           />
@@ -1574,13 +1329,9 @@ const Invoice = () => {
                           )}
                         </div>
                       </div>
-
                       <div className="flex justify-end mt-1 ">
                         {items.length - 1 === i && (
-                          <div
-                            onClick={handleAddClick}
-                            className="flex justify-end mt-2 addQuotationBtns"
-                          >
+                          <div onClick={handleAddClick} className="flex justify-end mt-2 addQuotationBtns">
                             <button className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md">
                               Add
                             </button>
@@ -1588,12 +1339,11 @@ const Invoice = () => {
                         )}
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </>
             )}
           </div>
-
           <div className="discountFieldWrap mt-5 ">
             <div className="flex items-center">
               <b className="mr-2"> Total Amount: </b>
@@ -1604,8 +1354,8 @@ const Invoice = () => {
               <input
                 className="py-1 text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "");
-                  handleDiscountChange(rawValue);
+                  const rawValue = e.target.value.replace(/,/g, "")
+                  handleDiscountChange(rawValue)
                 }}
                 value={formatNumber(discount)}
                 autoComplete="off"
@@ -1618,13 +1368,27 @@ const Invoice = () => {
               <input
                 className="text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "");
-                  handleVATChange(rawValue);
+                  const rawValue = e.target.value.replace(/,/g, "")
+                  handleVATChange(rawValue)
                 }}
                 value={formatNumber(vat)}
                 autoComplete="off"
                 type="text"
                 placeholder="Vat"
+              />
+            </div>
+            <div>
+              <b className="mr-2">Tax: </b> {/* New Tax Input Field */}
+              <input
+                className="text-center"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/,/g, "")
+                  handleTaxChange(rawValue)
+                }}
+                value={formatNumber(tax)}
+                autoComplete="off"
+                type="text"
+                placeholder="Tax"
               />
             </div>
             <div>
@@ -1638,8 +1402,8 @@ const Invoice = () => {
               <input
                 className="text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "");
-                  handleAdvance(rawValue);
+                  const rawValue = e.target.value.replace(/,/g, "")
+                  handleAdvance(rawValue)
                 }}
                 value={formatNumber(advance)}
                 autoComplete="off"
@@ -1654,39 +1418,29 @@ const Invoice = () => {
               </div>
             </div>
           </div>
-
           <div className="mt-8 buttonGroup ">
             <div className="hidden md:block order-3 md:order-2 ">
               <button type="submit" onClick={() => setGoOtherButton("preview")}>
                 Preview
               </button>
-
-              <button onClick={() => setGoOtherButton("money-receipt")}>
-                Money Receipt{" "}
-              </button>
+              <button onClick={() => setGoOtherButton("money-receipt")}>Money Receipt </button>
             </div>
-
             <div className="flex justify-end submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
                 Add To Invoice
               </button>
             </div>
-
             <div className=" md:hidden order-3 md:order-2 mt-4">
               <button type="submit" onClick={() => setGoOtherButton("preview")}>
                 Preview
               </button>
-
-              <button onClick={() => setGoOtherButton("money-receipt")}>
-                Money Receipt{" "}
-              </button>
+              <button onClick={() => setGoOtherButton("money-receipt")}>Money Receipt </button>
             </div>
           </div>
         </form>
       </div>
       <InvoiceTable />
     </div>
-  );
-};
-
-export default Invoice;
+  )
+}
+export default Invoice
