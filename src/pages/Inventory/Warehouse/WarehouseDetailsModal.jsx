@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-"use client"
+
 import {
   Dialog,
   DialogTitle,
@@ -33,7 +33,7 @@ const ViewWarehouseDetails = ({
   isLoaded,
   getTypeChip,
   getStatusChip,
-  formatBDT,
+  // formatBDT,
   onEdit,
 }) => {
   const theme = useTheme()
@@ -189,14 +189,7 @@ const ViewWarehouseDetails = ({
                       {warehouse.totalItems ? warehouse.totalItems.toLocaleString() : "0"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Value:
-                    </Typography>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
-                      {formatBDT(warehouse.totalValue || 0)}
-                    </Typography>
-                  </Grid>
+                  
                 </Grid>
               </CardContent>
             </Card>

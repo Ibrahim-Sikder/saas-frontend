@@ -42,11 +42,12 @@ import {
   CalendarToday,
   Star,
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
-import { StyledIconButton } from "@mui/joy/IconButton/IconButton";
-import { StyledChip, StyledTableContainer } from "../../../../utils/customStyle";
 
-
+import {
+  StyledChip,
+  StyledIconButton,
+  StyledTableContainer,
+} from "../../../../utils/customStyle";
 
 // Mock data for supplier products
 const mockProducts = [

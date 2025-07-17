@@ -11,14 +11,21 @@ const metaApi = baseApi.injectEndpoints({
       }),
       providesTags: ["meta"],
     }),
-    allCustomer: builder.query({
-      query: ({tenantDomain}) => ({
-        url: `/meta/allcustomer`,
-        method: "GET",
-        params:{tenantDomain}
-      }),
-      providesTags: ["meta"],
-    }),
+allCustomer: builder.query({
+  query: ({ tenantDomain, page = 1, limit = 10, searchTerm = "", isRecycled = false }) => ({
+    url: `/meta/allcustomer`,
+    method: "GET",
+    params: {
+      tenantDomain,
+      page,
+      limit,
+      searchTerm,
+      isRecycled,
+    },
+  }),
+  providesTags: ["meta"],
+}),
+
 
 
   }),

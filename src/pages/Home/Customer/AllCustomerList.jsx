@@ -12,6 +12,7 @@ import axios from "axios";
 import Loading from "../../../components/Loading/Loading";
 import { useMoveRecycledCustomerMutation } from "../../../redux/api/customerApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useAllCustomerQuery } from "../../../redux/api/meta.api";
 
 const AllCustomerList = () => {
   const textInputRef = useRef(null);
@@ -19,52 +20,23 @@ const AllCustomerList = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
-  const [allCustomerData, setAllCustomerData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const searchParam = new URLSearchParams(location.search).get("search");
   const ITEMS_PER_PAGE = 10;
   const tenantDomain = useTenantDomain();
 
-  useEffect(() => {
-    if (!tenantDomain) {
-      console.warn("Tenant domain not ready yet");
-      return;
-    }
-
-    console.log("Fetching with tenant domain:", tenantDomain);
-    fetchCustomerData(tenantDomain);
-  }, [tenantDomain, currentPage, filterType]);
-
-  console.log("tenant custo", tenantDomain);
-
-  const fetchCustomerData = async (domain) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/meta/allcustomer?tenantDomain=${tenantDomain}`,
-        {
-          params: {
-           
-            limit: ITEMS_PER_PAGE,
-            page: currentPage,
-            searchTerm: filterType,
-            isRecycled: false,
-          },
-        }
-      );
-      setAllCustomerData(response.data);
-    } catch (err) {
-      setError(err);
-      toast.error("Failed to fetch all customer data.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    data: allCustomerData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useAllCustomerQuery({
+    tenantDomain,
+    page: currentPage,
+    limit: 10,
+    searchTerm: filterType,
+    isRecycled: false,
+  });
 
   const [
     moveRecycledCustomer,
@@ -78,18 +50,6 @@ const AllCustomerList = () => {
     setCurrentPage(page);
   };
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-  };
-
-  const handleAllCustomer = () => {
-    setFilterType("");
-    setCurrentPage(1);
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-    fetchCustomerData();
-  };
 
   const handleIconPreview = (id, userType) => {
     switch (userType) {
@@ -123,32 +83,25 @@ const AllCustomerList = () => {
           "Move to Recycle bin successful.",
           "success"
         );
-        fetchCustomerData();
+
       } catch (error) {
         swal("Error", "An error occurred while deleting the card.", "error");
       }
     }
   };
 
-  useEffect(() => {
-    if (searchParam) {
-      setFilterType(searchParam);
-      if (textInputRef.current) {
-        textInputRef.current.value = searchParam;
-      }
-    }
-  }, [searchParam]);
-
-  useEffect(() => {
-    fetchCustomerData();
-  }, [currentPage, filterType]);
-
   if (deleteError) {
     toast.error(deleteError?.message);
   }
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filterType]);
+
+const handleSearch = () => {
+  setCurrentPage(1);
+};
+
+const handleAllCustomer = () => {
+  setFilterType("");
+  setCurrentPage(1);
+};
 
   return (
     <div className="w-full mt-5 mb-24">
@@ -205,16 +158,28 @@ const AllCustomerList = () => {
       {/* Table section */}
       <div className="overflow-x-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center text-xl">
+          <div className="flex items-center justify-center h-[300px] text-xl">
             <Loading />
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center text-xl text-red-500">
-            Failed to load customer data.
+          <div className="flex items-center justify-center h-[300px] text-xl text-red-500">
+            Failed to load customer data. Please try again.
           </div>
-        ) : allCustomerData?.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-xl text-center">
-            No matching customers found.
+        ) : allCustomerData?.data?.data?.length === 0 ? (
+          <div className="flex items-center justify-center h-[300px] text-xl text-center">
+            {filterType ? (
+              <div>
+                <p>No matching customers found for {filterType}</p>
+                <button
+                  onClick={handleAllCustomer}
+                  className="mt-4 bg-[#42A1DA] text-white px-4 py-2 rounded-md"
+                >
+                  Show All Customers
+                </button>
+              </div>
+            ) : (
+              "No customers available"
+            )}
           </div>
         ) : (
           <div className="tableContainer overflow-x-auto">
@@ -249,7 +214,6 @@ const AllCustomerList = () => {
                       <td>{customer?.name}</td>
                       <td>{customer?.vehicle_username}</td>
                       <td>{customer?.fullRegNums?.split(", ")[0] || ""}</td>
-                      {/* <td>{lastVehicle?.fullRegNum}</td> */}
                       <td>{customer?.contact}</td>
                       <td>{customer?.userType}</td>
                       <td>
@@ -294,15 +258,17 @@ const AllCustomerList = () => {
         )}
       </div>
 
-      {/* Pagination section */}
-      <div className="flex justify-center mt-4">
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          color="primary"
-          onChange={handlePageChange}
-        />
-      </div>
+      {/* Pagination section - Only show if there are pages */}
+      {totalPages > 0 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            color="primary"
+            onChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 };

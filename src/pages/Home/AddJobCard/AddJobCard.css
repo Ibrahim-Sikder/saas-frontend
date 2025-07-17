@@ -438,30 +438,3 @@
   padding: 8px;
   border: 1px solid #ddd;
 }
-
-/* Responsive styles */
-/* @media only screen and (max-width: 600px) {
-  .tableWrap {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  .table thead,
-  .table tbody,
-  .table tr,
-  .table th,
-  .table td {
-    display: block;
-  }
-  .table tr {
-    border-bottom: none;
-  }
-  .table td {
-    border-top: none;
-  }
-  .table th {
-    border-top: none;
-    position: sticky;
-    top: 0;
-  }
-} */

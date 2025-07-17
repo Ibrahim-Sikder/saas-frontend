@@ -34,8 +34,6 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
     setMenuOpen(!menuOpen);
   };
 
-  console.log("all meta there are ", allMetaData);
-
   return (
     <div className="static w-full h-16 xl:h-16">
       <div className="w-full h-16 xl:h-16 bg-[#42A1DA] fixed z-10 ">

@@ -289,68 +289,6 @@ const tenantDomain = useTenantDomain();
     refreshData();
   };
 
-  // Helper functions
-  // const getStatusChip = (status) => {
-  //   switch (status) {
-  //     case "in-stock":
-  //       return (
-  //         <Chip
-  //           icon={<CheckCircleOutlineIcon />}
-  //           label="In Stock"
-  //           color="success"
-  //           size="small"
-  //           sx={{
-  //             fontWeight: "bold",
-  //             background: alpha(theme.palette.success.main, 0.1),
-  //             "& .MuiChip-icon": { color: theme.palette.success.main },
-  //           }}
-  //         />
-  //       );
-  //     case "low-stock":
-  //       return (
-  //         <Chip
-  //           icon={<WarningAmberIcon />}
-  //           label="Low Stock"
-  //           color="warning"
-  //           size="small"
-  //           sx={{
-  //             fontWeight: "bold",
-  //             background: alpha(theme.palette.warning.main, 0.1),
-  //             "& .MuiChip-icon": { color: theme.palette.warning.main },
-  //           }}
-  //         />
-  //       );
-  //     case "out-of-stock":
-  //       return (
-  //         <Chip
-  //           icon={<ErrorOutlineIcon />}
-  //           label="Out of Stock"
-  //           color="error"
-  //           size="small"
-  //           sx={{
-  //             fontWeight: "bold",
-  //             background: alpha(theme.palette.error.main, 0.1),
-  //             "& .MuiChip-icon": { color: theme.palette.error.main },
-  //           }}
-  //         />
-  //       );
-  //     default:
-  //       return (
-  //         <Chip
-  //           icon={<CheckCircleOutlineIcon />}
-  //           label="In Stock"
-  //           color="success"
-  //           size="small"
-  //           sx={{
-  //             fontWeight: "bold",
-  //             background: alpha(theme.palette.success.main, 0.1),
-  //             "& .MuiChip-icon": { color: theme.palette.success.main },
-  //           }}
-  //         />
-  //       );
-  //   }
-  // };
-
   const getStockLevelColor = (quantity, stockAlert) => {
     if (quantity === 0) return theme.palette.error.main;
     if (stockAlert && quantity <= stockAlert) return theme.palette.warning.main;
@@ -477,57 +415,6 @@ const tenantDomain = useTenantDomain();
           </div>
         </div>
       </Box>
-
-      {/* Tabs */}
-      <Paper sx={{ mb: 4, borderRadius: 2, overflow: "hidden" }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            "& .MuiTab-root": {
-              minHeight: 64,
-              py: 2,
-            },
-          }}
-        >
-          <Tab
-            icon={<Inventory2Icon />}
-            label="Stock Overview"
-            iconPosition="start"
-            sx={{ fontWeight: "medium" }}
-          />
-          <Tab
-            icon={<TrendingUpIcon />}
-            label="Stock In"
-            iconPosition="start"
-            sx={{ fontWeight: "medium" }}
-          />
-          <Tab
-            icon={<TrendingDownIcon />}
-            label="Stock Out"
-            iconPosition="start"
-            sx={{ fontWeight: "medium" }}
-          />
-          <Tab
-            icon={<BarChartIcon />}
-            label="Analytics"
-            iconPosition="start"
-            sx={{ fontWeight: "medium" }}
-          />
-          <Tab
-            icon={<SettingsIcon />}
-            label="Settings"
-            iconPosition="start"
-            sx={{ fontWeight: "medium" }}
-          />
-        </Tabs>
-      </Paper>
-
-      {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card
@@ -702,6 +589,57 @@ const tenantDomain = useTenantDomain();
           </Card>
         </Grid>
       </Grid>
+      {/* Tabs */}
+      <Paper sx={{ mb: 4, borderRadius: 2, overflow: "hidden" }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            "& .MuiTab-root": {
+              minHeight: 64,
+              py: 2,
+            },
+          }}
+        >
+          <Tab
+            icon={<Inventory2Icon />}
+            label="Stock Overview"
+            iconPosition="start"
+            sx={{ fontWeight: "medium" }}
+          />
+          <Tab
+            icon={<TrendingUpIcon />}
+            label="Stock In"
+            iconPosition="start"
+            sx={{ fontWeight: "medium" }}
+          />
+          <Tab
+            icon={<TrendingDownIcon />}
+            label="Stock Out"
+            iconPosition="start"
+            sx={{ fontWeight: "medium" }}
+          />
+          <Tab
+            icon={<BarChartIcon />}
+            label="Analytics"
+            iconPosition="start"
+            sx={{ fontWeight: "medium" }}
+          />
+          <Tab
+            icon={<SettingsIcon />}
+            label="Settings"
+            iconPosition="start"
+            sx={{ fontWeight: "medium" }}
+          />
+        </Tabs>
+      </Paper>
+
+      {/* Summary Cards */}
+
 
       {/* Stock Movement Chart */}
       {tabValue === 0 && (

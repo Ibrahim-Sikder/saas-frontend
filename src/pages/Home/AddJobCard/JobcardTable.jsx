@@ -12,8 +12,6 @@ import {
 } from "../../../redux/api/jobCard";
 import {
   Pagination,
-  Chip,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,

@@ -132,7 +132,66 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
             <h3 className="text-xl font-semibold ml-2">Dashboard</h3>
           </NavLink>
         </div>
-
+        {/* Client */}
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel12"}
+          onChange={handleChange("panel12")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            className="dashboardAccordionSummary"
+          >
+            <Typography>
+              <div className="flex items-center justify-center">
+                <HiOutlineUserGroup size={22} />
+                <span className="ml-2"> Client</span>
+              </div>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <HiOutlineUserAdd className="mr-2" />
+                <NavLink to="/dashboard/add-customer">Customer Add</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserFriends className="mr-2" />
+                <NavLink to="/dashboard/customer-list">Customer List</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Business className="mr-2" />
+                <NavLink to="/dashboard/add-company"> Company Add </NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <HiOutlineOfficeBuilding className="mr-2" />
+                <NavLink to="/dashboard/company-list">Company List</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Store className="mr-2" />
+                <NavLink to="/dashboard/add-show-room"> Show Room Add</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Storefront className="mr-2" />
+                <NavLink to="/dashboard/show-room-list">Show Room List</NavLink>
+              </span>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
         {/* Vehicle Job Card */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
@@ -637,66 +696,7 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
           </AccordionDetails>
         </Accordion>
 
-        {/* Client */}
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel12"}
-          onChange={handleChange("panel12")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel2a-content"
-            id="panel2a-header"
-            className="dashboardAccordionSummary"
-          >
-            <Typography>
-              <div className="flex items-center justify-center">
-                <HiOutlineUserGroup size={22} />
-                <span className="ml-2"> Client</span>
-              </div>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <HiOutlineUserAdd className="mr-2" />
-                <NavLink to="/dashboard/add-customer">Customer Add</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserFriends className="mr-2" />
-                <NavLink to="/dashboard/customer-list">Customer List</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Business className="mr-2" />
-                <NavLink to="/dashboard/add-company"> Company Add </NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <HiOutlineOfficeBuilding className="mr-2" />
-                <NavLink to="/dashboard/company-list">Company List</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Store className="mr-2" />
-                <NavLink to="/dashboard/add-show-room"> Show Room Add</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Storefront className="mr-2" />
-                <NavLink to="/dashboard/show-room-list">Show Room List</NavLink>
-              </span>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+
 
         {/* HRM */}
         <Accordion

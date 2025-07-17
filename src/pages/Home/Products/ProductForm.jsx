@@ -755,12 +755,7 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="expense"
-              label={
-                <>
-                  Extra Expense
-                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
-                </>
-              }
+              
               placeholder="Expense"
               required
               icon={MonetizationOn}

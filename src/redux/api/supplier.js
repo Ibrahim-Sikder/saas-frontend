@@ -11,10 +11,10 @@ const supplierApi = baseApi.injectEndpoints({
       invalidatesTags: ["supplier"],
     }),
     getAllSuppliers: builder.query({
-      query: ({ tenantDomain, limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/suppliers`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { limit, page, searchTerm, isRecycled },
          headers: {
           "x-tenant-domain": tenantDomain,
         },
@@ -22,6 +22,7 @@ const supplierApi = baseApi.injectEndpoints({
       providesTags: ["supplier"],
     }),
 
+    
     getSingleSupplier: builder.query({
       query: ({ tenantDomain, id }) => ({
         url: `/suppliers/${id}`,

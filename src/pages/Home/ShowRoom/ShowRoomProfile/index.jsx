@@ -19,13 +19,17 @@ import CustomerMoneyList from "../../Customer/CustomerProfile/CustomerMoneyList"
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import CustomerNote from "../../Customer/CustomerProfile/CustomerNote";
 
 const ShowRoomProfile = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
-  const { data: profileData, isLoading } = useGetSingleShowRoomQuery({tenantDomain, id});
+  const { data: profileData, isLoading } = useGetSingleShowRoomQuery({
+    tenantDomain,
+    id,
+  });
 
   // Initialize tab value from localStorage or default to 0
   const [value, setValue] = useState(() => {
@@ -147,40 +151,54 @@ const tenantDomain = useTenantDomain();
             <Tab sx={tabStyles} label="Invoice" />
             <Tab sx={tabStyles} label="Money Receipt" />
             <Tab sx={tabStyles} label="Message" />
+            <Tab sx={tabStyles} label="Note" />
           </Tabs>
         </Box>
 
         <TabPanel value={value} index={0}>
-          <ShowRoomAccount tenantDomain={tenantDomain} profileData={profileData} />
+          <ShowRoomAccount
+            tenantDomain={tenantDomain}
+            profileData={profileData}
+          />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <VehicleDetails tenantDomain={tenantDomain} id={id} />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <CustomerJobCardList tenantDomain={tenantDomain}
+          <CustomerJobCardList
+            tenantDomain={tenantDomain}
             id={id}
             customerId={profileData?.data?.showRoomId}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          <CustomerQoutationList tenantDomain={tenantDomain}
+          <CustomerQoutationList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={4}>
-          <CustomerInvoiceList tenantDomain={tenantDomain}
+          <CustomerInvoiceList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={5}>
-          <CustomerMoneyList tenantDomain={tenantDomain} id={id} user_type={profileData?.data?.user_type} />
+          <CustomerMoneyList
+            tenantDomain={tenantDomain}
+            id={id}
+            user_type={profileData?.data?.user_type}
+          />
         </TabPanel>
 
         <TabPanel value={value} index={6}>
           <Message />
+        </TabPanel>
+        <TabPanel value={value} index={7}>
+          <CustomerNote tenantDomain={tenantDomain} id={id} />
         </TabPanel>
       </div>
 

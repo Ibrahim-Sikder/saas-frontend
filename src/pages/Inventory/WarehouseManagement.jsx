@@ -24,10 +24,7 @@ import {
   Zoom,
   LinearProgress,
   useTheme,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+
   Alert,
   Snackbar,
   TextField,
@@ -39,18 +36,15 @@ import {
   Delete as DeleteIcon,
   NavigateNext as NavigateNextIcon,
   Search as SearchIcon,
-  FilterList as FilterListIcon,
-  Refresh as RefreshIcon,
+
   Warehouse as WarehouseIcon,
   LocationOn as LocationOnIcon,
   Person as PersonIcon,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
-  Inventory as InventoryIcon,
-  Business as BusinessIcon,
+
 } from "@mui/icons-material";
 import { alpha } from "@mui/material/styles";
-import { useJsApiLoader } from "@react-google-maps/api";
 
 import {
   useDeleteWarehouseMutation,
@@ -60,29 +54,26 @@ import swal from "sweetalert";
 import ViewWarehouseDetails from "./Warehouse/WarehouseDetailsModal";
 import AddWarehouseModal from "./Warehouse/AddWarehouse";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
+import {
+  wareHouseButton,
+  wareHouseCard,
+  wareHouseInput,
+} from "../../utils/customStyle";
+import { warehouseTypes } from "../../data";
 
-const warehouseTypes = [
-  { value: "primary", label: "Primary Warehouse" },
-  { value: "secondary", label: "Secondary Warehouse" },
-  { value: "showroom", label: "Showroom" },
-  { value: "service", label: "Service Center" },
-  { value: "distribution", label: "Distribution Center" },
-];
-
-export default function WarehouseManagementBangladesh() {
+export default function WarehouseManagement() {
   const theme = useTheme();
   const [warehouses, setWarehouses] = useState([]);
   const [open, setOpen] = useState(false);
   const [editWarehouseId, setEditWarehouseId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
-const tenantDomain = useTenantDomain();
 
-  const { data: warehouseData, isLoading: isDataLoading } =
-    useGetAllWarehousesQuery({tenantDomain});
+  const tenantDomain = useTenantDomain();
+
+  const { data: warehouseData, isLoading: isDataLoading, refetch } =
+    useGetAllWarehousesQuery({ tenantDomain });
+
   const [deleteWarehouse] = useDeleteWarehouseMutation();
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -91,20 +82,11 @@ const tenantDomain = useTenantDomain();
   });
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
-  const [mapCenter, setMapCenter] = useState({ lat: 23.8103, lng: 90.4125 });
 
-  // Google Maps API loading
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "YOUR_API_KEY",
-  });
-
-  // Set loading state based on API loading
   useEffect(() => {
     setLoading(isDataLoading);
   }, [isDataLoading]);
 
-  // Update warehouses when data is loaded
   useEffect(() => {
     if (warehouseData?.data?.warehouses) {
       setWarehouses(warehouseData.data.warehouses);
@@ -128,10 +110,6 @@ const tenantDomain = useTenantDomain();
 
   const handleViewDetails = (warehouse) => {
     setSelectedWarehouse(warehouse);
-    setMapCenter({
-      lat: Number.parseFloat(warehouse.latitude) || 23.8103,
-      lng: Number.parseFloat(warehouse.longitude) || 90.4125,
-    });
     setViewDetailsOpen(true);
   };
 
@@ -150,12 +128,13 @@ const tenantDomain = useTenantDomain();
 
     if (willDelete) {
       try {
-        await deleteWarehouse({tenantDomain,id}).unwrap();
+        await deleteWarehouse({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
           "success"
         );
+        refetch();
       } catch (error) {
         swal(
           "Error",
@@ -170,9 +149,6 @@ const tenantDomain = useTenantDomain();
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const refreshData = () => {
-    setLoading(true);
-  };
 
   const getStatusChip = (status) => {
     switch (status) {
@@ -251,23 +227,11 @@ const tenantDomain = useTenantDomain();
     return <Chip label={typeObj.label} color={color} size="small" />;
   };
 
-
-  // Calculate summary statistics
-  const summaryStats = {
-    totalWarehouses: warehouses.length,
-    activeWarehouses: warehouses.filter((w) => w.status === "active").length,
-    totalItems: warehouses.reduce((sum, w) => sum + (w.totalItems || 0), 0),
-    totalValue: warehouses.reduce((sum, w) => sum + (w.totalValue || 0), 0),
-  };
-
-  // Format currency in BDT (Bangladeshi Taka)
-  const formatBDT = (amount) => {
-    return new Intl.NumberFormat("bn-BD", {
-      style: "currency",
-      currency: "BDT",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+  // Format date in a readable format
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   return (
@@ -275,7 +239,7 @@ const tenantDomain = useTenantDomain();
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb"
-        sx={{ mb: 3, mt: 3, boxShadow:2, py:3 }} 
+        sx={{ mb: 3, mt: 3, boxShadow: 2, py: 3 }}
       >
         <Link
           color="inherit"
@@ -309,35 +273,21 @@ const tenantDomain = useTenantDomain();
             mb: 1,
           }}
         >
-          Warehouse Management - Bangladesh
+          Warehouse Management
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Manage your warehouses, showrooms, and service centers across
-          Bangladesh
+          Manage your warehouses, showrooms, and service centers
         </Typography>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              height: "100%",
-              background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-              transition:
-                "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-5px)",
-                boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)",
-              },
-              borderRadius: 3,
-            }}
-          >
+          <Card sx={wareHouseCard}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: "#006a4e", // Bangladesh flag green
+                    bgcolor: "#006a4e",
                     width: 48,
                     height: 48,
                     boxShadow: "0 4px 8px rgba(0, 106, 78, 0.3)",
@@ -353,7 +303,7 @@ const tenantDomain = useTenantDomain();
                 {loading ? (
                   <LinearProgress sx={{ my: 2 }} />
                 ) : (
-                  summaryStats.totalWarehouses
+                  warehouses.length
                 )}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -363,20 +313,7 @@ const tenantDomain = useTenantDomain();
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              height: "100%",
-              background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-              transition:
-                "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-5px)",
-                boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)",
-              },
-              borderRadius: 3,
-            }}
-          >
+          <Card sx={wareHouseCard}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
@@ -397,99 +334,11 @@ const tenantDomain = useTenantDomain();
                 {loading ? (
                   <LinearProgress sx={{ my: 2 }} />
                 ) : (
-                  summaryStats.activeWarehouses
+                  warehouses.filter((w) => w.status === "active").length
                 )}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Number of active warehouses
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              height: "100%",
-              background: "linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%)",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-              transition:
-                "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-5px)",
-                boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)",
-              },
-              borderRadius: 3,
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "#ff9800",
-                    width: 48,
-                    height: 48,
-                    boxShadow: "0 4px 8px rgba(255, 152, 0, 0.3)",
-                  }}
-                >
-                  <InventoryIcon />
-                </Avatar>
-                <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-                  Total Items
-                </Typography>
-              </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
-                {loading ? (
-                  <LinearProgress sx={{ my: 2 }} />
-                ) : (
-                  summaryStats.totalItems.toLocaleString()
-                )}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Total inventory items across all warehouses
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              height: "100%",
-              background: "linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-              transition:
-                "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-5px)",
-                boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)",
-              },
-              borderRadius: 3,
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "#f44336", // Red from Bangladesh flag
-                    width: 48,
-                    height: 48,
-                    boxShadow: "0 4px 8px rgba(244, 67, 54, 0.3)",
-                  }}
-                >
-                  <BusinessIcon />
-                </Avatar>
-                <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-                  Total Value
-                </Typography>
-              </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
-                {loading ? (
-                  <LinearProgress sx={{ my: 2 }} />
-                ) : (
-                  formatBDT(summaryStats.totalValue)
-                )}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Total inventory value across all warehouses
               </Typography>
             </CardContent>
           </Card>
@@ -511,18 +360,7 @@ const tenantDomain = useTenantDomain();
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleClickOpen}
-          sx={{
-            borderRadius: 2,
-            py: 1,
-            px: 3,
-            boxShadow: `0 4px 14px ${alpha("#006a4e", 0.4)}`,
-            background: `linear-gradient(45deg, #006a4e 30%, #00a651 90%)`, // Bangladesh flag green colors
-            transition: "transform 0.2s",
-            "&:hover": {
-              transform: "translateY(-2px)",
-              boxShadow: `0 6px 20px ${alpha("#006a4e", 0.6)}`,
-            },
-          }}
+          sx={wareHouseButton}
         >
           Add New Warehouse
         </Button>
@@ -549,41 +387,16 @@ const tenantDomain = useTenantDomain();
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Filters and Search
           </Typography>
-          <Box>
-            <Tooltip title="Show/Hide Filters">
-              <IconButton onClick={() => setShowFilters(!showFilters)}>
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Refresh">
-              <IconButton onClick={refreshData}>
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+         
         </Box>
 
         <TextField
           variant="outlined"
-          placeholder="Search warehouses by name, code, address, or manager..."
+          placeholder="Search warehouses by name, address, or manager..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           fullWidth
-          sx={{
-            mb: 2,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-              backgroundColor: "white",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-              transition: "box-shadow 0.3s ease",
-              "&:hover": {
-                boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-              },
-              "&.Mui-focused": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-              },
-            },
-          }}
+          sx={wareHouseInput}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -593,59 +406,7 @@ const tenantDomain = useTenantDomain();
           }}
         />
 
-        {showFilters && (
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <FormControl
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    backgroundColor: "white",
-                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-                  },
-                }}
-              >
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={statusFilter}
-                  label="Status"
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <MenuItem value="all">All Statuses</MenuItem>
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    backgroundColor: "white",
-                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-                  },
-                }}
-              >
-                <InputLabel>Type</InputLabel>
-                <Select
-                  value={typeFilter}
-                  label="Type"
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                >
-                  <MenuItem value="all">All Types</MenuItem>
-                  {warehouseTypes.map((type) => (
-                    <MenuItem key={type.value} value={type.value}>
-                      {type.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        )}
+       
       </Paper>
 
       {loading ? (
@@ -667,17 +428,13 @@ const tenantDomain = useTenantDomain();
               <TableRow
                 sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}
               >
-                <TableCell sx={{ fontWeight: "bold" }}>Code</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Location</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Manager</TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                  Items
-                </TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                  Value
-                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Capacity</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Opening Date</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
                 <TableCell align="center" sx={{ fontWeight: "bold" }}>
                   Actions
@@ -685,7 +442,7 @@ const tenantDomain = useTenantDomain();
               </TableRow>
             </TableHead>
             <TableBody>
-              {warehouseData?.data?.warehouses?.map((warehouse) => (
+              {warehouses.map((warehouse) => (
                 <TableRow
                   key={warehouse?._id}
                   sx={{
@@ -695,16 +452,8 @@ const tenantDomain = useTenantDomain();
                     transition: "background-color 0.2s ease",
                   }}
                 >
-                  <TableCell>
-                    <Chip
-                      label={warehouse?.code}
-                      size="small"
-                      sx={{
-                        fontWeight: "medium",
-                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                        color: theme.palette.primary.main,
-                      }}
-                    />
+                  <TableCell sx={{ fontWeight: "medium" }}>
+                    {warehouse?.warehouseId || "N/A"}
                   </TableCell>
                   <TableCell sx={{ fontWeight: "medium" }}>
                     {warehouse?.name}
@@ -716,7 +465,10 @@ const tenantDomain = useTenantDomain();
                         fontSize="small"
                         sx={{ mr: 0.5, color: "text.secondary" }}
                       />
-                      <Typography variant="body2">{`${warehouse?.city}, ${warehouse?.division}`}</Typography>
+                      <Typography variant="body2">
+                        {warehouse?.city}
+                        {warehouse?.address && `, ${warehouse.address}`}
+                      </Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
@@ -726,17 +478,17 @@ const tenantDomain = useTenantDomain();
                         sx={{ mr: 0.5, color: "text.secondary" }}
                       />
                       <Typography variant="body2">
-                        {warehouse?.manager}
+                        {warehouse?.manager || "N/A"}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell align="right">
-                    {warehouse?.totalItems
-                      ? warehouse.totalItems.toLocaleString()
-                      : "0"}
+                  <TableCell>
+                    {warehouse?.capacity ? `${warehouse.capacity} sq ft` : "N/A"}
                   </TableCell>
-                  <TableCell align="right">
-                    {formatBDT(warehouse?.totalValue || 0)}
+                  <TableCell>
+                    {warehouse?.openingDate
+                      ? formatDate(warehouse.openingDate)
+                      : "N/A"}
                   </TableCell>
                   <TableCell>{getStatusChip(warehouse?.status)}</TableCell>
                   <TableCell align="center">
@@ -822,11 +574,8 @@ const tenantDomain = useTenantDomain();
         open={viewDetailsOpen}
         onClose={handleCloseDetails}
         warehouse={selectedWarehouse}
-        isLoaded={isLoaded}
-        mapCenter={mapCenter}
         getTypeChip={getTypeChip}
         getStatusChip={getStatusChip}
-        formatBDT={formatBDT}
         onEdit={handleEditOpen}
       />
 

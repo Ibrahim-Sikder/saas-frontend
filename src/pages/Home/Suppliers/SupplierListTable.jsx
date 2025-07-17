@@ -1,24 +1,22 @@
 /* eslint-disable react/prop-types */
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
   Table,
   Tooltip,
   Typography,
-  Rating,
+
   CircularProgress,
   Fade,
   useTheme,
   alpha,
   Snackbar,
-  Alert,
   LinearProgress,
   Checkbox,
-
-} from "@mui/material"
+} from "@mui/material";
 
 import {
   Add as AddIcon,
@@ -35,32 +33,38 @@ import {
   ArrowDownward as ArrowDownwardIcon,
   ErrorOutline as ErrorOutlineIcon,
   Refresh as RefreshIcon,
-} from "@mui/icons-material"
+} from "@mui/icons-material";
 
-import { Link } from "react-router-dom"
-import { useGetAllSuppliersQuery } from "../../../redux/api/supplier"
-import { useTenantDomain } from "../../../hooks/useTenantDomain"
-import { AnimatedIconButton, GlassCard, GradientButton, StatusChip, SupplierAvatar } from "../../../utils/customStyle"
-
-// Custom styled components
+import { Link } from "react-router-dom";
+import {
+  useGetAllSuppliersQuery,
+  useMoveRecycledSupplierMutation,
+} from "../../../redux/api/supplier";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import {
+  AnimatedIconButton,
+  GlassCard,
+  GradientButton,
+  StatusChip,
+  SupplierAvatar,
+} from "../../../utils/customStyle";
+import swal from "sweetalert";
 
 const WorldClassSupplierList = () => {
-  const theme = useTheme()
+  const theme = useTheme();
 
-  const [suppliers, setSuppliers] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [sortBy, setSortBy] = useState("full_name")
-  const [sortOrder, setSortOrder] = useState("asc")
-  const [selectedRows, setSelectedRows] = useState([])
-  const [selectAll, setSelectAll] = useState(false)
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success")
+  const [suppliers, setSuppliers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("full_name");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const itemsPerPage = 5
-  const limit = 15
-const tenantDomain = useTenantDomain();
-
+  const itemsPerPage = 5;
+  const limit = 15;
+  const tenantDomain = useTenantDomain();
+  const [moveRecycledSupplier] = useMoveRecycledSupplierMutation();
   const {
     data: allSuppliers,
     isLoading,
@@ -70,105 +74,124 @@ const tenantDomain = useTenantDomain();
     tenantDomain,
     limit,
     page: currentPage,
-  })
+    isRecycled: false,
+  });
 
-  // Effect to update suppliers when data is fetched
+  console.log('all supplier this ',allSuppliers)
+
   useEffect(() => {
     if (allSuppliers?.success && allSuppliers?.data?.suppliers) {
-      const apiSuppliers = allSuppliers.data.suppliers
-      setSuppliers(apiSuppliers)
+      const apiSuppliers = allSuppliers.data.suppliers;
+      setSuppliers(apiSuppliers);
     }
-  }, [allSuppliers])
+  }, [allSuppliers]);
 
   // Apply sorting to suppliers
   const sortedSuppliers = [...suppliers].sort((a, b) => {
-    let valueA = a[sortBy] || ""
-    let valueB = b[sortBy] || ""
+    let valueA = a[sortBy] || "";
+    let valueB = b[sortBy] || "";
 
     if (typeof valueA === "string") {
-      valueA = valueA.toLowerCase()
-      valueB = valueB.toLowerCase()
+      valueA = valueA.toLowerCase();
+      valueB = valueB.toLowerCase();
     }
 
-    if (valueA < valueB) return sortOrder === "asc" ? -1 : 1
-    if (valueA > valueB) return sortOrder === "asc" ? 1 : -1
-    return 0
-  })
+    if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
 
   // Calculate pagination
-  const totalPages = allSuppliers?.data?.meta?.totalPage || 1
-  const totalCount = allSuppliers?.data?.meta?.total || 0
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = Math.min(startIndex + itemsPerPage, totalCount)
+  const totalPages = allSuppliers?.data?.meta?.totalPage || 1;
+  const totalCount = allSuppliers?.data?.meta?.total || 0;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
 
   // Handlers
   const handleSort = (property) => {
-    const isAsc = sortBy === property && sortOrder === "asc"
-    setSortBy(property)
-    setSortOrder(isAsc ? "desc" : "asc")
-  }
+    const isAsc = sortBy === property && sortOrder === "asc";
+    setSortBy(property);
+    setSortOrder(isAsc ? "desc" : "asc");
+  };
 
-  const handleDeleteSupplier = (id) => {
-   
-    setSuppliers(suppliers.filter((supplier) => supplier._id !== id))
-    showSnackbar("Supplier moved to recycle bin", "success")
-  }
+  const handleDeleteSupplier = async (id) => {
+    const willDelete = await swal({
+      title: "Are you sure?",
+      text: " You want to move  this supplier recycle bin?",
+      icon: "warning",
+      dangerMode: true,
+    });
+
+    if (willDelete) {
+      try {
+        await moveRecycledSupplier({ tenantDomain, id }).unwrap();
+        swal(
+          "Move to Recycle bin!",
+          "Move to Recycle bin successful.",
+          "success"
+        );
+      } catch (error) {
+        swal("Error", "An error occurred while deleting the card.", "error");
+      }
+    }
+  };
 
   const handleRowSelect = (id) => {
     setSelectedRows((prev) => {
       if (prev.includes(id)) {
-        return prev.filter((rowId) => rowId !== id)
+        return prev.filter((rowId) => rowId !== id);
       } else {
-        return [...prev, id]
+        return [...prev, id];
       }
-    })
-  }
+    });
+  };
 
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedRows([])
+      setSelectedRows([]);
     } else {
-      setSelectedRows(sortedSuppliers.map((supplier) => supplier._id))
+      setSelectedRows(sortedSuppliers.map((supplier) => supplier._id));
     }
-    setSelectAll(!selectAll)
-  }
-
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbarMessage(message)
-    setSnackbarSeverity(severity)
-    setSnackbarOpen(true)
-  }
+    setSelectAll(!selectAll);
+  };
 
   const handleSnackbarClose = () => {
-    setSnackbarOpen(false)
-  }
+    setSnackbarOpen(false);
+  };
 
   // Get status icon
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
-        return <CheckCircleIcon fontSize="small" />
+        return <CheckCircleIcon fontSize="small" />;
       case "inactive":
-        return <CancelIcon fontSize="small" />
+        return <CancelIcon fontSize="small" />;
       case "pending":
-        return <WarningIcon fontSize="small" />
+        return <WarningIcon fontSize="small" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   // Show loading state while fetching initial data
   if (isLoading && suppliers.length === 0) {
     return (
       <div className="w-full mt-8 px-0 md:px-2">
         <GlassCard>
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 5 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              py: 5,
+            }}
+          >
             <CircularProgress />
             <Typography sx={{ ml: 2 }}>Loading suppliers...</Typography>
           </Box>
         </GlassCard>
       </div>
-    )
+    );
   }
 
   // Show error state
@@ -178,24 +201,36 @@ const tenantDomain = useTenantDomain();
         <GlassCard>
           <Box sx={{ textAlign: "center", py: 5 }}>
             <Box sx={{ mb: 3 }}>
-              <ErrorOutlineIcon sx={{ fontSize: 64, color: "error.main", mb: 2 }} />
+              <ErrorOutlineIcon
+                sx={{ fontSize: 64, color: "error.main", mb: 2 }}
+              />
             </Box>
 
             <Typography variant="h5" color="error" gutterBottom>
               Error Loading Suppliers
             </Typography>
 
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 500, mx: "auto" }}>
-              {error.message || "Something went wrong while loading the suppliers data."}
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ mb: 3, maxWidth: 500, mx: "auto" }}
+            >
+              {error.message ||
+                "Something went wrong while loading the suppliers data."}
             </Typography>
 
-            <Button variant="contained" startIcon={<RefreshIcon />} onClick={refetch} disabled={isLoading}>
+            <Button
+              variant="contained"
+              startIcon={<RefreshIcon />}
+              onClick={refetch}
+              disabled={isLoading}
+            >
               {isLoading ? "Retrying..." : "Retry"}
             </Button>
           </Box>
         </GlassCard>
       </div>
-    )
+    );
   }
 
   return (
@@ -208,7 +243,11 @@ const tenantDomain = useTenantDomain();
           </h2>
 
           <div className="md:flex gap-2">
-            <GradientButton to="/dashboard/add-supplier" component={Link} startIcon={<AddIcon />}>
+            <GradientButton
+              to="/dashboard/add-supplier"
+              component={Link}
+              startIcon={<AddIcon />}
+            >
               Add Supplier
             </GradientButton>
           </div>
@@ -228,13 +267,14 @@ const tenantDomain = useTenantDomain();
             }}
           >
             <Typography variant="body2">
-              {selectedRows.length} {selectedRows.length === 1 ? "supplier" : "suppliers"} selected
+              {selectedRows.length}{" "}
+              {selectedRows.length === 1 ? "supplier" : "suppliers"} selected
             </Typography>
             <Button
               size="small"
               onClick={() => {
-                setSelectedRows([])
-                setSelectAll(false)
+                setSelectedRows([]);
+                setSelectAll(false);
               }}
             >
               Clear selection
@@ -273,15 +313,25 @@ const tenantDomain = useTenantDomain();
             >
               <Table stickyHeader>
                 <thead>
-                  <tr style={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}>
+                  <tr
+                    style={{
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    }}
+                  >
                     <th style={{ padding: "16px 8px" }}>
                       <Checkbox
                         checked={selectAll}
                         onChange={handleSelectAll}
-                        indeterminate={selectedRows.length > 0 && selectedRows.length < sortedSuppliers.length}
+                        indeterminate={
+                          selectedRows.length > 0 &&
+                          selectedRows.length < sortedSuppliers.length
+                        }
                       />
                     </th>
-                    <th style={{ padding: "16px", cursor: "pointer" }} onClick={() => handleSort("supplierId")}>
+                    <th
+                      style={{ padding: "16px", cursor: "pointer" }}
+                      onClick={() => handleSort("supplierId")}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         ID
                         {sortBy === "supplierId" && (
@@ -295,7 +345,10 @@ const tenantDomain = useTenantDomain();
                         )}
                       </Box>
                     </th>
-                    <th style={{ padding: "16px", cursor: "pointer" }} onClick={() => handleSort("full_name")}>
+                    <th
+                      style={{ padding: "16px", cursor: "pointer" }}
+                      onClick={() => handleSort("full_name")}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         Supplier
                         {sortBy === "full_name" && (
@@ -309,7 +362,10 @@ const tenantDomain = useTenantDomain();
                         )}
                       </Box>
                     </th>
-                    <th style={{ padding: "16px", cursor: "pointer" }} onClick={() => handleSort("shop_name")}>
+                    <th
+                      style={{ padding: "16px", cursor: "pointer" }}
+                      onClick={() => handleSort("shop_name")}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         Company
                         {sortBy === "shop_name" && (
@@ -324,7 +380,10 @@ const tenantDomain = useTenantDomain();
                       </Box>
                     </th>
                     <th style={{ padding: "16px" }}>Contact</th>
-                    <th style={{ padding: "16px", cursor: "pointer" }} onClick={() => handleSort("supplier_status")}>
+                    <th
+                      style={{ padding: "16px", cursor: "pointer" }}
+                      onClick={() => handleSort("supplier_status")}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         Status
                         {sortBy === "supplier_status" && (
@@ -338,21 +397,10 @@ const tenantDomain = useTenantDomain();
                         )}
                       </Box>
                     </th>
-                    <th style={{ padding: "16px", cursor: "pointer" }} onClick={() => handleSort("supplier_rating")}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        Rating
-                        {sortBy === "supplier_rating" && (
-                          <Box sx={{ ml: 1 }}>
-                            {sortOrder === "asc" ? (
-                              <ArrowUpwardIcon fontSize="small" />
-                            ) : (
-                              <ArrowDownwardIcon fontSize="small" />
-                            )}
-                          </Box>
-                        )}
-                      </Box>
+                   
+                    <th style={{ padding: "16px", textAlign: "center" }}>
+                      Actions
                     </th>
-                    <th style={{ padding: "16px", textAlign: "center" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -369,41 +417,65 @@ const tenantDomain = useTenantDomain();
                         }}
                         onMouseEnter={(e) => {
                           if (!selectedRows.includes(supplier._id)) {
-                            e.currentTarget.style.backgroundColor = alpha(theme.palette.action.hover, 0.5)
+                            e.currentTarget.style.backgroundColor = alpha(
+                              theme.palette.action.hover,
+                              0.5
+                            );
                           }
                         }}
                         onMouseLeave={(e) => {
                           if (!selectedRows.includes(supplier._id)) {
-                            e.currentTarget.style.backgroundColor = "transparent"
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
                           }
                         }}
                       >
-                        <td style={{ padding: "16px 8px" }} onClick={(e) => e.stopPropagation()}>
+                        <td
+                          style={{ padding: "16px 8px" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Checkbox
                             checked={selectedRows.includes(supplier._id)}
                             onChange={() => handleRowSelect(supplier._id)}
                           />
                         </td>
-                        <td style={{ padding: "16px" }}>{supplier.supplierId || "N/A"}</td>
+                        <td style={{ padding: "16px" }}>
+                          {supplier.supplierId || "N/A"}
+                        </td>
                         <td style={{ padding: "16px" }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <SupplierAvatar src={supplier.supplier_photo} alt={supplier.full_name}>
+                            <SupplierAvatar
+                              src={supplier.supplier_photo}
+                              alt={supplier.full_name}
+                            >
                               {supplier.full_name?.charAt(0) || "S"}
                             </SupplierAvatar>
                             <Box sx={{ ml: 2 }}>
                               <Typography variant="body2" fontWeight="medium">
                                 {supplier.full_name || "Unknown"}
                               </Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
                                 {supplier.vendor || "N/A"}
                               </Typography>
                             </Box>
                           </Box>
                         </td>
-                        <td style={{ padding: "16px" }}>{supplier.shop_name || "N/A"}</td>
+                        <td style={{ padding: "16px" }}>
+                          {supplier.shop_name || "N/A"}
+                        </td>
                         <td style={{ padding: "16px" }}>
                           <Box>
-                            <Typography variant="body2" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mb: 0.5,
+                              }}
+                            >
                               <PhoneIcon
                                 fontSize="small"
                                 sx={{
@@ -411,9 +483,14 @@ const tenantDomain = useTenantDomain();
                                   color: theme.palette.text.secondary,
                                 }}
                               />
-                              {supplier.full_Phone_number || supplier.phone_number || "N/A"}
+                              {supplier.full_Phone_number ||
+                                supplier.phone_number ||
+                                "N/A"}
                             </Typography>
-                            <Typography variant="body2" sx={{ display: "flex", alignItems: "center" }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ display: "flex", alignItems: "center" }}
+                            >
                               <EmailIcon
                                 fontSize="small"
                                 sx={{
@@ -433,15 +510,11 @@ const tenantDomain = useTenantDomain();
                             status={supplier.supplier_status}
                           />
                         </td>
-                        <td style={{ padding: "16px" }}>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Rating value={supplier.supplier_rating || 0} readOnly precision={0.5} size="small" />
-                            <Typography variant="body2" sx={{ ml: 1 }}>
-                              ({supplier.supplier_rating || 0})
-                            </Typography>
-                          </Box>
-                        </td>
-                        <td style={{ padding: "16px", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+                        
+                        <td
+                          style={{ padding: "16px", textAlign: "center" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Tooltip title="View Details">
                             <AnimatedIconButton
                               size="small"
@@ -471,7 +544,7 @@ const tenantDomain = useTenantDomain();
                           </Tooltip>
                         </td>
                       </tr>
-                    )
+                    );
                   })}
                 </tbody>
               </Table>
@@ -495,7 +568,7 @@ const tenantDomain = useTenantDomain();
               </Button>
               <div className="mx-2">
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  const pageNum = i + 1
+                  const pageNum = i + 1;
                   return (
                     <Button
                       key={i}
@@ -506,7 +579,7 @@ const tenantDomain = useTenantDomain();
                     >
                       {pageNum}
                     </Button>
-                  )
+                  );
                 })}
                 {totalPages > 5 && (
                   <Typography variant="body2" sx={{ mx: 1 }}>
@@ -516,7 +589,9 @@ const tenantDomain = useTenantDomain();
               </div>
               <Button
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 size="small"
               >
                 Next
@@ -532,13 +607,9 @@ const tenantDomain = useTenantDomain();
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: "100%" }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      ></Snackbar>
     </div>
-  )
-}
+  );
+};
 
-export default WorldClassSupplierList
+export default WorldClassSupplierList;

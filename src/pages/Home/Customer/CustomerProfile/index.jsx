@@ -19,6 +19,7 @@ import Loading from "../../../../components/Loading/Loading";
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import CustomerNote from "./CustomerNote";
 
 const CustomerProfile = () => {
   const location = useLocation();
@@ -152,6 +153,7 @@ const CustomerProfile = () => {
             <Tab sx={tabStyles} label="Invoice" />
             <Tab sx={tabStyles} label="Money Receipt" />
             <Tab sx={tabStyles} label="Message" />
+            <Tab sx={tabStyles} label="Note" />
           </Tabs>
         </Box>
 
@@ -194,6 +196,9 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={6}>
           <Message />
+        </TabPanel>
+        <TabPanel value={value} index={7}>
+          <CustomerNote  tenantDomain={tenantDomain}  id={id}/>
         </TabPanel>
 
         <div>

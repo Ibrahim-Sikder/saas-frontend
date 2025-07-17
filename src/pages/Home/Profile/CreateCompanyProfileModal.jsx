@@ -117,12 +117,22 @@ const handleSave = async (formData) => {
             <Grid item xs={12} md={8}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
+                   <TASInput
+                    name="companyNameBN"
+                    label="Company Name Bangla"
+                    icon={BusinessIcon}
+                    required
+                  />
+                 
+                </Grid>
+                <Grid item xs={12}>
                   <TASInput
                     name="companyName"
                     label="Company Name"
                     icon={BusinessIcon}
                     required
                   />
+                 
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TASInput

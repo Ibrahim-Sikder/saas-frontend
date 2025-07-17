@@ -56,3 +56,6 @@ export const cityOptions = [
   { label: "Kushtia", value: "Kushtia" },
   { label: "Faridpur", value: "Faridpur" },
 ];
+
+
+export const vendorOption = ['Raw Materials', 'Machinery', 'Services', 'Components', 'Packaging']

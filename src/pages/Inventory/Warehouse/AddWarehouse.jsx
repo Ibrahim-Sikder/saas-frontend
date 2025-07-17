@@ -17,21 +17,15 @@ import {
   LocationOn as LocationOnIcon,
   Person as PersonIcon,
   Phone as PhoneIcon,
-  Email as EmailIcon,
-  Map as MapIcon,
   Business as BusinessIcon,
-  LocalPostOffice as PostalIcon,
-  Public as CountryIcon,
   Description as DescriptionIcon,
+  Event as EventIcon,
+  Storage as CapacityIcon,
 } from "@mui/icons-material";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import TASSelect from "../../../components/form/Select";
-import {
-  cityOptions,
-  divisionOptions,
-  warehouseTypes,
-} from "../../../utils/options";
+import { cityOptions, warehouseTypes } from "../../../utils/options";
 import TASAutocomplete from "../../../components/form/Autocomplete";
 import FormTextArea from "../../../components/form/FormTextArea";
 import {
@@ -41,17 +35,19 @@ import {
 } from "../../../redux/api/warehouseApi";
 import { toast } from "react-toastify";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { labelStyle } from "../../../utils/customStyle";
 
 const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
- const tenantDomain = useTenantDomain();
-
+  const tenantDomain = useTenantDomain();
   const theme = useTheme();
+
   const [createWarehouse] = useCreateWarehouseMutation();
   const [updateWarehouse] = useUpdateWarehouseMutation();
-  const { data: singleWarehouse, isLoading } = useGetSingleWarehouseQuery({
-    tenantDomain,
-    id: warehouseId,
-  });
+  const { data: singleWarehouse, isLoading } = useGetSingleWarehouseQuery(
+    { tenantDomain, id: warehouseId },
+    { skip: !warehouseId }
+  );
+
   const handleClose = () => {
     onClose(false);
   };
@@ -59,23 +55,17 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
   const handleSubmit = async (data) => {
     const modifiedData = {
       ...data,
-      city: data.city[0],
-      division: data.division[0],
+      city: data.city?.[0] || "",
     };
-  
 
     try {
       if (warehouseId) {
         const res = await updateWarehouse({
           id: warehouseId,
-          data: {
-            ...modifiedData,
-            tenantDomain,
-          },
+          data: { ...modifiedData, tenantDomain },
         }).unwrap();
-
         if (res.success) {
-          toast.success("Warehouse update successfully!");
+          toast.success("Warehouse updated successfully!");
           handleClose();
         }
       } else {
@@ -84,7 +74,7 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
           ...modifiedData,
         }).unwrap();
         if (res.success) {
-          toast.success(`Warehouse added successfully!`);
+          toast.success("Warehouse added successfully!");
           handleClose();
         }
       }
@@ -97,32 +87,28 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
       } else if (apiError?.message) {
         toast.error(apiError.message);
       } else {
-        toast.error("Failed to create warehouse");
+        toast.error("Failed to save warehouse");
       }
     }
   };
+
   const defaultValue = {
     name: singleWarehouse?.data?.name || "",
-    type: singleWarehouse?.data?.type || "",
-    manager: singleWarehouse?.data?.manager || "",
-    email: singleWarehouse?.data?.email || "",
-    phone: singleWarehouse?.data?.phone || "",
     address: singleWarehouse?.data?.address || "",
     city: [singleWarehouse?.data?.city] || [],
-    division: [singleWarehouse?.data?.division] || [],
-    country: singleWarehouse?.data?.country || "",
-    postalCode: singleWarehouse?.data?.postalCode || "",
-    code: singleWarehouse?.data?.code || "",
-    description: singleWarehouse?.data?.description || "",
-    latitude: singleWarehouse?.data?.latitude || "",
-    longitude: singleWarehouse?.data?.longitude || "",
+    manager: singleWarehouse?.data?.manager || "",
+    phone: singleWarehouse?.data?.phone || "",
+    type: singleWarehouse?.data?.type || "",
+    capacity: singleWarehouse?.data?.capacity || "",
+    openingDate: singleWarehouse?.data?.openingDate || "",
     status: singleWarehouse?.data?.status || "active",
+    note: singleWarehouse?.data?.note || "",
   };
 
   return (
     <>
       {isLoading ? (
-        <h3>loading.....</h3>
+        <h3>Loading...</h3>
       ) : (
         <Dialog
           open={open}
@@ -145,23 +131,63 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
             <Divider />
             <DialogContent sx={{ pb: 4 }}>
               <Grid container spacing={3} sx={{ mt: 0 }}>
-                {/* Basic Information */}
-                <Grid item xs={12} md={6}>
+                {/* Warehouse Name (Required) */}
+                <Grid item xs={12}>
                   <TASInput
                     name="name"
-                    label="Warehouse Name"
+                    label={
+                      <>
+                        Warehouse Name
+                        <span style={labelStyle}> *</span>
+                      </>
+                    }
                     icon={WarehouseIcon}
                     fullWidth
+                    
                     placeholder="Main Warehouse"
                   />
                 </Grid>
+
+                {/* Address */}
+                <Grid item xs={12}>
+                  <TASInput
+                    name="address"
+                    label="Address"
+                    icon={LocationOnIcon}
+                    fullWidth
+                    placeholder="123 Industrial Area"
+                  />
+                </Grid>
+
+                {/* City */}
+                <Grid item xs={12} md={6}>
+                  <TASAutocomplete
+                    name="city"
+                    label="City"
+                    options={cityOptions}
+                    icon={LocationOnIcon}
+                  />
+                </Grid>
+
+                {/* Store Manager */}
                 <Grid item xs={12} md={6}>
                   <TASInput
-                    name="code"
-                    label="Warehouse Code"
-                    icon={WarehouseIcon}
+                    name="manager"
+                    label="Store Manager"
+                    icon={PersonIcon}
                     fullWidth
-                    placeholder="WH-001"
+                    placeholder="John Doe"
+                  />
+                </Grid>
+
+                {/* Store Manager Phone */}
+                <Grid item xs={12} md={6}>
+                  <TASInput
+                    name="phone"
+                    label="Store Manager Phone"
+                    icon={PhoneIcon}
+                    fullWidth
+                    placeholder="+1 234 567 890"
                   />
                 </Grid>
 
@@ -174,138 +200,44 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
                     icon={BusinessIcon}
                   />
                 </Grid>
+
+                {/* Capacity */}
+                <Grid item xs={12} md={6}>
+                  <TASInput
+                    name="capacity"
+                    label="Capacity"
+                    icon={CapacityIcon}
+                    fullWidth
+                    placeholder="5000 Units"
+                  />
+                </Grid>
+
+                {/* Opening Date */}
+                <Grid item xs={12} md={6}>
+                  <TASInput
+                    name="openingDate"
+                    label="Opening Date"
+                    type="date"
+                    icon={EventIcon}
+                    fullWidth
+                  />
+                </Grid>
+
+                {/* Status */}
                 <Grid item xs={12} md={6}>
                   <TASSelect
                     name="status"
-                    label="Warehouse Status "
+                    label="Status"
                     items={["active", "inactive"]}
                     icon={BusinessIcon}
                   />
                 </Grid>
 
-                {/* Location Information */}
-                <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
-                    <LocationOnIcon /> Location Details
-                  </Typography>
-                  <Divider />
-                </Grid>
-                <Grid item xs={12}>
-                  <TASInput
-                    name="address"
-                    label="Street Address"
-                    icon={LocationOnIcon}
-                    fullWidth
-                    placeholder="123 Industrial Area"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASAutocomplete
-                    name="city"
-                    label="City"
-                    options={cityOptions}
-                    icon={LocationOnIcon}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASAutocomplete
-                    name="division"
-                    label="Division"
-                    options={divisionOptions}
-                    icon={BusinessIcon}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="postalCode"
-                    label="Postal Code"
-                    icon={PostalIcon}
-                    fullWidth
-                    placeholder="12345"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="country"
-                    label="Country"
-                    icon={CountryIcon}
-                    fullWidth
-                    placeholder="United States"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="latitude"
-                    label="Latitude"
-                    icon={MapIcon}
-                    fullWidth
-                    placeholder="40.7128° N"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="longitude"
-                    label="Longitude"
-                    icon={MapIcon}
-                    fullWidth
-                    placeholder="74.0060° W"
-                  />
-                </Grid>
-
-                {/* Contact Information */}
-                <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
-                    <PersonIcon /> Contact Details
-                  </Typography>
-                  <Divider />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="manager"
-                    label="Manager Name"
-                    icon={PersonIcon}
-                    fullWidth
-                    placeholder="John Doe"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="phone"
-                    label="Contact Phone"
-                    icon={PhoneIcon}
-                    fullWidth
-                    placeholder="+1 234 567 890"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TASInput
-                    name="email"
-                    label="Contact Email"
-                    icon={EmailIcon}
-                    fullWidth
-                    placeholder="contact@warehouse.com"
-                  />
-                </Grid>
+                {/* Notes */}
                 <Grid item xs={12}>
                   <FormTextArea
-                    name="description"
-                    label="Additional Notes"
+                    name="note"
+                    label="Notes"
                     icon={DescriptionIcon}
                     fullWidth
                     placeholder="Special storage requirements or other notes..."
@@ -342,7 +274,7 @@ const AddWarehouseModal = ({ open, onClose, warehouseId }) => {
                   },
                 }}
               >
-                {warehouseId ? " Update Warehouse" : " Create Warehouse"}
+                {warehouseId ? "Update Warehouse" : "Create Warehouse"}
               </Button>
             </DialogActions>
           </GarageForm>

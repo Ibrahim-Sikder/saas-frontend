@@ -49,3 +49,12 @@ export const subscriptionPlans = [
     recommended: false,
   },
 ]
+
+
+export const warehouseTypes = [
+  { value: "primary", label: "Primary Warehouse" },
+  { value: "secondary", label: "Secondary Warehouse" },
+  { value: "showroom", label: "Showroom" },
+  { value: "service", label: "Service Center" },
+  { value: "distribution", label: "Distribution Center" },
+];
