@@ -81,6 +81,14 @@ const noteApi = baseApi.injectEndpoints({
       invalidatesTags: ["note"],
     }),
 
+    restoreFromRecycleBinNotes: builder.mutation({
+      query: ({ id, tenantDomain }) => ({
+        url: `/notes/restore/${id}?tenantDomain=${tenantDomain}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["note"],
+    }),
+
     deleteNote: builder.mutation({
       query: ({ tenantDomain, id }) => ({
         url: `/notes/${id}`,
