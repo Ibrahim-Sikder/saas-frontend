@@ -160,9 +160,9 @@ const UpdateEmployee = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-8 ">
         <div className="productHeadWrap gap-3 ">
-          <div className="flex flex-wrap items-center justify-center">
+          <div className="flex flex-wrap">
             <Button
               onClick={handleBack}
               startIcon={<ArrowBack />}
@@ -170,10 +170,10 @@ const UpdateEmployee = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
+            
           </div>
           <div className="flex items-center justify-center ">
-            <FaUsers size={70} className="invoicIcon" />
+            
             <div>
               <h3 className="text-2xl font-bold"> Update Employee </h3>
             </div>
@@ -343,16 +343,7 @@ const UpdateEmployee = () => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Password"
-                      id="Password"
-                      {...register("password")}
-                      type="password"
-                      focused={singleEmployee?.data?.password || ""}
-                    />
-                  </Grid>
+                
                 </Grid>
               </Box>
               <Box sx={{ marginTop: "30px" }}>

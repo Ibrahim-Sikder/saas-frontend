@@ -8,8 +8,9 @@ import {
   useGetAllInvoicesQuery,
   useMoveRecycledInvoiceMutation,
 } from "../../../redux/api/invoice";
-import { Pagination } from "@mui/material";
+import { Pagination, Tooltip } from "@mui/material";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { Money } from "@mui/icons-material";
 
 const InvoiceTable = () => {
   const location = useLocation();
@@ -18,7 +19,6 @@ const InvoiceTable = () => {
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const tenantDomain = useTenantDomain();
-
 
   const navigate = useNavigate();
   const textInputRef = useRef(null);
@@ -50,7 +50,7 @@ const InvoiceTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice({tenantDomain, id}).unwrap();
+        await moveRecycledInvoice({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -113,10 +113,8 @@ const InvoiceTable = () => {
                       <th>Mobile Number</th>
                       <th>Vehicle Brand</th>
                       <th>Vehicle Name </th>
-                      {/* <th>Mileage History </th> */}
-
                       <th>Date</th>
-                      <th colSpan={4}>Action</th>
+                      <th colSpan={5}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -184,45 +182,98 @@ const InvoiceTable = () => {
                             <span>{card.vehicle?.vehicle_name}</span>
                           </td>
 
-
                           <td>{card.date}</td>
                           <td>
-                            <a
-                              className="editIconWrap edit2"
-                              href={`${
-                                import.meta.env.VITE_API_URL
-                              }/invoices/invoice/${card._id}?tenantDomain=${tenantDomain}`}
-                              target="_blank"
-                              rel="noreferrer"
+                            <Tooltip
+                              title="Money Receipt"
+                              arrow
+                              placement="top"
                             >
-                              <FaDownload className="editIcon" />
-                            </a>
-                          </td>
-                          <td>
-                            <div
-                              onClick={() => handleIconPreview(card._id)}
-                              className="editIconWrap edit2"
-                            >
-                              <FaEye className="editIcon" />
-                            </div>
-                          </td>
-                          <td>
-                            <div className="editIconWrap edit">
-                              <Link
-                                to={`/dashboard/update-invoice?id=${card._id}`}
+                              <a
+                                className="editIconWrap edit2"
+                                href={`/dashboard/money-receive?order_no=${card?.job_no}&id=${card?._id}&net_total=${card?.net_total}`}
+                                rel="noreferrer"
                               >
-                                <FaEdit className="editIcon" />
-                              </Link>
-                            </div>
+                                <Money className="editIcon" />
+                              </a>
+                            </Tooltip>
                           </td>
+
                           <td>
-                            <button
-                              disabled={deleteLoading}
-                              onClick={() => handleMoveToRecycledbin(card._id)}
-                              className=" bg-white  p-1 rounded-sm "
+                            <Tooltip
+                              title="Download Invoice"
+                              arrow
+                              placement="top"
                             >
-                              <FaTrashAlt className="text-[#f5365c] size-[16px]" />
-                            </button>
+                              <a
+                                className="editIconWrap edit2"
+                                href={`${
+                                  import.meta.env.VITE_API_URL
+                                }/invoices/invoice/${
+                                  card._id
+                                }?tenantDomain=${tenantDomain}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <FaDownload className="editIcon" />
+                              </a>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip title="Preview" arrow placement="top">
+                              <div
+                                onClick={() => handleIconPreview(card._id)}
+                                className="editIconWrap edit2"
+                                style={{ cursor: "pointer" }}
+                              >
+                                <FaEye className="editIcon" />
+                              </div>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip title="Edit Invoice" arrow placement="top">
+                              <div className="editIconWrap edit">
+                                <Link
+                                  to={`/dashboard/update-invoice?id=${card._id}`}
+                                >
+                                  <FaEdit className="editIcon" />
+                                </Link>
+                              </div>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip
+                              title={
+                                deleteLoading
+                                  ? "Deleting..."
+                                  : "Move to Recycled Bin"
+                              }
+                              arrow
+                              placement="top"
+                            >
+                              <span>
+                                {" "}
+                                {/* Wrap disabled button for tooltip functionality */}
+                                <button
+                                  disabled={deleteLoading}
+                                  onClick={() =>
+                                    handleMoveToRecycledbin(card._id)
+                                  }
+                                  className="bg-white p-1 rounded-sm"
+                                  style={{
+                                    cursor: deleteLoading
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    opacity: deleteLoading ? 0.7 : 1,
+                                  }}
+                                >
+                                  <FaTrashAlt className="text-[#f5365c] size-[16px]" />
+                                </button>
+                              </span>
+                            </Tooltip>
                           </td>
                         </tr>
                       );

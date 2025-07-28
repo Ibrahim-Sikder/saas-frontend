@@ -2,7 +2,13 @@
 
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaEye, FaDownload } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaEdit,
+  FaEye,
+  FaDownload,
+  FaFileInvoice,
+} from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
@@ -11,6 +17,7 @@ import {
   Pagination,
   Paper,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import {
   useGetAllQuotationsQuery,
@@ -18,7 +25,6 @@ import {
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
-
 
 const QuotationTable = () => {
   const location = useLocation();
@@ -30,7 +36,7 @@ const QuotationTable = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -43,7 +49,7 @@ const tenantDomain = useTenantDomain();
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
-       tenantDomain,
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -134,7 +140,7 @@ const tenantDomain = useTenantDomain();
                         <th>Mobile Number</th>
                         {/* <th>Mileage History</th> */}
                         <th>Date</th>
-                        <th colSpan={4}>Action</th>
+                        <th colSpan={5}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -205,40 +211,102 @@ const tenantDomain = useTenantDomain();
                             <td>{card.date}</td>
 
                             <td>
-                              <a
-                                className="editIconWrap edit2"
-                                href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Tooltip
+                                title="View Invoice"
+                                arrow
+                                placement="top"
                               >
-                                <FaDownload className="editIcon" />
-                              </a>
-                            </td>
-                            <td>
-                              <div
-                                onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2"
-                              >
-                                <FaEye className="editIcon" />
-                              </div>
-                            </td>
-                            <td>
-                              <div className="editIconWrap edit">
-                                <Link
-                                  to={`/dashboard/update-quotation?id=${card._id}`}
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
+                                  rel="noreferrer"
                                 >
-                                  <FaEdit className="editIcon" />
-                                </Link>
-                              </div>
+                                  <FaFileInvoice className="editIcon" />
+                                </a>
+                              </Tooltip>
                             </td>
+
                             <td>
-                              <button
-                                disabled={deleteLoading}
-                                onClick={() => handleMoveToRecycled(card._id)}
-                                className="editIconWrap"
+                              <Tooltip
+                                title="Download Quotation"
+                                arrow
+                                placement="top"
                               >
-                                <FaTrashAlt className="deleteIcon" />
-                              </button>
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`${
+                                    import.meta.env.VITE_API_URL
+                                  }/quotations/quotation/${
+                                    card._id
+                                  }?tenantDomain=${tenantDomain}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <FaDownload className="editIcon" />
+                                </a>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip title="Preview" arrow placement="top">
+                                <div
+                                  onClick={() => handleIconPreview(card._id)}
+                                  className="editIconWrap edit2"
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEye className="editIcon" />
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title="Edit Quotation"
+                                arrow
+                                placement="top"
+                              >
+                                <div className="editIconWrap edit">
+                                  <Link
+                                    to={`/dashboard/update-quotation?id=${card._id}`}
+                                  >
+                                    <FaEdit className="editIcon" />
+                                  </Link>
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title={
+                                  deleteLoading
+                                    ? "Deleting..."
+                                    : "Move to Recycled"
+                                }
+                                arrow
+                                placement="top"
+                              >
+                                <span>
+                                  {" "}
+                                  {/* Wrapper span for disabled button */}
+                                  <button
+                                    disabled={deleteLoading}
+                                    onClick={() =>
+                                      handleMoveToRecycled(card._id)
+                                    }
+                                    className="editIconWrap"
+                                    style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "none",
+                                      border: "none",
+                                      padding: 0,
+                                    }}
+                                  >
+                                    <FaTrashAlt className="deleteIcon" />
+                                  </button>
+                                </span>
+                              </Tooltip>
                             </td>
                           </tr>
                         );

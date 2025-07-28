@@ -112,10 +112,7 @@ const Sidebar = ({ toggle }) => {
     navigate("/");
   };
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-
-  console.log("user info this ", user);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
     <aside className="flex ">
@@ -696,8 +693,6 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
           </AccordionDetails>
         </Accordion>
 
-
-
         {/* HRM */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
@@ -734,18 +729,19 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
             </Typography>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
+                <CalendarToday className="mr-2" />
+                <NavLink to="/dashboard/add-attendance">Attendance Add</NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
                 <FaCalendarAlt className="mr-2" />
                 <NavLink to="/dashboard/attendance-list">
                   Attendance List
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <CalendarToday className="mr-2" />
-                <NavLink to="/dashboard/add-attendance">Attendance Add</NavLink>
-              </div>
-            </Typography>
+
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <EventNote className="mr-2" />
@@ -764,7 +760,7 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <AccessTime className="mr-2" />
                 <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
@@ -775,7 +771,7 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
                 <Schedule className="mr-2" />
                 <NavLink to="/dashboard/shift-list">Shift & Schedule</NavLink>
               </span>
-            </Typography>
+            </Typography> */}
           </AccordionDetails>
         </Accordion>
 

@@ -82,7 +82,7 @@ const AddEmployee = () => {
           toast.error(`${error.path}: ${error.message}`);
         });
       } else {
-        toast.error(err.data?.message || "Failed to creating the customer.");
+        toast.error(err.data?.message || "Failed to creating the employee.");
       }
     } finally {
       toast.dismiss(toastId);
@@ -122,7 +122,7 @@ const AddEmployee = () => {
     <section>
       <div className=" addProductWraps mt-10 ">
         <div className="productHeadWrap gap-3 ">
-          <div className="flex flex-wrap items-center justify-center">
+          <div className="flex flex-wrap ">
             <Button
               onClick={handleBack}
               startIcon={<ArrowBack />}
@@ -132,7 +132,6 @@ const AddEmployee = () => {
             </Button>
           </div>
           <div className="flex items-center justify-center ">
-            <FaUsers size={70} className="invoicIcon" />
             <div>
               <h3 className="text-2xl font-bold"> New Employee </h3>
             </div>
@@ -144,7 +143,7 @@ const AddEmployee = () => {
           </div>
         </div>
 
-        <div className="addProductWrap">
+        <div className="addProductWrap mb-10 ">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="addEmployeeFieldWraps space-y-3">
               <div>
@@ -192,11 +191,43 @@ const AddEmployee = () => {
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
-                      <TextField
+                      {/* <TextField
                         fullWidth
                         label="Blood Group "
                         {...register("blood_group")}
-                      />
+                      /> */}
+                      <FormControl fullWidth error={!!errors.blood_group}>
+                        <InputLabel id="blood-group-select-label">
+                          Blood Group
+                        </InputLabel>
+                        <Select
+                          labelId="blood-group-select-label"
+                          label="Blood Group"
+                          defaultValue=""
+                          {...register("blood_group", {
+                            required: "Blood group is required",
+                          })}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Blood Group
+                          </MenuItem>
+                          <MenuItem value="A+">A+</MenuItem>
+                          <MenuItem value="A-">A-</MenuItem>
+                          <MenuItem value="B+">B+</MenuItem>
+                          <MenuItem value="B-">B-</MenuItem>
+                          <MenuItem value="O+">O+</MenuItem>
+                          <MenuItem value="O-">O-</MenuItem>
+                          <MenuItem value="AB+">AB+</MenuItem>
+                          <MenuItem value="AB-">AB-</MenuItem>
+                          <MenuItem value="Unknown">Unknown</MenuItem>
+                          <MenuItem value="Other">Other</MenuItem>
+                        </Select>
+                        {/* {errors.blood_group && (
+                          <FormHelperText>
+                            {errors.blood_group.message}
+                          </FormHelperText>
+                        )} */}
+                      </FormControl>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <TextField
@@ -275,15 +306,7 @@ const AddEmployee = () => {
                       </FormControl>
                     </Grid>
 
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Password"
-                        id="Password"
-                        {...register("password")}
-                        type="password"
-                      />
-                    </Grid>
+                    
                   </Grid>
                 </Box>
                 <Box sx={{ marginTop: "30px" }}>
@@ -507,7 +530,6 @@ const AddEmployee = () => {
           </form>
         </div>
       </div>
-      <EmployeeTable />
     </section>
   );
 };

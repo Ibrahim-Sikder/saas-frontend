@@ -29,6 +29,8 @@ import {
 } from "../../../../style/tableStyle";
 
 const SingleEmployeeLeaveList = ({ tenantDomain, id }) => {
+
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [search, SetSearch] = useState("");
   const [selectedLeaveRequestId, setSelectedLeaveRequestId] = useState(null)

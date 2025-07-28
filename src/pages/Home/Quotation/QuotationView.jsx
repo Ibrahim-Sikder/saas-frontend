@@ -352,7 +352,7 @@ const tenantDomain = useTenantDomain();
             <Link
               to={`/dashboard/invoice?order_no=${quotationPreview?.job_no}&id=${id}`}
             >
-              {" "}
+        
               <button> Invoice </button>
             </Link>
           </div>

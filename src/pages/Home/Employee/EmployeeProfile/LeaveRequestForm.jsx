@@ -11,8 +11,13 @@ import { leaveRequest } from "../../../../utils/options";
 import RequestLeaveModal from "./RequestLeaveModal";
 import Loading from "../../../../components/Loading/Loading";
 import { useEffect, useState } from "react";
-const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
-  const { data, isLoading } = useGetSingleLeaveRequestQuery({tenantDomain,leaveRequestsId:id});
+const LeaveRequestForm = ({ tenantDomain, onClose, id, leaveRequestId, employeeId }) => {
+
+  console.log("employee id this  ", id);
+  const { data, isLoading } = useGetSingleLeaveRequestQuery({
+    tenantDomain,
+    leaveRequestsId: leaveRequestId,
+  });
   const {
     register,
     handleSubmit,
@@ -20,6 +25,8 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
     reset,
     setValue,
   } = useForm();
+
+  console.log("single leave data", data);
 
   const [createLeaveRequest] = useCreateLeaveRequestMutation();
   const [updateLeaveRequest] = useUpdateLeaveRequestMutation();
@@ -29,7 +36,9 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
     setStatus(event.target.value);
   };
   const handleFormSubmit = async (data) => {
-  const toastId = toast.loading(`${id ? "Updating" : "Creating"} leave request...`);
+    const toastId = toast.loading(
+      `${id ? "Updating" : "Creating"} leave request...`
+    );
 
     const modifyData = {
       employee: employeeId,
@@ -39,10 +48,13 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
       fromDate: data.fromDate,
       toDate: data.toDate,
       reason: data.reason,
-    }
+    };
 
     try {
-      const res = await createLeaveRequest({tenantDomain, ...modifyData}).unwrap();
+      const res = await createLeaveRequest({
+        tenantDomain,
+        ...modifyData,
+      }).unwrap();
       toast.success(res.message || "Leave request created successfully!");
 
       reset();
@@ -60,7 +72,7 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating leave request...");
     const modifyData = {
-      employeeId: employeeId,
+      employeeId: leaveRequestId,
       noOfDays: Number(data.noOfDays),
       remainingLeaves: Number(data.remainingLeaves),
       leaveType: data.leaveType,
@@ -72,8 +84,8 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
 
     try {
       const res = await updateLeaveRequest({
-        tenantDomain, 
-        id,
+        tenantDomain,
+        id:leaveRequestId,
         ...modifyData,
       }).unwrap();
       toast.success(res.message || "Leave request update successfully!");
@@ -106,7 +118,7 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
         Request Leave
       </h2>
       <form
-        onSubmit={handleSubmit(id ? onSubmit : handleFormSubmit)}
+        onSubmit={handleSubmit(leaveRequestId ? onSubmit : handleFormSubmit)}
       >
         <div className="flex">
           <label className="block mb-1">Leave Type</label>
@@ -218,7 +230,7 @@ const LeaveRequestForm = ({ tenantDomain,onClose, id, employeeId }) => {
             <p className="text-red-600">{errors.remainingLeaves.message}</p>
           )}
         </div>
-        {id && (
+        {leaveRequestId && (
           <div className="mt-4">
             <div className="flex">
               <label className="block mb-1">Status</label>

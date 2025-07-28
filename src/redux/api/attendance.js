@@ -12,10 +12,10 @@ const attendanceApi = baseApi.injectEndpoints({
     }),
 
     getTodayAttendance: builder.query({
-      query: ({tenantDomain}) => ({
+      query: ({ tenantDomain }) => ({
         url: `/attendances/today`,
         method: "GET",
-        params:{tenantDomain}
+        params: { tenantDomain },
       }),
       providesTags: ["attendance"],
     }),
@@ -29,23 +29,25 @@ const attendanceApi = baseApi.injectEndpoints({
     }),
 
     getSingleAttendance: builder.query({
-      query: ({tenantDomain,date}) => ({
+      query: ({ tenantDomain, date }) => ({
         url: `/attendances/${date}`,
         method: "GET",
-        params:{tenantDomain}
+        params: { tenantDomain },
       }),
       providesTags: ["attendance"],
     }),
 
-    deleteAttendance: builder.mutation({
-      query: ({tenantDomain , attendanceInfo}) => ({
-        url: "/attendances/remove",
-        method: "PUT",
-        body: attendanceInfo,
-        params:{tenantDomain}
-      }),
-      invalidatesTags: ["attendance"],
-    }),
+ deleteAttendance: builder.mutation({
+  query: ({ tenantDomain, date }) => ({
+    url: "/attendances/remove",
+    method: "DELETE",
+    params: { tenantDomain, date },
+  }),
+  invalidatesTags: ["attendance"],
+}),
+
+
+
   }),
 });
 
