@@ -11,12 +11,9 @@ import {
   TextField,
   InputAdornment,
   Chip,
-  Card,
   CardContent,
   Tooltip,
   IconButton,
-  Menu,
-  MenuItem,
   Skeleton,
   Breadcrumbs,
   Link,
@@ -34,29 +31,24 @@ import {
   FilterList,
   MoreVert,
   Refresh,
-  Download,
   Home,
   Category,
 } from "@mui/icons-material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 import { useGetAllICategoryQuery } from "../../../redux/api/categoryApi";
 import {
   useDeleteExpenseCategoryMutation,
   useGetAllExpensesCategoryQuery,
 } from "../../../redux/api/expense";
 import CreateExpenseCategoryModal from "./CreateExpenseCategoryModal";
-import UpdateExpenseCategoryModal from "./UpdateExpenseCategoryModal";
-import { styled } from "@mui/material/styles";
 import { ActionButton, StyledDataGrid } from "../../../utils/customStyle";
 import { StyledCard } from "../../../utils";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
-
-
 export default function ExpenseCategoryList() {
-  const [open, setOpen] = useState(false);
-  const [update, setUpdate] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [open, setOpen] = useState(false); // Create modal open state
+  const [updateOpen, setUpdateOpen] = useState(false); // Update modal open state
+  const [selectedId, setSelectedId] = useState(null); // Selected category ID for edit
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(10);
@@ -65,11 +57,11 @@ export default function ExpenseCategoryList() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   // Fetch data
   const { data, isLoading, refetch } = useGetAllICategoryQuery({
-    tenantDomain, 
+    tenantDomain,
     limit: pageSize,
     page: currentPage,
     searchTerm: search,
@@ -77,7 +69,7 @@ const tenantDomain = useTenantDomain();
 
   const { data: expenseCategoryData, isLoading: categoryLoading } =
     useGetAllExpensesCategoryQuery({
-      tenantDomain, 
+      tenantDomain,
       limit: 9999999999,
       page: currentPage,
       searchTerm: search,
@@ -89,10 +81,20 @@ const tenantDomain = useTenantDomain();
   const expenseCategories = expenseCategoryData?.data || [];
 
   // Modal handlers
-  const handleOpen = () => setOpen(true);
-  const handleUpdateClose = () => setUpdate(false);
-  const handleUpdateOpen = () => setUpdate(true);
+  const handleOpen = () => {
+    setSelectedId(null); // Clear selectedId when creating new
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
+
+  const handleUpdateOpen = (id) => {
+    setSelectedId(id);
+    setUpdateOpen(true);
+  };
+  const handleUpdateClose = () => {
+    setUpdateOpen(false);
+    setSelectedId(null);
+  };
 
   // Menu handlers
   const handleMenuOpen = (event) => {
@@ -119,7 +121,7 @@ const tenantDomain = useTenantDomain();
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteExpenseCategory({tenantDomain, id:categoryToDelete}).unwrap();
+      await deleteExpenseCategory({ tenantDomain, id: categoryToDelete }).unwrap();
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
     } catch (error) {
@@ -148,40 +150,13 @@ const tenantDomain = useTenantDomain();
     setCurrentPage(page);
   };
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const headers = ["Name", "Code", "Status"];
-    const data = expenseCategories.map((category) => [
-      category.name,
-      category.code,
-      category.status || "Active",
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...data.map((row) => row.join(",")),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "expense_categories.csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   // DataGrid columns
   const columns = [
     {
       field: "name",
       headerName: "Category Name",
       flex: 2,
-      renderCell: (params) => (
-        <Typography fontWeight="500">{params.value}</Typography>
-      ),
+      renderCell: (params) => <Typography fontWeight="500">{params.value}</Typography>,
     },
     {
       field: "code",
@@ -213,16 +188,6 @@ const tenantDomain = useTenantDomain();
       ),
     },
     {
-      field: "createdAt",
-      headerName: "Created Date",
-      flex: 1.5,
-      valueGetter: (params) => {
-        return params.row?.createdAt
-          ? new Date(params.row?.createdAt).toLocaleDateString()
-          : "N/A";
-      },
-    },
-    {
       field: "action",
       headerName: "Actions",
       flex: 1.5,
@@ -230,10 +195,7 @@ const tenantDomain = useTenantDomain();
         <Stack direction="row" spacing={1}>
           <Tooltip title="Edit Category">
             <ActionButton
-              onClick={() => {
-                setSelectedId(params.id);
-                handleUpdateOpen();
-              }}
+              onClick={() => handleUpdateOpen(params.id)}
               variant="outlined"
               startIcon={<EditIcon />}
               sx={{
@@ -281,8 +243,7 @@ const tenantDomain = useTenantDomain();
       id: category?._id,
       code: category?.code,
       name: category?.name,
-      status: category?.status || "Active",
-      createdAt: category?.createdAt,
+      status: category?.status,
     }));
 
   const { meta } = data?.data || { meta: {} };
@@ -361,47 +322,11 @@ const tenantDomain = useTenantDomain();
                     </IconButton>
                   </Tooltip>
 
-                  <Menu
-                    anchorEl={filterAnchorEl}
-                    open={Boolean(filterAnchorEl)}
-                    onClose={handleFilterMenuClose}
-                  >
-                    <MenuItem
-                      onClick={() => handleFilterChange("all")}
-                      selected={statusFilter === "all"}
-                    >
-                      All Categories
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleFilterChange("Active")}
-                      selected={statusFilter === "Active"}
-                    >
-                      Active
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleFilterChange("Inactive")}
-                      selected={statusFilter === "Inactive"}
-                    >
-                      Inactive
-                    </MenuItem>
-                  </Menu>
-
                   <Tooltip title="More options">
                     <IconButton onClick={handleMenuOpen}>
                       <MoreVert />
                     </IconButton>
                   </Tooltip>
-
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    <MenuItem onClick={exportToCSV}>
-                      <Download fontSize="small" sx={{ mr: 1 }} />
-                      Export to CSV
-                    </MenuItem>
-                  </Menu>
 
                   <Button
                     variant="contained"
@@ -498,11 +423,15 @@ const tenantDomain = useTenantDomain();
         </StyledCard>
       </Box>
 
-      {/* Modals */}
-      {open && <CreateExpenseCategoryModal open={open} setOpen={handleClose} />}
-      {update && (
-        <UpdateExpenseCategoryModal
-          open={update}
+      {/* Create Expense Category Modal */}
+      {open && (
+        <CreateExpenseCategoryModal open={open} setOpen={handleClose} />
+      )}
+
+      {/* Update Expense Category Modal */}
+      {updateOpen && selectedId && (
+        <CreateExpenseCategoryModal
+          open={updateOpen}
           setOpen={handleUpdateClose}
           categoryId={selectedId}
         />
@@ -523,11 +452,7 @@ const tenantDomain = useTenantDomain();
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleDeleteCancel}
-            color="primary"
-            variant="outlined"
-          >
+          <Button onClick={handleDeleteCancel} color="primary" variant="outlined">
             Cancel
           </Button>
           <Button

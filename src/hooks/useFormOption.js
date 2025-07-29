@@ -4,6 +4,8 @@ import { useAllCustomerQuery } from "../redux/api/meta.api";
 import { useGetAllInvoicesQuery } from "../redux/api/invoice";
 import { useGetAllJobCardsQuery } from "../redux/api/jobCard";
 import { useTenantDomain } from "./useTenantDomain";
+import { useGetAllSuppliersQuery } from "../redux/api/supplier";
+import { useGetAllExpensesCategoryQuery } from "../redux/api/expense";
 
 export const useFormOptions = (initialFilterType = "") => {
   const tenantDomain = useTenantDomain();
@@ -12,21 +14,45 @@ export const useFormOptions = (initialFilterType = "") => {
   const limit = 10;
 
   // Fetch data
-  const { data: allCustomers } = useAllCustomerQuery({tenantDomain});
-  const { data: allInvoices, isLoading: invoiceLoading } = useGetAllInvoicesQuery({
+  const { data: allCustomers } = useAllCustomerQuery({ tenantDomain });
+  const { data: allInvoices, isLoading: invoiceLoading } =
+    useGetAllInvoicesQuery({
+      tenantDomain,
+      limit,
+      page: currentPage,
+      searchTerm: filterType,
+      isRecycled: false,
+    });
+  const { data: allJobCards, isLoading: jobCardLoading } =
+    useGetAllJobCardsQuery({
+      tenantDomain,
+      limit,
+      page: currentPage,
+      searchTerm: filterType,
+      isRecycled: false,
+    });
+  const { data: suppliers } = useGetAllSuppliersQuery({
     tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
   });
-  const { data: allJobCards, isLoading: jobCardLoading } = useGetAllJobCardsQuery({
+  
+  const { data } = useGetAllExpensesCategoryQuery({
     tenantDomain,
-    limit,
-    page: currentPage,
-    searchTerm: filterType,
-    isRecycled: false,
+    limit: 99999999999,
+    page: 1,
+    searchTerm: "",
   });
+
+  const categoryOptions = useMemo(() => {
+    if (!data?.data) return [];
+    return data.data.map((category) => ({
+      label: category.name,
+      value: category._id,
+    }));
+  }, [data]);
 
   // Generate options
   const jobcardOption = useMemo(() => {
@@ -63,6 +89,13 @@ export const useFormOptions = (initialFilterType = "") => {
       value: invoice._id,
     }));
   }, [allInvoices?.data?.invoices]);
+  const supplierOption = useMemo(() => {
+    if (!suppliers?.data?.suppliers) return [];
+    return suppliers.data.suppliers.map((supplier) => ({
+      label: `${supplier.full_name}`,
+      value: supplier._id,
+    }));
+  }, [suppliers?.data?.suppliers]);
 
   // Return all options and loading states
   return {
@@ -71,22 +104,23 @@ export const useFormOptions = (initialFilterType = "") => {
     customerOption,
     vehicleOptions,
     invoiceOption,
-    
+categoryOptions,
     // Loading states
     invoiceLoading,
     jobCardLoading,
-    
+
     // Pagination controls
     currentPage,
     setCurrentPage,
-    
+
     // Filter controls
     filterType,
     setFilterType,
-    
+
     // Raw data (in case you need it)
     allCustomers,
     allInvoices,
-    allJobCards
+    allJobCards,
+    supplierOption,
   };
 };

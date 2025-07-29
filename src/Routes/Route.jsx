@@ -60,7 +60,7 @@ import RunningProject from "../pages/Home/Projects/RunningProject";
 import CompletedProject from "../pages/Home/Projects/CompletedProject";
 import ViewEmployeeAttendance from "../pages/Home/Attendance/ViewEmployeeAttendance";
 import EmployeeHoliday from "../pages/Holiday/Holiday";
-import ShiftList from "../pages/Home/Employee/ShiftAndSchedule/ShiftList";
+
 import UpdateBillPay from "../pages/BillPay/UpdateBillPay";
 import BillPayInvoice from "../pages/BillPay/BillPayInvoice";
 import PurchaseList from "../pages/Home/Parchase/PurchasList";
@@ -512,10 +512,7 @@ export const router = createBrowserRouter([
         path: "update-holiday",
         element: <UpdateHoliday />,
       },
-      {
-        path: "shift-list",
-        element: <ShiftList />,
-      },
+
       {
         path: "add-income",
         element: <Income />,

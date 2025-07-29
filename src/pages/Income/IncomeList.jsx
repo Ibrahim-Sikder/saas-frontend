@@ -2,7 +2,6 @@
 
 /* eslint-disable no-unused-vars */
 
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -72,7 +71,7 @@ const IncomeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const limit = 15;
- const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data: allIncomes, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,
@@ -95,7 +94,7 @@ const IncomeList = () => {
 
     if (willDelete) {
       try {
-        await deleteIncome({tenantDomain, id}).unwrap();
+        await deleteIncome({ tenantDomain, id }).unwrap();
         swal("Deleted!", "Income record deleted successfully.", "success");
       } catch (error) {
         swal("Error", "An error occurred while deleting the record.", "error");
@@ -105,12 +104,12 @@ const IncomeList = () => {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on new search
+    setCurrentPage(1);
   };
 
   const handleCategoryFilter = (e) => {
     setFilterCategory(e.target.value);
-    setCurrentPage(1); // Reset to first page on new filter
+    setCurrentPage(1);
   };
 
   if (incomeLoading) {
@@ -183,23 +182,7 @@ const IncomeList = () => {
           }}
         />
 
-        <FormControl size="small" sx={{ minWidth: "180px" }}>
-          <InputLabel id="category-filter-label">Filter by Category</InputLabel>
-          <Select
-            labelId="category-filter-label"
-            value={filterCategory}
-            onChange={handleCategoryFilter}
-            label="Filter by Category"
-            startAdornment={<FilterListIcon sx={{ color: "#42A1DA", mr: 1 }} />}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            <MenuItem value="service">Service</MenuItem>
-            <MenuItem value="parts">Parts</MenuItem>
-            <MenuItem value="repair">Repair</MenuItem>
-            <MenuItem value="maintenance">Maintenance</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
-          </Select>
-        </FormControl>
+       
       </Box>
 
       <TableContainer
@@ -223,12 +206,8 @@ const IncomeList = () => {
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 Receipt/Invoice
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Income Category
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Income Name
-              </TableCell>
+           
+           
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 Customer
               </TableCell>
@@ -295,34 +274,7 @@ const IncomeList = () => {
                     </Tooltip>
                   </TableCell>
 
-                  <TableCell align="center">
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 0.5,
-                        justifyContent: "center",
-                      }}
-                    >
-                      {row?.category?.map((category, idx) => (
-                        <Chip
-                          key={idx}
-                          label={category}
-                          size="small"
-                          sx={{
-                            backgroundColor: "rgba(66, 161, 218, 0.1)",
-                            borderColor: "#42A1DA",
-                            color: "#2980b9",
-                            fontWeight: "medium",
-                            fontSize: "0.75rem",
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </TableCell>
-
-                  <TableCell align="center">{row.income_name}</TableCell>
-
+          
                   <TableCell align="center">
                     <Tooltip title={`Customer: ${customer}`}>
                       <Box
@@ -368,20 +320,7 @@ const IncomeList = () => {
                         maximumFractionDigits: 2,
                       })}
                     </Typography>
-                    {row.tax_applied && (
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        sx={{ color: "text.secondary" }}
-                      >
-                        +$
-                        {Number(row.tax_amount || 0).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}{" "}
-                        tax
-                      </Typography>
-                    )}
+                   
                   </TableCell>
 
                   <TableCell align="center">
@@ -390,9 +329,9 @@ const IncomeList = () => {
                         label={
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <span style={{ marginRight: "4px" }}>
-                              {getPaymentMethodIcon(paymentMethod)}
+                              {paymentMethod}
                             </span>
-                            <span>{paymentMethod.replace("_", " ")}</span>
+      
                           </Box>
                         }
                         size="small"

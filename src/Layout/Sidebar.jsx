@@ -765,13 +765,8 @@ const Sidebar = ({ toggle }) => {
                 <AccessTime className="mr-2" />
                 <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
               </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Schedule className="mr-2" />
-                <NavLink to="/dashboard/shift-list">Shift & Schedule</NavLink>
-              </span>
             </Typography> */}
+           
           </AccordionDetails>
         </Accordion>
 
