@@ -1280,36 +1280,84 @@ export const wareHouseCard = {
   borderRadius: 3,
 };
 
-
-
-
 export const NoteHeader = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   color: theme.palette.text.primary,
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px'
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
 }));
 
 export const NoteDate = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
-  fontSize: '0.75rem',
-  marginTop: '4px'
+  fontSize: "0.75rem",
+  marginTop: "4px",
 }));
 
-export const PriorityTag = styled('span')(({ priority, theme }) => ({
-  display: 'inline-block',
-  padding: '4px 10px',
-  borderRadius: '20px',
-  fontSize: '0.7rem',
-  fontWeight: '600',
-  marginLeft: 'auto',
-  backgroundColor: 
-    priority === 'high' ? theme.palette.error.light : 
-    priority === 'medium' ? theme.palette.warning.light : 
-    theme.palette.success.light,
-  color: 
-    priority === 'high' ? theme.palette.error.contrastText : 
-    priority === 'medium' ? theme.palette.warning.contrastText : 
-    theme.palette.success.contrastText
+export const PriorityTag = styled("span")(({ priority, theme }) => ({
+  display: "inline-block",
+  padding: "4px 10px",
+  borderRadius: "20px",
+  fontSize: "0.7rem",
+  fontWeight: "600",
+  marginLeft: "auto",
+  backgroundColor:
+    priority === "high"
+      ? theme.palette.error.light
+      : priority === "medium"
+      ? theme.palette.warning.light
+      : theme.palette.success.light,
+  color:
+    priority === "high"
+      ? theme.palette.error.contrastText
+      : priority === "medium"
+      ? theme.palette.warning.contrastText
+      : theme.palette.success.contrastText,
 }));
+
+export const inputStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 3,
+    background: alpha("#ffffff", 0.05),
+    "& fieldset": {
+      borderColor: alpha("#06b6d4", 0.3),
+    },
+    "&:hover fieldset": {
+      borderColor: alpha("#06b6d4", 0.5),
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#06b6d4",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: alpha("#ffffff", 0.7),
+  },
+  "& .MuiOutlinedInput-input": {
+    color: "#ffffff",
+  },
+};
+
+export const buttonStyle = {
+  background: "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
+  py: 3,
+  fontSize: "1.1rem",
+  fontWeight: 700,
+  borderRadius: 3,
+  boxShadow: `0 15px 40px ${alpha("#06b6d4", 0.4)}`,
+  "&:hover": {
+    background: "linear-gradient(45deg, #ff006e, #8338ec, #3a86ff)",
+    boxShadow: `0 20px 50px ${alpha("#06b6d4", 0.5)}`,
+  },
+};
+  export const expenseInputStyle = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#3b82f6",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#3b82f6",
+        borderWidth: 2,
+      },
+    },
+  };

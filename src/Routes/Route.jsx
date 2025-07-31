@@ -133,6 +133,7 @@ import UserProfilePage from "../pages/Home/Profile/Profile";
 import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
 import AllTenantList from "../pages/Home/Tenant/AllTenantList";
 import AllUserList from "../pages/Home/Tenant/AllUserList";
+import ContactUserList from "../pages/Home/Tenant/ContactUserList";
 
 export const router = createBrowserRouter([
   {
@@ -696,6 +697,10 @@ export const router = createBrowserRouter([
       {
         path: "all-user-list",
         element: <AllUserList />,
+      },
+      {
+        path: "contact-customer",
+        element: <ContactUserList />,
       },
       {
         path: "backup",

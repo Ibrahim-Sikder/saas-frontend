@@ -3,8 +3,8 @@ import { baseApi } from "./baseApi";
 const incomeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createIncome: builder.mutation({
-      query: (incomeInfo) => ({
-        url: "/incomes",
+      query: ({ tenantDomain, incomeInfo }) => ({
+        url: `/incomes?tenantDomain=${tenantDomain}`,
         method: "POST",
         body: incomeInfo,
       }),

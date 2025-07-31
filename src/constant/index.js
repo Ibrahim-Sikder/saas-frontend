@@ -48,8 +48,8 @@ export const paymentMethods = [
   "Bkash",
   "Nagad",
   "Rocket",
-  "Check",
-  "Card",
+  // "Check",
+  // "Card",
   "Bank Transfer",
   "Other",
 ];

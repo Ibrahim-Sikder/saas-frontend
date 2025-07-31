@@ -672,7 +672,7 @@ const Sidebar = ({ toggle }) => {
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Payments className="mr-2" />
                 <NavLink to="/dashboard/add-paybill"> Pay Bill </NavLink>
@@ -683,7 +683,7 @@ const Sidebar = ({ toggle }) => {
                 <ReceiptLong className="mr-2" />
                 <NavLink to="/dashboard/paybill">Bill List</NavLink>
               </div>
-            </Typography>
+            </Typography> */}
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
@@ -781,13 +781,14 @@ const Sidebar = ({ toggle }) => {
           </div>
         )}
         <div className="pl-4 space-y-3 mt-3 ">
-          <Link to="/dashboard/all-user-list">
-            <div className="flex items-center dashboardItems cursor-pointer">
-              <Logout size={22} />
-              <span className="ml-2">All User List</span>
-            </div>
-          </Link>
-        </div>
+            <Link to="/dashboard/all-user-list">
+              <div className="flex items-center dashboardItems cursor-pointer">
+                <Logout size={22} />
+                <span className="ml-2">All User List</span>
+              </div>
+            </Link>
+          </div>
+      
         {/* Recycle Bin */}
         <Accordion
           sx={{ paddingBottom: "10px" }}

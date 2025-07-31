@@ -47,6 +47,9 @@ const tenantDomain = useTenantDomain();
   const handleOpenModal = () => {
     setModalOpen(true);
   };
+  const handleUpdateModal = () => {
+    setModalOpen(true);
+  };
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -137,7 +140,22 @@ const tenantDomain = useTenantDomain();
                 color: "#fff",
               }}
             >
-              Crate Profile
+              Create Profile
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={handleUpdateModal}
+              size="large"
+              sx={{
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                textTransform: "none",
+                color: "#fff",
+              }}
+            >
+              Update Profile
             </Button>
           </Box>
 

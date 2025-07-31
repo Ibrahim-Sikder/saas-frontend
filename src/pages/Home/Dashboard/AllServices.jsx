@@ -23,7 +23,6 @@ const AllServices = () => {
     isLoading,
     isError,
   } = useGetAllMetaQuery({ tenantDomain });
-  console.log("all meta ", allMetaData);
 
   if (isLoading) return <Loading />;
 

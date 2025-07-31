@@ -152,7 +152,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
             <Link to="/dashboard/holiday">
               <FaCalendarDays size={20} className="text-[#fff]" />
             </Link>
-            <UserProfile />
+            <UserProfile tenantDomain={tenantDomain}/>
           </div>
         </div>
 

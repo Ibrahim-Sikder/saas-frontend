@@ -11,6 +11,7 @@ const userApi = baseApi.injectEndpoints({
         };
       },
     }),
+    
     deleteUser: builder.mutation({
       query: ({ tenantDomain, id }) => ({
         url: `/user/${id}`,
@@ -27,7 +28,38 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
+    updateUser: builder.mutation({
+      query: ({ id, data, tenantDomain }) => ({
+        url: `/user/${id}`,
+        method: "PATCH",
+        body: data,
+        params: { tenantDomain },
+      }),
+      invalidatesTags: ["user"],
+    }),
+    getAllContactUser: builder.query({
+      query: ({ limit, page, searchTerm }) => ({
+        url: `/contact`,
+        method: "GET",
+        params: { limit, page, searchTerm },
+      }),
+      providesTags: ["contact"],
+    }),
+    deleteContactUser: builder.mutation({
+      query: ({ id }) => ({
+        url: `/contact/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["contact"],
+    }),
   }),
 });
 
-export const { useCreateUserMutation, useGetAllUserQuery, useDeleteUserMutation } = userApi;
+export const {
+  useCreateUserMutation,
+  useGetAllUserQuery,
+  useDeleteUserMutation,
+  useGetAllContactUserQuery,
+  useDeleteContactUserMutation,
+  useUpdateUserMutation
+} = userApi;

@@ -19,7 +19,7 @@ import {
   Avatar,
   Skeleton,
 } from "@mui/material"
-import { ControlPoint, AttachFile, Payment, TrendingUp, Receipt } from "@mui/icons-material"
+import { ControlPoint, Payment, TrendingUp, Receipt } from "@mui/icons-material"
 import { Link } from "react-router-dom"
 import EditIcon from "@mui/icons-material/Edit"
 import IconButton from "@mui/material/IconButton"
@@ -68,14 +68,12 @@ export default function ExpenseList() {
     data?.data?.expenses?.map((expense) => ({
       id: expense._id,
       date: expense.date,
-      reference_no: expense.reference_no,
-      amount: expense.amount,
-      expense_category: expense.expense_category,
-      vendor: expense.vendor,
+      reference_no: expense.transactionNumber,
+      amount: expense.totalAmount, // Use totalAmount instead of invoiceCost
       payment_method: expense.payment_method,
       invoice_id: expense.invoice_id,
-      attachment: expense.attachment,
       note: expense.note,
+      expense_items: expense.expense_items,
     })) || []
 
   const handleSearch = (e) => {
@@ -104,19 +102,10 @@ export default function ExpenseList() {
             <Skeleton variant="text" width={80} />
           </TableCell>
           <TableCell>
-            <Skeleton variant="rectangular" width={120} height={24} />
-          </TableCell>
-          <TableCell>
             <Skeleton variant="text" width={100} />
           </TableCell>
           <TableCell>
-            <Skeleton variant="rectangular" width={100} height={24} />
-          </TableCell>
-          <TableCell>
             <Skeleton variant="text" width={120} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="circular" width={32} height={32} />
           </TableCell>
           <TableCell>
             <Skeleton variant="rectangular" width={80} height={32} />
@@ -178,7 +167,6 @@ export default function ExpenseList() {
             </CardContent>
           </Card>
         </Grid>
-       
       </Grid>
 
       {/* Main Table */}
@@ -235,12 +223,9 @@ export default function ExpenseList() {
               <TableRow sx={{ bgcolor: "#f8fafc" }}>
                 <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Date</TableCell>
                 <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Reference</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Amount</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Category</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Vendor</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Payment</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Invoice ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Attachment</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Total Amount</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Payment Method</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Expense Items</TableCell>
                 <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2, textAlign: "center" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -249,7 +234,7 @@ export default function ExpenseList() {
                 <LoadingSkeleton />
               ) : rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} sx={{ textAlign: "center", py: 6 }}>
+                  <TableCell colSpan={6} sx={{ textAlign: "center", py: 6 }}>
                     <Typography variant="h6" sx={{ color: "#64748b", mb: 1 }}>
                       No expenses found
                     </Typography>
@@ -296,49 +281,6 @@ export default function ExpenseList() {
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {Array.isArray(row.expense_category) && row.expense_category.length > 0 ? (
-                          <>
-                            {row.expense_category.slice(0, 2).map((category, idx) => (
-                              <Chip
-                                key={idx}
-                                label={category}
-                                size="small"
-                                sx={{
-                                  bgcolor: "#fef3c7",
-                                  color: "#92400e",
-                                  fontSize: "0.75rem",
-                                  height: 24,
-                                  border: "1px solid #fde68a",
-                                }}
-                              />
-                            ))}
-                            {row.expense_category.length > 2 && (
-                              <Chip
-                                label={`+${row.expense_category.length - 2}`}
-                                size="small"
-                                sx={{
-                                  bgcolor: "#f3f4f6",
-                                  color: "#6b7280",
-                                  fontSize: "0.75rem",
-                                  height: 24,
-                                }}
-                              />
-                            )}
-                          </>
-                        ) : (
-                          <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                            N/A
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ py: 2 }}>
-                      <Typography variant="body2" sx={{ color: "#374151" }}>
-                        {Array.isArray(row.vendor) ? row.vendor.join(", ") : row.vendor || "N/A"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 2 }}>
                       <Chip
                         label={row.payment_method || "N/A"}
                         size="small"
@@ -351,28 +293,42 @@ export default function ExpenseList() {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
-                      <Typography variant="body2" sx={{ color: "#374151" }}>
-                        {Array.isArray(row.invoice_id) ? row.invoice_id[0] : row.invoice_id || "N/A"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 2, textAlign: "center" }}>
-                      {row.attachment ? (
-                        <IconButton
-                          size="small"
-                          onClick={() => window.open(row.attachment, "_blank")}
-                          sx={{
-                            color: "#2563eb",
-                            bgcolor: "#eff6ff",
-                            "&:hover": { bgcolor: "#dbeafe" },
-                          }}
-                        >
-                          <AttachFile fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                          -
-                        </Typography>
-                      )}
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {Array.isArray(row.expense_items) && row.expense_items.length > 0 ? (
+                          <>
+                            {row.expense_items.slice(0, 2).map((item, idx) => (
+                              <Chip
+                                key={idx}
+                                label={`${item.name}: $${item.amount?.toLocaleString() || "0"}`}
+                                size="small"
+                                sx={{
+                                  bgcolor: "#fef3c7",
+                                  color: "#92400e",
+                                  fontSize: "0.75rem",
+                                  height: 24,
+                                  border: "1px solid #fde68a",
+                                }}
+                              />
+                            ))}
+                            {row.expense_items.length > 2 && (
+                              <Chip
+                                label={`+${row.expense_items.length - 2} items`}
+                                size="small"
+                                sx={{
+                                  bgcolor: "#f3f4f6",
+                                  color: "#6b7280",
+                                  fontSize: "0.75rem",
+                                  height: 24,
+                                }}
+                              />
+                            )}
+                          </>
+                        ) : (
+                          <Typography variant="body2" sx={{ color: "#9ca3af" }}>
+                            No items
+                          </Typography>
+                        )}
+                      </Box>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Stack direction="row" spacing={1} justifyContent="center">

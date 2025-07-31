@@ -110,16 +110,6 @@ const AddCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Customer...");
-    // const getTenantName = () => {
-    //   const host = window.location.hostname;
-
-    //   if (host.includes("localhost")) {
-    //     return host.split(".")[0];
-    //   }
-
-    //   return host.split(".")[0];
-    // };
-    // const tenantDomain = getTenantName();
 
     const customer = {
       company_name: data.company_name,

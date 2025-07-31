@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 
 export function getTenantDomain(hostname) {
   if (!hostname) return "";
-
-  // যদি hostname localhost থাকে (বা dev environment)
   if (hostname.includes("localhost")) {
-    // যেমন: fashions.com.localhost → 'fashions.com'
     const parts = hostname.split(".");
     return parts.slice(0, parts.length - 1).join(".");
   }
@@ -13,11 +10,8 @@ export function getTenantDomain(hostname) {
   const parts = hostname.split(".");
 
   if (parts.length > 2) {
-    // সাবডোমেইন আছে
     return parts[0];
   }
-
-  // কাস্টম ডোমেইন
   return hostname;
 }
 

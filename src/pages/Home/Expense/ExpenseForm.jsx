@@ -1,6 +1,8 @@
-/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 "use client";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -11,71 +13,156 @@ import {
   Button,
   Card,
   CardContent,
-  useTheme,
   Stack,
+  IconButton,
+  Avatar,
+  InputAdornment,
+  Divider,
+  Chip,
 } from "@mui/material";
 import {
   Receipt,
-  AttachMoney,
   Description,
-  CloudUpload,
-  Save,
+  Add,
+  Delete,
+  Payment,
+  AttachMoney,
+  DateRange,
+  BusinessCenter,
 } from "@mui/icons-material";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import {
   useCreateExpenseMutation,
   useGetSingleExpenseQuery,
   useUpdateExpenseMutation,
 } from "../../../redux/api/expense";
 import TASDatepicker from "../../../components/form/Datepicker";
-import TASForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
+import TASTextarea from "../../../components/form/Textarea";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetAllInvoicesQuery } from "../../../redux/api/invoice";
+import ExpenseAutoComplete from "./ExpenseAutoComplete";
+import Loading from "../../../components/Loading/Loading";
 import TASSelect from "../../../components/form/Select";
 import { paymentMethods } from "../../../constant";
-import TASTextarea from "../../../components/form/Textarea";
-import TASFileupload from "../../../components/form/Fileupload";
-import { boxStyle } from "../../../utils";
-import { useTenantDomain } from "../../../hooks/useTenantDomain";
-
-import FormAutocomplete from "../../../components/form/FormAutocomplete";
-import { useFormOptions } from "../../../hooks/useFormOption";
+import { expenseInputStyle } from "../../../utils/customStyle";
 
 const ExpenseForm = ({ id }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
   const tenantDomain = useTenantDomain();
-  const { invoiceOption, supplierOption, categoryOptions } = useFormOptions();
+  const [filterType, setFilterType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
+
   const { data: singleExpense, isLoading } = useGetSingleExpenseQuery({
     tenantDomain,
     id,
   });
-  const [createExpense, ] =
-    useCreateExpenseMutation();
+
+  const [createExpense] = useCreateExpenseMutation();
   const [updateExpense] = useUpdateExpenseMutation();
 
-  const defaultValues = {
-    attachment: singleExpense?.data?.attachment || "",
-    expense_category: singleExpense?.data?.expense_category || "",
-    invoice_id: singleExpense?.data?.invoice_id || "",
-    date: singleExpense?.data?.date || "",
-    vendor: singleExpense?.data?.vendor || "",
-    amount: singleExpense?.data?.amount || "",
-    payment_method: singleExpense?.data?.payment_method || "",
-    reference_no: singleExpense?.data?.reference_no || "",
-    note: singleExpense?.data?.note || "",
-    voucher_no: singleExpense?.data?.voucher_no || "",
-  };
+  const { data: allInvoices } = useGetAllInvoicesQuery({
+    tenantDomain,
+    limit,
+    page: currentPage,
+    searchTerm: filterType,
+    isRecycled: false,
+  });
 
-  const handleSubmit = async (data, reset) => {
+  const invoiceOption = useMemo(() => {
+    if (!allInvoices?.data?.invoices) return [];
+    return allInvoices.data.invoices.map((invoice) => ({
+      label: `${invoice.invoice_no} - ${invoice.Id}`,
+      _id: invoice._id,
+    }));
+  }, [allInvoices?.data?.invoices]);
 
-    console.log(data)
-    const docUrl = Array.isArray(data.document)
-      ? data.document[0]
-      : data.document;
+  const defaultValues = useMemo(() => {
+    if (id && singleExpense?.data) {
+      let selectedInvoiceId = null;
+      if (singleExpense.data.invoice_id) {
+        selectedInvoiceId =
+          typeof singleExpense.data.invoice_id === "object"
+            ? singleExpense.data.invoice_id._id
+            : singleExpense.data.invoice_id;
+      }
 
-    const modifyValues = {
-      ...data,
-      document: docUrl,
-      amount: Number(data.amount),
+      return {
+        date: singleExpense.data.date,
+        invoice_id: selectedInvoiceId,
+        invoiceCost: singleExpense.data.invoiceCost ?? 0,
+        payment_method: singleExpense.data.payment_method || "Bkash",
+        accountNumber: singleExpense.data.accountNumber || "",
+        transactionNumber: singleExpense.data.transactionNumber || "",
+        note: singleExpense.data.note || "",
+        items: singleExpense.data.expense_items.map((expenseItem) => ({
+          name: expenseItem.name || "",
+          amount: expenseItem.amount?.toString() || "0",
+        })),
+      };
+    }
+
+    return {
+      date: new Date(),
+      invoice_id: null,
+      invoiceCost: 0,
+      payment_method: "Bkash",
+      accountNumber: "",
+      transactionNumber: "",
+      note: "",
+      items: [{ name: "", amount: "0" }],
+    };
+  }, [id, singleExpense?.data, invoiceOption]);
+
+  const methods = useForm({
+    defaultValues,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isDirty },
+  } = methods;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  const items = watch("items");
+  const totalExpenseAmount = useMemo(() => {
+    return items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  }, [items]);
+
+  useEffect(() => {
+    if (Object.keys(defaultValues).length > 0 && !isDirty) {
+      reset(defaultValues);
+    }
+  }, [defaultValues, reset, isDirty]);
+
+  const handleFormSubmit = async (data) => {
+    const cleanedExpenseItems = data.items.map((item) => ({
+      name: item.name,
+      amount: Number(item.amount),
+    }));
+
+    const formattedDate =
+      data.date instanceof Date
+        ? data.date.toISOString().split("T")[0]
+        : data.date;
+
+    const expenseData = {
+      date: formattedDate,
+      invoice_id: data.invoice_id || "",
+      invoiceCost: Number(data.invoiceCost) || 0,
+      expense_items: cleanedExpenseItems,
+      payment_method: data.payment_method,
+      accountNumber: data.accountNumber || "",
+      transactionNumber: data.transactionNumber || "",
+      note: data.note || "",
     };
 
     const toastId = toast.loading(
@@ -88,12 +175,12 @@ const ExpenseForm = ({ id }) => {
         res = await updateExpense({
           tenantDomain,
           id,
-          ...modifyValues,
+          ...expenseData,
         }).unwrap();
       } else {
         res = await createExpense({
           tenantDomain,
-          expenseInfo: modifyValues,
+          expenseInfo: expenseData,
         }).unwrap();
       }
 
@@ -104,255 +191,335 @@ const ExpenseForm = ({ id }) => {
         isLoading: false,
         autoClose: 3000,
       });
+
       navigate("/dashboard/expense-list");
-      reset();
     } catch (error) {
       toast.update(toastId, {
         render:
           `Error ${id ? "updating" : "creating"} expense: ` +
-          (error.message || "Something went wrong!"),
+          (error?.data?.message || error?.message || "Something went wrong!"),
         type: "error",
         isLoading: false,
         autoClose: 3000,
       });
-    } finally {
-      toast.dismiss(toastId);
     }
   };
 
-  console.log('single expense', singleExpense)
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <>
-      {isLoading ? (
-        <h3>Loading</h3>
-      ) : (
-        <Box sx={{ maxWidth: "80%", mx: "auto", p: { xs: 2, md: 3 } }}>
-          <Paper
-            elevation={0}
+    <Box
+      sx={{
+        maxWidth: "1200px",
+        mx: "auto",
+        p: { xs: 2, md: 4 },
+        backgroundColor: "#f8fafc",
+        minHeight: "100vh",
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 4 },
+          mb: 4,
+          borderRadius: 3,
+          backgroundColor: "white",
+          border: "1px solid #e2e8f0",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: "linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4)",
+          },
+        }}
+      >
+        <Stack direction="row" spacing={3} alignItems="center">
+          <Avatar
             sx={{
-              p: { xs: 2, md: 3 },
-              mb: 3,
-              borderRadius: 2,
-              bgcolor: theme.palette.primary.main,
-              color: "white",
+              width: 64,
+              height: 64,
+              backgroundColor: "#3b82f6",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
             }}
           >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              alignItems="center"
+            <Receipt sx={{ fontSize: 32 }} />
+          </Avatar>
+          <Box>
+            <Typography
+              variant="h4"
+              fontWeight="700"
+              color="#1e293b"
+              sx={{ mb: 1 }}
             >
-              <Receipt sx={{ fontSize: 40 }} />
-              <Box>
-                <Typography variant="h4" fontWeight="bold">
-                  {id ? "Edit Expense" : "Add Expense"}
-                </Typography>
-                <Typography variant="body2">
-                  Dashboard / Expense Management
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
+              {id ? "Edit Expense" : "Create New Expense"}
+            </Typography>
+            <Typography variant="body1" color="#64748b">
+              {id
+                ? "Update expense details"
+                : "Add a new expense to your records"}
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
 
-          <Paper
-            elevation={1}
-            sx={{ p: { xs: 2, md: 3 }, mb: 3, borderRadius: 2 }}
-          >
-            <TASForm onSubmit={handleSubmit} defaultValues={defaultValues}>
-              <Grid container spacing={3}>
-                {/* Basic Information Section */}
-                <Grid item xs={12}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        mb={2}
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <Grid container spacing={4}>
+            {/* Invoice & Date Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+                    <DateRange sx={{ color: "#3b82f6", fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight="600" color="#1e293b">
+                      Invoice & Date Information
+                    </Typography>
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={4}>
+                      <ExpenseAutoComplete
+                        label="Select Invoice"
+                        name="invoice_id"
+                        options={invoiceOption}
+                        size="normal"
+                        multiple={false}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <TASDatepicker
+                        size="medium"
+                        fullWidth
+                        name="date"
+                        label="Date"
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <TASInput
+                        fullWidth
+                        name="invoiceCost"
+                        label="Invoice Cost"
+                        type="number"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AttachMoney sx={{ color: "#10b981" }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Expense Items Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mb={3}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <BusinessCenter sx={{ color: "#8b5cf6", fontSize: 24 }} />
+                      <Typography variant="h6" fontWeight="600" color="#1e293b">
+                        Expense Items
+                      </Typography>
+                    </Stack>
+                    <Chip
+                      label={`Total: $${totalExpenseAmount.toFixed(2)}`}
+                      sx={{
+                        backgroundColor: "#dcfce7",
+                        color: "#166534",
+                        fontWeight: "600",
+                      }}
+                    />
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Stack spacing={3}>
+                    {fields.map((item, index) => (
+                      <Paper
+                        key={item.id}
+                        sx={{
+                          p: 3,
+                          borderRadius: 2,
+                          backgroundColor: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                        }}
                       >
-                        <Receipt color="primary" />
-                        <Typography variant="h6" fontWeight="medium">
-                          Expense Details
-                        </Typography>
-                      </Stack>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
-                          <TASDatepicker
-                            size="medium"
-                            fullWidth
-                            name="date"
-                            label="Date"
-                          />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <FormAutocomplete
-                          
-                            label={
-                              <>
-                                Select Invoice
-                                <span
-                                  style={{ color: "red", fontSize: "25px" }}
-                                >
-                                  {" "}
-                                  *
-                                </span>
-                              </>
-                            }
-                            name="invoice_id"
-                            options={invoiceOption}
-                          />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <FormAutocomplete
-                            name="expense_category"
-                            label="Expense Category"
-                            options={categoryOptions}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={6}>
-                          <FormAutocomplete
-                            name="vendor"
-                            label={
-                              <>
-                                Vendor/Supplier
-                                <span
-                                  style={{ color: "red", fontSize: "25px" }}
-                                >
-                                  {" "}
-                                  *
-                                </span>
-                              </>
-                            }
-                            options={supplierOption}
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Additional Information Section */}
-                <Grid item xs={12}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        mb={2}
-                      >
-                        <Description color="primary" />
-                        <Typography variant="h6" fontWeight="medium">
-                          Additional Information
-                        </Typography>
-                      </Stack>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                          <Box sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" gutterBottom>
-                              Attachment
-                            </Typography>
-                            <TASFileupload
-                              uploadBoxStyles={boxStyle}
+                        <Grid container spacing={3} alignItems="center">
+                          <Grid item xs={12} md={5}>
+                            <TASInput
                               fullWidth
-                              name="attachment"
-                              label="Upload document"
-                              icon={
-                                <CloudUpload
-                                  sx={{
-                                    fontSize: 40,
-                                    color: theme.palette.primary.main,
-                                    mb: 1,
-                                  }}
-                                />
-                              }
-                              helperText="Drag and drop files here or click to browse"
+                              name={`items[${index}].name`}
+                              label={`Item ${index + 1} Name`}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Description sx={{ color: "#6b7280" }} />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={expenseInputStyle}
                             />
-                          </Box>
+                          </Grid>
+                          <Grid item xs={12} md={4}>
+                            <TASInput
+                              fullWidth
+                              label="Amount"
+                              name={`items[${index}].amount`}
+                              type="number"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <AttachMoney sx={{ color: "#10b981" }} />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={expenseInputStyle}
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="center"
+                            >
+                              <IconButton
+                                color="error"
+                                onClick={() => remove(index)}
+                                disabled={fields.length === 1}
+                                sx={expenseInputStyle}
+                              >
+                                <Delete />
+                              </IconButton>
+                            </Stack>
+                          </Grid>
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Typography variant="subtitle2" gutterBottom>
-                            Note
-                          </Typography>
-                          <TASTextarea
-                            fullWidth
-                            name="note"
-                            minRows={3}
-                            placeholder="Add any additional notes about this expense..."
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      </Paper>
+                    ))}
+                  </Stack>
+                  <Box display="flex" justifyContent="center" mt={3}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={() => append({ name: "", amount: "0" })}
+                      sx={expenseInputStyle}
+                    >
+                      Add New Item
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
 
-                {/* Payment Details Section */}
-                <Grid item xs={12}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        mb={2}
-                      >
-                        <AttachMoney color="primary" />
-                        <Typography variant="h6" fontWeight="medium">
-                          Amount & Payment
-                        </Typography>
-                      </Stack>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
+            {/* Payment & Details Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+                    <Payment sx={{ color: "#8b5cf6", fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight="600" color="#1e293b">
+                      Payment Information
+                    </Typography>
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <TASSelect
+                        size="normal"
+                        name="payment_method"
+                        label="Payment Method"
+                        items={paymentMethods}
+                      />
+                    </Grid>
+                    {/* Conditional Payment Fields */}
+                    {["Bkash", "Nagad", "Rocket", "Other"].includes(
+                      methods.watch("payment_method")
+                    ) && (
+                      <>
+                        <Grid item xs={12} md={3}>
                           <TASInput
-                            size="medium"
                             fullWidth
-                            name="amount"
-                            label="Amount *"
-                            type="number"
-                            startAdornment={
-                              <AttachMoney fontSize="small" color="action" />
-                            }
+                            name="accountNumber"
+                            label="Account Number"
+                            sx={expenseInputStyle}
                           />
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                          <TASSelect
-                            items={paymentMethods}
-                            size="medium"
-                            fullWidth
-                            name="payment_method"
-                            label="Payment Method"
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} md={3}>
                           <TASInput
-                            size="medium"
                             fullWidth
-                            name="reference_no"
-                            label="Reference No"
+                            name="transactionNumber"
+                            label="Transaction Number"
+                            sx={expenseInputStyle}
                           />
                         </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
+                      </>
+                    )}
+                    <Grid item xs={12}>
+                      <TASTextarea
+                        fullWidth
+                        name="note"
+                        minRows={4}
+                        placeholder="Add any additional notes about this expense..."
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  startIcon={<Save />}
-                >
-                  {id ? "Update Expense" : "Create Expense"}
-                </Button>
-              </Box>
-            </TASForm>
-          </Paper>
-        </Box>
-      )}
-    </>
+          {/* Submit Button */}
+          <Box display="flex" justifyContent="center" mt={4}>
+            <Button
+              variant="contained"
+              type="submit"
+              size="large"
+              sx={expenseInputStyle}
+            >
+              {id ? "Update Expense" : "Create Expense"}
+            </Button>
+          </Box>
+        </form>
+      </FormProvider>
+    </Box>
   );
 };
 

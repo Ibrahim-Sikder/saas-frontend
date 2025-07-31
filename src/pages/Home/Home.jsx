@@ -11,7 +11,22 @@ import RcentQuotation from "./Dashboard/RcentQuotation";
 import RecentInvoice from "./Dashboard/RecentInvoice";
 import EmployeeStatistics from "./Dashboard/EmployeeStatistics";
 
+import { useTenantDomain } from "../../hooks/useTenantDomain";
+import { useGetAllMetaQuery } from "../../redux/api/meta.api";
+import DashboardSummary from "./Dashboard/IncomeCard";
+import Loading from "../../components/Loading/Loading";
+
 const Home = () => {
+  const tenantDomain = useTenantDomain();
+  const {
+    data: allMetaData,
+    isLoading,
+    isError,
+  } = useGetAllMetaQuery({ tenantDomain });
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <div className="mt-10 ">
       <div className="flex items-center justify-between">
@@ -21,6 +36,7 @@ const Home = () => {
         </div>
       </div>
       <AllServices />
+      <DashboardSummary data={allMetaData?.data} />
 
       <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />
