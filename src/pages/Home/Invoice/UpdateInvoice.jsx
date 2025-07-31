@@ -1,105 +1,126 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-"use client"
-import { useEffect, useRef, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
-import { Autocomplete, Box, Button, Chip, Grid, TextField } from "@mui/material"
-import { useForm } from "react-hook-form"
-import InputMask from "react-input-mask"
-import { cmDmOptions, countries } from "../../../constant"
-import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress"
-import { DatePicker } from "@mui/x-date-pickers/DatePicker"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import dayjs from "dayjs"
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  Grid,
+  TextField,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { cmDmOptions, countries } from "../../../constant";
+import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import {
   useGetSingleInvoiceQuery,
   useRemoveInvoiceMutation,
   useUpdateInvoiceMutation,
-} from "../../../redux/api/invoice"
-import { unitOptions } from "../../../utils/options"
-import { formatNumber } from "../../../utils/formateSemicolon"
-import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile"
-import { useTenantDomain } from "../../../hooks/useTenantDomain"
+} from "../../../redux/api/invoice";
+import { unitOptions } from "../../../utils/options";
+import { formatNumber } from "../../../utils/formateSemicolon";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateInvoice = () => {
-  const [specificInvoice, setSpecificInvoice] = useState(null)
-  const [value, setValue] = useState(specificInvoice?.vehicle?.carReg_no)
-  const [partsTotal, setPartsTotal] = useState(0)
-  const [serviceTotal, setServiceTotal] = useState(0)
-  const [grandTotal, setGrandTotal] = useState(0)
-  const tenantDomain = useTenantDomain()
-  const [currentMileage, setCurrentMileage] = useState("")
-  const [mileageChanged, setMileageChanged] = useState(false)
-  const [discount, setDiscount] = useState("")
-  const [vat, setVAT] = useState("")
-  const [tax, setTax] = useState("") // New state for Tax
-  const [advance, setAdvance] = useState("")
-  const [error, setError] = useState("")
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [removeButton, setRemoveButton] = useState("")
-  const [reload, setReload] = useState(false)
-  const [addButton, setAddButton] = useState(false)
-  const [serviceAddButton, setServiceAddButton] = useState(false)
-  const partsDiscountRef = useRef(null)
-  const netTotalAmountRef = useRef(null)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const id = new URLSearchParams(location.search).get("id")
-  const userTypeFromProfile = new URLSearchParams(location.search).get("user_type")
-  const userFromProfile = new URLSearchParams(location.search).get("user")
+  const [specificInvoice, setSpecificInvoice] = useState(null);
+  const [value, setValue] = useState(specificInvoice?.vehicle?.carReg_no);
+  const [partsTotal, setPartsTotal] = useState(0);
+  const [serviceTotal, setServiceTotal] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const tenantDomain = useTenantDomain();
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
+  const [discount, setDiscount] = useState("");
+  const [vat, setVAT] = useState("");
+  const [tax, setTax] = useState(""); // New state for Tax
+  const [advance, setAdvance] = useState("");
+  const [error, setError] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [removeButton, setRemoveButton] = useState("");
+  const [reload, setReload] = useState(false);
+  const [addButton, setAddButton] = useState(false);
+  const [serviceAddButton, setServiceAddButton] = useState(false);
+  const partsDiscountRef = useRef(null);
+  const netTotalAmountRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const id = new URLSearchParams(location.search).get("id");
+  const userTypeFromProfile = new URLSearchParams(location.search).get(
+    "user_type"
+  );
+  const userFromProfile = new URLSearchParams(location.search).get("user");
 
   // country code set
-  const [countryCode, setCountryCode] = useState(countries[0])
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [countryCode, setCountryCode] = useState(countries[0]);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handlePhoneNumberChange = (e) => {
-    const newPhoneNumber = e.target.value
+    const newPhoneNumber = e.target.value;
     if (
       /^\d*$/.test(newPhoneNumber) &&
       newPhoneNumber.length <= 11 &&
-      (newPhoneNumber === "" || !newPhoneNumber.startsWith("0") || newPhoneNumber.length > 1)
+      (newPhoneNumber === "" ||
+        !newPhoneNumber.startsWith("0") ||
+        newPhoneNumber.length > 1)
     ) {
-      setPhoneNumber(newPhoneNumber)
+      setPhoneNumber(newPhoneNumber);
     }
-  }
+  };
 
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
-  })
+  });
 
-  const [items, setItems] = useState([{ description: "", unit: "", quantity: "", rate: "", total: "" }])
-  const [serviceItems, setServiceItems] = useState([{ description: "", unit: "", quantity: "", rate: "", total: "" }])
+  const [items, setItems] = useState([
+    { description: "", unit: "", quantity: "", rate: "", total: "" },
+  ]);
+  const [serviceItems, setServiceItems] = useState([
+    { description: "", unit: "", quantity: "", rate: "", total: "" },
+  ]);
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
-  const [updateInvoice, { isLoading: updateLoading, error: updateError }] = useUpdateInvoiceMutation()
-  const [removeInvoice, { isLoading: removeLoading, error: removeError }] = useRemoveInvoiceMutation()
+  const [updateInvoice, { isLoading: updateLoading, error: updateError }] =
+    useUpdateInvoiceMutation();
+  const [removeInvoice, { isLoading: removeLoading, error: removeError }] =
+    useRemoveInvoiceMutation();
 
-  const { data } = useGetSingleInvoiceQuery({ tenantDomain, id })
+  const { data } = useGetSingleInvoiceQuery({ tenantDomain, id });
 
   useEffect(() => {
     if (data?.data) {
-      setSpecificInvoice(data.data)
+      setSpecificInvoice(data.data);
       // Initialize discount, vat, tax, and advance from specificInvoice
-      setDiscount(data.data.discount !== undefined ? Number(data.data.discount) : "")
-      setVAT(data.data.vat !== undefined ? Number(data.data.vat) : "")
-      setTax(data.data.tax !== undefined ? Number(data.data.tax) : "") // Initialize tax
-      setAdvance(data.data.advance !== undefined ? Number(data.data.advance) : "")
+      setDiscount(
+        data.data.discount !== undefined ? Number(data.data.discount) : ""
+      );
+      setVAT(data.data.vat !== undefined ? Number(data.data.vat) : "");
+      setTax(data.data.tax !== undefined ? Number(data.data.tax) : ""); // Initialize tax
+      setAdvance(
+        data.data.advance !== undefined ? Number(data.data.advance) : ""
+      );
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     if (specificInvoice?.date) {
-      setSelectedDate(specificInvoice.date)
+      setSelectedDate(specificInvoice.date);
     }
-  }, [specificInvoice])
+  }, [specificInvoice]);
 
   useEffect(() => {
     if (specificInvoice?.user_type === "customer") {
@@ -118,7 +139,7 @@ const UpdateInvoice = () => {
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
         mileage: specificInvoice?.vehicle?.mileage,
-      })
+      });
     }
     if (specificInvoice?.user_type === "company") {
       reset({
@@ -138,7 +159,7 @@ const UpdateInvoice = () => {
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
         mileage: specificInvoice?.vehicle?.mileage,
-      })
+      });
     }
     if (specificInvoice?.user_type === "showRoom") {
       reset({
@@ -148,7 +169,8 @@ const UpdateInvoice = () => {
         vehicle_username: specificInvoice?.showRoom?.vehicle_username,
         showRoom_address: specificInvoice?.showRoom?.showRoom_address,
         company_name: specificInvoice?.showRoom?.company_name,
-        company_contact: phoneNumber || specificInvoice?.showRoom?.company_contact,
+        company_contact:
+          phoneNumber || specificInvoice?.showRoom?.company_contact,
         company_country_code: specificInvoice?.showRoom?.company_country_code,
         carReg_no: specificInvoice?.vehicle?.carReg_no,
         car_registration_no: specificInvoice?.vehicle?.car_registration_no,
@@ -157,7 +179,7 @@ const UpdateInvoice = () => {
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
         mileage: specificInvoice?.vehicle?.mileage,
-      })
+      });
     }
   }, [
     phoneNumber,
@@ -190,373 +212,415 @@ const UpdateInvoice = () => {
     specificInvoice?.vehicle?.mileage,
     specificInvoice?.vehicle?.vehicle_brand,
     specificInvoice?.vehicle?.vehicle_name,
-  ])
+  ]);
 
   const handleRemove = (index) => {
     if (!index) {
-      const list = [...items]
-      setItems(list)
+      const list = [...items];
+      setItems(list);
     } else {
-      const list = [...items]
-      list.splice(index, 1)
-      setItems(list)
+      const list = [...items];
+      list.splice(index, 1);
+      setItems(list);
     }
-  }
+  };
 
   const handleServiceDescriptionRemove = (index) => {
     if (!index) {
-      const list = [...serviceItems]
-      setServiceItems(list)
+      const list = [...serviceItems];
+      setServiceItems(list);
     } else {
-      const list = [...serviceItems]
-      list.splice(index, 1)
-      setServiceItems(list)
+      const list = [...serviceItems];
+      list.splice(index, 1);
+      setServiceItems(list);
     }
-  }
+  };
 
   useEffect(() => {
-    const totalSum = specificInvoice?.input_data?.reduce((sum, item) => sum + Number(item.total), 0)
-    const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0)
-    const serviceTotalSum = specificInvoice?.service_input_data?.reduce((sum, item) => sum + Number(item.total), 0)
-    const serviceTotalSum2 = serviceItems.reduce((sum, item) => sum + Number(item.total), 0)
-    const newTotalSum = isNaN(totalSum) ? 0 : totalSum
-    const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2
-    const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum
-    const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2
-    const newGrandTotal = newTotalSum + newTotalSum2
-    const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2
-    const totalGrand = Number.parseFloat((newGrandTotal + newServiceGrandTotal).toFixed(2))
-    setPartsTotal(newGrandTotal)
-    setServiceTotal(newServiceGrandTotal)
-    setGrandTotal(totalGrand)
-  }, [items, serviceItems, specificInvoice?.input_data, specificInvoice?.service_input_data])
+    const totalSum = specificInvoice?.input_data?.reduce(
+      (sum, item) => sum + Number(item.total),
+      0
+    );
+    const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0);
+    const serviceTotalSum = specificInvoice?.service_input_data?.reduce(
+      (sum, item) => sum + Number(item.total),
+      0
+    );
+    const serviceTotalSum2 = serviceItems.reduce(
+      (sum, item) => sum + Number(item.total),
+      0
+    );
+    const newTotalSum = isNaN(totalSum) ? 0 : totalSum;
+    const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2;
+    const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum;
+    const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2;
+    const newGrandTotal = newTotalSum + newTotalSum2;
+    const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2;
+    const totalGrand = Number.parseFloat(
+      (newGrandTotal + newServiceGrandTotal).toFixed(2)
+    );
+    setPartsTotal(newGrandTotal);
+    setServiceTotal(newServiceGrandTotal);
+    setGrandTotal(totalGrand);
+  }, [
+    items,
+    serviceItems,
+    specificInvoice?.input_data,
+    specificInvoice?.service_input_data,
+  ]);
 
   const handleDateChange = (newValue) => {
     if (newValue) {
-      const formattedDate = newValue.format("YYYY-MM-DD")
-      setSelectedDate(formattedDate)
+      const formattedDate = newValue.format("YYYY-MM-DD");
+      setSelectedDate(formattedDate);
     }
-  }
+  };
 
   const handleDescriptionChange = (index, value) => {
-    const newItems = [...(specificInvoice?.input_data || [])]
+    const newItems = [...(specificInvoice?.input_data || [])];
     newItems[index] = {
       ...newItems[index],
       description: value,
-    }
+    };
     setSpecificInvoice((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleDescriptionChange2 = (index, value) => {
-    const newItems = [...items]
-    newItems[index].description = value
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    newItems[index].description = value;
+    setItems(newItems);
+  };
 
   const handleServiceDescriptionChange = (index, value) => {
-    const newItems = [...(specificInvoice?.service_input_data || [])]
+    const newItems = [...(specificInvoice?.service_input_data || [])];
     newItems[index] = {
       ...newItems[index],
       description: value,
-    }
+    };
     setSpecificInvoice((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleServiceDescriptionChange2 = (index, value) => {
-    const newItems = [...serviceItems]
-    newItems[index].description = value
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    newItems[index].description = value;
+    setServiceItems(newItems);
+  };
 
   const handleQuantityChange = (index, value) => {
     if (!isNaN(value)) {
-      const newItems = [...(specificInvoice?.input_data || [])]
-      const roundedValue = Math.round(value) || 0
-      newItems[index].quantity = Number(roundedValue)
-      newItems[index].total = Number(roundedValue) * newItems[index].rate
-      newItems[index].total = Number(newItems[index].total.toFixed(2))
+      const newItems = [...(specificInvoice?.input_data || [])];
+      const roundedValue = Math.round(value) || 0;
+      newItems[index].quantity = Number(roundedValue);
+      newItems[index].total = Number(roundedValue) * newItems[index].rate;
+      newItems[index].total = Number(newItems[index].total.toFixed(2));
       setSpecificInvoice((prevState) => ({
         ...prevState,
         input_data: newItems,
-      }))
+      }));
     }
-  }
+  };
 
   const handleQuantityChange2 = (index, value) => {
-    const newItems = [...items]
-    const roundedValue = Math.round(value) || 0
-    newItems[index].quantity = Number(roundedValue)
-    newItems[index].total = Number(roundedValue) * newItems[index].rate
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    const roundedValue = Math.round(value) || 0;
+    newItems[index].quantity = Number(roundedValue);
+    newItems[index].total = Number(roundedValue) * newItems[index].rate;
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    setItems(newItems);
+  };
 
   const handleServiceQuantityChange = (index, value) => {
     if (!isNaN(value)) {
-      const newItems = [...(specificInvoice?.service_input_data || [])]
-      const roundedValue = Math.round(value) || 0
-      newItems[index].quantity = Number(roundedValue)
-      newItems[index].total = Number(roundedValue) * newItems[index].rate
-      newItems[index].total = Number(newItems[index].total.toFixed(2))
+      const newItems = [...(specificInvoice?.service_input_data || [])];
+      const roundedValue = Math.round(value) || 0;
+      newItems[index].quantity = Number(roundedValue);
+      newItems[index].total = Number(roundedValue) * newItems[index].rate;
+      newItems[index].total = Number(newItems[index].total.toFixed(2));
       setSpecificInvoice((prevState) => ({
         ...prevState,
         service_input_data: newItems,
-      }))
+      }));
     }
-  }
+  };
 
   const handleServiceQuantityChange2 = (index, value) => {
-    const newItems = [...serviceItems]
-    const roundedValue = Math.round(value) || 0
-    newItems[index].quantity = Number(roundedValue)
-    newItems[index].total = Number(roundedValue) * newItems[index].rate
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    const roundedValue = Math.round(value) || 0;
+    newItems[index].quantity = Number(roundedValue);
+    newItems[index].total = Number(roundedValue) * newItems[index].rate;
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    setServiceItems(newItems);
+  };
 
   const handleUnitChange = (index, value) => {
-    const newItems = [...serviceItems]
-    newItems[index].unit = value
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    newItems[index].unit = value;
+    setServiceItems(newItems);
+  };
 
   const handleUnitChange2 = (index, value) => {
-    const newItems = [...(specificInvoice?.service_input_data || [])]
+    const newItems = [...(specificInvoice?.service_input_data || [])];
     newItems[index] = {
       ...newItems[index],
       unit: value,
-    }
+    };
     setSpecificInvoice((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleInputUnitChange = (index, value) => {
-    const newItems = [...items]
-    newItems[index].unit = value
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    newItems[index].unit = value;
+    setItems(newItems);
+  };
 
   const handleInputUnitChange2 = (index, value) => {
-    const newItems = [...(specificInvoice?.input_data || [])]
+    const newItems = [...(specificInvoice?.input_data || [])];
     newItems[index] = {
       ...newItems[index],
       unit: value,
-    }
+    };
     setSpecificInvoice((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleRateChange = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    const newItems = [...(specificInvoice?.input_data || [])]
-    newItems[index].rate = Number(numericValue) || 0
-    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const newItems = [...(specificInvoice?.input_data || [])];
+    newItems[index].rate = Number(numericValue) || 0;
+    newItems[index].total = Number(
+      newItems[index].quantity * newItems[index].rate
+    );
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
     setSpecificInvoice((prevState) => ({
       ...prevState,
       input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleRateChange2 = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    const newItems = [...items]
-    newItems[index].rate = Number(numericValue) || 0
-    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
-    setItems(newItems)
-  }
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const newItems = [...items];
+    newItems[index].rate = Number(numericValue) || 0;
+    newItems[index].total = Number(
+      newItems[index].quantity * newItems[index].rate
+    );
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    setItems(newItems);
+  };
 
   const handleServiceRateChange = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    const newItems = [...(specificInvoice?.service_input_data || [])]
-    newItems[index].rate = Number(numericValue) || 0
-    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const newItems = [...(specificInvoice?.service_input_data || [])];
+    newItems[index].rate = Number(numericValue) || 0;
+    newItems[index].total = Number(
+      newItems[index].quantity * newItems[index].rate
+    );
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
     setSpecificInvoice((prevState) => ({
       ...prevState,
       service_input_data: newItems,
-    }))
-  }
+    }));
+  };
 
   const handleServiceRateChange2 = (index, value) => {
     // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    const newItems = [...serviceItems]
-    newItems[index].rate = Number(numericValue) || 0
-    newItems[index].total = Number(newItems[index].quantity * newItems[index].rate)
-    newItems[index].total = Number(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
-  }
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const newItems = [...serviceItems];
+    newItems[index].rate = Number(numericValue) || 0;
+    newItems[index].total = Number(
+      newItems[index].quantity * newItems[index].rate
+    );
+    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    setServiceItems(newItems);
+  };
 
   const handleDiscountChange = (value) => {
-    const parsedValue = Number(value)
+    const parsedValue = Number(value);
     if (!isNaN(parsedValue)) {
-      setDiscount(parsedValue)
+      setDiscount(parsedValue);
     }
-  }
+  };
 
   const handleVATChange = (value) => {
-    const parsedValue = Number(value)
+    const parsedValue = Number(value);
     if (!isNaN(parsedValue)) {
-      setVAT(parsedValue)
+      setVAT(parsedValue);
     }
-  }
+  };
 
   const handleTaxChange = (value) => {
     // New handler for Tax
-    const parsedValue = Number(value)
+    const parsedValue = Number(value);
     if (!isNaN(parsedValue)) {
-      setTax(parsedValue)
+      setTax(parsedValue);
     }
-  }
+  };
 
   const handleAdvance = (value) => {
-    const parsedValue = Number(value)
+    const parsedValue = Number(value);
     if (!isNaN(parsedValue)) {
-      setAdvance(parsedValue)
+      setAdvance(parsedValue);
     }
-  }
+  };
 
   const calculateFinalTotal = () => {
-    let finalTotal
-    let differenceExistAndNewGrandTotal = 0 // Initialize to 0
-    let vatAsPercentage = 0
-    let discountAsPercentage = 0
-    let taxAsPercentage = 0 // New variable for tax
-    let totalAfterDiscount = 0
+    let finalTotal;
+    let differenceExistAndNewGrandTotal = 0; // Initialize to 0
+    let vatAsPercentage = 0;
+    let discountAsPercentage = 0;
+    let taxAsPercentage = 0; // New variable for tax
+    let totalAfterDiscount = 0;
 
     // Calculate the difference between the grand total and the specific invoice's total amount
     if (grandTotal !== specificInvoice?.total_amount) {
-      differenceExistAndNewGrandTotal = grandTotal - (Number(specificInvoice?.total_amount) || 0) // Convert to number
+      differenceExistAndNewGrandTotal =
+        grandTotal - (Number(specificInvoice?.total_amount) || 0); // Convert to number
     }
 
     // Determine the discount percentage
     if (discount > 0) {
-      discountAsPercentage = discount
+      discountAsPercentage = discount;
     } else if (discount === 0) {
-      discountAsPercentage = 0 // If it's 0, we assign 0 but ensure it won't reduce the amount
+      discountAsPercentage = 0; // If it's 0, we assign 0 but ensure it won't reduce the amount
     } else if (discount === "") {
-      discountAsPercentage = Number(specificInvoice?.discount) || 0
+      discountAsPercentage = Number(specificInvoice?.discount) || 0;
     }
 
     // Convert specificInvoice?.total_amount to a number
-    const specificTotalAmount = Number(specificInvoice?.total_amount) || 0 // Ensure it's treated as a number
-    const differenceWithoutDiscount = specificTotalAmount + differenceExistAndNewGrandTotal
+    const specificTotalAmount = Number(specificInvoice?.total_amount) || 0; // Ensure it's treated as a number
+    const differenceWithoutDiscount =
+      specificTotalAmount + differenceExistAndNewGrandTotal;
 
     // Apply discount
     if (discountAsPercentage === 0) {
-      totalAfterDiscount = differenceWithoutDiscount
+      totalAfterDiscount = differenceWithoutDiscount;
     } else if (discountAsPercentage === "") {
-      totalAfterDiscount = differenceWithoutDiscount - (Number(specificInvoice?.discount) || 0)
+      totalAfterDiscount =
+        differenceWithoutDiscount - (Number(specificInvoice?.discount) || 0);
     } else {
-      totalAfterDiscount = differenceWithoutDiscount - discountAsPercentage
+      totalAfterDiscount = differenceWithoutDiscount - discountAsPercentage;
     }
 
     // Ensure that if there's no discount, no subtraction happens
-    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount
+    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount;
 
     // Determine the VAT percentage
     if (vat > 0) {
-      vatAsPercentage = vat
+      vatAsPercentage = vat;
     } else if (vat === 0) {
-      vatAsPercentage = 0
+      vatAsPercentage = 0;
     } else if (vat === "") {
-      vatAsPercentage = Number(specificInvoice?.vat) || 0
+      vatAsPercentage = Number(specificInvoice?.vat) || 0;
     }
 
     // Calculate total after VAT
-    const totalAfterVat = totalAfterDiscount + totalAfterDiscount * (vatAsPercentage / 100)
+    const totalAfterVat =
+      totalAfterDiscount + totalAfterDiscount * (vatAsPercentage / 100);
 
     // Determine the Tax percentage (new logic)
     if (tax > 0) {
-      taxAsPercentage = tax
+      taxAsPercentage = tax;
     } else if (tax === 0) {
-      taxAsPercentage = 0
+      taxAsPercentage = 0;
     } else if (tax === "") {
-      taxAsPercentage = Number(specificInvoice?.tax) || 0
+      taxAsPercentage = Number(specificInvoice?.tax) || 0;
     }
 
     // Calculate total after Tax (new logic)
-    const finalTotalWithTax = totalAfterVat + totalAfterVat * (taxAsPercentage / 100)
+    const finalTotalWithTax =
+      totalAfterVat + totalAfterVat * (taxAsPercentage / 100);
 
     // Final total with 2 decimal precision
-    finalTotal = Number.parseFloat(finalTotalWithTax).toFixed(2)
-    return finalTotal
-  }
+    finalTotal = Number.parseFloat(finalTotalWithTax).toFixed(2);
+    return finalTotal;
+  };
 
   const calculateDue = () => {
-    let due
+    let due;
     // Determine the advance amount based on the conditions
     const advanceAmount =
-      advance !== undefined && advance !== "" ? Number(advance) : Number(specificInvoice?.advance) || 0
+      advance !== undefined && advance !== ""
+        ? Number(advance)
+        : Number(specificInvoice?.advance) || 0;
     // Calculate due based on the calculated final total and advance amount
-    due = calculateFinalTotal() - advanceAmount
+    due = calculateFinalTotal() - advanceAmount;
     // Ensure the due is a valid number and round it to 2 decimal places
     if (isNaN(due) || due < 0) {
-      due = 0
+      due = 0;
     } else {
-      due = Number.parseFloat(due).toFixed(2)
+      due = Number.parseFloat(due).toFixed(2);
     }
-    return due
-  }
+    return due;
+  };
 
   const handleAddClick = () => {
-    setItems([...items, { description: "", unit: "", quantity: "", date: "" }])
+    setItems([...items, { description: "", unit: "", quantity: "", date: "" }]);
     if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificInvoice?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
+      partsDiscountRef.current.value = discount
+        ? discount
+        : specificInvoice?.discount;
+      netTotalAmountRef.current.innerText = calculateFinalTotal();
     }
-  }
+  };
 
   const handleServiceDescriptionAdd = () => {
-    setServiceItems([...serviceItems, { description: "", unit: "", quantity: "", rate: "", total: "" }])
+    setServiceItems([
+      ...serviceItems,
+      { description: "", unit: "", quantity: "", rate: "", total: "" },
+    ]);
     if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificInvoice?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
+      partsDiscountRef.current.value = discount
+        ? discount
+        : specificInvoice?.discount;
+      netTotalAmountRef.current.innerText = calculateFinalTotal();
     }
-  }
+  };
 
   const handlePartsAddButton = () => {
-    setAddButton(!addButton)
+    setAddButton(!addButton);
     if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificInvoice?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
+      partsDiscountRef.current.value = discount
+        ? discount
+        : specificInvoice?.discount;
+      netTotalAmountRef.current.innerText = calculateFinalTotal();
     }
-  }
+  };
 
   const handleServiceAddButton = () => {
-    setServiceAddButton(!serviceAddButton)
+    setServiceAddButton(!serviceAddButton);
     if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificInvoice?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
+      partsDiscountRef.current.value = discount
+        ? discount
+        : specificInvoice?.discount;
+      netTotalAmountRef.current.innerText = calculateFinalTotal();
     }
-  }
+  };
 
   const handleRemoveButton = async (i, name) => {
     const values = {
       id: id,
       data: { index: i, invoice_name: name },
-    }
-    const res = await removeInvoice(values).unwrap()
+    };
+    const res = await removeInvoice(values).unwrap();
     if (res.success) {
-      setReload(!reload)
-      toast.success(res.message)
+      setReload(!reload);
+      toast.success(res.message);
     }
-  }
+  };
 
   // Fixed function to handle mileage history deletion
   const handleMileageHistoryDelete = (indexToDelete) => {
@@ -564,10 +628,13 @@ const UpdateInvoice = () => {
       ...prevState,
       vehicle: {
         ...prevState.vehicle,
-        mileageHistory: prevState.vehicle?.mileageHistory?.filter((_, index) => index !== indexToDelete) || [],
+        mileageHistory:
+          prevState.vehicle?.mileageHistory?.filter(
+            (_, index) => index !== indexToDelete
+          ) || [],
       },
-    }))
-  }
+    }));
+  };
 
   const input_data = [
     ...(specificInvoice?.input_data || []),
@@ -580,7 +647,7 @@ const UpdateInvoice = () => {
         unit: item.unit,
         total: item.total,
       })),
-  ]
+  ];
 
   const service_input_data = [
     ...(specificInvoice?.service_input_data || []),
@@ -593,10 +660,10 @@ const UpdateInvoice = () => {
         unit: item.unit,
         total: item.total,
       })),
-  ]
+  ];
 
   const onSubmit = async (data) => {
-    setRemoveButton("")
+    setRemoveButton("");
     try {
       const customer = {
         company_name: data.company_name,
@@ -604,14 +671,14 @@ const UpdateInvoice = () => {
         customer_contact: data.customer_contact,
         customer_country_code: data.company_country_code,
         customer_address: data.customer_address,
-      }
+      };
       const company = {
         company_name: data.company_name,
         vehicle_username: data.vehicle_username,
         company_address: data.company_address,
         company_contact: data.company_contact,
         company_country_code: data.company_country_code,
-      }
+      };
       const showRoom = {
         showRoom_name: data.showRoom_name,
         vehicle_username: data.vehicle_username,
@@ -619,24 +686,30 @@ const UpdateInvoice = () => {
         company_contact: data.company_contact,
         company_country_code: data.company_country_code,
         company_address: data.company_address,
-      }
+      };
       // Fixed mileage history logic
-      data.mileage = Number(data.mileage)
-      const newMileageValue = Number(data.mileage)
+      data.mileage = Number(data.mileage);
+      const newMileageValue = Number(data.mileage);
+
       // Get existing mileage history or initialize empty array
-      const existingMileageHistory = specificInvoice?.vehicle?.mileageHistory || []
-      const updatedMileageHistory = [...existingMileageHistory]
+      const existingMileageHistory =
+        specificInvoice?.vehicle?.mileageHistory || [];
+      const updatedMileageHistory = [...existingMileageHistory];
+
       // Only add new mileage to history if it's valid and different from the last entry
       if (!isNaN(newMileageValue) && newMileageValue > 0) {
         const lastMileage =
-          updatedMileageHistory.length > 0 ? updatedMileageHistory[updatedMileageHistory.length - 1].mileage : null
+          updatedMileageHistory.length > 0
+            ? updatedMileageHistory[updatedMileageHistory.length - 1].mileage
+            : null;
+
         // Only add if it's different from the last mileage entry
         if (lastMileage !== newMileageValue) {
           const newMileageEntry = {
             mileage: newMileageValue,
             date: new Date().toISOString(),
-          }
-          updatedMileageHistory.push(newMileageEntry)
+          };
+          updatedMileageHistory.push(newMileageEntry);
         }
       }
       const vehicle = {
@@ -646,9 +719,9 @@ const UpdateInvoice = () => {
         engine_no: data.engine_no,
         vehicle_brand: data.vehicle_brand,
         vehicle_name: data.vehicle_name,
-        mileage: newMileageValue,
+       mileage: newMileageValue,
         mileageHistory: updatedMileageHistory,
-      }
+      };
       const invoice = {
         user_type: specificInvoice?.user_type,
         Id: specificInvoice?.Id,
@@ -657,15 +730,18 @@ const UpdateInvoice = () => {
         parts_total: partsTotal || specificInvoice.parts_total,
         service_total: serviceTotal || specificInvoice.serviceTotal,
         total_amount: grandTotal || specificInvoice?.total_amount,
-        discount: discount === 0 || discount > 0 ? discount : specificInvoice?.discount,
+        discount:
+          discount === 0 || discount > 0 ? discount : specificInvoice?.discount,
         vat: vat === 0 || vat > 0 ? vat : specificInvoice?.vat,
         tax: tax === 0 || tax > 0 ? tax : specificInvoice?.tax, // Include tax
         net_total: calculateFinalTotal() || specificInvoice.net_total,
-        advance: advance === 0 || advance > 0 ? advance : specificInvoice?.advance,
+        advance:
+          advance === 0 || advance > 0 ? advance : specificInvoice?.advance,
         due: calculateDue() || specificInvoice.due,
         input_data: input_data,
         service_input_data: service_input_data,
-      }
+          mileage: newMileageValue,
+      };
       const values = {
         tenantDomain,
         customer,
@@ -673,62 +749,70 @@ const UpdateInvoice = () => {
         showRoom,
         vehicle,
         invoice,
-      }
+      };
       const newValue = {
         id: id,
         data: {
           ...values,
         },
-      }
+      };
       if (removeButton === "") {
-        const res = await updateInvoice(newValue).unwrap()
+        const res = await updateInvoice(newValue).unwrap();
         if (res.success) {
-          setReload(!reload)
+          setReload(!reload);
         }
       }
     } catch (error) {
       if (error.response) {
-        setError(error.response.data.message)
+        setError(error.response.data.message);
       }
     }
-  }
+  };
 
   const handleOnSubmit = () => {
-    handleSubmit(onSubmit)()
+    handleSubmit(onSubmit)();
     if (!userTypeFromProfile) {
-      navigate("/dashboard/invoice-view")
+      navigate("/dashboard/invoice-view");
     }
     if (userTypeFromProfile === "company") {
-      navigate(`/dashboard/company-profile?id=${userFromProfile}`)
+      navigate(`/dashboard/company-profile?id=${userFromProfile}`);
     }
     if (userTypeFromProfile === "customer") {
-      navigate(`/dashboard/customer-profile?id=${userFromProfile}`)
+      navigate(`/dashboard/customer-profile?id=${userFromProfile}`);
     }
     if (userTypeFromProfile === "showRoom") {
-      navigate(`/dashboard/show-room-profile?id=${userFromProfile}`)
+      navigate(`/dashboard/show-room-profile?id=${userFromProfile}`);
     }
-    toast.success("Invoice update successful")
-  }
+    toast.success("Invoice update successful");
+  };
 
   const handleGoMoneyReceipt = () => {
-    handleSubmit(onSubmit)()
+    handleSubmit(onSubmit)();
     navigate(
-      `/dashboard/money-receive?order_no=${specificInvoice?.job_no}&id=${id}&net_total=${specificInvoice?.net_total}`,
-    )
-  }
+      `/dashboard/money-receive?order_no=${specificInvoice?.job_no}&id=${id}&net_total=${specificInvoice?.net_total}`
+    );
+  };
 
   const handleGoPreview = () => {
-    handleSubmit(onSubmit)()
-    navigate(`/dashboard/detail?id=${id}`)
-  }
+    handleSubmit(onSubmit)();
+    navigate(`/dashboard/detail?id=${id}`);
+  };
 
   return (
     <div className="px-5 py-10">
       <div className=" addJobCardHeads">
-        <img src={CompanyInfoData?.data?.logo || "/placeholder.svg"} alt="logo" className=" addJobLogoImg" />
+        <img
+          src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
+          alt="logo"
+          className=" addJobLogoImg"
+        />
         <div>
-          <h2 className=" trustAutoTitle trustAutoTitleQutation">{CompanyInfoData?.data?.companyName}</h2>
-          <span className="text-[12px] lg:text-xl mt-5 block">Office: {CompanyInfoData?.data?.address}</span>
+          <h2 className=" trustAutoTitle trustAutoTitleQutation">
+            {CompanyInfoData?.data?.companyName}
+          </h2>
+          <span className="text-[12px] lg:text-xl mt-5 block">
+            Office: {CompanyInfoData?.data?.address}
+          </span>
         </div>
         <TrustAutoAddress />
       </div>
@@ -741,7 +825,9 @@ const UpdateInvoice = () => {
               {/* Track if user has interacted with the date picker */}
               {!selectedDate || selectedDate === specificInvoice?.date ? (
                 <div className="flex items-center gap-x-2">
-                  <div className="border py-4 px-5 rounded-md ">{selectedDate}</div>
+                  <div className="border py-4 px-5 rounded-md ">
+                    {selectedDate}
+                  </div>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       sx={{ width: "170px" }}
@@ -749,9 +835,9 @@ const UpdateInvoice = () => {
                       value={selectedDate ? dayjs(selectedDate) : dayjs()}
                       onChange={(newValue) => {
                         if (newValue) {
-                          const formattedDate = newValue.format("YYYY-MM-DD")
+                          const formattedDate = newValue.format("YYYY-MM-DD");
                           // This will hide the div and only show DatePicker
-                          setSelectedDate(formattedDate)
+                          setSelectedDate(formattedDate);
                         }
                       }}
                       slotProps={{
@@ -768,8 +854,8 @@ const UpdateInvoice = () => {
                     value={selectedDate ? dayjs(selectedDate) : dayjs()}
                     onChange={(newValue) => {
                       if (newValue) {
-                        const formattedDate = newValue.format("YYYY-MM-DD")
-                        setSelectedDate(formattedDate)
+                        const formattedDate = newValue.format("YYYY-MM-DD");
+                        setSelectedDate(formattedDate);
                       }
                     }}
                     slotProps={{
@@ -782,7 +868,9 @@ const UpdateInvoice = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-10 ">
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-3 ">Customer Info</h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-3 ">
+                Customer Info
+              </h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -838,12 +926,14 @@ const UpdateInvoice = () => {
                       {...register("customer_name")}
                     />
                   )}
-                  {(specificInvoice?.user_type === "company" || specificInvoice?.user_type === "showRoom") && (
+                  {(specificInvoice?.user_type === "company" ||
+                    specificInvoice?.user_type === "showRoom") && (
                     <TextField
                       fullWidth
                       label="Customer"
                       focused={
-                        specificInvoice?.company?.vehicle_username || specificInvoice?.showRoom?.vehicle_username
+                        specificInvoice?.company?.vehicle_username ||
+                        specificInvoice?.showRoom?.vehicle_username
                       }
                       {...register("vehicle_username")}
                     />
@@ -859,8 +949,8 @@ const UpdateInvoice = () => {
                         getOptionLabel={(option) => option.label}
                         value={countryCode}
                         onChange={(event, newValue) => {
-                          setCountryCode(newValue)
-                          setPhoneNumber("") // Reset the phone number when changing country codes
+                          setCountryCode(newValue);
+                          setPhoneNumber(""); // Reset the phone number when changing country codes
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -868,7 +958,10 @@ const UpdateInvoice = () => {
                             {...register("customer_country_code")}
                             label="Select Country Code"
                             variant="outlined"
-                            focused={specificInvoice?.customer?.customer_country_code || ""}
+                            focused={
+                              specificInvoice?.customer
+                                ?.customer_country_code || ""
+                            }
                           />
                         )}
                       />
@@ -880,7 +973,11 @@ const UpdateInvoice = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : specificInvoice?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : specificInvoice?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
                         />
@@ -891,23 +988,35 @@ const UpdateInvoice = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : specificInvoice?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : specificInvoice?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
-                          focused={specificInvoice?.customer?.customer_contact || ""}
+                          focused={
+                            specificInvoice?.customer?.customer_contact || ""
+                          }
                         />
                       )}
-                      {(specificInvoice?.user_type === "company" || specificInvoice?.user_type === "showRoom") && (
+                      {(specificInvoice?.user_type === "company" ||
+                        specificInvoice?.user_type === "showRoom") && (
                         <TextField
                           {...register("company_contact")}
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : specificInvoice?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : specificInvoice?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Company Contact No (N)"
                           focused={
-                            specificInvoice?.company?.company_contact || specificInvoice?.showRoom?.company_contact
+                            specificInvoice?.company?.company_contact ||
+                            specificInvoice?.showRoom?.company_contact
                           }
                         />
                       )}
@@ -915,7 +1024,13 @@ const UpdateInvoice = () => {
                   </Grid>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {!specificInvoice && <TextField fullWidth label="Address" {...register("customer_address")} />}
+                  {!specificInvoice && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("customer_address")}
+                    />
+                  )}
                   {specificInvoice?.user_type === "customer" && (
                     <TextField
                       fullWidth
@@ -937,14 +1052,18 @@ const UpdateInvoice = () => {
                       fullWidth
                       label="Address"
                       {...register("showRoom_address")}
-                      focused={specificInvoice?.showRoom?.showRoom_address || ""}
+                      focused={
+                        specificInvoice?.showRoom?.showRoom_address || ""
+                      }
                     />
                   )}
                 </Grid>
               </Grid>
             </Box>
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-3">Vehicle Info</h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-3">
+                Vehicle Info
+              </h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -974,7 +1093,7 @@ const UpdateInvoice = () => {
                         options={cmDmOptions.map((option) => option.label)}
                         value={specificInvoice?.vehicle?.carReg_no || ""}
                         onChange={(event, newValue) => {
-                          setValue("carReg_no", newValue)
+                          setValue("carReg_no", newValue);
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -987,14 +1106,21 @@ const UpdateInvoice = () => {
                       />
                     </Grid>
                     <Grid item lg={9} md={7} sm={12} xs={12}>
-                      <InputMask mask="99-9999" maskChar={null} {...register("car_registration_no")}>
+                      <InputMask
+                        mask="99-9999"
+                        maskChar={null}
+                        {...register("car_registration_no")}
+                      >
                         {(inputProps) => (
                           <TextField
                             fullWidth
                             {...inputProps}
                             {...register("car_registration_no")}
                             label="Car R (N)"
-                            focused={specificInvoice?.vehicle?.car_registration_no || ""}
+                            focused={
+                              specificInvoice?.vehicle?.car_registration_no ||
+                              ""
+                            }
                           />
                         )}
                       </InputMask>
@@ -1030,15 +1156,17 @@ const UpdateInvoice = () => {
                     focused={specificInvoice?.mileage || ""}
                     defaultValue={specificInvoice?.mileage || ""}
                     onChange={(e) => {
-                      const newMileage = e.target.value
-                      setCurrentMileage(newMileage)
-                      const lastMileage = specificInvoice?.vehicle?.mileageHistory?.slice(-1)[0]?.mileage
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        specificInvoice?.vehicle?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
                       if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true)
+                        setMileageChanged(true);
                       } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true)
+                        setMileageChanged(true);
                       } else {
-                        setMileageChanged(false)
+                        setMileageChanged(false);
                       }
                     }}
                     error={!!errors.mileage}
@@ -1050,21 +1178,29 @@ const UpdateInvoice = () => {
                     <strong>Mileage History:</strong>
                     {specificInvoice?.vehicle?.mileageHistory?.length > 0 ? (
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {specificInvoice?.vehicle?.mileageHistory.map((entry, index) => (
-                          <Chip
-                            key={index}
-                            label={`${entry.mileage} km (${new Date(entry.date).toLocaleDateString()})`}
-                            variant="outlined"
-                            className="bg-gray-100 border-gray-300 text-gray-800"
-                            onDelete={() => handleMileageHistoryDelete(index)}
-                            deleteIcon={
-                              <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">×</span>
-                            }
-                          />
-                        ))}
+                        {specificInvoice?.vehicle?.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => handleMileageHistoryDelete(index)}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
                       </div>
                     ) : (
-                      <p className="text-gray-500 mt-1">No previous mileage records</p>
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
                     )}
                   </div>
                 </Grid>
@@ -1072,12 +1208,24 @@ const UpdateInvoice = () => {
             </Box>
           </div>
           <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
-            <label className="col-span-12 md:col-span-6 text-center">Services Description</label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
-            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block">hidden items for responsive</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              SL No
+            </label>
+            <label className="col-span-12 md:col-span-6 text-center">
+              Services Description
+            </label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+              Qty
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              Rate
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+              Amount
+            </label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block">
+              hidden items for responsive
+            </label>
           </div>
           <div>
             {specificInvoice?.service_input_data?.length > 0 && (
@@ -1102,7 +1250,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) => handleServiceDescriptionChange(i, e.target.value)}
+                            onChange={(e) =>
+                              handleServiceDescriptionChange(i, e.target.value)
+                            }
                             value={item.description}
                             required
                           />
@@ -1114,13 +1264,17 @@ const UpdateInvoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) => handleServiceQuantityChange(i, e.target.value)}
+                              onChange={(e) =>
+                                handleServiceQuantityChange(i, e.target.value)
+                              }
                               required
                               value={item.quantity}
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) => handleUnitChange2(i, e.target.value)}
+                              onChange={(e) =>
+                                handleUnitChange2(i, e.target.value)
+                              }
                               value={item.unit || ""}
                               required
                             >
@@ -1141,7 +1295,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Rate"
-                            onChange={(e) => handleServiceRateChange(i, e.target.value)}
+                            onChange={(e) =>
+                              handleServiceRateChange(i, e.target.value)
+                            }
                             required
                             value={formatNumber(item.rate)}
                           />
@@ -1156,7 +1312,10 @@ const UpdateInvoice = () => {
                             readOnly
                           />
                         </div>
-                        <div className="col-span-12 md:col-span-1" onClick={() => setRemoveButton("remove")}>
+                        <div
+                          className="col-span-12 md:col-span-1"
+                          onClick={() => setRemoveButton("remove")}
+                        >
                           {items.length !== 0 && (
                             <button
                               disabled={removeLoading}
@@ -1169,7 +1328,7 @@ const UpdateInvoice = () => {
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </>
             )}
@@ -1215,7 +1374,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) => handleServiceDescriptionChange2(i, e.target.value)}
+                            onChange={(e) =>
+                              handleServiceDescriptionChange2(i, e.target.value)
+                            }
                             value={item.description}
                             required
                           />
@@ -1227,13 +1388,17 @@ const UpdateInvoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) => handleServiceQuantityChange2(i, e.target.value)}
+                              onChange={(e) =>
+                                handleServiceQuantityChange2(i, e.target.value)
+                              }
                               value={item.quantity}
                               required
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) => handleUnitChange(i, e.target.value)}
+                              onChange={(e) =>
+                                handleUnitChange(i, e.target.value)
+                              }
                               value={item.unit || ""}
                               required
                             >
@@ -1254,7 +1419,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Rate"
-                            onChange={(e) => handleServiceRateChange2(i, e.target.value)}
+                            onChange={(e) =>
+                              handleServiceRateChange2(i, e.target.value)
+                            }
                             value={formatNumber(item.rate)}
                             required
                           />
@@ -1291,18 +1458,30 @@ const UpdateInvoice = () => {
                         )}
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </>
             )}
           </div>
           <div className="grid grid-cols-12 gap-2 items-center font-bold mt-5  md:mb-1 ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
-            <label className="col-span-12 md:col-span-6 text-center">Parts Description</label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
-            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">hidden items for responsive</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              SL No
+            </label>
+            <label className="col-span-12 md:col-span-6 text-center">
+              Parts Description
+            </label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+              Qty
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              Rate
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+              Amount
+            </label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
+              hidden items for responsive
+            </label>
           </div>
           <div>
             {specificInvoice?.input_data?.length > 0 && (
@@ -1327,7 +1506,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) => handleDescriptionChange(i, e.target.value)}
+                            onChange={(e) =>
+                              handleDescriptionChange(i, e.target.value)
+                            }
                             value={item.description}
                             required
                           />
@@ -1339,13 +1520,17 @@ const UpdateInvoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) => handleQuantityChange(i, e.target.value)}
+                              onChange={(e) =>
+                                handleQuantityChange(i, e.target.value)
+                              }
                               required
                               value={item.quantity}
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) => handleInputUnitChange2(i, e.target.value)}
+                              onChange={(e) =>
+                                handleInputUnitChange2(i, e.target.value)
+                              }
                               value={item.unit || ""}
                               required
                             >
@@ -1366,7 +1551,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Rate"
-                            onChange={(e) => handleRateChange(i, e.target.value)}
+                            onChange={(e) =>
+                              handleRateChange(i, e.target.value)
+                            }
                             required
                             value={formatNumber(item.rate)}
                           />
@@ -1381,7 +1568,10 @@ const UpdateInvoice = () => {
                             readOnly
                           />
                         </div>
-                        <div className="col-span-12 md:col-span-1" onClick={() => setRemoveButton("remove")}>
+                        <div
+                          className="col-span-12 md:col-span-1"
+                          onClick={() => setRemoveButton("remove")}
+                        >
                           {items.length !== 0 && (
                             <button
                               disabled={removeLoading}
@@ -1394,7 +1584,7 @@ const UpdateInvoice = () => {
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </>
             )}
@@ -1440,7 +1630,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Description"
-                            onChange={(e) => handleDescriptionChange2(i, e.target.value)}
+                            onChange={(e) =>
+                              handleDescriptionChange2(i, e.target.value)
+                            }
                             value={item.description}
                             required
                           />
@@ -1452,13 +1644,17 @@ const UpdateInvoice = () => {
                               autoComplete="off"
                               type="text"
                               placeholder="Qty"
-                              onChange={(e) => handleQuantityChange2(i, e.target.value)}
+                              onChange={(e) =>
+                                handleQuantityChange2(i, e.target.value)
+                              }
                               value={item.quantity}
                               required
                             />
                             <select
                               className="inputField col-span-9"
-                              onChange={(e) => handleInputUnitChange(i, e.target.value)}
+                              onChange={(e) =>
+                                handleInputUnitChange(i, e.target.value)
+                              }
                               value={item.unit || ""}
                               required
                             >
@@ -1479,7 +1675,9 @@ const UpdateInvoice = () => {
                             autoComplete="off"
                             type="text"
                             placeholder="Rate"
-                            onChange={(e) => handleRateChange2(i, e.target.value)}
+                            onChange={(e) =>
+                              handleRateChange2(i, e.target.value)
+                            }
                             value={formatNumber(item.rate)}
                             required
                           />
@@ -1516,7 +1714,7 @@ const UpdateInvoice = () => {
                         )}
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </>
             )}
@@ -1525,7 +1723,11 @@ const UpdateInvoice = () => {
         <div className="discountFieldWrap mt-5 ">
           <div className="flex items-center gap-x-2">
             <b> Total Amount: </b>
-            <span>{formatNumber(grandTotal ? grandTotal : specificInvoice?.total_amount)}</span>
+            <span>
+              {formatNumber(
+                grandTotal ? grandTotal : specificInvoice?.total_amount
+              )}
+            </span>
           </div>
           <div className="flex items-center gap-x-2">
             <b> Discount: </b>
@@ -1565,7 +1767,11 @@ const UpdateInvoice = () => {
             <div className="flex items-center ">
               <b className="mr-3">Final Total: </b>
               <span ref={netTotalAmountRef}>
-                {formatNumber(calculateFinalTotal() ? calculateFinalTotal() : specificInvoice?.net_total)}
+                {formatNumber(
+                  calculateFinalTotal()
+                    ? calculateFinalTotal()
+                    : specificInvoice?.net_total
+                )}
               </span>
             </div>
           </div>
@@ -1595,7 +1801,9 @@ const UpdateInvoice = () => {
                 <button>
                   <a
                     className="bg-[#42A0D9] text-white px-3 py-5  rounded-full "
-                    href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${specificInvoice?._id}`}
+                    href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
+                      specificInvoice?._id
+                    }`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -1619,6 +1827,6 @@ const UpdateInvoice = () => {
         </div>
       </div>
     </div>
-  )
-}
-export default UpdateInvoice
+  );
+};
+export default UpdateInvoice;

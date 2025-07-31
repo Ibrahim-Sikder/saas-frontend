@@ -345,11 +345,9 @@ const UpdateJobCard = () => {
       driver_country_code: driverCountryCode.code,
       reference_name: data.reference_name,
     };
-    data.vehicle_model = Number(data.vehicle_model);
+   
+ data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
-
-    // Get the current mileage value
-    const newMileageValue = Number(data.mileage);
 
     // Get existing mileage history
     const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
@@ -371,6 +369,7 @@ const UpdateJobCard = () => {
         updatedMileageHistory.push(newMileageEntry);
       }
     }
+
     // Extract vehicle information - use the existing mileage history without modification
     const vehicle = {
       carReg_no: data.carReg_no,
@@ -383,7 +382,6 @@ const UpdateJobCard = () => {
       vehicle_category: data.vehicle_category,
       color_code: data.color_code,
       fuel_type: data.fuel_type,
-      // Just pass the existing mileage history without modification
       mileageHistory: updatedMileageHistory,
     };
 
@@ -1197,25 +1195,25 @@ const UpdateJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <TextField
+                 <TextField
                     fullWidth
+                    label="Current Mileage (KM)"
                     {...register("mileage", {
                       required: "Mileage is required!",
                     })}
-                    label="Current Mileage (KM)"
                     type="number"
-                    // value={currentMileage || getDataWithChassisNo?.mileage || ""}
-                    focused={currentMileage || singleCard?.mileage || ""}
-                    defaultValue={currentMileage || singleCard?.mileage || ""}
+                    value={currentMileage}
                     onChange={(e) => {
-                      const newMileage = e.target.value;
+                      const newMileage =
+                        e.target.value === "" ? "" : Number(e.target.value);
                       setCurrentMileage(newMileage);
+                      setValue("mileage", newMileage);
 
-                      // Check if mileage has changed from the last recorded value
                       const lastMileage =
                         getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
                           ?.mileage;
-                      if (lastMileage && Number(newMileage) !== lastMileage) {
+
+                      if (lastMileage && newMileage !== lastMileage) {
                         setMileageChanged(true);
                       } else if (!lastMileage && newMileage) {
                         setMileageChanged(true);
@@ -1223,8 +1221,6 @@ const UpdateJobCard = () => {
                         setMileageChanged(false);
                       }
                     }}
-                    error={!!errors.mileage}
-                    helperText={errors.mileage?.message}
                   />
                 </Grid>
 

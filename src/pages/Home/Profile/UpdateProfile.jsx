@@ -31,7 +31,7 @@ import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import CompanyProfileModal from "./CreateCompanyProfileModal";
 import Loading from "../../../components/Loading/Loading";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
-
+import AddIcon from "@mui/icons-material/Add";
 export default function CompanyProfileDisplay() {
   const tenantDomain = useTenantDomain();
 
@@ -104,6 +104,14 @@ export default function CompanyProfileDisplay() {
     return <Loading />;
   }
 
+  const buttonStyle = {
+    borderRadius: 2,
+    px: 3,
+    py: 1.5,
+    textTransform: "none",
+    color: "#fff",
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Card elevation={3} sx={{ borderRadius: 3, overflow: "hidden" }}>
@@ -131,36 +139,35 @@ export default function CompanyProfileDisplay() {
                 </Typography>
               )}
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={handleOpenModal}
-              size="large"
-              sx={{
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                textTransform: "none",
-                color: "#fff",
-              }}
-            >
-              Create Profile
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={() => handleUpdateModal(profileData)}
-              size="large"
-              sx={{
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                textTransform: "none",
-                color: "#fff",
-              }}
-            >
-              Update Profile
-            </Button>
+            <Box display="flex" gap={3} flexWrap="wrap">
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleOpenModal}
+                size="large"
+                sx={{
+                  ...buttonStyle,
+                  backgroundColor: "#1976d2", // blue
+                  "&:hover": { backgroundColor: "#115293" },
+                }}
+              >
+                Create Profile
+              </Button>
+
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={() => handleUpdateModal(profileData)}
+                size="large"
+                sx={{
+                  ...buttonStyle,
+                  backgroundColor: "#2e7d32", // green
+                  "&:hover": { backgroundColor: "#1b5e20" },
+                }}
+              >
+                Update Profile
+              </Button>
+            </Box>
           </Box>
 
           <Divider sx={{ mb: 4 }} />

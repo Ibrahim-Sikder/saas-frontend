@@ -766,11 +766,49 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
               </span>
             </Typography> */}
-           
           </AccordionDetails>
         </Accordion>
 
-        {user.role === "superadmin" && (
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel30"}
+          onChange={handleChange("panel30")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            className=""
+          >
+            <Typography>
+              <div className="flex items-center dashboardItems">
+                <FaUsers size={22} />
+                <span className="ml-2">Tenant & UI Management</span>
+              </div>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserPlus className="mr-2" />
+                <NavLink to="/dashboard/all-tenant-list">
+                  All Tenant List
+                </NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserPlus className="mr-2" />
+                <NavLink to="/dashboard/contact-customer">
+                  Contact Customer List{" "}
+                </NavLink>
+              </span>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        {/* {user.role === "superadmin" && (
           <div className="pl-4 space-y-3 mt-3 ">
             <Link to="/dashboard/all-tenant-list">
               <div className="flex items-center dashboardItems cursor-pointer">
@@ -779,16 +817,16 @@ const Sidebar = ({ toggle }) => {
               </div>
             </Link>
           </div>
-        )}
+        )} */}
         <div className="pl-4 space-y-3 mt-3 ">
-            <Link to="/dashboard/all-user-list">
-              <div className="flex items-center dashboardItems cursor-pointer">
-                <Logout size={22} />
-                <span className="ml-2">All User List</span>
-              </div>
-            </Link>
-          </div>
-      
+          <Link to="/dashboard/all-user-list">
+            <div className="flex items-center dashboardItems cursor-pointer">
+              <Logout size={22} />
+              <span className="ml-2">All User List</span>
+            </div>
+          </Link>
+        </div>
+
         {/* Recycle Bin */}
         <Accordion
           sx={{ paddingBottom: "10px" }}

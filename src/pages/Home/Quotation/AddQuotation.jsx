@@ -518,32 +518,40 @@ const AddQuotation = () => {
       company_address: data.company_address,
     }
 
-    data.mileage = Number(data.mileage)
-    const newMileageValue = Number(data.mileage)
-    const existingMileageHistory = getDataWithChassisNo?.mileageHistory || []
-    const updatedMileageHistory = [...existingMileageHistory]
+    data.mileage = Number(data.mileage);
+    const newMileageValue = Number(data.mileage);
+
+    const existingMileageHistory = getDataWithChassisNo?.mileageHistory || [];
+    const updatedMileageHistory = [...existingMileageHistory];
 
     // Only add current mileage to history if it has changed
     if (mileageChanged && currentMileage) {
       const newMileageEntry = {
         mileage: Number(currentMileage),
         date: new Date().toISOString(),
-      }
+      };
+
       // Check if this mileage value already exists in history
-      const mileageExists = updatedMileageHistory.some((entry) => entry.mileage === Number(currentMileage))
+      const mileageExists = updatedMileageHistory.some(
+        (entry) => entry.mileage === Number(currentMileage)
+      );
+
       if (!mileageExists) {
-        updatedMileageHistory.push(newMileageEntry)
+        updatedMileageHistory.push(newMileageEntry);
       }
     }
 
     // Only add a new entry if it's a valid number and not already in the history
     if (!isNaN(newMileageValue) && newMileageValue > 0) {
-      const mileageExists = updatedMileageHistory.some((entry) => entry.mileage === newMileageValue)
+      const mileageExists = updatedMileageHistory.some(
+        (entry) => entry.mileage === newMileageValue
+      );
+
       if (!mileageExists) {
         updatedMileageHistory.push({
           mileage: newMileageValue,
           date: new Date().toISOString(),
-        })
+        });
       }
     }
 

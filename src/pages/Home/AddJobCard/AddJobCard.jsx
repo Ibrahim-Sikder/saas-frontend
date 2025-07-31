@@ -393,6 +393,7 @@ const AddJobCard = () => {
         updatedMileageHistory.push(newMileageEntry);
       }
     }
+
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -1442,7 +1443,7 @@ const AddJobCard = () => {
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <TextField
+                  {/* <TextField
                     fullWidth
                     {...register("mileage")}
                     label="Current Mileage (KM)"
@@ -1469,6 +1470,33 @@ const AddJobCard = () => {
                         setMileageChanged(false);
                       }
                     }}
+                  /> */}
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    value={currentMileage}
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+
+                      const lastMileage =
+                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
+                      }
+                    }}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   />
                 </Grid>
 
@@ -1569,12 +1597,12 @@ const AddJobCard = () => {
                         {...register("driver_contact", {
                           required: "Driver No is required!",
                         })}
-                     label={
-                      <>
-                        Driver No (No)
-                        <span style={labelStyle}> *</span>
-                      </>
-                    }
+                        label={
+                          <>
+                            Driver No (No)
+                            <span style={labelStyle}> *</span>
+                          </>
+                        }
                         variant="outlined"
                         fullWidth
                         type="tel"
