@@ -35,6 +35,8 @@ const TodayAttendance = () => {
     }
   );
 
+  console.log("today attendance this ", todayAttendance);
+
   const [deleteAttendance, { isLoading: isDeleting }] =
     useDeleteAttendanceMutation();
 

@@ -664,14 +664,14 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/expense-list">Expense List</NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Category className="mr-2" />
                 <NavLink to="/dashboard/expense-categories">
                   Expense Categories{" "}
                 </NavLink>
               </div>
-            </Typography>
+            </Typography> */}
             {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Payments className="mr-2" />
@@ -684,12 +684,12 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/paybill">Bill List</NavLink>
               </div>
             </Typography> */}
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
                 <NavLink to="/dashboard/donation">Donation</NavLink>
               </div>
-            </Typography>
+            </Typography> */}
           </AccordionDetails>
         </Accordion>
 
@@ -803,6 +803,22 @@ const Sidebar = ({ toggle }) => {
                 <FaUserPlus className="mr-2" />
                 <NavLink to="/dashboard/contact-customer">
                   Contact Customer List{" "}
+                </NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserPlus className="mr-2" />
+                <NavLink to="/dashboard/company-brand">
+                  Company Brand  
+                </NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserPlus className="mr-2" />
+                <NavLink to="/dashboard/review">
+                  Client Reivew  
                 </NavLink>
               </span>
             </Typography>

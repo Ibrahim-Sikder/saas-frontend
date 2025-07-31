@@ -123,6 +123,7 @@ const handleDeleteFilter = async (date) => {
         <TodayAttendance />
       </div>
 
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between my-10">
         <div className="flex items-center gap-3">

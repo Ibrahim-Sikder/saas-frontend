@@ -586,7 +586,7 @@ const Invoice = () => {
       total_amount: grandTotal,
       discount: discount,
       vat: vat,
-      tax: tax, // Include tax in the invoice object
+      tax: tax, 
       net_total: calculateFinalTotal(),
       input_data: inputData,
       service_input_data: serviceInputData,

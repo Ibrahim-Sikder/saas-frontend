@@ -41,7 +41,7 @@ export const FooterSection = () => {
                 <AutoFixHigh sx={{ fontSize: 32 }} />
               </Box>
               <Typography sx={{ color: "#fff" }} variant="h4" fontWeight="bold">
-                Garage Master Pro
+                Garage Master
               </Typography>
             </Stack>
             <Typography
@@ -133,7 +133,7 @@ export const FooterSection = () => {
         <Divider sx={{ my: 6, borderColor: alpha("#ffffff", 0.1) }} />
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={3}>
           <Typography variant="body1" sx={{ opacity: 0.6 }}>
-            © 2024 Garage Master Pro. All rights reserved. Built with ❤️ for garage owners worldwide.
+            © 2024 Garage Master. All rights reserved. Built with ❤️ for garage owners worldwide.
           </Typography>
           <Stack direction="row" spacing={4} alignItems="center">
             <Typography variant="body2" sx={{ opacity: 0.6 }}>

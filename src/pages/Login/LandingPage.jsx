@@ -301,7 +301,7 @@ export default function GarageLandingPage() {
       rating: 5,
       revenue: "+250%",
       content:
-        "Garage Master Pro transformed our entire business operation. The workflow from customer to payment is seamless. Our revenue increased by 250% in just 6 months!",
+        "Garage Master transformed our entire business operation. The workflow from customer to payment is seamless. Our revenue increased by 250% in just 6 months!",
       badge: "🏆 Top Performer",
     },
     {
@@ -323,7 +323,7 @@ export default function GarageLandingPage() {
       rating: 5,
       revenue: "+320%",
       content:
-        "Managing 15 locations was a nightmare before Garage Master Pro. Now everything is centralized, automated, and profitable. Best investment we ever made!",
+        "Managing 15 locations was a nightmare before Garage Master. Now everything is centralized, automated, and profitable. Best investment we ever made!",
       badge: "⭐ Enterprise Champion",
     },
     {

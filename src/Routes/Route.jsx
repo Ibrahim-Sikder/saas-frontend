@@ -134,6 +134,8 @@ import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
 import AllTenantList from "../pages/Home/Tenant/AllTenantList";
 import AllUserList from "../pages/Home/Tenant/AllUserList";
 import ContactUserList from "../pages/Home/Tenant/ContactUserList";
+import CompanyBrand from "../pages/CompanyBrand/CompanyBrand";
+import Review from "../pages/Review/Review";
 
 export const router = createBrowserRouter([
   {
@@ -701,6 +703,14 @@ export const router = createBrowserRouter([
       {
         path: "contact-customer",
         element: <ContactUserList />,
+      },
+      {
+        path: "company-brand",
+        element: <CompanyBrand />,
+      },
+      {
+        path: "review",
+        element: <Review />,
       },
       {
         path: "backup",

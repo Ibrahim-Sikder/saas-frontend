@@ -301,7 +301,7 @@ export const HeroSection = () => {
                     <Box
                       component="img"
                       src="/placeholder.svg?height=600&width=800"
-                      alt="Garage Master Pro Dashboard"
+                      alt="Garage Master Dashboard"
                       sx={{
                         width: "100%",
                         height: "auto",

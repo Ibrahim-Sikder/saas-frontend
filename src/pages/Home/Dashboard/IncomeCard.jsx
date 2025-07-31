@@ -79,7 +79,7 @@ const DashboardSummary = ({ data }) => {
         </Grid>
 
         {/* === Expense Overview === */}
-        <Grid item xs={12} mt={4}>
+        <Grid item xs={12}>
           <Typography variant="h5" fontWeight="bold" color="red">
             💸 Expense Overview
           </Typography>

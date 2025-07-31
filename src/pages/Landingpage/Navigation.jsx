@@ -91,7 +91,7 @@ export const Navigation = ({ scrollToSection }) => {
               </Box>
             </motion.div>
             <Typography variant="h5" component="div" sx={{ fontWeight: 900, letterSpacing: "-1px", color: "#fff" }}>
-              Garage Master Pro
+              Garage Master
             </Typography>
            
           </Stack>

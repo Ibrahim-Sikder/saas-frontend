@@ -454,7 +454,7 @@
 //       rating: 5,
 //       revenue: "+250%",
 //       content:
-//         "Garage Master Pro transformed our entire business operation. The workflow from customer to payment is seamless. Our revenue increased by 250% in just 6 months!",
+//         "Garage Master transformed our entire business operation. The workflow from customer to payment is seamless. Our revenue increased by 250% in just 6 months!",
 //       badge: "🏆 Top Performer",
 //     },
 //     {
@@ -476,7 +476,7 @@
 //       rating: 5,
 //       revenue: "+320%",
 //       content:
-//         "Managing 15 locations was a nightmare before Garage Master Pro. Now everything is centralized, automated, and profitable. Best investment we ever made!",
+//         "Managing 15 locations was a nightmare before Garage Master. Now everything is centralized, automated, and profitable. Best investment we ever made!",
 //       badge: "⭐ Enterprise Champion",
 //     },
 //     {
@@ -581,7 +581,7 @@
 //               component="div"
 //               sx={{ fontWeight: 900, letterSpacing: "-1px" , color:'#fff'}}
 //             >
-//               Garage Master Pro
+//               Garage Master
 //             </Typography>
 //             <Chip
 //               label="AI-Powered"
@@ -1046,7 +1046,7 @@
 //                       <Box
 //                         component="img"
 //                         src="/placeholder.svg?height=600&width=800"
-//                         alt="Garage Master Pro Dashboard"
+//                         alt="Garage Master Dashboard"
 //                         sx={{
 //                           width: "100%",
 //                           height: "auto",
@@ -3315,7 +3315,7 @@
 //                   variant="h4"
 //                   fontWeight="bold"
 //                 >
-//                   Garage Master Pro
+//                   Garage Master
 //                 </Typography>
 //               </Stack>
 //               <Typography
@@ -3455,7 +3455,7 @@
 //             spacing={3}
 //           >
 //             <Typography variant="body1" sx={{ opacity: 0.6 }}>
-//               © 2024 Garage Master Pro. All rights reserved. Built with ❤️ for
+//               © 2024 Garage Master. All rights reserved. Built with ❤️ for
 //               garage owners worldwide.
 //             </Typography>
 //             <Stack direction="row" spacing={4} alignItems="center">
