@@ -121,7 +121,6 @@ const StatusChip = ({ status }) => {
 
 // Product card component for grid view
 const ProductCard = ({ product, onEdit, onDelete, onFavorite, isFavorite }) => {
-  console.log("product console this ", product);
   const [elevation, setElevation] = useState(1);
 
   return (

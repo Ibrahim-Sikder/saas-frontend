@@ -55,7 +55,6 @@ const UpdateQuotation = () => {
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   })
-  console.log(specificQuotation)
   const userTypeFromProfile = new URLSearchParams(location.search).get("user_type")
   const userFromProfile = new URLSearchParams(location.search).get("user")
   const [countryCode, setCountryCode] = useState(countries[0])

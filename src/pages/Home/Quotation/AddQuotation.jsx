@@ -82,7 +82,6 @@ const AddQuotation = () => {
   }
 
   const { data: stockData } = useGetAllStocksQuery(queryParams)
-  console.log("stock data", stockData)
 
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
@@ -419,7 +418,6 @@ const AddQuotation = () => {
         (shortName && (option.value === shortName || option.label === shortName)),
     )
     if (exactMatch) {
-      console.log("Found exact match:", exactMatch.value)
       return exactMatch.value
     }
     const caseInsensitiveMatch = unitOptions.find(
@@ -431,14 +429,12 @@ const AddQuotation = () => {
             option.label.toLowerCase() === shortName.toLowerCase())),
     )
     if (caseInsensitiveMatch) {
-      console.log("Found case-insensitive match:", caseInsensitiveMatch.value)
       return caseInsensitiveMatch.value
     }
     return "Pcs"
   }
 
   const handleSelectSuggestion = (product) => {
-    console.log("selected product", product)
     if (activeInputType === "service") {
       const newItems = [...serviceItems]
       const matchingUnit = findMatchingUnit(product.product.unit)
@@ -458,8 +454,6 @@ const AddQuotation = () => {
         (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
         (Number.parseFloat(newItems[activeInputIndex].rate) || 0)
       newItems[activeInputIndex].total = Number.parseFloat(newItems[activeInputIndex].total.toFixed(2))
-
-      console.log("Service item updated:", newItems[activeInputIndex])
       setServiceItems(newItems)
     } else if (activeInputType === "parts") {
       const newItems = [...items]
@@ -480,8 +474,6 @@ const AddQuotation = () => {
         (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
         (Number.parseFloat(newItems[activeInputIndex].rate) || 0)
       newItems[activeInputIndex].total = Number.parseFloat(newItems[activeInputIndex].total.toFixed(2))
-
-      console.log("Parts item updated:", newItems[activeInputIndex])
       setItems(newItems)
     }
     setShowSuggestions(false)

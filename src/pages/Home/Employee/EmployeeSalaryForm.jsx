@@ -68,7 +68,7 @@ const initialSelectedOption = allMonths[new Date().getMonth()];
 const currentYear = new Date().getFullYear().toString();
 
 const EmployeeSalaryForm = ({ tenantDomain }) => {
-  console.log('tenant ', tenantDomain)
+
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
@@ -178,8 +178,6 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
         initializeWithDefaults(employeeCount);
         return;
       }
-
-      console.log("Found salary data array:", salariesArray);
       const employees = getAllEmployee.data.employees;
 
       // Initialize arrays with default values
@@ -223,9 +221,7 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
           ? employees.findIndex((emp) => emp._id === targetEmployeeId)
           : -1;
 
-        console.log(
-          `Processing salary for employee ID: ${targetEmployeeId}, index: ${targetEmployeeIndex}`
-        );
+    
 
         // Set the specific employee's data if found
         if (targetEmployeeIndex !== -1) {
@@ -251,9 +247,7 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
           paidArray[targetEmployeeIndex] =
             salaryData.payment_status === "completed";
 
-          console.log(
-            `Successfully populated data for employee at index: ${targetEmployeeIndex}`
-          );
+      
         } else {
           console.warn(`Employee not found for salary data:`, salaryData);
         }
@@ -274,9 +268,9 @@ const EmployeeSalaryForm = ({ tenantDomain }) => {
       setDue(dueArray);
       setPaid(paidArray);
 
-      console.log("Successfully initialized all salary data");
+    
     } catch (error) {
-      console.error("Error initializing with salary data:", error);
+     
       toast.error("Error loading salary data");
       initializeWithDefaults(employeeCount);
     }

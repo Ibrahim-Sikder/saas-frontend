@@ -12,8 +12,6 @@ import RequestLeaveModal from "./RequestLeaveModal";
 import Loading from "../../../../components/Loading/Loading";
 import { useEffect, useState } from "react";
 const LeaveRequestForm = ({ tenantDomain, onClose, id, leaveRequestId, employeeId }) => {
-
-  console.log("employee id this  ", id);
   const { data, isLoading } = useGetSingleLeaveRequestQuery({
     tenantDomain,
     leaveRequestsId: leaveRequestId,
@@ -25,8 +23,6 @@ const LeaveRequestForm = ({ tenantDomain, onClose, id, leaveRequestId, employeeI
     reset,
     setValue,
   } = useForm();
-
-  console.log("single leave data", data);
 
   const [createLeaveRequest] = useCreateLeaveRequestMutation();
   const [updateLeaveRequest] = useUpdateLeaveRequestMutation();

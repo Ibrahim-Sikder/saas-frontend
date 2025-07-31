@@ -81,7 +81,6 @@ export const useIncomeForm = (id) => {
   const populateForm = (incomeData) => {
     if (!incomeData) return;
     const data = incomeData?.data;
-    console.log("income data", data)
 
     // Parse date string to Date object
     const dateValue = data?.date ? new Date(data?.date) : new Date();

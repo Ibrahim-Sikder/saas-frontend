@@ -23,38 +23,69 @@ import {
   Language as WebsiteIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import { useCreateCompanyProfileMutation, useUpdateCompanyProfileMutation } from "../../../redux/api/companyProfile";
+import {
+  useCreateCompanyProfileMutation,
+  useUpdateCompanyProfileMutation,
+} from "../../../redux/api/companyProfile";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
 import { toast } from "react-toastify";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
-export default function CompanyProfileModal({
-  profileData,
-  open,
-  onClose,
-}) {
+export default function CompanyProfileModal({ profileData, open, onClose }) {
   const tenantDomain = useTenantDomain();
 
   const [createCompanyProfile] = useCreateCompanyProfileMutation();
   const [updateCompanyProfile] = useUpdateCompanyProfileMutation();
+
+  const isUpdateMode = Boolean(profileData?._id);
+
   const handleSave = async (formData) => {
-    try {
-      const res = await createCompanyProfile({
+
+  try {
+
+    const finalLogo =
+      Array.isArray(formData.logo) && Array.isArray(formData.logo[0])
+        ? formData.logo[0]
+        : formData.logo;
+
+    const payload = {
+      ...formData,
+      logo: finalLogo, 
+    };
+    console.log('debug',payload)
+
+    if (isUpdateMode) {
+      const res = await updateCompanyProfile({
         tenantDomain,
-        data: formData,
+        id: profileData._id,
+        data: payload,
       }).unwrap();
 
       if (res.success) {
-        toast.success("Profile Update successfully!");
+        toast.success("Company profile updated successfully!");
         onClose();
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to create profile");
+    } else {
+      const res = await createCompanyProfile({
+        tenantDomain,
+        data: payload,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Company profile created successfully!");
+        onClose();
+      }
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error(
+      isUpdateMode ? "Failed to update profile" : "Failed to create profile"
+    );
+  }
+};
+
 
   const handleClose = () => onClose();
 
@@ -64,12 +95,11 @@ export default function CompanyProfileModal({
     companyNameBN: profileData?.companyNameBN || "",
     description: profileData?.description || "",
     email: profileData?.email || "",
-    logo: profileData?.logo || [], 
+    logo: profileData?.logo || [],
     phone: profileData?.phone || "",
     website: profileData?.website || "",
     whatsapp: profileData?.whatsapp || "",
   };
-  
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
@@ -77,7 +107,9 @@ export default function CompanyProfileModal({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box>
             <Typography variant="h5" color="primary" fontWeight={600}>
-              Edit Company Profile
+              {isUpdateMode
+                ? "Update Company Profile"
+                : "Create Company Profile"}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               This information will appear on all your documents
@@ -88,6 +120,7 @@ export default function CompanyProfileModal({
           </IconButton>
         </Box>
       </DialogTitle>
+
       <GarageForm onSubmit={handleSave} defaultValues={defaultValues}>
         <DialogContent dividers sx={{ pt: 3, pb: 3 }}>
           <Alert
@@ -215,7 +248,7 @@ export default function CompanyProfileModal({
             startIcon={<SaveIcon />}
             type="submit"
           >
-            Update
+            {isUpdateMode ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </GarageForm>

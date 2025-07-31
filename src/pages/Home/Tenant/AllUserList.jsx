@@ -54,7 +54,6 @@ const AllUserList = () => {
     refetch,
   } = useGetAllUserQuery({ tenantDomain });
   const [deleteUser, { isLoading: deleteLoading }] = useDeleteUserMutation();
-  console.log("user data this ", userData);
   const users = userData?.data || [];
   const filteredUsers = users.filter((user) =>
     [user.name, user.email].some((field) =>

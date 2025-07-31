@@ -12,7 +12,7 @@ const UserProfile = ({ tenantDomain }) => {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
-  console.log("user data this new user", data);
+
   const handleLogout = () => {
     Cookies.remove("tas-auth");
     navigate("/");

@@ -2,21 +2,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { countries } from "../constant/Vehicle.constant";
 
-// Mock API hooks and tenant domain hook for demonstration
-// Replace with your actual Redux Toolkit Query hooks and useTenantDomain
+
 const useCreateSupplierMutation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const createSupplier = async (data) => {
     setIsLoading(true);
     return new Promise((resolve) => {
       setTimeout(() => {
-        console.log("Mock create supplier:", data);
         setIsLoading(false);
         resolve({ success: true, message: "Supplier created successfully!" });
       }, 1500);
@@ -31,7 +28,6 @@ const useUpdateSupplierMutation = () => {
     setIsLoading(true);
     return new Promise((resolve) => {
       setTimeout(() => {
-        console.log(`Mock update supplier ${id}:`, data);
         setIsLoading(false);
         resolve({ success: true, message: "Supplier updated successfully!" });
       }, 1500);

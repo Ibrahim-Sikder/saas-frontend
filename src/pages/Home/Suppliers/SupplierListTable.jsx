@@ -77,7 +77,6 @@ const WorldClassSupplierList = () => {
     isRecycled: false,
   });
 
-  console.log('all supplier this ',allSuppliers)
 
   useEffect(() => {
     if (allSuppliers?.success && allSuppliers?.data?.suppliers) {

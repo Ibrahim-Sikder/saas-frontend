@@ -110,8 +110,6 @@ const SupplierForm = ({ id }) => {
       id: id || "",
     });
 
-    console.log(singleSupplier)
-
 const defaultSupplierValues = {
   full_name: singleSupplier?.data?.full_name || "",
   contact_person_name: singleSupplier?.data?.contact_person_name || "",
@@ -176,8 +174,6 @@ const handleFormSubmission = async (data) => {
   );
   navigate("/dashboard/supplier-list");
 }
-
-    console.log('response ', response)
   } catch (error) {
     toast.error(
       error.message ||

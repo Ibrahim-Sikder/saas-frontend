@@ -90,16 +90,14 @@ const AttendanceList = () => {
   };
 
 const handleDeleteFilter = async (date) => {
-  console.log("raw data ", date);
+
   const formattedDate = dayjs(date).format("DD-MM-YYYY");
 
   try {
     const response = await deleteAttendance({
       tenantDomain,
-      attendanceInfo: { date: formattedDate }, // ✅ this is what your API expects
+      attendanceInfo: { date: formattedDate },
     }).unwrap();
-
-    console.log("response this ", response);
 
     if (response.success) {
       toast.success(response.message);
