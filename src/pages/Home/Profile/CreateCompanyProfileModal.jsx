@@ -23,38 +23,53 @@ import {
   Language as WebsiteIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import { useCreateCompanyProfileMutation } from "../../../redux/api/companyProfile";
+import { useCreateCompanyProfileMutation, useUpdateCompanyProfileMutation } from "../../../redux/api/companyProfile";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
 import { toast } from "react-toastify";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
-export default function CompanyProfileModal({ open, onClose, initialData }) {
+export default function CompanyProfileModal({
+  profileData,
+  open,
+  onClose,
+}) {
   const tenantDomain = useTenantDomain();
 
-
   const [createCompanyProfile] = useCreateCompanyProfileMutation();
-const handleSave = async (formData) => {
-  try {
-    const res = await createCompanyProfile({
-      tenantDomain,
-      data: formData, 
-    }).unwrap();
+  const [updateCompanyProfile] = useUpdateCompanyProfileMutation();
+  const handleSave = async (formData) => {
+    try {
+      const res = await createCompanyProfile({
+        tenantDomain,
+        data: formData,
+      }).unwrap();
 
-    if(res.success){
-      toast.success("Profile Update successfully!");
-      onClose();
+      if (res.success) {
+        toast.success("Profile Update successfully!");
+        onClose();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create profile");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to create profile");
-  }
-};
+  };
 
   const handleClose = () => onClose();
 
-
+  const defaultValues = {
+    address: profileData?.address || "",
+    companyName: profileData?.companyName || "",
+    companyNameBN: profileData?.companyNameBN || "",
+    description: profileData?.description || "",
+    email: profileData?.email || "",
+    logo: profileData?.logo || [], 
+    phone: profileData?.phone || "",
+    website: profileData?.website || "",
+    whatsapp: profileData?.whatsapp || "",
+  };
+  
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
@@ -73,7 +88,7 @@ const handleSave = async (formData) => {
           </IconButton>
         </Box>
       </DialogTitle>
-      <GarageForm onSubmit={handleSave}>
+      <GarageForm onSubmit={handleSave} defaultValues={defaultValues}>
         <DialogContent dividers sx={{ pt: 3, pb: 3 }}>
           <Alert
             severity="info"
@@ -102,7 +117,8 @@ const handleSave = async (formData) => {
                 <ImageUpload
                   name="logo"
                   label="Upload Company Logo"
-                  defaultImage={initialData?.logo || ""}
+                  defaultImage={profileData?.logo || []}
+                  defaultValues={profileData?.logo || []}
                 />
                 <Typography
                   variant="caption"
@@ -117,13 +133,12 @@ const handleSave = async (formData) => {
             <Grid item xs={12} md={8}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                   <TASInput
+                  <TASInput
                     name="companyNameBN"
                     label="Company Name Bangla"
                     icon={BusinessIcon}
                     required
                   />
-                 
                 </Grid>
                 <Grid item xs={12}>
                   <TASInput
@@ -132,7 +147,6 @@ const handleSave = async (formData) => {
                     icon={BusinessIcon}
                     required
                   />
-                 
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TASInput

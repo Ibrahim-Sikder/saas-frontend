@@ -33,7 +33,7 @@ import Loading from "../../../components/Loading/Loading";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function CompanyProfileDisplay() {
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading, refetch } = useGetCompanyProfileQuery({
     tenantDomain,
@@ -43,11 +43,15 @@ const tenantDomain = useTenantDomain();
 
   const profileData = data?.data;
   const isFirstTime = !data?.data;
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const handleOpenModal = () => {
+    setSelectedProfile(null);
     setModalOpen(true);
   };
+
   const handleUpdateModal = () => {
+    setSelectedProfile(profileData);
     setModalOpen(true);
   };
 
@@ -145,7 +149,7 @@ const tenantDomain = useTenantDomain();
             <Button
               variant="contained"
               startIcon={<EditIcon />}
-              onClick={handleUpdateModal}
+              onClick={() => handleUpdateModal(profileData)}
               size="large"
               sx={{
                 borderRadius: 2,
@@ -312,6 +316,7 @@ const tenantDomain = useTenantDomain();
         </CardContent>
       </Card>
       <CompanyProfileModal
+        profileData={selectedProfile}
         open={modalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveProfile}
