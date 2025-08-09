@@ -345,8 +345,8 @@ const UpdateJobCard = () => {
       driver_country_code: driverCountryCode.code,
       reference_name: data.reference_name,
     };
-   
- data.vehicle_model = Number(data.vehicle_model);
+
+    data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
 
     // Get existing mileage history
@@ -402,6 +402,7 @@ const UpdateJobCard = () => {
       mileage: data.mileage,
     };
     const newCard = {
+            tenantDomain: tenantDomain,
       customer,
       company,
       showroom,
@@ -410,6 +411,7 @@ const UpdateJobCard = () => {
     };
 
     const newData = {
+      tenantDomain: tenantDomain,
       id,
       data: newCard,
     };
@@ -515,6 +517,33 @@ const UpdateJobCard = () => {
     );
     setGetDataWithChassisNo(filtered);
   };
+
+  // last update mileage show
+  useEffect(() => {
+    const lastMileage =
+      getDataWithChassisNo?.mileageHistory?.length > 0
+        ? getDataWithChassisNo.mileageHistory[
+            getDataWithChassisNo.mileageHistory.length - 1
+          ].mileage
+        : singleCard?.mileage || "";
+
+    setCurrentMileage(lastMileage);
+  }, [getDataWithChassisNo, singleCard]);
+
+  const getLatestMileage = () => {
+    if (getDataWithChassisNo?.mileageHistory?.length > 0) {
+      const last =
+        getDataWithChassisNo.mileageHistory[
+          getDataWithChassisNo.mileageHistory.length - 1
+        ];
+      return last.mileage;
+    }
+    return getDataWithChassisNo?.mileage || 0;
+  };
+  useEffect(() => {
+    setCurrentMileage(getLatestMileage());
+  }, [getDataWithChassisNo]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center text-xl">
@@ -1195,7 +1224,33 @@ const UpdateJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                 <TextField
+                  {/* <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    focused={currentMileage || singleCard?.mileage || ""}
+                    defaultValue={currentMileage || singleCard?.mileage || ""}
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
+                      }
+                    }}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
+                  /> */}
+                  <TextField
                     fullWidth
                     label="Current Mileage (KM)"
                     {...register("mileage", {

@@ -30,6 +30,7 @@ const PreviewJobCard = () => {
   });
 
   const previewData = data?.data;
+  console.log("preview data", previewData);
 
   const extractTextFromHTML = (htmlString) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
@@ -359,7 +360,7 @@ const PreviewJobCard = () => {
                 </label>
                 <textarea
                   disabled
-                  defaultValue={vehicleInterior || "N/A"}
+                  defaultValue={previewData?.vehicle_interior_parts || "N/A"}
                 ></textarea>
               </div>
               <div className="flex  justify-between ">
@@ -367,12 +368,15 @@ const PreviewJobCard = () => {
                   <div>
                     <label>Reported Defect</label>
 
-                    <textarea defaultValue={reportedDefect || "N/A"} readOnly />
+                    <textarea
+                      defaultValue={previewData?.reported_defect || "N/A"}
+                      readOnly
+                    />
                   </div>
                   <div>
                     <label> Reported Action</label>
                     <textarea
-                      defaultValue={reportedAction || "N/A"}
+                      defaultValue={previewData?.reported_action || "N/A"}
                       readOnly
                     ></textarea>
                   </div>

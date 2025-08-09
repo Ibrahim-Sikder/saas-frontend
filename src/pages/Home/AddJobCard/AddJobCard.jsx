@@ -91,6 +91,7 @@ const AddJobCard = () => {
   const [mileageChanged, setMileageChanged] = useState(false);
 
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState("");
+  console.log("data with chassis number ", getDataWithChassisNo);
   const formRef = useRef();
   const textInputRef = useRef(null);
   const navigate = useNavigate();
@@ -551,12 +552,21 @@ const AddJobCard = () => {
     }
   };
 
-  const handleAllJobCard = () => {
-    setFilterType("");
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-  };
+  useEffect(() => {
+    setCurrentMileage("");
+    setMileageChanged(false);
+  }, [getDataWithChassisNo?.chassis_no]);
+
+  useEffect(() => {
+    const defaultMileage =
+      getDataWithChassisNo?.mileageHistory?.length > 0
+        ? getDataWithChassisNo.mileageHistory[
+            getDataWithChassisNo.mileageHistory.length - 1
+          ].mileage
+        : getDataWithChassisNo?.mileage || "";
+
+    setCurrentMileage(defaultMileage);
+  }, [getDataWithChassisNo]);
 
   const [localMileageEntries, setLocalMileageEntries] = useState([]);
 
@@ -814,7 +824,7 @@ const AddJobCard = () => {
                                 })}
                                 label={
                                   <>
-                                    Customer Contact No (N)
+                                    Customer Contact Number (T)
                                     <span
                                       style={{
                                         color: "red",
@@ -1144,7 +1154,7 @@ const AddJobCard = () => {
                           />
                           <TextField
                             {...register("company_contact")}
-                            label="Company Contact No (N)"
+                            label="Company Contact No (N) (new field) "
                             variant="outlined"
                             fullWidth
                             type="tel"
@@ -1203,7 +1213,7 @@ const AddJobCard = () => {
                           {...params}
                           label={
                             <>
-                              Select Chassis no
+                              Select Chassis no (N)
                               <span
                                 style={{
                                   color: "red",
@@ -1235,20 +1245,7 @@ const AddJobCard = () => {
                         {...register("chassis_no", {
                           required: "Chassis number is required!",
                         })}
-                        label={
-                          <>
-                            Chassis no
-                            <span
-                              style={{
-                                color: "red",
-                                fontSize: "25px",
-                              }}
-                            >
-                              {" "}
-                              *
-                            </span>
-                          </>
-                        }
+                        label="Chassis no"
                         focused={getDataWithChassisNo?.chassis_no || ""}
                         error={!!errors.chassis_no}
                         helperText={errors.chassis_no?.message}
@@ -1274,26 +1271,9 @@ const AddJobCard = () => {
                           <TextField
                             fullWidth
                             {...params}
-                            label={
-                              <>
-                                Vehicle Reg No
-                                <span
-                                  style={{
-                                    color: "red",
-                                    fontSize: "25px",
-                                  }}
-                                >
-                                  {" "}
-                                  *
-                                </span>
-                              </>
-                            }
-                            {...register("carReg_no", {
-                              required: "Vehicle  is required!",
-                            })}
+                            label="Vehicle Reg No"
+                            {...register("carReg_no")}
                             focused={getDataWithChassisNo?.carReg_no || ""}
-                            error={!!errors.carReg_no}
-                            helperText={errors.carReg_no?.message}
                           />
                         )}
                       />
@@ -1307,9 +1287,7 @@ const AddJobCard = () => {
                         {(inputProps) => (
                           <TextField
                             {...inputProps}
-                            {...register("car_registration_no", {
-                              required: "Car Reg No is required!",
-                            })}
+                            {...register("car_registration_no")}
                             fullWidth
                             label={
                               <>
@@ -1325,8 +1303,6 @@ const AddJobCard = () => {
                                 </span>
                               </>
                             }
-                            error={!!errors.car_registration_no}
-                            helperText={errors.car_registration_no?.message}
                             focused={
                               getDataWithChassisNo?.car_registration_no || ""
                             }
@@ -1362,7 +1338,11 @@ const AddJobCard = () => {
                         {...params}
                         label="Vehicle Brand"
                         // focused={getDataWithChassisNo?.vehicle_brand}
-                        {...register("vehicle_brand")}
+                        {...register("vehicle_brand", {
+                          required: "Vehicle brand is required!",
+                        })}
+                        error={!!errors.vehicle_brand}
+                        helperText={errors.vehicle_brand?.message}
                       />
                     )}
                   />
@@ -1436,16 +1416,22 @@ const AddJobCard = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
-                    {...register("color_code")}
+                    {...register("color_code", {
+                      required: "Color code is required!",
+                    })}
                     label="Color & Code (T&N) "
                     focused={getDataWithChassisNo?.color_code || ""}
+                    error={!!errors.color_code}
+                    helperText={errors.color_code?.message}
                   />
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   {/* <TextField
                     fullWidth
-                    {...register("mileage")}
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
                     label="Current Mileage (KM)"
                     type="number"
                     value={
@@ -1470,6 +1456,8 @@ const AddJobCard = () => {
                         setMileageChanged(false);
                       }
                     }}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   /> */}
                   <TextField
                     fullWidth
@@ -1539,8 +1527,12 @@ const AddJobCard = () => {
                         fullWidth
                         {...params}
                         label=" Fuel Type"
-                        {...register("fuel_type")}
+                        {...register("fuel_type", {
+                          required: "Fuel type is required!",
+                        })}
                         focused={getDataWithChassisNo?.fuel_type || ""}
+                        error={!!errors.fuel_type}
+                        helperText={errors.fuel_type?.message}
                       />
                     )}
                   />
@@ -1553,15 +1545,19 @@ const AddJobCard = () => {
                     label={
                       <>
                         Driver Name (T)
-                        <span style={labelStyle}> *</span>
+                        <span
+                          style={{
+                            color: "red",
+                            fontSize: "25px",
+                          }}
+                        >
+                          {" "}
+                          *
+                        </span>
                       </>
                     }
-                    {...register("driver_name", {
-                      required: "Driver name is required!",
-                    })}
+                    {...register("driver_name")}
                     focused={userDetails?.data?.driver_name || ""}
-                    error={!!errors.driver_name}
-                    helperText={errors.driver_name?.message}
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -1594,13 +1590,19 @@ const AddJobCard = () => {
                     </Grid>
                     <Grid item lg={10} md={12} sm={12} xs={12}>
                       <TextField
-                        {...register("driver_contact", {
-                          required: "Driver No is required!",
-                        })}
+                        {...register("driver_contact")}
                         label={
                           <>
-                            Driver No (No)
-                            <span style={labelStyle}> *</span>
+                            Driver Contact Number (N)
+                            <span
+                              style={{
+                                color: "red",
+                                fontSize: "25px",
+                              }}
+                            >
+                              {" "}
+                              *
+                            </span>
                           </>
                         }
                         variant="outlined"
@@ -1614,8 +1616,6 @@ const AddJobCard = () => {
                         onChange={handleDriverPhoneNumberChange}
                         placeholder="Driver Contact Number "
                         focused={userDetails?.data?.driver_contact || ""}
-                        error={!!errors.driver_contact}
-                        helperText={errors.driver_contact?.message}
                       />
                     </Grid>
                   </Grid>
@@ -1686,8 +1686,12 @@ const AddJobCard = () => {
             <div>
               <TextField
                 className="ownerInput"
-                {...register("technician_name")}
+                {...register("technician_name", {
+                  required: "Technician name is required!",
+                })}
                 label="Technician Name (T) "
+                error={!!errors.technician_name}
+                helperText={errors.technician_name?.message}
               />
               <br />
             </div>
