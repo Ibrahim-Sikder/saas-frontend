@@ -41,7 +41,7 @@ const AddQuotation = () => {
   const [grandTotal, setGrandTotal] = useState(0)
   const [discount, setDiscount] = useState(0)
   const [vat, setVAT] = useState(0)
-  const [tax, setTax] = useState(0) // New state for Tax
+  const [tax, setTax] = useState(0)
   const [partsTotal, setPartsTotal] = useState(0)
   const [serviceTotal, setServiceTotal] = useState(0)
   const [currentMileage, setCurrentMileage] = useState("")

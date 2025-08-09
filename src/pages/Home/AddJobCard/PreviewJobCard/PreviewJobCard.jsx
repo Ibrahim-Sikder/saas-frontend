@@ -85,11 +85,11 @@ const PreviewJobCard = () => {
       <div ref={componentRef}>
         <div ref={targetRef} className=" jobCardPrint">
           <div className="headerContainer">
-            <div className="mx-auto text-center border-b-2 border-[#110255]">
-              <div className="mx-auto text-center border-b-2 border-[#110255] py-2">
+            <div className="mx-auto text-center border-b-[2px] ">
+              <div className="mx-auto text-center border-b-[2px] border-[#110255] py-2">
                 <div className="flex  md:flex-row justify-between items-center">
                   <img
-                    className="w-[120px] md:w-[150px] mb-2 md:mb-0"
+                    className="w-[110px] mb-2 md:mb-0"
                     src={CompanyInfoData?.data?.logo[0]}
                     alt="logo"
                   />

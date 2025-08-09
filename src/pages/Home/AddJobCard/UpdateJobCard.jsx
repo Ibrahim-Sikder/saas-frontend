@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 /* eslint-disable no-unused-vars */
@@ -402,7 +403,7 @@ const UpdateJobCard = () => {
       mileage: data.mileage,
     };
     const newCard = {
-            tenantDomain: tenantDomain,
+      tenantDomain: tenantDomain,
       customer,
       company,
       showroom,
@@ -557,19 +558,18 @@ const UpdateJobCard = () => {
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
           <img
-            src={logo || "/placeholder.svg"}
+            src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
             alt="logo"
             className=" addJobLogoImg"
           />
           <div>
             <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              Trust Auto Solution{" "}
+              {CompanyInfoData?.data?.companyName}
             </h2>
             <span className="text-[12px] lg:text-xl mt-5 block">
-              Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+              Office: {CompanyInfoData?.data?.address}
             </span>
           </div>
-
           <TrustAutoAddress />
         </div>
       </div>

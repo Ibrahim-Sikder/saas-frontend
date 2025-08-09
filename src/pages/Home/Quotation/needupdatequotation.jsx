@@ -1,7 +1,7 @@
 // /* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable no-unused-vars */
 // "use client";
-// import logo from "../../../../public/assets/logo.png";
+
 // import { useEffect, useRef, useState } from "react";
 // import { useLocation, useNavigate } from "react-router-dom";
 // import { toast } from "react-toastify";
@@ -28,12 +28,11 @@
 // import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import dayjs from "dayjs";
-// import { useGetAllIProductQuery } from "../../../redux/api/productApi";
 // import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
 // import { suggestionStyles } from "../../../utils/customStyle";
-// import { getTenantName } from "../../../utils/getTenantName";
 // import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 // import { useTenantDomain } from "../../../hooks/useTenantDomain";
+
 // // Function to format numbers with thousand separators
 // const formatNumber = (num) => {
 //   if (num === undefined || num === null || num === "") return "";
@@ -42,16 +41,15 @@
 
 // const UpdateQuotation = () => {
 //   const [specificQuotation, setSpecificQuotation] = useState({});
+  
 //   const [value, setValue] = useState(specificQuotation?.vehicle?.carReg_no);
 //   const [partsTotal, setPartsTotal] = useState(0);
 //   const [serviceTotal, setServiceTotal] = useState(0);
 //   const [grandTotal, setGrandTotal] = useState(0);
-
 //   const [discount, setDiscount] = useState("");
 //   const [vat, setVAT] = useState("");
-
+//   const [tax, setTax] = useState("");
 //   const [error, setError] = useState("");
-
 //   const [removeButton, setRemoveButton] = useState("");
 //   const [reload, setReload] = useState(false);
 //   const [addButton, setAddButton] = useState(false);
@@ -62,7 +60,6 @@
 //   const location = useLocation();
 //   const id = new URLSearchParams(location.search).get("id");
 //   const tenantDomain = useTenantDomain();
-
 //   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
 //     tenantDomain,
 //   });
@@ -70,20 +67,31 @@
 //     "user_type"
 //   );
 //   const userFromProfile = new URLSearchParams(location.search).get("user");
-
 //   const [countryCode, setCountryCode] = useState(countries[0]);
 //   const [phoneNumber, setPhoneNumber] = useState("");
-
 //   const [selectedDate, setSelectedDate] = useState(() => {
 //     const today = new Date();
 //     return today.toISOString().split("T")[0];
 //   });
-
 //   const [items, setItems] = useState([
-//     { description: "", unit: "", quantity: "", rate: "", total: "" },
+//     {
+//       description: "",
+//       unit: "",
+//       quantity: "",
+//       rate: "",
+//       rateDisplay: "",
+//       total: "",
+//     },
 //   ]);
 //   const [serviceItems, setServiceItems] = useState([
-//     { description: "", unit: "", quantity: "", rate: "", total: "" },
+//     {
+//       description: "",
+//       unit: "",
+//       quantity: "",
+//       rate: "",
+//       rateDisplay: "",
+//       total: "",
+//     },
 //   ]);
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [filterType, setFilterType] = useState("");
@@ -94,7 +102,6 @@
 //   const [activeInputIndex, setActiveInputIndex] = useState(null);
 //   const [currentMileage, setCurrentMileage] = useState("");
 //   const [mileageChanged, setMileageChanged] = useState(false);
-
 //   const {
 //     register,
 //     handleSubmit,
@@ -102,20 +109,18 @@
 //     setValue: setFormValue,
 //     formState: { errors },
 //   } = useForm();
-
 //   const queryParams = {
 //     tenantDomain,
 //     page: currentPage,
 //     searchTerm: filterType,
 //     isRecycled: false,
 //   };
-
 //   const { data: stockData } = useGetAllStocksQuery(queryParams);
-
 //   const [updateQuotation, { isLoading: updateLoading, error: updateError }] =
 //     useUpdateQuotationMutation();
 //   const [removeQuotation, { isLoading: removeLoading, error: removeError }] =
 //     useRemoveQuotationMutation();
+
 //   useEffect(() => {
 //     if (specificQuotation?.date) {
 //       setSelectedDate(specificQuotation.date);
@@ -138,7 +143,6 @@
 //   const handleRemove = (index) => {
 //     if (!index) {
 //       const list = [...items];
-
 //       setItems(list);
 //     } else {
 //       const list = [...items];
@@ -150,7 +154,6 @@
 //   const handleServiceDescriptionRemove = (index) => {
 //     if (!index) {
 //       const list = [...serviceItems];
-
 //       setServiceItems(list);
 //     } else {
 //       const list = [...serviceItems];
@@ -167,6 +170,9 @@
 //   useEffect(() => {
 //     if (data?.data) {
 //       setSpecificQuotation(data.data);
+//       setDiscount(data.data.discount || "");
+//       setVAT(data.data.vat || "");
+//       setTax(data.data.tax || "");
 //     }
 //   }, [data]);
 
@@ -176,21 +182,18 @@
 //         Id: specificQuotation?.Id,
 //         job_no: specificQuotation?.job_no,
 //         company_name: specificQuotation?.customer?.company_name,
-
 //         customer_name: specificQuotation?.customer?.customer_name,
 //         customer_country_code:
 //           specificQuotation?.customer?.customer_country_code,
 //         customer_contact: specificQuotation?.customer?.customer_contact,
-
 //         customer_address: specificQuotation?.customer?.customer_address,
-
 //         carReg_no: specificQuotation?.vehicle?.carReg_no,
 //         car_registration_no: specificQuotation?.vehicle?.car_registration_no,
 //         engine_no: specificQuotation?.vehicle?.engine_no,
 //         vehicle_brand: specificQuotation?.vehicle?.vehicle_name,
 //         vehicle_name: specificQuotation?.vehicle?.vehicle_name,
 //         chassis_no: specificQuotation?.vehicle?.chassis_no,
-//         mileage: specificQuotation?.vehicle?.mileage,
+//           mileage: specificQuotation?.vehicle?.mileage,
 //       });
 //     }
 //     if (specificQuotation?.user_type === "company") {
@@ -204,7 +207,6 @@
 //         company_country_code: specificQuotation?.company?.company_country_code,
 //         company_email: specificQuotation?.company?.company_email,
 //         customer_address: specificQuotation?.company?.customer_address,
-
 //         carReg_no: specificQuotation?.vehicle?.carReg_no,
 //         car_registration_no: specificQuotation?.vehicle?.car_registration_no,
 //         engine_no: specificQuotation?.vehicle?.engine_no,
@@ -225,14 +227,12 @@
 //         company_contact:
 //           phoneNumber || specificQuotation?.showRoom?.company_contact,
 //         company_country_code: specificQuotation?.showRoom?.company_country_code,
-
 //         carReg_no: specificQuotation?.vehicle?.carReg_no,
 //         car_registration_no: specificQuotation?.vehicle?.car_registration_no,
 //         engine_no: specificQuotation?.vehicle?.engine_no,
 //         vehicle_brand: specificQuotation?.vehicle?.vehicle_brand,
 //         vehicle_name: specificQuotation?.vehicle?.vehicle_name,
 //         chassis_no: specificQuotation?.vehicle?.chassis_no,
-
 //         mileage: specificQuotation?.vehicle?.mileage,
 //       });
 //     }
@@ -272,27 +272,21 @@
 //       (sum, item) => sum + Number(item.total),
 //       0
 //     );
-
 //     const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0);
-
 //     const serviceTotalSum = specificQuotation?.service_input_data?.reduce(
 //       (sum, item) => sum + Number(item.total),
 //       0
 //     );
-
 //     const serviceTotalSum2 = serviceItems.reduce(
 //       (sum, item) => sum + Number(item.total),
 //       0
 //     );
-
 //     const newTotalSum = isNaN(totalSum) ? 0 : totalSum;
 //     const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2;
 //     const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum;
 //     const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2;
-
 //     const newGrandTotal = newTotalSum + newTotalSum2;
 //     const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2;
-
 //     const totalGrand = Number.parseFloat(
 //       newGrandTotal + newServiceGrandTotal
 //     ).toFixed(2);
@@ -305,6 +299,7 @@
 //     specificQuotation?.input_data,
 //     specificQuotation?.service_input_data,
 //   ]);
+
 //   const handleDateChange = (newDate) => {
 //     setSelectedDate(formatDate(newDate));
 //   };
@@ -320,13 +315,13 @@
 //       input_data: newItems,
 //     }));
 //   };
+
 //   const handleUnitChange2 = (index, value) => {
 //     const newItems = [...items];
-
 //     newItems[index].unit = value;
-
 //     setItems(newItems);
 //   };
+
 //   const handleServiceUnitChange = (index, value) => {
 //     const newItems = [...specificQuotation.service_input_data];
 //     newItems[index] = {
@@ -338,11 +333,10 @@
 //       service_input_data: newItems,
 //     }));
 //   };
+
 //   const handleServiceUnitChange2 = (index, value) => {
 //     const newItems = [...serviceItems];
-
 //     newItems[index].unit = value;
-
 //     setServiceItems(newItems);
 //   };
 
@@ -352,7 +346,6 @@
 //       setShowSuggestions(false);
 //       return;
 //     }
-
 //     const filteredProducts = stockData.data.filter((stock) =>
 //       stock.product.product_name
 //         .toLowerCase()
@@ -373,7 +366,6 @@
 //       ...prevState,
 //       service_input_data: newItems,
 //     }));
-
 //     setActiveInputType("service");
 //     setActiveInputIndex(index);
 //     filterProductSuggestions(value);
@@ -383,7 +375,6 @@
 //     const newItems = [...serviceItems];
 //     newItems[index].description = value;
 //     setServiceItems(newItems);
-
 //     setActiveInputType("service");
 //     setActiveInputIndex(
 //       index + (specificQuotation?.service_input_data?.length || 0)
@@ -401,7 +392,6 @@
 //       ...prevState,
 //       input_data: newItems,
 //     }));
-
 //     setActiveInputType("parts");
 //     setActiveInputIndex(index);
 //     filterProductSuggestions(value);
@@ -411,20 +401,30 @@
 //     const newItems = [...items];
 //     newItems[index].description = value;
 //     setItems(newItems);
-
 //     setActiveInputType("parts");
 //     setActiveInputIndex(index + (specificQuotation?.input_data?.length || 0));
 //     filterProductSuggestions(value);
 //   };
 
+//   // Fixed quantity change handlers to allow decimals
 //   const handleQuantityChange = (index, value) => {
-//     if (!isNaN(value)) {
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
+//     const numericValue = value.replace(/[^0-9.]/g, "");
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
+//     if (!isNaN(cleanValue) && cleanValue !== "") {
 //       const newItems = [...specificQuotation.input_data];
-//       const roundedValue = Math.round(value) || 0;
-//       newItems[index].quantity = Number(roundedValue);
-
-//       newItems[index].total = Number(roundedValue) * newItems[index].rate;
-//       newItems[index].total = Number(newItems[index].total.toFixed(2));
+//       const parsedValue = Number.parseFloat(cleanValue) || 0;
+//       newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+//       newItems[index].total =
+//         parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+//       newItems[index].total = Number.parseFloat(
+//         newItems[index].total.toFixed(2)
+//       );
 //       setSpecificQuotation((prevState) => ({
 //         ...prevState,
 //         input_data: newItems,
@@ -433,22 +433,41 @@
 //   };
 
 //   const handleQuantityChange2 = (index, value) => {
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
+//     const numericValue = value.replace(/[^0-9.]/g, "");
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...items];
-//     const roundedValue = Math.round(value) || 0;
-//     newItems[index].quantity = Number(roundedValue);
-
-//     newItems[index].total = Number(roundedValue) * newItems[index].rate;
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedValue = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+//     newItems[index].total =
+//       parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setItems(newItems);
 //   };
-//   const handleServiceQuantityChange = (index, value) => {
-//     if (!isNaN(value)) {
-//       const newItems = [...specificQuotation.service_input_data];
-//       const roundedValue = Math.round(value) || 0;
-//       newItems[index].quantity = Number(roundedValue);
 
-//       newItems[index].total = Number(roundedValue) * newItems[index].rate;
-//       newItems[index].total = Number(newItems[index].total.toFixed(2));
+//   const handleServiceQuantityChange = (index, value) => {
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
+//     const numericValue = value.replace(/[^0-9.]/g, "");
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
+//     if (!isNaN(cleanValue) && cleanValue !== "") {
+//       const newItems = [...specificQuotation.service_input_data];
+//       const parsedValue = Number.parseFloat(cleanValue) || 0;
+//       newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+//       newItems[index].total =
+//         parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+//       newItems[index].total = Number.parseFloat(
+//         newItems[index].total.toFixed(2)
+//       );
 //       setSpecificQuotation((prevState) => ({
 //         ...prevState,
 //         service_input_data: newItems,
@@ -457,25 +476,40 @@
 //   };
 
 //   const handleServiceQuantityChange2 = (index, value) => {
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
+//     const numericValue = value.replace(/[^0-9.]/g, "");
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...serviceItems];
-//     const roundedValue = Math.round(value) || 0;
-//     newItems[index].quantity = Number(roundedValue);
-
-//     newItems[index].total = Number(roundedValue) * newItems[index].rate;
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedValue = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+//     newItems[index].total =
+//       parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setServiceItems(newItems);
 //   };
 
+//   // Fixed rate change handlers to properly handle decimals without formatNumber interference
 //   const handleRateChange = (index, value) => {
-//     // Remove any non-numeric characters except decimal point
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
 //     const numericValue = value.replace(/[^0-9.]/g, "");
-
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...specificQuotation.input_data];
-//     newItems[index].rate = Number(numericValue) || 0;
-//     newItems[index].total = Number(
-//       newItems[index].quantity * newItems[index].rate
-//     );
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedRate = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].rate = parsedRate;
+//     newItems[index].rateDisplay = cleanValue; // Store raw input for display
+//     newItems[index].total =
+//       (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setSpecificQuotation((prevState) => ({
 //       ...prevState,
 //       input_data: newItems,
@@ -483,28 +517,40 @@
 //   };
 
 //   const handleRateChange2 = (index, value) => {
-//     // Remove any non-numeric characters except decimal point
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
 //     const numericValue = value.replace(/[^0-9.]/g, "");
-
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...items];
-//     newItems[index].rate = Number(numericValue) || 0;
-//     newItems[index].total = Number(
-//       newItems[index].quantity * newItems[index].rate
-//     );
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedRate = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].rate = parsedRate;
+//     newItems[index].rateDisplay = cleanValue; // Store raw input for display
+//     newItems[index].total =
+//       (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setItems(newItems);
 //   };
 
 //   const handleServiceRateChange = (index, value) => {
-//     // Remove any non-numeric characters except decimal point
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
 //     const numericValue = value.replace(/[^0-9.]/g, "");
-
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...specificQuotation.service_input_data];
-//     newItems[index].rate = Number(numericValue) || 0;
-//     newItems[index].total = Number(
-//       newItems[index].quantity * newItems[index].rate
-//     );
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedRate = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].rate = parsedRate;
+//     newItems[index].rateDisplay = cleanValue; // Store raw input for display
+//     newItems[index].total =
+//       (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setSpecificQuotation((prevState) => ({
 //       ...prevState,
 //       service_input_data: newItems,
@@ -512,21 +558,26 @@
 //   };
 
 //   const handleServiceRateChange2 = (index, value) => {
-//     // Remove any non-numeric characters except decimal point
+//     // Allow decimal numbers by removing non-numeric characters except decimal point
 //     const numericValue = value.replace(/[^0-9.]/g, "");
-
+//     // Prevent multiple decimal points
+//     const parts = numericValue.split(".");
+//     const cleanValue =
+//       parts.length > 2
+//         ? parts[0] + "." + parts.slice(1).join("")
+//         : numericValue;
 //     const newItems = [...serviceItems];
-//     newItems[index].rate = Number(numericValue) || 0;
-//     newItems[index].total = Number(
-//       newItems[index].quantity * newItems[index].rate
-//     );
-//     newItems[index].total = Number(newItems[index].total.toFixed(2));
+//     const parsedRate = Number.parseFloat(cleanValue) || 0;
+//     newItems[index].rate = parsedRate;
+//     newItems[index].rateDisplay = cleanValue; // Store raw input for display
+//     newItems[index].total =
+//       (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+//     newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
 //     setServiceItems(newItems);
 //   };
 
 //   const handleDiscountChange = (value) => {
 //     const parsedValue = Number(value);
-
 //     if (!isNaN(parsedValue)) {
 //       setDiscount(parsedValue);
 //     }
@@ -534,106 +585,110 @@
 
 //   const handleVATChange = (value) => {
 //     const parsedValue = Number(value);
-
 //     if (!isNaN(parsedValue)) {
 //       setVAT(parsedValue);
 //     }
 //   };
 
+//   const handleTaxChange = (value) => {
+//     const parsedValue = Number(value);
+//     if (!isNaN(parsedValue)) {
+//       setTax(parsedValue);
+//     }
+//   };
+
 //   const calculateFinalTotal = () => {
-//     let finalTotal;
-//     let differenceExistAndNewGrandTotal = 0; // Initialize to 0
-//     let vatAsPercentage = 0;
-//     let discountAsPercentage = 0;
-//     let totalAfterDiscount = 0;
+//     let currentPartsTotal = partsTotal;
+//     let currentServiceTotal = serviceTotal;
 
-//     // Calculate the difference between the grand total and the specific quotation's total amount
-//     if (grandTotal !== specificQuotation?.total_amount) {
-//       differenceExistAndNewGrandTotal =
-//         grandTotal - (Number(specificQuotation?.total_amount) || 0); // Convert to number
+//     // If partsTotal or serviceTotal are 0 (e.g., on initial load before items are re-calculated),
+//     // use the values from specificQuotation if available.
+//     // This ensures the initial calculation uses existing data.
+//     if (currentPartsTotal === 0 && specificQuotation?.parts_total) {
+//       currentPartsTotal = Number(specificQuotation.parts_total);
+//     }
+//     if (currentServiceTotal === 0 && specificQuotation?.service_total) {
+//       currentServiceTotal = Number(specificQuotation.service_total);
 //     }
 
-//     // Determine the discount percentage
-//     if (discount > 0) {
-//       discountAsPercentage = discount;
-//     } else if (discount === 0) {
-//       discountAsPercentage = 0; // If it's 0, we assign 0 but ensure it won't reduce the amount
+//     const currentGrandTotal = currentPartsTotal + currentServiceTotal;
+
+//     // Determine the discount value
+//     let effectiveDiscount = 0;
+//     if (discount === 0 || discount > 0) {
+//       // If discount is explicitly set (0 or positive number)
+//       effectiveDiscount = discount;
 //     } else if (discount === "") {
-//       discountAsPercentage = Number(specificQuotation?.discount) || 0;
+//       // If discount state is empty, use existing specificQuotation discount
+//       effectiveDiscount = Number(specificQuotation?.discount) || 0;
 //     }
-
-//     // Convert specificQuotation?.total_amount to a number
-//     const specificTotalAmount = Number(specificQuotation?.total_amount) || 0; // Ensure it's treated as a number
-//     const differenceWithoutDiscount =
-//       specificTotalAmount + differenceExistAndNewGrandTotal;
 
 //     // Apply discount
-//     if (discountAsPercentage === 0) {
-//       totalAfterDiscount = differenceWithoutDiscount;
-//     } else if (discountAsPercentage === "") {
-//       totalAfterDiscount =
-//         differenceWithoutDiscount - (Number(specificQuotation?.discount) || 0);
-//     } else {
-//       totalAfterDiscount = differenceWithoutDiscount - discountAsPercentage;
-//     }
-
-//     // Ensure that if there's no discount, no subtraction happens
-//     totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount;
+//     let totalAfterDiscount = currentGrandTotal - effectiveDiscount;
+//     totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount; // Ensure total doesn't go negative
 
 //     // Determine the VAT percentage
-//     if (vat > 0) {
-//       vatAsPercentage = vat;
-//     } else if (vat === 0) {
-//       vatAsPercentage = 0;
+//     let effectiveVat = 0;
+//     if (vat === 0 || vat > 0) {
+//       // If vat is explicitly set (0 or positive number)
+//       effectiveVat = vat;
 //     } else if (vat === "") {
-//       vatAsPercentage = Number(specificQuotation?.vat) || 0;
+//       // If vat state is empty, use existing specificQuotation vat
+//       effectiveVat = Number(specificQuotation?.vat) || 0;
 //     }
 
 //     // Calculate total after VAT
-//     const calculateVat = totalAfterDiscount * (vatAsPercentage / 100);
+//     const vatAmount = totalAfterDiscount * (effectiveVat / 100);
+//     const totalAfterVat = totalAfterDiscount + vatAmount;
 
-//     const totalAfterTax = totalAfterDiscount + calculateVat;
+//     // Determine the Tax percentage (new logic)
+//     let effectiveTax = 0;
+//     if (tax === 0 || tax > 0) {
+//       // If tax is explicitly set (0 or positive number)
+//       effectiveTax = tax;
+//     } else if (tax === "") {
+//       // If tax state is empty, use existing specificQuotation tax
+//       effectiveTax = Number(specificQuotation?.tax) || 0; // Assuming specificQuotation will have a 'tax' field
+//     }
+
+//     // Apply tax after VAT
+//     const taxAmount = totalAfterVat * (effectiveTax / 100);
+//     const finalTotal = totalAfterVat + taxAmount;
+
 //     // Final total with 2 decimal precision
-//     finalTotal = Number.parseFloat(totalAfterTax).toFixed(2);
-
-//     return finalTotal;
+//     return Number.parseFloat(finalTotal).toFixed(2);
 //   };
 
 //   // Fixed handleSelectSuggestion function
 //   const handleSelectSuggestion = (product) => {
 //     if (!product) return;
-
 //     // Extract product details correctly based on the data structure
 //     const productName = product.product?.product_name || "";
 //     const productPrice = Number(product.product?.sellingPrice) || 0;
 //     const productQuantity = product.product.product_quantity || 1;
-
 //     // Get unit from the unit object
 //     let productUnit = "Set"; // Default unit
 //     if (product.product?.unit && typeof product.product.unit === "object") {
 //       productUnit = product.product.unit.unit || "Set";
 //     }
-
 //     // Calculate total
 //     const total = productQuantity * productPrice;
-
 //     if (activeInputType === "service") {
 //       if (
 //         activeInputIndex < (specificQuotation?.service_input_data?.length || 0)
 //       ) {
 //         // For existing service items
 //         const newItems = [...specificQuotation.service_input_data];
-
 //         // Set the product details
 //         newItems[activeInputIndex] = {
 //           ...newItems[activeInputIndex],
 //           description: productName,
 //           unit: productUnit,
 //           rate: productPrice,
+//           rateDisplay: productPrice.toString(),
 //           quantity: productQuantity,
 //           total: total,
 //         };
-
 //         setSpecificQuotation((prevState) => ({
 //           ...prevState,
 //           service_input_data: newItems,
@@ -644,34 +699,32 @@
 //           activeInputIndex -
 //           (specificQuotation?.service_input_data?.length || 0);
 //         const newItems = [...serviceItems];
-
 //         // Set the product details
 //         newItems[actualIndex] = {
 //           ...newItems[actualIndex],
 //           description: productName,
 //           unit: productUnit,
 //           rate: productPrice,
+//           rateDisplay: productPrice.toString(),
 //           quantity: productQuantity,
 //           total: total,
 //         };
-
 //         setServiceItems([...newItems]);
 //       }
 //     } else if (activeInputType === "parts") {
 //       if (activeInputIndex < (specificQuotation?.input_data?.length || 0)) {
 //         // For existing parts items
 //         const newItems = [...specificQuotation.input_data];
-
 //         // Set the product details
 //         newItems[activeInputIndex] = {
 //           ...newItems[activeInputIndex],
 //           description: productName,
 //           unit: productUnit,
 //           rate: productPrice,
+//           rateDisplay: productPrice.toString(),
 //           quantity: productQuantity,
 //           total: total,
 //         };
-
 //         setSpecificQuotation((prevState) => ({
 //           ...prevState,
 //           input_data: newItems,
@@ -681,21 +734,19 @@
 //         const actualIndex =
 //           activeInputIndex - (specificQuotation?.input_data?.length || 0);
 //         const newItems = [...items];
-
 //         // Set the product details
 //         newItems[actualIndex] = {
 //           ...newItems[actualIndex],
 //           description: productName,
 //           unit: productUnit,
 //           rate: productPrice,
+//           rateDisplay: productPrice.toString(),
 //           quantity: productQuantity,
 //           total: total,
 //         };
-
 //         setItems([...newItems]);
 //       }
 //     }
-
 //     // Close the suggestions dropdown
 //     setShowSuggestions(false);
 //   };
@@ -703,7 +754,14 @@
 //   const handleAddClick = () => {
 //     setItems([
 //       ...items,
-//       { description: "", unit: "", quantity: "", rate: "", total: "" },
+//       {
+//         description: "",
+//         unit: "",
+//         quantity: "",
+//         rate: "",
+//         rateDisplay: "",
+//         total: "",
+//       },
 //     ]);
 //     if (partsDiscountRef.current) {
 //       partsDiscountRef.current.value = discount
@@ -716,7 +774,14 @@
 //   const handleServiceDescriptionAdd = () => {
 //     setServiceItems([
 //       ...serviceItems,
-//       { description: "", unit: "", quantity: "", rate: "", total: "" },
+//       {
+//         description: "",
+//         unit: "",
+//         quantity: "",
+//         rate: "",
+//         rateDisplay: "",
+//         total: "",
+//       },
 //     ]);
 //     if (partsDiscountRef.current) {
 //       partsDiscountRef.current.value = discount
@@ -751,7 +816,6 @@
 //       id: id,
 //       data: { index: i, quotation_name: name },
 //     };
-
 //     const res = await removeQuotation(values).unwrap();
 //     if (res.success) {
 //       setReload(!reload);
@@ -771,6 +835,7 @@
 //         total: item.total,
 //       })),
 //   ];
+
 //   const service_input_data = [
 //     ...(specificQuotation?.service_input_data || []),
 //     ...serviceItems
@@ -789,11 +854,9 @@
 //     try {
 //       const customer = {
 //         company_name: data.company_name,
-
 //         customer_name: data.customer_name,
 //         customer_contact: data.customer_contact,
 //         customer_country_code: data.company_country_code,
-
 //         customer_address: data.customer_address,
 //       };
 //       const company = {
@@ -802,15 +865,15 @@
 //         company_address: data.company_address,
 //         company_contact: data.company_contact,
 //         company_country_code: data.company_country_code,
+//         company_email: data.company_email,
+//         customer_address: data.company_address,
 //       };
 //       const showRoom = {
 //         showRoom_name: data.showRoom_name,
 //         vehicle_username: data.vehicle_username,
-
 //         company_name: data.company_name,
 //         company_contact: data.company_contact,
 //         company_country_code: data.company_country_code,
-
 //         company_address: data.company_address,
 //       };
 //       data.vehicle_model = Number(data.vehicle_model);
@@ -853,7 +916,6 @@
 //         Id: specificQuotation?.Id,
 //         job_no: specificQuotation?.job_no,
 //         date: selectedDate || specificQuotation?.date,
-
 //         parts_total: partsTotal || specificQuotation.parts_total,
 //         service_total: serviceTotal || specificQuotation.serviceTotal,
 //         total_amount: grandTotal || specificQuotation?.total_amount,
@@ -862,8 +924,8 @@
 //             ? discount
 //             : specificQuotation?.discount,
 //         vat: vat === 0 || vat > 0 ? vat : specificQuotation?.vat,
+//         tax: tax === 0 || tax > 0 ? tax : specificQuotation?.tax, // New: Include tax
 //         net_total: calculateFinalTotal() || specificQuotation.net_total,
-
 //         input_data: input_data,
 //         service_input_data: service_input_data,
 //       };
@@ -875,14 +937,12 @@
 //         vehicle,
 //         quotation,
 //       };
-
 //       const newValue = {
 //         id: id,
 //         data: {
 //           ...values,
 //         },
 //       };
-
 //       if (removeButton === "") {
 //         const res = await updateQuotation(newValue).unwrap();
 //         if (res.success) {
@@ -902,6 +962,7 @@
 //       `/dashboard/invoice?order_no=${specificQuotation?.job_no}&id=${id}`
 //     );
 //   };
+
 //   const handleGoPreview = () => {
 //     handleSubmit(onSubmit)();
 //     navigate(`/dashboard/quotation-view?id=${id}`);
@@ -909,7 +970,6 @@
 
 //   const handleOnSubmit = () => {
 //     handleSubmit(onSubmit)();
-
 //     if (!userTypeFromProfile) {
 //       navigate("/dashboard/quotation-list");
 //     }
@@ -922,7 +982,6 @@
 //     if (userTypeFromProfile === "showRoom") {
 //       navigate(`/dashboard/show-room-profile?id=${userFromProfile}`);
 //     }
-
 //     toast.success("Quotation update successful");
 //   };
 
@@ -937,7 +996,6 @@
 //         setShowSuggestions(false);
 //       }
 //     };
-
 //     document.addEventListener("mousedown", handleClickOutside);
 //     return () => {
 //       document.removeEventListener("mousedown", handleClickOutside);
@@ -960,7 +1018,7 @@
 //     <div className="px-5 py-10">
 //       <div className=" addJobCardHeads">
 //         <img
-//           src={CompanyInfoData?.data?.logo}
+//           src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
 //           alt="logo"
 //           className=" addJobLogoImg"
 //         />
@@ -1254,7 +1312,7 @@
 //                       options={cmDmOptions.map((option) => option.label)}
 //                       value={specificQuotation?.vehicle?.carReg_no || ""}
 //                       onChange={(event, newValue) => {
-//                         setValue("carReg_no", newValue);
+//                         setFormValue("carReg_no", newValue);
 //                       }}
 //                       renderInput={(params) => (
 //                         <TextField
@@ -1312,7 +1370,10 @@
 //                     })}
 //                     label="Current Mileage (KM)"
 //                     type="number"
-//                     value={currentMileage || specificQuotation?.mileage || ""}
+//                     // focused={currentMileage || specificQuotation?.mileage || ""}
+//                     // value={currentMileage || specificQuotation?.mileage || ""}
+//                     focused={specificQuotation?.mileage || ""}
+//                     defaultValue={specificQuotation?.mileage || ""}
 //                     onChange={(e) => {
 //                       const newMileage = e.target.value;
 //                       setCurrentMileage(newMileage);
