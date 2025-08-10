@@ -15,6 +15,7 @@ import {
   useRestoreFromRecycledCustomerMutation,
 } from "../../../redux/api/customerApi";
 import { toast } from "react-toastify";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RecycledbinCustomerList = () => {
   const textInputRef = useRef(null);
@@ -27,7 +28,7 @@ const RecycledbinCustomerList = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+const tenantDomain = useTenantDomain();
 
   const {
 
@@ -36,7 +37,7 @@ const RecycledbinCustomerList = () => {
     error: customerError,
     refetch,
   } = useGetAllCustomersQuery({
-      tenantDomain: domain,
+      tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -51,7 +52,6 @@ const RecycledbinCustomerList = () => {
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/customer-profile?id=${e}`);
   };
-
   const handleDeleteOrRestore = async (id) => {
     const result = await swal({
       title: "Select Action",
@@ -76,7 +76,7 @@ const RecycledbinCustomerList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledCustomer({ tenantDomain: domain, id }).unwrap();
+        await restoreFromRecycledCustomer({ tenantDomain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Customer has been restored successfully.",
@@ -93,7 +93,7 @@ const RecycledbinCustomerList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteCustomer({ tenantDomain: domain, id }).unwrap();
+        await permanantlyDeleteCustomer({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Customer has been permanently deleted.",

@@ -63,6 +63,7 @@ import {
 import { Link, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { useDeletePurchaseMutation, useGetAllPurchasesQuery } from "../../../redux/api/purchaseApi"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 // Status chip colors
 const statusColors = {
@@ -96,14 +97,17 @@ export default function PurchaseList() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+const tenantDomain = useTenantDomain();
+
 
   const { data, isLoading, refetch } = useGetAllPurchasesQuery({
-    limit: rowsPerPage,
+    tenantDomain,
+    limit: 10,
     page: page + 1,
     searchTerm: search,
-    sortBy: sortField,
-    sortOrder: sortDirection,
-    status: filterStatus,
+    // sortBy: sortField,
+    // sortOrder: sortDirection,
+    // status: filterStatus,
     payment: filterPayment,
   })
 
@@ -152,7 +156,7 @@ export default function PurchaseList() {
     if (!confirmDelete.id) return
 
     try {
-      await deletePurchase(confirmDelete.id).unwrap()
+      await deletePurchase({tenantDomain, id: confirmDelete.id}).unwrap()
       Swal.fire({
         title: "Deleted!",
         text: "The purchase has been deleted successfully.",
@@ -1226,12 +1230,7 @@ export default function PurchaseList() {
             <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClose}>
-            <PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
-            <ExportIcon fontSize="small" sx={{ mr: 1 }} /> Export
-          </MenuItem>
+         
         </Menu>
 
         {/* Delete Confirmation Dialog */}

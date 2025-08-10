@@ -1,10 +1,9 @@
+/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
 import { FaUsers } from "react-icons/fa";
-import { NotificationAdd } from "@mui/icons-material";
-import { FaUserGear } from "react-icons/fa6";
 import "../Employee.css";
 import EmployeeLeaveTable from "./EmployeeLeaveTable";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Users,
   UserCheck,
@@ -13,8 +12,8 @@ import {
   CheckCircle,
   Calendar,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useGetAllELeaveRequestQuery } from "../../../../redux/api/leaveRequestApi";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const leaveData = [
   {
@@ -76,32 +75,18 @@ const leaveData = [
 const EmployeeLeave = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, SetSearch] = useState("");
+  const tenantDomain = useTenantDomain();
+
   const { data, isLoading } = useGetAllELeaveRequestQuery({
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
   });
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  useEffect(() => {
-    const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDarkMode(darkModeQuery.matches);
 
-    const handleChange = (e) => {
-      setIsDarkMode(e.matches);
-    };
-
-    darkModeQuery.addEventListener("change", handleChange);
-    return () => darkModeQuery.removeEventListener("change", handleChange);
-  }, []);
   return (
     <div className="w-full mt-5 mb-24">
-      <div className="flex justify-end pb-3 border-b-2">
-        <div className="flex items-end justify-end">
-          <NotificationAdd size={30} className="mr-2" />
-          <FaUserGear size={30} />{" "}
-        </div>
-      </div>
       <div className="flex flex-wrap items-center justify-between my-3 mb-8">
         <div className="flex items-center justify-center ">
           <FaUsers size={70} className="invoicIcon" />
@@ -111,35 +96,19 @@ const EmployeeLeave = () => {
           </div>{" "}
         </div>{" "}
       </div>
-      <div className={isDarkMode ? "dark" : ""}>
+      <div>
         <div className="bg-white dark:bg-gray-900 p-6 rounded-xl">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
               <Users className="h-5 w-5" />
               Employee Overview
             </h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              >
-                {isDarkMode ? "🌞" : "🌙"}
-              </button>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {leaveData.map((leave, index) => (
-              <motion.div
-                key={leave.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{
-                  y: -5,
-                  boxShadow:
-                    "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-                }}
+              <div
+                key={index}
                 className={`relative overflow-hidden rounded-xl border ${leave.borderColor} ${leave.color} p-6 shadow-lg ${leave.shadowColor} transition-all duration-300`}
               >
                 <div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white/20 dark:bg-black/10" />
@@ -160,29 +129,25 @@ const EmployeeLeave = () => {
                 </div>
 
                 <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min(
-                        Number.parseInt(
-                          leave.day.toString().split("/")[0] || leave.day
-                        ) * 10,
-                        100
-                      )}%`,
-                    }}
-                    transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
+                  <div
                     className={`h-full rounded-full ${leave.textColor.replace(
                       "text",
                       "bg"
                     )}`}
                   />
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </div>
-      <EmployeeLeaveTable ncurrentPage={currentPage} data={data} SetSearch={SetSearch} setCurrentPage={setCurrentPage} isLoading={isLoading}/>
+      <EmployeeLeaveTable
+        ncurrentPage={currentPage}
+        data={data}
+        SetSearch={SetSearch}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

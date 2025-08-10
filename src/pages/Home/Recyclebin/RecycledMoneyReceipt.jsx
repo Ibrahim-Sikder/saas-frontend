@@ -11,6 +11,7 @@ import {
 import { Pagination } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
 import { ArrowForwardIos } from "@mui/icons-material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RecycledMoneyReceipt = () => {
   const location = useLocation();
@@ -20,6 +21,8 @@ const RecycledMoneyReceipt = () => {
   const limit = 10;
   const navigate = useNavigate();
   const textInputRef = useRef(null);
+const tenantDomain = useTenantDomain();
+
 
   useEffect(() => {
     if (search) {
@@ -30,6 +33,7 @@ const RecycledMoneyReceipt = () => {
   
   const { data: allMoneyReceipts, isLoading: moneyReceiptLoading } =
     useGetAllMoneyReceiptsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -71,7 +75,7 @@ const RecycledMoneyReceipt = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledMoneyReceipt(id).unwrap();
+        await restoreFromRecycledMoneyReceipt({tenantDomain, id}).unwrap();
         swal({
           title: "Restored!",
           text: "Money Receipt has been restored successfully.",
@@ -88,7 +92,7 @@ const RecycledMoneyReceipt = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteMoneyReceipt(id).unwrap();
+      await permanantlyDeleteMoneyReceipt({tenantDomain, id}).unwrap();
         swal({
           title: "Deleted!",
           text: "Money Receipt has been permanently deleted.",

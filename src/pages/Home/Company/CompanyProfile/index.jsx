@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { HiLocationMarker } from "react-icons/hi";
-import { HiEnvelope, HiMiniPhone } from "react-icons/hi2";
+import { HiMiniPhone } from "react-icons/hi2";
 import { ImUserTie } from "react-icons/im";
 import "../../Customer/Customer.css";
 import SupplierPaymentList from "../../Suppliers/SupplierPaymentList";
@@ -19,21 +18,18 @@ import CustomerInvoiceList from "../../Customer/CustomerProfile/CustomerInvoiceL
 import CustomerMoneyList from "../../Customer/CustomerProfile/CustomerMoneyList";
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import CustomerNote from "../../Customer/CustomerProfile/CustomerNote";
 const CompanyProfile = () => {
-  const [jobCardData, setJobCardData] = useState([]);
-  const [quotationData, setQuotationData] = useState([]);
-  const [invoiceData, setInvoiceData] = useState([]);
-
-  const [moneyReceiptData, setMoneyReceiptData] = useState([]);
-
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = useTenantDomain();
 
   const {
     data: profileData,
     isLoading,
     error: companyError,
-  } = useGetSingleCompanyQuery(id);
+  } = useGetSingleCompanyQuery({ tenantDomain, id });
 
   const [value, setValue] = useState(() => {
     const savedTab = localStorage.getItem(`company-tab-${id}`);
@@ -49,8 +45,6 @@ const CompanyProfile = () => {
     localStorage.setItem(`company-tab-${id}`, value.toString());
   }, [value, id]);
 
-
-
   if (isLoading) {
     return <Loading />;
   }
@@ -61,19 +55,18 @@ const CompanyProfile = () => {
   const totalAmount = profileData?.data?.invoices?.reduce((sum, receipt) => {
     return sum + (receipt?.isRecycled === false ? receipt?.net_total || 0 : 0);
   }, 0);
-  
+
   const discount = profileData?.data?.invoices?.reduce((sum, receipt) => {
     return sum + (receipt?.isRecycled === false ? receipt?.discount || 0 : 0);
   }, 0);
-  
+
   const totalDue = profileData?.data?.invoices?.reduce((sum, receipt) => {
     return sum + (receipt?.isRecycled === false ? receipt?.due || 0 : 0);
   }, 0);
-  
+
   const totalAdvance = profileData?.data?.invoices?.reduce((sum, receipt) => {
     return sum + (receipt?.isRecycled === false ? receipt?.advance || 0 : 0);
   }, 0);
-  
 
   return (
     <div>
@@ -154,17 +147,22 @@ const CompanyProfile = () => {
             <Tab sx={tabStyles} label="Money Receipt" />
             <Tab sx={tabStyles} label="Payment" />
             <Tab sx={tabStyles} label="Message" />
+            <Tab sx={tabStyles} label="Note" />
           </Tabs>
         </Box>
 
         <TabPanel value={value} index={0}>
-          <CompanyAccount profileData={profileData} />
+          <CompanyAccount
+            tenantDomain={tenantDomain}
+            profileData={profileData}
+          />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <VehicleDetails id={id} />
+          <VehicleDetails tenantDomain={tenantDomain} id={id} />
         </TabPanel>
         <TabPanel value={value} index={2}>
           <CustomerJobCardList
+            tenantDomain={tenantDomain}
             id={id}
             customerId={profileData?.data?.companyId}
             user_type={profileData?.data?.user_type}
@@ -172,30 +170,39 @@ const CompanyProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <CustomerQoutationList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={4}>
           <CustomerInvoiceList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={5}>
-          <CustomerMoneyList id={id} user_type={profileData?.data?.user_type} />
+          <CustomerMoneyList
+            tenantDomain={tenantDomain}
+            id={id}
+            user_type={profileData?.data?.user_type}
+          />
         </TabPanel>
         <TabPanel value={value} index={6}>
-          <SupplierPaymentList />
+          <SupplierPaymentList tenantDomain={tenantDomain} />
         </TabPanel>
         <TabPanel value={value} index={7}>
           <Message />
+        </TabPanel>
+        <TabPanel value={value} index={8}>
+          <CustomerNote tenantDomain={tenantDomain} id={id} />
         </TabPanel>
       </div>
 
       <div>
         <p className="my-5 text-center">
-          © Copyright 2024 | Trust Auto Solution | All Rights Reserved
+          © Copyright 2024 | Softypy Garage | All Rights Reserved
         </p>
       </div>
     </div>

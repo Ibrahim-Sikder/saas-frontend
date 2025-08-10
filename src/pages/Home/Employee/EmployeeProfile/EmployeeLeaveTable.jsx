@@ -30,6 +30,7 @@ import {
   tableStyle,
 } from "../../../../style/tableStyle";
 import { Pencil, Trash2 } from "lucide-react";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -53,6 +54,8 @@ export default function EmployeeLeaveTable({
 }) {
   const [open, setOpen] = useState(false);
   const [leaveRequestId, setLeaveRequestId] = useState(null);
+  const tenantDomain = useTenantDomain();
+
   const handleOpen = (id) => {
     setLeaveRequestId(id);
     setOpen(true);
@@ -106,7 +109,7 @@ export default function EmployeeLeaveTable({
   const { totalPage = 1 } = meta || {};
 
   const [columns, setColumns] = useState([
-    "Employee ID",
+    "Employee Name",
     "Leave Type",
     "From",
     "To",
@@ -121,22 +124,22 @@ export default function EmployeeLeaveTable({
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", p: 3 }}>
-    <Typography
-  variant="h4"
-  component="h1"
-  gutterBottom
-  fontWeight="bold"
-  sx={{
-    fontSize: {
-      xs: "24px", 
-      sm: "28px", 
-      md: "32px", 
-    },
-    fontWeight: "bold",
-  }}
->
-  Employee Leave Requests
-</Typography>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        fontWeight="bold"
+        sx={{
+          fontSize: {
+            xs: "24px",
+            sm: "28px",
+            md: "32px",
+          },
+          fontWeight: "bold",
+        }}
+      >
+        Employee Leave Requests
+      </Typography>
 
       <TextField
         fullWidth
@@ -239,6 +242,7 @@ export default function EmployeeLeaveTable({
         <LeaveRequestForm
           onClose={handleClose}
           leaveRequestId={leaveRequestId}
+          tenantDomain={tenantDomain}
         />
       )}
     </Paper>

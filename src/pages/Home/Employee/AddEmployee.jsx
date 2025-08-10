@@ -19,20 +19,17 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { countries } from "../../../constant";
-import {
-  useCreateEmployeeMutation,
-  useDeleteEmployeeMutation,
-} from "../../../redux/api/employee";
+import { useCreateEmployeeMutation } from "../../../redux/api/employee";
 import uploadFile from "../../../helper/uploadFile";
 import EmployeeTable from "./EmployeeTable";
 import { ArrowBack } from "@mui/icons-material";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const AddEmployee = () => {
-  const [active, setActive] = useState("");
+  const tenantDomain = useTenantDomain();
   const [url, setUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,8 +50,6 @@ const AddEmployee = () => {
 
   const [createEmployee, { isLoading: createLoading, error: createError }] =
     useCreateEmployeeMutation();
-  const [deleteEmployee, { isLoading: deleteLoading, error: deleteError }] =
-    useDeleteEmployeeMutation();
 
   const handleImageUpload = async (event) => {
     setLoading(true);
@@ -75,7 +70,7 @@ const AddEmployee = () => {
     data.nid_number = Number(data.nid_number);
 
     try {
-      const res = await createEmployee(data).unwrap();
+      const res = await createEmployee({ tenantDomain, ...data }).unwrap();
 
       if (res.success) {
         toast.success(res.message);
@@ -87,7 +82,7 @@ const AddEmployee = () => {
           toast.error(`${error.path}: ${error.message}`);
         });
       } else {
-        toast.error(err.data?.message || "Failed to creating the customer.");
+        toast.error(err.data?.message || "Failed to creating the employee.");
       }
     } finally {
       toast.dismiss(toastId);
@@ -125,9 +120,9 @@ const AddEmployee = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-10 ">
         <div className="productHeadWrap gap-3 ">
-          <div className="flex flex-wrap items-center justify-center">
+          <div className="flex flex-wrap ">
             <Button
               onClick={handleBack}
               startIcon={<ArrowBack />}
@@ -135,10 +130,8 @@ const AddEmployee = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <div className="flex items-center justify-center ">
-            <FaUsers size={70} className="invoicIcon" />
             <div>
               <h3 className="text-2xl font-bold"> New Employee </h3>
             </div>
@@ -150,7 +143,7 @@ const AddEmployee = () => {
           </div>
         </div>
 
-        <div className="addProductWrap">
+        <div className="addProductWrap mb-10 ">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="addEmployeeFieldWraps space-y-3">
               <div>
@@ -198,11 +191,43 @@ const AddEmployee = () => {
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
-                      <TextField
+                      {/* <TextField
                         fullWidth
                         label="Blood Group "
                         {...register("blood_group")}
-                      />
+                      /> */}
+                      <FormControl fullWidth error={!!errors.blood_group}>
+                        <InputLabel id="blood-group-select-label">
+                          Blood Group
+                        </InputLabel>
+                        <Select
+                          labelId="blood-group-select-label"
+                          label="Blood Group"
+                          defaultValue=""
+                          {...register("blood_group", {
+                            required: "Blood group is required",
+                          })}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Blood Group
+                          </MenuItem>
+                          <MenuItem value="A+">A+</MenuItem>
+                          <MenuItem value="A-">A-</MenuItem>
+                          <MenuItem value="B+">B+</MenuItem>
+                          <MenuItem value="B-">B-</MenuItem>
+                          <MenuItem value="O+">O+</MenuItem>
+                          <MenuItem value="O-">O-</MenuItem>
+                          <MenuItem value="AB+">AB+</MenuItem>
+                          <MenuItem value="AB-">AB-</MenuItem>
+                          <MenuItem value="Unknown">Unknown</MenuItem>
+                          <MenuItem value="Other">Other</MenuItem>
+                        </Select>
+                        {/* {errors.blood_group && (
+                          <FormHelperText>
+                            {errors.blood_group.message}
+                          </FormHelperText>
+                        )} */}
+                      </FormControl>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <TextField
@@ -281,15 +306,7 @@ const AddEmployee = () => {
                       </FormControl>
                     </Grid>
 
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Password"
-                        id="Password"
-                        {...register("password")}
-                        type="password"
-                      />
-                    </Grid>
+                    
                   </Grid>
                 </Box>
                 <Box sx={{ marginTop: "30px" }}>
@@ -513,7 +530,6 @@ const AddEmployee = () => {
           </form>
         </div>
       </div>
-      <EmployeeTable />
     </section>
   );
 };

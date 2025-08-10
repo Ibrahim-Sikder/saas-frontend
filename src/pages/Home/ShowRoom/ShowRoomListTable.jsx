@@ -14,6 +14,7 @@ import {
   useMoveRecycledShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
 import EmptyData from "../../../components/EmptyData/EmptyData";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const ShowRoomListTable = () => {
   const textInputRef = useRef(null);
   const [filterType, setFilterType] = useState("");
@@ -22,9 +23,10 @@ const ShowRoomListTable = () => {
 
   const navigate = useNavigate();
   const limit = 10;
-   const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
+
   const { data: showRoomData, isLoading: loading } = useGetAllShowRoomsQuery({
-    tenantDomain:domain, 
+    tenantDomain, 
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -47,7 +49,7 @@ const ShowRoomListTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledShowRoom({ tenantDomain: domain, id }).unwrap();
+        await moveRecycledShowRoom({ tenantDomain, id }).unwrap();
         swal("Moved to Recycle bin!", "Successful.", "success");
       } catch (error) {
         swal("Error", "An error occurred while deleting the card.", "error");

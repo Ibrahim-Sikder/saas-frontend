@@ -4,28 +4,62 @@ const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createUser: builder.mutation({
       query: (data) => {
-        console.log('from redux api',data)
         return {
-          url: '/user',
-          method: 'POST',
+          url: "/user",
+          method: "POST",
           body: data,
-        //   headers: {
-        //     'X-Tenant-Domain': tenantDomain,
-        //     'Origin': `https://${tenantDomain}`,
-        //   },
         };
       },
     }),
-
+    
+    deleteUser: builder.mutation({
+      query: ({ tenantDomain, id }) => ({
+        url: `/user/${id}`,
+        method: "DELETE",
+        params: { tenantDomain },
+      }),
+      invalidatesTags: ["user"],
+    }),
     getAllUser: builder.query({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
+        url: `/user`,
+        method: "GET",
+        params: { tenantDomain, limit, page, searchTerm },
+      }),
+      providesTags: ["user"],
+    }),
+    updateUser: builder.mutation({
+      query: ({ id, data, tenantDomain }) => ({
+        url: `/user/${id}`,
+        method: "PATCH",
+        body: data,
+        params: { tenantDomain },
+      }),
+      invalidatesTags: ["user"],
+    }),
+    getAllContactUser: builder.query({
       query: ({ limit, page, searchTerm }) => ({
-        url: `/users`,
+        url: `/contact`,
         method: "GET",
         params: { limit, page, searchTerm },
       }),
-      providesTags: ["user"],
+      providesTags: ["contact"],
+    }),
+    deleteContactUser: builder.mutation({
+      query: ({ id }) => ({
+        url: `/contact/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["contact"],
     }),
   }),
 });
 
-export const { useCreateUserMutation, useGetAllUserQuery } = userApi;
+export const {
+  useCreateUserMutation,
+  useGetAllUserQuery,
+  useDeleteUserMutation,
+  useGetAllContactUserQuery,
+  useDeleteContactUserMutation,
+  useUpdateUserMutation
+} = userApi;

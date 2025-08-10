@@ -1,120 +1,171 @@
 /* eslint-disable no-unused-vars */
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./Login.css";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+/* eslint-disable react/no-unescaped-entities */
+import { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Button, Box, Typography, Link, Divider, Alert } from "@mui/material";
+import { Lock, Google, Facebook, Person } from "@mui/icons-material";
+import AuthLayout from "../../auth/AuthLayout";
+import { useTenantLoginMutation } from "../../redux/api/authApi";
 import Cookies from "js-cookie";
+import GarageForm from "../../components/form/Form";
+import TASInput from "../../components/form/Input";
 import { toast } from "react-toastify";
-
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [defaultEmail, setDefaultEmail] = useState("");
-  const [defaultPassword, setDefaultPassword] = useState("");
-  const navigate = useNavigate();
-  const email = useRef();
-  const password = useRef();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [tenantLogin] = useTenantLoginMutation();
 
-  const handleShowPassword = () => {
-    setShowPassword((showPassword) => !showPassword);
-  };
+  const handleSubmit = async (data) => {
+    setLoading(true);
+    setError("");
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    if (
-      email.current.value === "trustautosolution@gmail.com" &&
-      password.current.value === "trust@#Auto5033"
-  ) {
-      Cookies.set("tas-auth", "51RSM78du77QnlJy86LgWSEUpVM", { expires: 7 });
-      navigate("/dashboard");
-      toast.success("Login Successfully");
-    } else {
-      toast.error("Invalid Email &  Password");
+    try {
+      const res = await tenantLogin(data).unwrap();
+
+      
+      if (res.success) {
+        const accessToken = res?.data?.accessToken;
+        const user = res?.data?.user;
+
+        Cookies.set("token", accessToken, { expires: 7 });
+
+        try {
+          localStorage.setItem("user", JSON.stringify(user));
+        } catch (e) {
+          console.error("Failed to save user to localStorage:", e);
+        }
+
+        toast.success(res.message || "Login successful!");
+
+        const tenantKey = user?.tenantDomain || data.tenantDomain;
+        const isLocalhost = window.location.hostname.includes("localhost");
+
+        let redirectURL;
+
+        if (tenantKey === "superadmin") {
+          redirectURL = isLocalhost
+            ? "http://localhost:5173/dashboard"
+            : "https://garage.trustautosolution.com/dashboard/all-tenant-list"
+        } else {
+          if (isLocalhost) {
+            redirectURL = `http://localhost:5173/dashboard`;
+          } else {
+            // redirect to the tenant's custom domain
+            redirectURL = `https://${tenantKey}/dashboard`;
+          }
+        }
+
+        setTimeout(() => {
+          window.location.href = redirectURL;
+        }, 100);
+      } else {
+        toast.error(res.message || "Invalid username or password!");
+      }
+    } catch (err) {
+      toast.error(err?.data?.message || "Login failed. Please try again.");
+      setError("Invalid username or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRowClick = (emailValue, passwordValue) => {
-    email.current.value = emailValue;
-    password.current.value = passwordValue;
-    handleLogin({
-      preventDefault: () => {},
-    });
-  };
-
   return (
-    <div className="loginWrap">
-      <div
-        className="py-5  min-h-screen flex items-center 
-      "
-      >
-        <div className="loginFormWraps">
-          <h2 className="text-lg sm:text-2xl md:text-4xl capitalize mb-8 font-bold text-white text-center">
-            Welcome to T.A.S !
-          </h2>
-          <div className="signUnWrap">
-            <form onSubmit={handleLogin}>
-              <div className="signupFormWrap">
-                <div className="singleSignupForm">
-                  <label>Email </label>
-                  <input
-                    ref={email}
-                    name="email"
-                    placeholder="Email"
-                    type="email"
-                    className="inputFiel"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="singleSignupForm passwordWrap">
-                  <label>Password</label>
-                  <input
-                    ref={password}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    className="inputFiel"
-                    autoComplete="off"
-                  />
-                  <div onClick={handleShowPassword} className="showIconWrap">
-                    {showPassword ? (
-                      <FaEye className="showPassIcon" />
-                    ) : (
-                      <FaEyeSlash className="showPassIcon" />
-                    )}
-                  </div>
-                </div>
-                <div className="singleSignupForm">
-                  <button type="submit">Login</button>
-                </div>
-              </div>
-            </form>
-            <table className="loginTable mt-3 hidden ">
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Password</th>
-                  <th>Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  onClick={() => handleRowClick("trust@gmail.com", "trust123")}
-                >
-                  <td>
-                    <span>trustautosolution@gmail.com</span>
-                  </td>
-                  <td>
-                    <span>trust@#Auto33</span>
-                  </td>
-                  <td>
-                    <span>Admin</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to your account to continue"
+    >
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      <GarageForm onSubmit={handleSubmit}>
+        <TASInput
+          name="name"
+          label="User Name"
+          placeholder="User Name"
+          required
+          icon={Person}
+          iconPosition="start"
+        />
+        <TASInput
+          name="tenantDomain"
+          label="Domain"
+          required
+          icon={Person}
+          iconPosition="start"
+        />
+        <TASInput
+          name="password"
+          label="User password"
+          placeholder="User password"
+          required
+          icon={Lock}
+          iconPosition="start"
+        />
+
+        <Box sx={{ textAlign: "right", mt: 1 }}>
+          <Link component={RouterLink} to="/forgot-password" variant="body2">
+            Forgot password?
+          </Link>
+        </Box>
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          sx={{ mt: 3, mb: 2 }}
+          disabled={loading}
+        >
+          {loading ? "Signing in..." : "Sign In"}
+        </Button>
+
+        <Divider sx={{ my: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            OR
+          </Typography>
+        </Divider>
+
+        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<Google />}
+            sx={{ py: 1 }}
+          >
+            Google
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<Facebook />}
+            sx={{ py: 1 }}
+          >
+            Facebook
+          </Button>
+        </Box>
+
+        <Box sx={{ textAlign: "center", mt: 2 }}>
+          <Typography variant="body2">
+            Don't have an account?{" "}
+            <Link component={RouterLink} to="/create-tenant" variant="body2">
+              Sign up
+            </Link>
+          </Typography>
+        </Box>
+
+        <Box sx={{ textAlign: "center", mt: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            Want to create a new tenant?{" "}
+            <Link component={RouterLink} to="/create-tenant" variant="body2">
+              Register your business
+            </Link>
+          </Typography>
+        </Box>
+      </GarageForm>
+    </AuthLayout>
   );
 };
 

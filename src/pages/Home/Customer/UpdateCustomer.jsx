@@ -23,6 +23,7 @@ import {
   useUpdateCustomerMutation,
 } from "../../../redux/api/customerApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateCustomer = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
@@ -43,8 +44,6 @@ const UpdateCustomer = () => {
       (vehicle) => vehicle.label === newValue
     );
     setFilteredVehicles(filtered);
-
-    // Update vehicle brand while preserving other data
     if (newValue) {
       setGetDataWithChassisNo((prev) => ({
         ...prev,
@@ -71,14 +70,13 @@ const UpdateCustomer = () => {
     setYearSelectInput(option.label);
     setFilteredOptions([]);
   };
-
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCustomerQuery({ tenantDomain: domain, id });
+  } = useGetSingleCustomerQuery({ tenantDomain, id });
 
   const [updateCustomer, { isLoading: updateLoading, error }] =
     useUpdateCustomerMutation();
@@ -181,17 +179,8 @@ const UpdateCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
 
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
 
-      return host.split(".")[0];
-    };
-
-    const tenantDomain = getTenantName();
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -321,7 +310,7 @@ const UpdateCustomer = () => {
   }
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-10 ">
         <div className="productHeadWrap">
           <Button
             onClick={handleBack}
@@ -331,7 +320,7 @@ const UpdateCustomer = () => {
             Back
           </Button>
           <div className="flex flex-wrap items-center justify-center">
-            <HiOutlineUserGroup className="invoicIcon" />
+     
             <h3 className="text-sm font-bold md:text-2xl">Update Customer </h3>
           </div>
           <div className="productHome">
@@ -344,7 +333,7 @@ const UpdateCustomer = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-10 ">
               <Box>
-                <h3 className="mb-1 text-xl font-bold">
+                <h3 className="my-3  text-xl font-bold">
                   Customer Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -513,7 +502,7 @@ const UpdateCustomer = () => {
                 </Grid>
               </Box>
               <Box>
-                <h3 className="mb-2 text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3  text-xl font-bold">Vehicle Information </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

@@ -12,20 +12,24 @@ import { useReactToPrint } from "react-to-print";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const ViewEmployeeAttendance = () => {
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [filterDate, setFilterDate] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const printRef = useRef(null);
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading } = useGetAllAttendancesQuery({
+    tenantDomain, 
     limit: 10,
     page: 1,
   });
 
   const { data: employeeData, isLoading: employeeLoading } =
     useGetAllEmployeesQuery({
+      tenantDomain, 
       limit: 10,
       page: 1,
     });
@@ -39,7 +43,6 @@ const ViewEmployeeAttendance = () => {
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: "Employee Attendance Report",
-    onAfterPrint: () => console.log("Print completed"),
   });
 
   // Prepare data for CSV and PDF

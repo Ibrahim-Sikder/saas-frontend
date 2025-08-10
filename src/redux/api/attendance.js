@@ -10,40 +10,44 @@ const attendanceApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["attendance", "employee"],
     }),
+
     getTodayAttendance: builder.query({
-      query: () => ({
+      query: ({ tenantDomain }) => ({
         url: `/attendances/today`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["attendance"],
     }),
     getAllAttendances: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/attendances`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["attendance"],
     }),
 
-    
     getSingleAttendance: builder.query({
-      query: (date) => ({
+      query: ({ tenantDomain, date }) => ({
         url: `/attendances/${date}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["attendance"],
     }),
 
-    
-    deleteAttendance: builder.mutation({
-      query: (attendanceInfo) => ({
-        url: "/attendances/remove",
-        method: "PUT",
-        body: attendanceInfo,
-      }),
-      invalidatesTags: ["attendance"],
-    }),
+ deleteAttendance: builder.mutation({
+  query: ({ tenantDomain, date }) => ({
+    url: "/attendances/remove",
+    method: "DELETE",
+    params: { tenantDomain, date },
+  }),
+  invalidatesTags: ["attendance"],
+}),
+
+
+
   }),
 });
 
@@ -52,5 +56,5 @@ export const {
   useGetTodayAttendanceQuery,
   useGetAllAttendancesQuery,
   useGetSingleAttendanceQuery,
-  useDeleteAttendanceMutation
+  useDeleteAttendanceMutation,
 } = attendanceApi;

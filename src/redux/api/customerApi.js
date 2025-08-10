@@ -13,6 +13,7 @@ const customerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["customer"],
     }),
+    
     getAllCustomers: builder.query({
       query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/customers`,
@@ -47,7 +48,7 @@ const customerApi = baseApi.injectEndpoints({
     }),
     permanantlyDeleteCustomer: builder.mutation({
       query: ({ tenantDomain, id }) => ({
-        url: `/customers/${id}`,
+        url: `/customers/delete-permanantly/${id}`,
         method: "DELETE",
           params: {
           tenantDomain,
@@ -55,6 +56,7 @@ const customerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["customer"],
     }),
+    
     moveRecycledCustomer: builder.mutation({
       query: ({ tenantDomain, id }) => ({
         url: `/customers/recycle/${id}`,

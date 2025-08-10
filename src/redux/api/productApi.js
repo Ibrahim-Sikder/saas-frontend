@@ -12,17 +12,24 @@ const productApi = baseApi.injectEndpoints({
     }),
 
     getAllIProduct: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
-        url: `/products`,
+      query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
+        url: "/products",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { limit, page, searchTerm, isRecycled }, 
+        headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
+
       providesTags: ["products"],
     }),
     getSingleProduct: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/products/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["products"],
     }),
@@ -36,9 +43,12 @@ const productApi = baseApi.injectEndpoints({
     }),
 
     deleteProduct: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/products/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["products"],
     }),

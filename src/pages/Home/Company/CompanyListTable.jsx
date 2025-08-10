@@ -14,6 +14,7 @@ import {
 } from "../../../redux/api/companyApi";
 import EmptyData from "../../../components/EmptyData/EmptyData";
 import { mileageStyle } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const CompanyListTable = () => {
   const textInputRef = useRef(null);
@@ -27,10 +28,11 @@ const CompanyListTable = () => {
   };
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+   const tenantDomain = useTenantDomain();
+
   const { data: companyData, isLoading: companyLoading } =
     useGetAllCompaniesQuery({
-      tenantDomain:domain, 
+      tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -52,7 +54,7 @@ const handleMoveToRecycled = async (id) => {
 
   if (willDelete) {
     try {
-      await moveRecycledCompany({ tenantDomain: domain, id }).unwrap(); 
+      await moveRecycledCompany({ tenantDomain, id }).unwrap(); 
       swal(
         "Moved to Recycle Bin!",
         "Company successfully moved to the recycle bin.",

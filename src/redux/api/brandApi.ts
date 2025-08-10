@@ -12,18 +12,24 @@ const brandApi = baseApi.injectEndpoints({
     }),
 
     getAllIBrand: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({tenantDomain, limit, page, searchTerm }) => ({
         url: `/brand`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: {limit, page, searchTerm },
+        headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
       providesTags: ["brand"],
     }),
 
     getSingleBrand: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/brand/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["brand"],
     }),
@@ -38,9 +44,12 @@ const brandApi = baseApi.injectEndpoints({
     
 
     deleteBrand: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/brand/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["brand"],
     }),

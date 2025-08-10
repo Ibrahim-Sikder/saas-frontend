@@ -6,10 +6,12 @@ import {
   Avatar,
   Badge,
   Box,
+  Breadcrumbs,
   Button,
   Card,
   CardHeader,
   Chip,
+  DialogTitle,
   Divider,
   IconButton,
   LinearProgress,
@@ -25,6 +27,10 @@ import {
   Typography,
 } from "@mui/material";
 import { StyledTab } from ".";
+import { DataGrid } from "@mui/x-data-grid";
+import TASRightSideModal from "../components/Share/Modal/Modal";
+import GarageForm from "../components/form/Form";
+import { CalendarMonth } from "@mui/icons-material";
 
 export const tabStyles = {
   width: 115,
@@ -42,6 +48,91 @@ export const tabStyles = {
     color: "#fff",
   },
 };
+
+export const GradientBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
+  padding: theme.spacing(1.5, 2),
+  borderRadius: theme.shape.borderRadius,
+  background: `linear-gradient(90deg, ${alpha(
+    theme.palette.primary.main,
+    0.12
+  )}, ${alpha(theme.palette.background.default, 0.05)})`,
+  backdropFilter: "blur(8px)",
+  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.08)}`,
+}));
+
+export const StyledTableHead = styled(TableHead)(({ theme }) => ({
+  "& .MuiTableCell-head": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+    color: theme.palette.primary.main,
+    fontWeight: 600,
+    borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+  },
+}));
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: alpha(theme.palette.background.paper, 0.5),
+  },
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+    transition: "background-color 0.2s ease",
+  },
+  "&.expired": {
+    backgroundColor: alpha(theme.palette.error.light, 0.05),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.error.light, 0.1),
+    },
+  },
+  "&.expiring-soon": {
+    backgroundColor: alpha(theme.palette.warning.light, 0.05),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.warning.light, 0.1),
+    },
+  },
+  transition: "transform 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: `0 4px 8px ${alpha(theme.palette.text.primary, 0.1)}`,
+  },
+}));
+
+export const GradientButton = styled(Button)(
+  ({ theme, color = "primary" }) => ({
+    background: `linear-gradient(45deg, ${theme.palette[color].main}, ${theme.palette[color].dark})`,
+    boxShadow: `0 4px 10px ${alpha(theme.palette[color].main, 0.3)}`,
+    transition: "all 0.3s",
+    "&:hover": {
+      boxShadow: `0 6px 15px ${alpha(theme.palette[color].main, 0.4)}`,
+      transform: "translateY(-2px)",
+    },
+  })
+);
+
+export const AnimatedChip = styled(Chip)(({ theme }) => ({
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "scale(1.05)",
+  },
+}));
+
+export const GlassCard = styled(Card)(({ theme }) => ({
+  background: alpha(theme.palette.background.paper, 0.7),
+  backdropFilter: "blur(10px)",
+  borderRadius: theme.shape.borderRadius * 2,
+  boxShadow: `0 8px 32px ${alpha(theme.palette.text.primary, 0.1)}`,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    boxShadow: `0 12px 48px ${alpha(theme.palette.primary.main, 0.12)}`,
+    transform: "translateY(-5px)",
+  },
+}));
+
+export const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  background: `linear-gradient(45deg, ${theme.palette.error.dark}, ${theme.palette.error.main})`,
+  color: theme.palette.common.white,
+  padding: theme.spacing(2),
+}));
 export const tabsStyles = {
   "& .MuiTabs-indicator": {
     display: "none", // Hides the underline indicator
@@ -80,22 +171,8 @@ export const backBtnStyle = {
     xs: "30px",
     md: "auto",
   },
-  borderRadius:5
+  borderRadius: 5,
 };
-
-export const GlassCard = styled(Paper)(({ theme }) => ({
-  background: alpha(theme.palette.background.paper, 0.8),
-  backdropFilter: "blur(10px)",
-  borderRadius: 16,
-  padding: theme.spacing(2),
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-  border: "1px solid rgba(255, 255, 255, 0.18)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-  "&:hover": {
-    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)",
-    transform: "translateY(-5px)",
-  },
-}));
 
 export const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   borderRadius: 12,
@@ -172,26 +249,6 @@ export const SearchTextField = styled(TextField)(({ theme }) => ({
     },
   },
 }));
-
-export const GradientButton = styled(Button)(({ theme, color = "primary" }) => {
-  const mainColor = theme.palette[color].main;
-  const lightColor = theme.palette[color].light;
-
-  return {
-    background: `linear-gradient(45deg, ${mainColor} 30%, ${lightColor} 90%)`,
-    borderRadius: 20,
-    border: 0,
-    color: "white",
-    // px: { xs: "0px", md: "8px" },
-    // py: { xs: "4px", md: "16px" },
-    padding: "8px 16px",
-    boxShadow: `0 3px 5px 2px ${alpha(mainColor, 0.3)}`,
-    transition: "transform 0.2s ease",
-    "&:hover": {
-      transform: "scale(1.05)",
-    },
-  };
-});
 
 export const SupplierAvatar = styled(Avatar)(({ theme }) => ({
   width: 40,
@@ -673,27 +730,9 @@ export const GradientCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-// const GradientButton = styled(Button)(({ theme, color = "primary" }) => ({
-//   background: `linear-gradient(45deg, ${theme.palette[color].main}, ${theme.palette[color].dark})`,
-//   color: theme.palette.common.white,
-//   fontWeight: 600,
-//   borderRadius: 8,
-//   padding: "10px 24px",
-//   boxShadow: `0 4px 14px ${alpha(theme.palette[color].main, 0.4)}`,
-//   transition: "all 0.3s",
-//   "&:hover": {
-//     boxShadow: `0 6px 20px ${alpha(theme.palette[color].main, 0.6)}`,
-//     transform: "translateY(-2px)",
-//   },
-//   "&:disabled": {
-//     background: theme.palette.action.disabledBackground,
-//     boxShadow: "none",
-//   },
-// }))
-
 export const AnimatedAvatar = styled(Avatar)(({ theme }) => ({
-  width: {xs:0, md:140},
-  height: {xs:0, md:140},
+  width: { xs: 0, md: 140 },
+  height: { xs: 0, md: 140 },
   backgroundColor: alpha(theme.palette.primary.main, 0.1),
   color: theme.palette.primary.main,
   boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
@@ -701,37 +740,6 @@ export const AnimatedAvatar = styled(Avatar)(({ theme }) => ({
   "&:hover": {
     transform: "scale(1.1)",
     boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
-  },
-}));
-
-export const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  "& .MuiTableCell-head": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.08),
-    color: theme.palette.primary.main,
-    fontWeight: 600,
-    borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-  },
-}));
-
-export const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: alpha(theme.palette.background.paper, 0.5),
-  },
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.05),
-    transition: "background-color 0.2s ease",
-  },
-  transition: "transform 0.2s ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 4px 8px ${alpha(theme.palette.text.primary, 0.1)}`,
-  },
-}));
-
-export const AnimatedChip = styled(Chip)(({ theme }) => ({
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "scale(1.05)",
   },
 }));
 
@@ -828,8 +836,6 @@ export const addButtonStyle = {
   padding: 0,
   color: "#fff",
   borderRadius: "12px",
-
-  
 };
 
 export const AnimatedTab = styled(StyledTab)(({ theme }) => ({
@@ -847,7 +853,7 @@ export const AnimatedTab = styled(StyledTab)(({ theme }) => ({
     color: theme.palette.primary.main,
     transform: "translateY(-3px)",
   },
-}))
+}));
 
 export const EnhancedStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepLabel-root": {
@@ -869,7 +875,7 @@ export const EnhancedStepper = styled(Stepper)(({ theme }) => ({
   "& .MuiStepConnector-line": {
     borderColor: alpha(theme.palette.primary.main, 0.2),
   },
-}))
+}));
 
 export const ProgressIndicator = styled(LinearProgress)(({ theme }) => ({
   height: 6,
@@ -880,14 +886,14 @@ export const ProgressIndicator = styled(LinearProgress)(({ theme }) => ({
     borderRadius: 3,
     background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
   },
-}))
+}));
 
 export const EnhancedDivider = styled(Divider)(({ theme }) => ({
   "&::before, &::after": {
     borderColor: alpha(theme.palette.primary.main, 0.2),
   },
   margin: theme.spacing(4, 0),
-}))
+}));
 
 export const FormSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -900,7 +906,7 @@ export const FormSection = styled(Box)(({ theme }) => ({
     boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
     backgroundColor: alpha(theme.palette.background.paper, 0.8),
   },
-}))
+}));
 
 export const EnhancedSectionTitle = styled(SectionTitle)(({ theme }) => ({
   position: "relative",
@@ -916,7 +922,7 @@ export const EnhancedSectionTitle = styled(SectionTitle)(({ theme }) => ({
   },
   marginBottom: theme.spacing(3),
   paddingBottom: theme.spacing(1),
-}))
+}));
 
 export const suggestionStyles = {
   suggestionContainer: {
@@ -957,3 +963,401 @@ export const suggestionStyles = {
     color: "#42A1DA",
   },
 };
+export const ResponsiveCalendarContainer = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  "& .MuiCalendarPicker-root, & .MuiPickersCalendarHeader-root, & .MuiDayPicker-header, & .MuiDayPicker-monthContainer":
+    {
+      width: "100%",
+      maxWidth: "100%",
+    },
+  "& .MuiPickersDay-root": {
+    margin: "1px",
+    [theme.breakpoints.down("sm")]: {
+      margin: "0px",
+      fontSize: "0.75rem",
+      padding: "0px",
+      height: "32px",
+      width: "32px",
+    },
+  },
+  "& .MuiPickersCalendarHeader-label": {
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "0.9rem",
+    },
+  },
+  "& .MuiPickersCalendarHeader-switchViewButton, & .MuiPickersArrowSwitcher-button":
+    {
+      [theme.breakpoints.down("sm")]: {
+        padding: "4px",
+      },
+    },
+  "& .MuiDayPicker-weekDayLabel": {
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "0.75rem",
+      width: "32px",
+      height: "24px",
+    },
+  },
+}));
+
+export const StyledPaper = styled(Paper)(({ theme }) => ({
+  borderRadius: 20,
+  overflow: "hidden",
+  position: "relative",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-5px)",
+    boxShadow: "0 20px 30px rgba(0,0,0,0.1)",
+  },
+}));
+
+export const GlowingBorder = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 4,
+  background: "linear-gradient(90deg, #42A1DA, #F77F00, #42A1DA)",
+  backgroundSize: "200% 100%",
+  animation: "glow 3s linear infinite",
+}));
+
+export const IconWrapper = styled(Box)(({ theme }) => ({
+  width: 60,
+  height: 60,
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: theme.spacing(2),
+}));
+
+export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  border: "none",
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: "#42A1DA",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: "14px",
+    padding: "16px",
+  },
+  "& .MuiDataGrid-cell": {
+    padding: "16px",
+    fontSize: "14px",
+  },
+  "& .MuiDataGrid-row:nth-of-type(even)": {
+    backgroundColor: "#f9f9f9",
+  },
+  "& .MuiDataGrid-row:hover": {
+    backgroundColor: "rgba(66, 161, 218, 0.08)",
+  },
+  "& .MuiDataGrid-footerContainer": {
+    display: "none",
+  },
+}));
+
+export const ActionButton = styled(Button)(({ theme, color }) => ({
+  borderRadius: "8px",
+  textTransform: "none",
+  fontWeight: "600",
+  boxShadow: "none",
+  padding: "6px 12px",
+}));
+
+export const StyledModal = styled(TASRightSideModal)(({ theme }) => ({
+  "& .MuiPaper-root": {
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    borderRadius: "8px 0 0 8px",
+  },
+}));
+
+export const StyledForm = styled(GarageForm)(({ theme }) => ({
+  "& .MuiGrid-item": {
+    marginBottom: theme.spacing(2),
+  },
+}));
+
+export const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
+export const GlowingBadge = styled(Box)(({ theme }) => ({
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    background: "linear-gradient(45deg, #ff00ea, #00fffb)",
+    zIndex: -1,
+    filter: "blur(5px)",
+    borderRadius: "50%",
+    animation: "glowing 1.5s linear infinite",
+  },
+  "@keyframes glowing": {
+    "0%": { opacity: 0.5 },
+    "50%": { opacity: 1 },
+    "100%": { opacity: 0.5 },
+  },
+}));
+
+export const StatusCard = styled(Card)(({ theme, status }) => ({
+  borderRadius: "16px",
+  marginBottom: theme.spacing(2),
+  background:
+    status === "active"
+      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
+      : status === "expired"
+      ? "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)"
+      : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
+  color: "white",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+}));
+
+export const PaymentStatusCard = styled(Card)(({ theme, ispaid }) => ({
+  background:
+    ispaid === "true"
+      ? "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)"
+      : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
+  color: "white",
+  borderRadius: "16px",
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+  animation: ispaid === "false" ? "pulse 2s infinite" : "none",
+  "@keyframes pulse": {
+    "0%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
+    "50%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.4)",
+    },
+    "100%": {
+      boxShadow: "0 8px 32px rgba(244, 67, 54, 0.2)",
+    },
+  },
+}));
+
+export const GradientBorder = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 4,
+  background: "linear-gradient(90deg, #42A1DA, #F77F00, #42A1DA)",
+  backgroundSize: "200% 100%",
+  animation: "gradientMove 5s ease infinite",
+}));
+
+export const StyledCalendar = styled(CalendarMonth)(({ theme }) => ({
+  "& .rbc-today": {
+    backgroundColor: theme.palette.primary.light,
+  },
+  "& .rbc-event": {
+    backgroundColor: theme.palette.secondary.main,
+  },
+  "& .rbc-header": {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+  },
+}));
+
+export const StyledChip = styled(Chip)(({ theme }) => ({
+  borderRadius: 4,
+  fontWeight: "bold",
+  "&.in-stock": {
+    backgroundColor: alpha(theme.palette.success.main, 0.1),
+    color: theme.palette.success.dark,
+  },
+  "&.low-stock": {
+    backgroundColor: alpha(theme.palette.warning.main, 0.1),
+    color: theme.palette.warning.dark,
+  },
+  "&.out-of-stock": {
+    backgroundColor: alpha(theme.palette.error.main, 0.1),
+    color: theme.palette.error.dark,
+  },
+}));
+
+export const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  },
+}));
+
+export const btnStyle = {
+  background: "rgba(255, 255, 255, 0.9)",
+  color: "#0B1F3A",
+  fontWeight: 600,
+  fontSize: {
+    xs: "13px",
+    sm: "15px",
+  },
+  width: "70%",
+  padding: "0px",
+  margin: "0 auto",
+  borderRadius: "12px",
+  border: "1px solid rgba(0,0,0,0.1)",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  textTransform: "none",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    backgroundColor: "#fff",
+    color: "#42A1DA",
+    borderColor: "#42A1DA",
+    transform: "scale(1.02)",
+  },
+};
+export const btnStyle2 = {
+  background: "#fff",
+  width: "125px",
+  padding: "0px",
+  height: "35px",
+  "&:hover": {
+    backgroundColor: "#fff",
+    color: "#42A1DA",
+    border: "1px solid #42A1DA",
+  },
+};
+export const labelStyle = {
+  color: "red",
+  fontSize: "25px",
+};
+
+export const wareHouseInput = {
+  mb: 2,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 2,
+    backgroundColor: "white",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
+    transition: "box-shadow 0.3s ease",
+    "&:hover": {
+      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+    },
+    "&.Mui-focused": {
+      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+    },
+  },
+};
+
+export const wareHouseButton = {
+  borderRadius: 2,
+  py: 1,
+  px: 3,
+  color: "#fff",
+  boxShadow: `0 4px 14px ${alpha("#006a4e", 0.4)}`,
+  background: `linear-gradient(45deg, #006a4e 30%, #00a651 90%)`,
+  transition: "transform 0.2s",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: `0 6px 20px ${alpha("#006a4e", 0.6)}`,
+  },
+};
+export const wareHouseCard = {
+  height: "100%",
+  background: "linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)",
+  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+  "&:hover": {
+    transform: "translateY(-5px)",
+    boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)",
+  },
+  borderRadius: 3,
+};
+
+export const NoteHeader = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  color: theme.palette.text.primary,
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+}));
+
+export const NoteDate = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontSize: "0.75rem",
+  marginTop: "4px",
+}));
+
+export const PriorityTag = styled("span")(({ priority, theme }) => ({
+  display: "inline-block",
+  padding: "4px 10px",
+  borderRadius: "20px",
+  fontSize: "0.7rem",
+  fontWeight: "600",
+  marginLeft: "auto",
+  backgroundColor:
+    priority === "high"
+      ? theme.palette.error.light
+      : priority === "medium"
+      ? theme.palette.warning.light
+      : theme.palette.success.light,
+  color:
+    priority === "high"
+      ? theme.palette.error.contrastText
+      : priority === "medium"
+      ? theme.palette.warning.contrastText
+      : theme.palette.success.contrastText,
+}));
+
+export const inputStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 3,
+    background: alpha("#ffffff", 0.05),
+    "& fieldset": {
+      borderColor: alpha("#06b6d4", 0.3),
+    },
+    "&:hover fieldset": {
+      borderColor: alpha("#06b6d4", 0.5),
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#06b6d4",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: alpha("#ffffff", 0.7),
+  },
+  "& .MuiOutlinedInput-input": {
+    color: "#ffffff",
+  },
+};
+
+export const buttonStyle = {
+  background: "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
+  py: 3,
+  fontSize: "1.1rem",
+  fontWeight: 700,
+  borderRadius: 3,
+  boxShadow: `0 15px 40px ${alpha("#06b6d4", 0.4)}`,
+  "&:hover": {
+    background: "linear-gradient(45deg, #ff006e, #8338ec, #3a86ff)",
+    boxShadow: `0 20px 50px ${alpha("#06b6d4", 0.5)}`,
+  },
+};
+  export const expenseInputStyle = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#3b82f6",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#3b82f6",
+        borderWidth: 2,
+      },
+    },
+  };

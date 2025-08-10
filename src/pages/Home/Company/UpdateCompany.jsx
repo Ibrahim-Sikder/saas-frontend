@@ -23,6 +23,7 @@ import {
   useUpdateCompanyMutation,
 } from "../../../redux/api/companyApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateCompany = () => {
   const [filteredVehicles, setFilteredVehicles] = useState([]);
@@ -43,7 +44,7 @@ const UpdateCompany = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const handleBrandChange = (event, newValue) => {
     const filtered = vehicleName.filter(
@@ -54,8 +55,7 @@ const UpdateCompany = () => {
 
 
   const handleYearSelectInput = (event) => {
-    const value = event.target.value;
-    // Check if the input is a number and does not exceed 4 digits
+    const value = event.target.value
     if (/^\d{0,4}$/.test(value)) {
       setYearSelectInput(value);
       const filtered = vehicleModels?.filter((option) =>
@@ -113,7 +113,7 @@ const UpdateCompany = () => {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCompanyQuery({ tenantDomain: domain, id });
+  } = useGetSingleCompanyQuery({ tenantDomain, id });
 
   const [updateCompany] =
     useUpdateCompanyMutation();
@@ -177,16 +177,6 @@ const UpdateCompany = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Company...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
-
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-    const tenantDomain = getTenantName();
     const company = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -290,7 +280,7 @@ const UpdateCompany = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-8">
         <div className="productHeadWrap">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -300,7 +290,6 @@ const UpdateCompany = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <h3 className="text-sm font-bold md:text-2xl"> Update Company </h3>
           <div className="productHome">
@@ -313,7 +302,7 @@ const UpdateCompany = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
               <Box>
-                <h3 className=" text-xl font-bold mb-3">
+                <h3 className=" text-xl font-bold my-3 ">
                   Company Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -478,7 +467,7 @@ const UpdateCompany = () => {
               </Box>
 
               <Box>
-                <h3 className=" text-xl font-bold mb-3">
+                <h3 className=" text-xl font-bold my-3 ">
                   Vehicle Information{" "}
                 </h3>
                 <Grid container spacing={2}>

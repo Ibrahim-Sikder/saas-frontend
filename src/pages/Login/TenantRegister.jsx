@@ -357,7 +357,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
             </svg>
           </Box>
           <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
-            GarageERP Pro
+            Garage Master
           </Typography>
           <Typography variant="h6" sx={{ mb: 6, textAlign: "center" }}>
             The complete solution for your garage business management

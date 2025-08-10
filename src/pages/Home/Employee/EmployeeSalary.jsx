@@ -6,6 +6,7 @@ import { useGetAllSalaryQuery } from "../../../redux/api/salary";
 import EmployeeSalaryForm from "./EmployeeSalaryForm";
 import EmployeeSalaryListTable from "./EmployeeSalaryListTable";
 import { allMonths } from "../../../utils/month";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 // Constants
 const years = [{ value: "Select Year", label: "Select Year" }];
@@ -16,6 +17,7 @@ for (let year = 2024; year <= 2030; year++) {
 const initialSelectedOption = allMonths[new Date().getMonth()];
 
 const EmployeeSalary = () => {
+    const tenantDomain = useTenantDomain();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
   const limit = 100;
@@ -29,8 +31,9 @@ const EmployeeSalary = () => {
   });
   return (
     <>
-      <EmployeeSalaryForm />
+      <EmployeeSalaryForm tenantDomain={tenantDomain}/>
       <EmployeeSalaryListTable
+      tenantDomain={tenantDomain}
         filterType={filterType}
         setFilterType={setFilterType}
         getAllSalary={getAllSalary}

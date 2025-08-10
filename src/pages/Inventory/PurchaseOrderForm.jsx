@@ -61,7 +61,6 @@ import {
 import TASInput from "../../components/form/Input";
 import TASSelect from "../../components/form/Select";
 import TASAutocomplete from "../../components/form/Autocomplete";
-import { productCategory } from "../../constant";
 import { useGetAllIProductQuery } from "../../redux/api/productApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -79,10 +78,8 @@ import ImageUpload from "../../components/form/ImageUpload";
 import { useGetAllWarehousesQuery } from "../../redux/api/warehouseApi";
 const MotionCard = motion(Card);
 
-const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
+const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
-  const [params, setParams] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productFields, setProductFields] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -107,7 +104,6 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
     paymentStatus: "Unpaid",
     note: "",
   });
-  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const [createPurchaseOrder, { isLoading: isSubmitting }] =
     useCreatePurchaseOrderMutation();
@@ -117,24 +113,31 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
     data: productsData,
     isLoading: productsLoading,
     isFetching: productsFetching,
-  } = useGetAllIProductQuery([...params]);
+  } = useGetAllIProductQuery({
+    tenantDomain,
+    limit: 100,
+    page: 1,
+    searchTerm: "",
+  });
 
   const { data: supplierData } = useGetAllSuppliersQuery({
+    tenantDomain,
     limit: 1000000,
     page: 1,
     searchTerm: "",
   });
   const { data: warehouseData } = useGetAllWarehousesQuery({
+    tenantDomain,
     limit: 1000000,
     page: 1,
     searchTerm: "",
   });
-  const id = new URLSearchParams(location.search).get("id");
 
-  const { data: singlePurchase, isLoading } =
-    useGetSinglePurchaseOrderQuery(orderId);
-  console.log("single purchase", singlePurchase);
-  // Prepare supplier options
+  const { data: singlePurchase, isLoading } = useGetSinglePurchaseOrderQuery({
+    tenantDomain,
+    id: orderId,
+  });
+
   const suppliersOptions = useMemo(() => {
     if (!supplierData?.data?.suppliers) return [];
     return supplierData.data.suppliers.map((supplier) => ({
@@ -150,8 +153,6 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
       value: war._id,
     }));
   }, [warehouseData?.data?.warehouses]);
-
-  // Prepare product options
   const productOptions = useMemo(() => {
     if (!productsData?.data?.products) return [];
     return productsData.data.products.map((product) => ({
@@ -160,8 +161,6 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
       product,
     }));
   }, [productsData?.data?.products]);
-
-  // Calculate totals whenever product fields change
   useEffect(() => {
     const newTotalAmount = productFields.reduce(
       (acc, item) => acc + item.unit_price * item.product_quantity,
@@ -192,7 +191,6 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
 
   const handleProductSearch = (value) => {
     setSearchTerm(value);
-    setParams([{ name: "searchTerm", value }]);
   };
 
   const handleAddProduct = (product) => {
@@ -423,13 +421,17 @@ const PurchaseOrderForm = ({ open, onClose, onSave, orderId }) => {
         const res = await updatePurchase({
           id: orderId,
           ...modifyData,
+          tenantDomain,
         }).unwrap();
         if (res.success) {
           toast.success("Purchase updated successfully!");
           onClose();
         }
       } else {
-        const res = await createPurchaseOrder(modifyData).unwrap();
+        const res = await createPurchaseOrder({
+          tenantDomain,
+          ...modifyData,
+        }).unwrap();
         if (res.success) {
           toast.success("Purchase order successfully!");
           onClose();

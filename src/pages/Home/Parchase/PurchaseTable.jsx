@@ -65,16 +65,16 @@ const rows = [
 export default function PurchaseTable() {
   const [rowData, setRowData] = useState(rows);
   const [open, setOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null); // For holding the selected product data
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleOpen = (product) => {
-    setSelectedProduct(product); // Set the selected product
-    setOpen(true); // Open the modal
+    setSelectedProduct(product); 
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setSelectedProduct(null); // Clear the selected product
-    setOpen(false); // Close the modal
+    setSelectedProduct(null);
+    setOpen(false); 
   };
 
   const handleQuantityChange = (id, increment) => {

@@ -11,58 +11,61 @@ const employeeApi = baseApi.injectEndpoints({
       invalidatesTags: ["employee"],
     }),
     getAllEmployees: builder.query({
-      query: ({ id, limit, page, searchTerm, isRecycled }) => ({
+      query: ({ tenantDomain, id, limit, page, searchTerm, isRecycled }) => ({
         url: `/employees`,
         method: "GET",
-        params: { id, limit, page, searchTerm, isRecycled },
+        params: { tenantDomain, id, limit, page, searchTerm, isRecycled },
       }),
 
       providesTags: ["employee", "attendance"],
     }),
 
     getSingleEmployee: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employees/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["employee"],
     }),
     updateEmployee: builder.mutation({
-      query: (employeeInfo) => {
-        return {
-          url: `/employees/${employeeInfo.id}`,
-          method: "PUT",
-          body: employeeInfo.data,
-        };
-      },
+      query: ({ id, data }) => ({
+        url: `/employees/${id}`,
+        method: "PUT",
+        body: data,
+      }),
       invalidatesTags: ["employee"],
     }),
 
     deleteEmployee: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employees/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["employee"],
     }),
     permenantlyDeleteEmployee: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employees/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["employee"],
     }),
     moveRecycledEmployee: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employees/recycle/${id}`,
         method: "PATCH",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["employee"],
     }),
     restoreFromRecycledEmployee: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employees/restore/${id}`,
         method: "PATCH",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["employee"],
     }),

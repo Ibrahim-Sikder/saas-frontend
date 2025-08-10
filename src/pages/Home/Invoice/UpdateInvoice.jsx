@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 "use client";
-import logo from "../../../../public/assets/logo.png";
+
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -10,7 +10,6 @@ import {
   Box,
   Button,
   Chip,
-  CircularProgress,
   Grid,
   TextField,
 } from "@mui/material";
@@ -22,29 +21,31 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-
 import {
+  useGetSingleInvoiceQuery,
   useRemoveInvoiceMutation,
   useUpdateInvoiceMutation,
 } from "../../../redux/api/invoice";
 import { unitOptions } from "../../../utils/options";
 import { formatNumber } from "../../../utils/formateSemicolon";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateInvoice = () => {
-  const [specificInvoice, setSpecificInvoice] = useState({});
+  const [specificInvoice, setSpecificInvoice] = useState(null);
   const [value, setValue] = useState(specificInvoice?.vehicle?.carReg_no);
   const [partsTotal, setPartsTotal] = useState(0);
   const [serviceTotal, setServiceTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const tenantDomain = useTenantDomain();
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
   const [discount, setDiscount] = useState("");
   const [vat, setVAT] = useState("");
+  const [tax, setTax] = useState(""); // New state for Tax
   const [advance, setAdvance] = useState("");
-
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-
   const [removeButton, setRemoveButton] = useState("");
   const [reload, setReload] = useState(false);
   const [addButton, setAddButton] = useState(false);
@@ -76,9 +77,14 @@ const UpdateInvoice = () => {
     }
   };
 
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+
   const [items, setItems] = useState([
     { description: "", unit: "", quantity: "", rate: "", total: "" },
   ]);
+
   const [serviceItems, setServiceItems] = useState([
     { description: "", unit: "", quantity: "", rate: "", total: "" },
   ]);
@@ -92,17 +98,25 @@ const UpdateInvoice = () => {
 
   const [updateInvoice, { isLoading: updateLoading, error: updateError }] =
     useUpdateInvoiceMutation();
-
   const [removeInvoice, { isLoading: removeLoading, error: removeError }] =
     useRemoveInvoiceMutation();
 
+  const { data } = useGetSingleInvoiceQuery({ tenantDomain, id });
+
   useEffect(() => {
-    // Don't set selectedDate initially, so we show the div first
-    if (specificInvoice?.date && selectedDate === null) {
-      // Keep selectedDate as null initially
-      // This will make the div show up first
+    if (data?.data) {
+      setSpecificInvoice(data.data);
+      // Initialize discount, vat, tax, and advance from specificInvoice
+      setDiscount(
+        data.data.discount !== undefined ? Number(data.data.discount) : ""
+      );
+      setVAT(data.data.vat !== undefined ? Number(data.data.vat) : "");
+      setTax(data.data.tax !== undefined ? Number(data.data.tax) : ""); // Initialize tax
+      setAdvance(
+        data.data.advance !== undefined ? Number(data.data.advance) : ""
+      );
     }
-  }, [specificInvoice]);
+  }, [data]);
 
   useEffect(() => {
     if (specificInvoice?.date) {
@@ -116,20 +130,17 @@ const UpdateInvoice = () => {
         Id: specificInvoice?.Id,
         job_no: specificInvoice?.job_no,
         company_name: specificInvoice?.customer?.company_name,
-
         customer_name: specificInvoice?.customer?.customer_name,
         customer_country_code: specificInvoice?.customer?.customer_country_code,
         customer_contact: specificInvoice?.customer?.customer_contact,
-
         customer_address: specificInvoice?.customer?.customer_address,
-
         carReg_no: specificInvoice?.vehicle?.carReg_no,
         car_registration_no: specificInvoice?.vehicle?.car_registration_no,
         engine_no: specificInvoice?.vehicle?.engine_no,
         vehicle_brand: specificInvoice?.vehicle?.vehicle_brand,
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
-        mileage: specificInvoice?.vehicle?.mileage,
+        mileage: specificInvoice?.mileage, // Fixed: Use specificInvoice.mileage instead of specificInvoice.vehicle.mileage
       });
     }
     if (specificInvoice?.user_type === "company") {
@@ -143,14 +154,13 @@ const UpdateInvoice = () => {
         company_country_code: specificInvoice?.company?.company_country_code,
         company_email: specificInvoice?.company?.company_email,
         customer_address: specificInvoice?.company?.customer_address,
-
         carReg_no: specificInvoice?.vehicle?.carReg_no,
         car_registration_no: specificInvoice?.vehicle?.car_registration_no,
         engine_no: specificInvoice?.vehicle?.engine_no,
         vehicle_brand: specificInvoice?.vehicle?.vehicle_name,
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
-        mileage: specificInvoice?.vehicle?.mileage,
+        mileage: specificInvoice?.mileage, // Fixed: Use specificInvoice.mileage instead of specificInvoice.vehicle.mileage
       });
     }
     if (specificInvoice?.user_type === "showRoom") {
@@ -164,15 +174,13 @@ const UpdateInvoice = () => {
         company_contact:
           phoneNumber || specificInvoice?.showRoom?.company_contact,
         company_country_code: specificInvoice?.showRoom?.company_country_code,
-
         carReg_no: specificInvoice?.vehicle?.carReg_no,
         car_registration_no: specificInvoice?.vehicle?.car_registration_no,
         engine_no: specificInvoice?.vehicle?.engine_no,
         vehicle_brand: specificInvoice?.vehicle?.vehicle_brand,
         vehicle_name: specificInvoice?.vehicle?.vehicle_name,
         chassis_no: specificInvoice?.vehicle?.chassis_no,
-
-        mileage: specificInvoice?.vehicle?.mileage,
+        mileage: specificInvoice?.mileage, // Fixed: Use specificInvoice.mileage instead of specificInvoice.vehicle.mileage
       });
     }
   }, [
@@ -203,7 +211,7 @@ const UpdateInvoice = () => {
     specificInvoice?.vehicle?.car_registration_no,
     specificInvoice?.vehicle?.chassis_no,
     specificInvoice?.vehicle?.engine_no,
-    specificInvoice?.vehicle?.mileage,
+    specificInvoice?.mileage, // Fixed: Added specificInvoice.mileage to dependencies
     specificInvoice?.vehicle?.vehicle_brand,
     specificInvoice?.vehicle?.vehicle_name,
   ]);
@@ -211,7 +219,6 @@ const UpdateInvoice = () => {
   const handleRemove = (index) => {
     if (!index) {
       const list = [...items];
-
       setItems(list);
     } else {
       const list = [...items];
@@ -223,7 +230,6 @@ const UpdateInvoice = () => {
   const handleServiceDescriptionRemove = (index) => {
     if (!index) {
       const list = [...serviceItems];
-
       setServiceItems(list);
     } else {
       const list = [...serviceItems];
@@ -233,32 +239,15 @@ const UpdateInvoice = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/invoices/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSpecificInvoice(data.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching invoice:", error);
-        setIsLoading(false);
-      });
-  }, [id, reload]);
-
-  useEffect(() => {
-    const totalSum = specificInvoice.input_data?.reduce(
+    const totalSum = specificInvoice?.input_data?.reduce(
       (sum, item) => sum + Number(item.total),
       0
     );
-
     const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0);
-
     const serviceTotalSum = specificInvoice?.service_input_data?.reduce(
       (sum, item) => sum + Number(item.total),
       0
     );
-
     const serviceTotalSum2 = serviceItems.reduce(
       (sum, item) => sum + Number(item.total),
       0
@@ -271,10 +260,10 @@ const UpdateInvoice = () => {
 
     const newGrandTotal = newTotalSum + newTotalSum2;
     const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2;
-
     const totalGrand = Number.parseFloat(
-      newGrandTotal + newServiceGrandTotal
-    ).toFixed(2);
+      (newGrandTotal + newServiceGrandTotal).toFixed(2)
+    );
+
     setPartsTotal(newGrandTotal);
     setServiceTotal(newServiceGrandTotal);
     setGrandTotal(totalGrand);
@@ -293,7 +282,7 @@ const UpdateInvoice = () => {
   };
 
   const handleDescriptionChange = (index, value) => {
-    const newItems = [...specificInvoice.input_data];
+    const newItems = [...(specificInvoice?.input_data || [])];
     newItems[index] = {
       ...newItems[index],
       description: value,
@@ -303,15 +292,15 @@ const UpdateInvoice = () => {
       input_data: newItems,
     }));
   };
+
   const handleDescriptionChange2 = (index, value) => {
     const newItems = [...items];
-
     newItems[index].description = value;
-
     setItems(newItems);
   };
+
   const handleServiceDescriptionChange = (index, value) => {
-    const newItems = [...specificInvoice.service_input_data];
+    const newItems = [...(specificInvoice?.service_input_data || [])];
     newItems[index] = {
       ...newItems[index],
       description: value,
@@ -321,62 +310,104 @@ const UpdateInvoice = () => {
       service_input_data: newItems,
     }));
   };
+
   const handleServiceDescriptionChange2 = (index, value) => {
     const newItems = [...serviceItems];
-
     newItems[index].description = value;
-
     setServiceItems(newItems);
   };
 
   const handleQuantityChange = (index, value) => {
-    if (!isNaN(value)) {
-      const newItems = [...specificInvoice.input_data];
-      const roundedValue = Math.round(value) || 0;
-      newItems[index].quantity = Number(roundedValue);
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-      newItems[index].total = Number(roundedValue) * newItems[index].rate;
-      newItems[index].total = Number(newItems[index].total.toFixed(2));
-      setSpecificInvoice((prevState) => ({
-        ...prevState,
-        input_data: newItems,
-      }));
-    }
+    const newItems = [...(specificInvoice?.input_data || [])];
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0;
+    const rate = Number.parseFloat(newItems[index].rate) || 0;
+    const total = parsedQuantity * rate;
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
+
+    setSpecificInvoice((prevState) => ({
+      ...prevState,
+      input_data: newItems,
+    }));
   };
 
   const handleQuantityChange2 = (index, value) => {
-    const newItems = [...items];
-    const roundedValue = Math.round(value) || 0;
-    newItems[index].quantity = Number(roundedValue);
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    newItems[index].total = Number(roundedValue) * newItems[index].rate;
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const newItems = [...items];
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0;
+    const rate = Number.parseFloat(newItems[index].rate) || 0;
+    const total = parsedQuantity * rate;
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
     setItems(newItems);
   };
-  const handleServiceQuantityChange = (index, value) => {
-    if (!isNaN(value)) {
-      const newItems = [...specificInvoice.service_input_data];
-      const roundedValue = Math.round(value) || 0;
-      newItems[index].quantity = Number(roundedValue);
 
-      newItems[index].total = Number(roundedValue) * newItems[index].rate;
-      newItems[index].total = Number(newItems[index].total.toFixed(2));
-      setSpecificInvoice((prevState) => ({
-        ...prevState,
-        service_input_data: newItems,
-      }));
-    }
+  const handleServiceQuantityChange = (index, value) => {
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
+
+    const newItems = [...(specificInvoice?.service_input_data || [])];
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0;
+    const rate = Number.parseFloat(newItems[index].rate) || 0;
+    const total = parsedQuantity * rate;
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
+    setSpecificInvoice((prevState) => ({
+      ...prevState,
+      service_input_data: newItems,
+    }));
   };
 
   const handleServiceQuantityChange2 = (index, value) => {
-    const newItems = [...serviceItems];
-    const roundedValue = Math.round(value) || 0;
-    newItems[index].quantity = Number(roundedValue);
+    const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    newItems[index].total = Number(roundedValue) * newItems[index].rate;
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const newItems = [...serviceItems];
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0;
+    const rate = Number.parseFloat(newItems[index].rate) || 0;
+    const total = parsedQuantity * rate;
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
     setServiceItems(newItems);
   };
+
   const handleUnitChange = (index, value) => {
     const newItems = [...serviceItems];
     newItems[index].unit = value;
@@ -384,7 +415,7 @@ const UpdateInvoice = () => {
   };
 
   const handleUnitChange2 = (index, value) => {
-    const newItems = [...specificInvoice.service_input_data];
+    const newItems = [...(specificInvoice?.service_input_data || [])];
     newItems[index] = {
       ...newItems[index],
       unit: value,
@@ -394,6 +425,7 @@ const UpdateInvoice = () => {
       service_input_data: newItems,
     }));
   };
+
   const handleInputUnitChange = (index, value) => {
     const newItems = [...items];
     newItems[index].unit = value;
@@ -401,7 +433,7 @@ const UpdateInvoice = () => {
   };
 
   const handleInputUnitChange2 = (index, value) => {
-    const newItems = [...specificInvoice.input_data];
+    const newItems = [...(specificInvoice?.input_data || [])];
     newItems[index] = {
       ...newItems[index],
       unit: value,
@@ -413,15 +445,25 @@ const UpdateInvoice = () => {
   };
 
   const handleRateChange = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...specificInvoice.input_data];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const newItems = [...(specificInvoice?.input_data || [])];
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0;
+    const total = quantity * parsedRate;
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
+
     setSpecificInvoice((prevState) => ({
       ...prevState,
       input_data: newItems,
@@ -429,28 +471,46 @@ const UpdateInvoice = () => {
   };
 
   const handleRateChange2 = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
     const newItems = [...items];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0;
+    const total = quantity * parsedRate;
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
     setItems(newItems);
   };
 
   const handleServiceRateChange = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...specificInvoice.service_input_data];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const newItems = [...(specificInvoice?.service_input_data || [])];
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0;
+    const total = quantity * parsedRate;
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
     setSpecificInvoice((prevState) => ({
       ...prevState,
       service_input_data: newItems,
@@ -458,21 +518,29 @@ const UpdateInvoice = () => {
   };
 
   const handleServiceRateChange2 = (index, value) => {
-    // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
     const newItems = [...serviceItems];
-    newItems[index].rate = Number(numericValue) || 0;
-    newItems[index].total = Number(
-      newItems[index].quantity * newItems[index].rate
-    );
-    newItems[index].total = Number(newItems[index].total.toFixed(2));
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0;
+    const total = quantity * parsedRate;
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    };
     setServiceItems(newItems);
   };
 
   const handleDiscountChange = (value) => {
     const parsedValue = Number(value);
-
     if (!isNaN(parsedValue)) {
       setDiscount(parsedValue);
     }
@@ -480,14 +548,21 @@ const UpdateInvoice = () => {
 
   const handleVATChange = (value) => {
     const parsedValue = Number(value);
-
     if (!isNaN(parsedValue)) {
       setVAT(parsedValue);
     }
   };
+
+  const handleTaxChange = (value) => {
+    // New handler for Tax
+    const parsedValue = Number(value);
+    if (!isNaN(parsedValue)) {
+      setTax(parsedValue);
+    }
+  };
+
   const handleAdvance = (value) => {
     const parsedValue = Number(value);
-
     if (!isNaN(parsedValue)) {
       setAdvance(parsedValue);
     }
@@ -498,9 +573,10 @@ const UpdateInvoice = () => {
     let differenceExistAndNewGrandTotal = 0; // Initialize to 0
     let vatAsPercentage = 0;
     let discountAsPercentage = 0;
+    let taxAsPercentage = 0; // New variable for tax
     let totalAfterDiscount = 0;
 
-    // Calculate the difference between the grand total and the specific quotation's total amount
+    // Calculate the difference between the grand total and the specific invoice's total amount
     if (grandTotal !== specificInvoice?.total_amount) {
       differenceExistAndNewGrandTotal =
         grandTotal - (Number(specificInvoice?.total_amount) || 0); // Convert to number
@@ -543,11 +619,24 @@ const UpdateInvoice = () => {
     }
 
     // Calculate total after VAT
-    const calculateVat = totalAfterDiscount * (vatAsPercentage / 100);
+    const totalAfterVat =
+      totalAfterDiscount + totalAfterDiscount * (vatAsPercentage / 100);
 
-    const totalAfterTax = totalAfterDiscount + calculateVat;
+    // Determine the Tax percentage (new logic)
+    if (tax > 0) {
+      taxAsPercentage = tax;
+    } else if (tax === 0) {
+      taxAsPercentage = 0;
+    } else if (tax === "") {
+      taxAsPercentage = Number(specificInvoice?.tax) || 0;
+    }
+
+    // Calculate total after Tax (new logic)
+    const finalTotalWithTax =
+      totalAfterVat + totalAfterVat * (taxAsPercentage / 100);
+
     // Final total with 2 decimal precision
-    finalTotal = Number.parseFloat(totalAfterTax).toFixed(2);
+    finalTotal = Number.parseFloat(finalTotalWithTax).toFixed(2);
 
     return finalTotal;
   };
@@ -619,16 +708,31 @@ const UpdateInvoice = () => {
 
   const handleRemoveButton = async (i, name) => {
     const values = {
-      id: id,
-      data: { index: i, invoice_name: name },
+      tenantDomain,
+      invoiceInfo: {
+        id: id,
+        data: { index: i, invoice_name: name },
+      },
     };
-
     const res = await removeInvoice(values).unwrap();
-
     if (res.success) {
       setReload(!reload);
       toast.success(res.message);
     }
+  };
+
+  // Fixed function to handle mileage history deletion
+  const handleMileageHistoryDelete = (indexToDelete) => {
+    setSpecificInvoice((prevState) => ({
+      ...prevState,
+      vehicle: {
+        ...prevState.vehicle,
+        mileageHistory:
+          prevState.vehicle?.mileageHistory?.filter(
+            (_, index) => index !== indexToDelete
+          ) || [],
+      },
+    }));
   };
 
   const input_data = [
@@ -643,6 +747,7 @@ const UpdateInvoice = () => {
         total: item.total,
       })),
   ];
+
   const service_input_data = [
     ...(specificInvoice?.service_input_data || []),
     ...serviceItems
@@ -658,15 +763,12 @@ const UpdateInvoice = () => {
 
   const onSubmit = async (data) => {
     setRemoveButton("");
-
     try {
       const customer = {
         company_name: data.company_name,
-
         customer_name: data.customer_name,
         customer_contact: data.customer_contact,
         customer_country_code: data.company_country_code,
-
         customer_address: data.customer_address,
       };
 
@@ -681,33 +783,38 @@ const UpdateInvoice = () => {
       const showRoom = {
         showRoom_name: data.showRoom_name,
         vehicle_username: data.vehicle_username,
-
         company_name: data.company_name,
         company_contact: data.company_contact,
         company_country_code: data.company_country_code,
-
         company_address: data.company_address,
       };
 
-      // Get the current mileage value
+      // Fixed mileage history logic
+      data.mileage = Number(data.mileage);
       const newMileageValue = Number(data.mileage);
 
-      // Check if we need to add a new mileage entry
-      const updatedMileageHistory = [...(specificInvoice.mileageHistory || [])];
+      // Get existing mileage history or initialize empty array
+      const existingMileageHistory =
+        specificInvoice?.vehicle?.mileageHistory || [];
+      const updatedMileageHistory = [...existingMileageHistory];
 
-      // Only add a new entry if it's a valid number and not already in the history
+      // Only add new mileage to history if it's valid and different from the last entry
       if (!isNaN(newMileageValue) && newMileageValue > 0) {
-        const mileageExists = updatedMileageHistory.some(
-          (entry) => entry.mileage === newMileageValue
-        );
+        const lastMileage =
+          updatedMileageHistory.length > 0
+            ? updatedMileageHistory[updatedMileageHistory.length - 1].mileage
+            : null;
 
-        if (!mileageExists) {
-          updatedMileageHistory.push({
+        // Only add if it's different from the last mileage entry
+        if (lastMileage !== newMileageValue) {
+          const newMileageEntry = {
             mileage: newMileageValue,
             date: new Date().toISOString(),
-          });
+          };
+          updatedMileageHistory.push(newMileageEntry);
         }
       }
+
       const vehicle = {
         carReg_no: data.carReg_no,
         car_registration_no: data.car_registration_no,
@@ -715,13 +822,8 @@ const UpdateInvoice = () => {
         engine_no: data.engine_no,
         vehicle_brand: data.vehicle_brand,
         vehicle_name: data.vehicle_name,
-        mileage:
-          specificInvoice?.vehicle?.mileageHistory?.length > 0
-            ? specificInvoice?.vehicle?.mileageHistory[
-                specificInvoice?.vehicle?.mileageHistory.length - 1
-              ].mileage
-            : Number(data.mileage),
-        mileageHistory: specificInvoice?.vehicle?.mileageHistory || [],
+        mileage: newMileageValue,
+        mileageHistory: updatedMileageHistory,
       };
 
       const invoice = {
@@ -729,24 +831,24 @@ const UpdateInvoice = () => {
         Id: specificInvoice?.Id,
         job_no: specificInvoice?.job_no,
         date: selectedDate || specificInvoice?.date,
-
         parts_total: partsTotal || specificInvoice.parts_total,
         service_total: serviceTotal || specificInvoice.serviceTotal,
         total_amount: grandTotal || specificInvoice?.total_amount,
         discount:
           discount === 0 || discount > 0 ? discount : specificInvoice?.discount,
-
         vat: vat === 0 || vat > 0 ? vat : specificInvoice?.vat,
+        tax: tax === 0 || tax > 0 ? tax : specificInvoice?.tax, // Include tax
         net_total: calculateFinalTotal() || specificInvoice.net_total,
-
         advance:
           advance === 0 || advance > 0 ? advance : specificInvoice?.advance,
         due: calculateDue() || specificInvoice.due,
         input_data: input_data,
         service_input_data: service_input_data,
+        mileage: newMileageValue,
       };
 
       const values = {
+        tenantDomain,
         customer,
         company,
         showRoom,
@@ -756,7 +858,9 @@ const UpdateInvoice = () => {
 
       const newValue = {
         id: id,
-        data: values,
+        data: {
+          ...values,
+        },
       };
 
       if (removeButton === "") {
@@ -786,7 +890,6 @@ const UpdateInvoice = () => {
     if (userTypeFromProfile === "showRoom") {
       navigate(`/dashboard/show-room-profile?id=${userFromProfile}`);
     }
-
     toast.success("Invoice update successful");
   };
 
@@ -796,34 +899,26 @@ const UpdateInvoice = () => {
       `/dashboard/money-receive?order_no=${specificInvoice?.job_no}&id=${id}&net_total=${specificInvoice?.net_total}`
     );
   };
+
   const handleGoPreview = () => {
     handleSubmit(onSubmit)();
     navigate(`/dashboard/detail?id=${id}`);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <CircularProgress size={60} thickness={4} color="primary" />
-        <p className="ml-4 text-xl">Loading invoice data...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="px-5 py-10">
       <div className=" addJobCardHeads">
         <img
-          src={logo || "/placeholder.svg"}
+          src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
           alt="logo"
           className=" addJobLogoImg"
         />
         <div>
           <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            Trust Auto Solution{" "}
+            {CompanyInfoData?.data?.companyName}
           </h2>
           <span className="text-[12px] lg:text-xl mt-5 block">
-            Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+            Office: {CompanyInfoData?.data?.address}
           </span>
         </div>
         <TrustAutoAddress />
@@ -834,7 +929,6 @@ const UpdateInvoice = () => {
           <div className="flex md:flex-row flex-col justify-between items-center">
             <div className="hidden"></div>
             <div className="vehicleCard">Update Invoice </div>
-
             <div className="flex items-center gap-x-2">
               {/* Track if user has interacted with the date picker */}
               {!selectedDate || selectedDate === specificInvoice?.date ? (
@@ -953,7 +1047,6 @@ const UpdateInvoice = () => {
                     />
                   )}
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={5} sm={12} xs={12}>
@@ -1038,7 +1131,6 @@ const UpdateInvoice = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   {!specificInvoice && (
                     <TextField
@@ -1093,7 +1185,6 @@ const UpdateInvoice = () => {
                     }}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <Grid container spacing={1}>
                     <Grid item lg={3} md={5} sm={12} xs={12}>
@@ -1144,7 +1235,6 @@ const UpdateInvoice = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
@@ -1164,182 +1254,67 @@ const UpdateInvoice = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <Autocomplete
-                    multiple
-                    id="tags-filled"
-                    options={
-                      specificInvoice?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    value={
-                      specificInvoice?.vehicle?.mileageHistory
-                        ?.slice(-1)
-                        .map(
-                          (option) =>
-                            `${option.mileage} km (${new Date(
-                              option.date
-                            ).toLocaleDateString()})`
-                        ) || []
-                    }
-                    freeSolo
-                    disableClearable
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.stopPropagation();
+                  <TextField
+                    fullWidth
+                    {...register("mileage", {
+                      required: "Mileage is required!",
+                    })}
+                    label="Current Mileage (KM)"
+                    type="number"
+                    focused={!!specificInvoice?.mileage} // Fixed: Use !! to convert to boolean
+                    defaultValue={specificInvoice?.mileage || ""} // This should now work correctly
+                    onChange={(e) => {
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        specificInvoice?.vehicle?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
+                        setMileageChanged(true);
+                      } else if (!lastMileage && newMileage) {
+                        setMileageChanged(true);
+                      } else {
+                        setMileageChanged(false);
                       }
                     }}
-                    onChange={(event, newValue) => {
-                      const currentHistory = [
-                        ...(specificInvoice?.vehicle?.mileageHistory || []),
-                      ];
-
-                      // Handle deletion
-                      if (newValue.length === 0) {
-                        const updatedHistory = currentHistory.slice(0, -1);
-                        setSpecificInvoice((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                        return;
-                      }
-
-                      // Handle addition
-                      const newEntry = newValue[newValue.length - 1];
-                      const mileageMatch = newEntry.match(/^(\d+)/);
-                      const newMileage = mileageMatch
-                        ? Number.parseInt(mileageMatch[1])
-                        : 0;
-                      const lastEntry =
-                        currentHistory[currentHistory.length - 1];
-
-                      if (!lastEntry || lastEntry.mileage !== newMileage) {
-                        const updatedHistory = [
-                          ...currentHistory,
-                          {
-                            mileage: newMileage,
-                            date: new Date().toISOString(),
-                          },
-                        ];
-
-                        setSpecificInvoice((prev) => ({
-                          ...prev,
-                          vehicle: {
-                            ...prev.vehicle,
-                            mileageHistory: updatedHistory,
-                          },
-                        }));
-                      }
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          key={index}
-                          {...getTagProps({ index })}
-                          onDelete={(e) => {
-                            const currentHistory = [
-                              ...(specificInvoice?.vehicle?.mileageHistory ||
-                                []),
-                            ];
-                            const updatedHistory = currentHistory.slice(0, -1);
-
-                            setSpecificInvoice((prev) => ({
-                              ...prev,
-                              vehicle: {
-                                ...prev.vehicle,
-                                mileageHistory: updatedHistory,
-                              },
-                            }));
-                          }}
-                          className="bg-gray-100 border-gray-300 text-gray-800"
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Mileage History"
-                        placeholder="Add new mileage"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {params.InputProps.endAdornment}
-                              <button
-                                type="button"
-                                className="sm:hidden absolute right-8 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  const input = document
-                                    .getElementById("tags-filled")
-                                    ?.querySelector("input");
-                                  const inputValue = input?.value || "";
-
-                                  if (inputValue) {
-                                    const currentHistory = [
-                                      ...(specificInvoice?.vehicle
-                                        ?.mileageHistory || []),
-                                    ];
-                                    const mileageMatch =
-                                      inputValue.match(/^(\d+)/);
-                                    const newMileage = mileageMatch
-                                      ? Number.parseInt(mileageMatch[1])
-                                      : 0;
-                                    const lastEntry =
-                                      currentHistory[currentHistory.length - 1];
-
-                                    if (
-                                      !lastEntry ||
-                                      lastEntry.mileage !== newMileage
-                                    ) {
-                                      const updatedHistory = [
-                                        ...currentHistory,
-                                        {
-                                          mileage: newMileage,
-                                          date: new Date().toISOString(),
-                                        },
-                                      ];
-
-                                      setSpecificInvoice((prev) => ({
-                                        ...prev,
-                                        vehicle: {
-                                          ...prev.vehicle,
-                                          mileageHistory: updatedHistory,
-                                        },
-                                      }));
-
-                                      if (input) input.value = "";
-                                    }
-                                  }
-                                }}
-                              >
-                                Add
-                              </button>
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
+                    error={!!errors.mileage}
+                    helperText={errors.mileage?.message}
                   />
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mb-2">
+                    <strong>Mileage History:</strong>
+                    {specificInvoice?.vehicle?.mileageHistory?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {specificInvoice?.vehicle?.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => handleMileageHistoryDelete(index)}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
+                    )}
+                  </div>
                 </Grid>
               </Grid>
             </Box>
           </div>
-
           <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 ">
             <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
               SL No
@@ -1401,7 +1376,7 @@ const UpdateInvoice = () => {
                                 handleServiceQuantityChange(i, e.target.value)
                               }
                               required
-                              value={item.quantity}
+                              value={item.quantity || ""}
                             />
                             <select
                               className="inputField col-span-9"
@@ -1432,7 +1407,7 @@ const UpdateInvoice = () => {
                               handleServiceRateChange(i, e.target.value)
                             }
                             required
-                            value={formatNumber(item.rate)}
+                            value={item.rateDisplay || item.rate || ""}
                           />
                         </div>
                         <div className="col-span-12 md:col-span-1">
@@ -1524,7 +1499,7 @@ const UpdateInvoice = () => {
                               onChange={(e) =>
                                 handleServiceQuantityChange2(i, e.target.value)
                               }
-                              value={item.quantity}
+                              value={item.quantity || ""}
                               required
                             />
                             <select
@@ -1555,7 +1530,7 @@ const UpdateInvoice = () => {
                             onChange={(e) =>
                               handleServiceRateChange2(i, e.target.value)
                             }
-                            value={formatNumber(item.rate)}
+                            value={item.rateDisplay || item.rate || ""}
                             required
                           />
                         </div>
@@ -1580,7 +1555,6 @@ const UpdateInvoice = () => {
                           )}
                         </div>
                       </div>
-
                       <div className="flex justify-end  ">
                         {items.length - 1 === i && (
                           <button
@@ -1597,7 +1571,6 @@ const UpdateInvoice = () => {
               </>
             )}
           </div>
-
           <div className="grid grid-cols-12 gap-2 items-center font-bold mt-5  md:mb-1 ">
             <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
               SL No
@@ -1659,7 +1632,7 @@ const UpdateInvoice = () => {
                                 handleQuantityChange(i, e.target.value)
                               }
                               required
-                              value={item.quantity}
+                              value={item.quantity || ""}
                             />
                             <select
                               className="inputField col-span-9"
@@ -1690,7 +1663,7 @@ const UpdateInvoice = () => {
                               handleRateChange(i, e.target.value)
                             }
                             required
-                            value={formatNumber(item.rate)}
+                            value={item.rateDisplay || item.rate || ""}
                           />
                         </div>
                         <div className="col-span-12 md:col-span-1">
@@ -1782,7 +1755,7 @@ const UpdateInvoice = () => {
                               onChange={(e) =>
                                 handleQuantityChange2(i, e.target.value)
                               }
-                              value={item.quantity}
+                              value={item.quantity || ""}
                               required
                             />
                             <select
@@ -1813,7 +1786,7 @@ const UpdateInvoice = () => {
                             onChange={(e) =>
                               handleRateChange2(i, e.target.value)
                             }
-                            value={formatNumber(item.rate)}
+                            value={item.rateDisplay || item.rate || ""}
                             required
                           />
                         </div>
@@ -1838,7 +1811,6 @@ const UpdateInvoice = () => {
                           )}
                         </div>
                       </div>
-
                       <div className="flex justify-end mt-1 ">
                         {items.length - 1 === i && (
                           <button
@@ -1856,13 +1828,12 @@ const UpdateInvoice = () => {
             )}
           </div>
         </form>
-
         <div className="discountFieldWrap mt-5 ">
           <div className="flex items-center gap-x-2">
             <b> Total Amount: </b>
             <span>
               {formatNumber(
-                grandTotal ? grandTotal : specificInvoice.total_amount
+                grandTotal ? grandTotal : specificInvoice?.total_amount
               )}
             </span>
           </div>
@@ -1874,7 +1845,7 @@ const UpdateInvoice = () => {
               autoComplete="off"
               type="text"
               placeholder="Discount"
-              defaultValue={formatNumber(specificInvoice.discount)}
+              defaultValue={formatNumber(specificInvoice?.discount)}
               ref={partsDiscountRef}
             />
           </div>
@@ -1901,7 +1872,6 @@ const UpdateInvoice = () => {
               </span>
             </div>
           </div>
-
           <div className="flex items-center gap-x-2">
             <b className="mr-2">Advance: </b>
             <input
@@ -1910,16 +1880,14 @@ const UpdateInvoice = () => {
               autoComplete="off"
               type="text"
               placeholder="Advance"
-              defaultValue={formatNumber(specificInvoice.advance)}
+              defaultValue={formatNumber(specificInvoice?.advance)}
             />
           </div>
-
           <div className="flex items-center gap-x-2  ">
             <b className="mr-2">Due: </b>
             <span>{formatNumber(calculateDue())}</span>
           </div>
         </div>
-
         <div>
           <div className="mt-8 buttonGroup buttonMargin">
             <div className="flex md:flex-row flex-col justify-end">
@@ -1927,12 +1895,11 @@ const UpdateInvoice = () => {
                 <button type="submit" onClick={handleGoPreview}>
                   Preview
                 </button>
-
                 <button>
                   <a
                     className="bg-[#42A0D9] text-white px-3 py-5  rounded-full "
                     href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
-                      specificInvoice._id
+                      specificInvoice?._id
                     }`}
                     target="_blank"
                     rel="noreferrer"
@@ -1940,12 +1907,10 @@ const UpdateInvoice = () => {
                     Download
                   </a>
                 </button>
-
                 <button onClick={handleGoMoneyReceipt}>Money Receipt </button>
               </div>
             </div>
           </div>
-
           <div className="flex  justify-center align-items-center mt-5 ">
             <Button
               sx={{ background: "#42A1DA", color: "#fff" }}

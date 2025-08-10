@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 "use client"
 
@@ -310,9 +311,6 @@ export default function AddRole() {
       status,
       permissions,
     }
-
-    // Log the data (replace with your API call)
-    console.log("Role created:", roleData)
 
     // Show success message or redirect
     alert("Role created successfully!")

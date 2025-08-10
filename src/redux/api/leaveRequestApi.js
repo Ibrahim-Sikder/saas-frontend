@@ -10,26 +10,30 @@ const leaveApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["leave"],
     }),
+
     getAllELeaveRequest: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/leave-requests`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: {tenantDomain,  limit, page, searchTerm },
       }),
       providesTags: ["leave"],
     }),
 
     getSingleLeaveRequest: builder.query({
-      query: (id) => ({
-        url: `/leave-requests/${id}`,
+      query: ({tenantDomain,leaveRequestsId}) => ({
+        url: `/leave-requests/${leaveRequestsId}`,
         method: "GET",
+         params:{tenantDomain}
       }),
       providesTags: ["leave"],
     }),
+
     getLeaveRequestByEmployeeId: builder.query({
-      query: (employeeId) => ({
+      query: ({tenantDomain, employeeId}) => ({
         url: `/leave-requests/employeeId?employeeId=${employeeId}`,
         method: "GET",
+        params:{tenantDomain}
       }),
       providesTags: ["leave"],
     }),
@@ -46,9 +50,10 @@ const leaveApi = baseApi.injectEndpoints({
     }),
 
     deleteLeaveRequest: builder.mutation({
-      query: (id) => ({
+      query: ({tenantDomain,id}) => ({
         url: `/leave-requests/${id}`,
         method: "DELETE",
+         params:{tenantDomain}
       }),
       invalidatesTags: ["leave"],
     }),

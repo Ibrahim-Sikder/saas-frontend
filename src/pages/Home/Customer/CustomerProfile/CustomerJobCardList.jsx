@@ -13,7 +13,7 @@ import { Pagination } from "@mui/material";
 import Loading from "../../../../components/Loading/Loading";
 import car from "../../../../../src/assets/jobcard/car-repair.png";
 import EmptyCustomerData from "../../../../components/EmptyCustomerData/EmptyCustomerData";
-const CustomerJobCardList = ({ id, customerId, user_type }) => {
+const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
   const [filterType, setFilterType] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +26,7 @@ const CustomerJobCardList = ({ id, customerId, user_type }) => {
   };
 
   const { data: jobCards, isLoading } = useGetAllJobCardsQuery({
+    tenantDomain,
     id,
     limit,
     page: currentPage,
@@ -46,7 +47,7 @@ const CustomerJobCardList = ({ id, customerId, user_type }) => {
 
     if (willDelete) {
       try {
-        await movetoRecyclebinJobCard(id).unwrap();
+        await movetoRecyclebinJobCard({tenantDomain,id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

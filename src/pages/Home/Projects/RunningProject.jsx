@@ -13,9 +13,11 @@ import {
 } from "../../../redux/api/quotation";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { backBtnStyle } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const QuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
+const tenantDomain = useTenantDomain();
 
   const [filterType, setFilterType] = useState("");
 
@@ -37,6 +39,7 @@ const QuotationList = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -88,7 +91,7 @@ const QuotationList = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
+            
           </div>
           <div className="productHome">
             <span>Dashboard / </span>

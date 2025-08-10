@@ -66,6 +66,7 @@ import {
   useGetAllPurchaseOrdersQuery,
 } from "../../redux/api/purchaseOrderApi";
 import UpdatePurchaseOrderModal from "./UpdatePurchaseOrderModal";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 
 export default function PurchaseOrdersPage() {
@@ -79,8 +80,9 @@ export default function PurchaseOrdersPage() {
   const [receiveDate, setReceiveDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [search, setSearch] = useState("");
+const tenantDomain = useTenantDomain();
 
+  const [search, setSearch] = useState("");
   const [receiveStatus, setReceiveStatus] = useState("received");
   const [receiveNote, setReceiveNote] = useState("");
   const [dateRange, setDateRange] = useState({
@@ -93,6 +95,7 @@ export default function PurchaseOrdersPage() {
   const rowsPerPage = 10;
   const [deletePurchase] = useDeletePurchaseOrderMutation();
   const { data: purchaseOrderData, refetch } = useGetAllPurchaseOrdersQuery({
+    tenantDomain,
     limit: 10,
     page,
     searchTerm: search,
@@ -1011,9 +1014,11 @@ export default function PurchaseOrdersPage() {
         open={openPurchaseModal}
         onClose={handlePurchaseClose}
         onSave={handleSavePurchaseOrder}
+          tenantDomain={tenantDomain}
       />
       {open && selectedOrder && (
         <UpdatePurchaseOrderModal
+        tenantDomain={tenantDomain}
           onClose={handleClose}
           open={open}
           orderId={selectedOrder._id}

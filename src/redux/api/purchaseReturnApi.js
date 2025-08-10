@@ -12,30 +12,34 @@ const purchaseReturnApi = baseApi.injectEndpoints({
     }),
 
     getAllPurchaseReturns: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: "/purchase-return",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["purchaseReturn"],
     }),
-
     getSinglePurchaseReturn: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchase-return/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["purchaseReturn"],
     }),
 
-    updatePurchaseReturn: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/purchase-return/${id}`,
-        method: "PUT",
-        body: data,
-      }),
-      invalidatesTags: ["purchaseReturn"],
-    }),
+   updatePurchaseReturn: builder.mutation({
+  query: ({ id, tenantDomain, data }) => ({
+    url: `/purchase-return/${id}`,
+    method: "PUT",
+    body: {
+      ...data,
+      tenantDomain, 
+    },
+  }),
+  invalidatesTags: ["purchaseReturn"],
+}),
+
 
     removePurchaseReturn: builder.mutation({
       query: ({ id, data }) => ({
@@ -48,9 +52,10 @@ const purchaseReturnApi = baseApi.injectEndpoints({
     }),
 
     deletePurchaseReturn: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchase-return/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["purchaseReturn"],
     }),

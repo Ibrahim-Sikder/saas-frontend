@@ -1,704 +1,596 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormProvider } from "react-hook-form";
+import { toast } from "react-toastify";
 import {
+  Box,
   Grid,
   Typography,
   Paper,
-  Box,
-  Divider,
   Button,
-  CircularProgress,
-  Tabs,
+  Card,
+  CardContent,
+  Stack,
   IconButton,
-  Tooltip,
-  useTheme,
+  Avatar,
+  InputAdornment,
+  Divider,
+  Chip,
 } from "@mui/material";
-
 import {
-  FaFileInvoice,
-  FaMoneyBillWave,
-  FaCalendarAlt,
-  FaTag,
-  FaFileAlt,
-  FaFileInvoiceDollar,
-  FaInfoCircle,
-  FaUser,
-  FaCar,
-  FaTools,
-  FaCreditCard,
-  FaCheckCircle,
-  FaPercentage,
-  FaQuestionCircle,
-  FaReceipt,
-  FaBuilding,
-  FaIdCard,
-} from "react-icons/fa";
-import { MdOutlinePayments, MdSave } from "react-icons/md";
-import { useGetSingleIncomeQuery } from "../../redux/api/income";
+  Receipt,
+  Description,
+  Add,
+  Delete,
+  Payment,
+  AttachMoney,
+  DateRange,
+  BusinessCenter,
+} from "@mui/icons-material";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+import {
+  useCreateIncomeMutation,
+  useGetSingleIncomeQuery,
+  useUpdateIncomeMutation,
+} from "../../redux/api/income";
+import { useGetAllInvoicesQuery } from "../../redux/api/invoice";
+import ExpenseAutoComplete from "../Home/Expense/ExpenseAutoComplete";
 import TASInput from "../../components/form/Input";
-import {
-  IncomeCategoriesOption,
-  IncomeOption,
-  PaymentMethodsOption,
-  PaymentStatusOption,
-  ServiceTypesOption,
-} from "../../options";
-import FormSelect from "../../components/form/FormSelect";
-import FormAutocomplete from "../../components/form/FormAutocomplete";
-import TASDatepicker from "../../components/form/Datepicker";
+import TASTextarea from "../../components/form/Textarea";
+import FormDatePicker from "../../components/form/Datepicker";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
+import Loading from "../../components/Loading/Loading";
+import TASSelect from "../../components/form/Select";
+import { paymentMethods } from "../../constant";
+import { expenseInputStyle } from "../../utils/customStyle";
 
-import TASSwitch from "../../components/form/switch";
-import IncomeHeader from "./IncomeHeader";
-import TASFileupload from "../../components/form/Fileupload";
-import { CloudUpload } from "@mui/icons-material";
-import {
-  boxStyle,
-  SectionTitle,
-  StyledPaper,
-  StyledTab,
-  SubmitButton,
-} from "../../utils";
-import { useFormOptions } from "../../hooks/useFormOption";
-import { useIncomeForm } from "../../hooks/useIncomeForm";
-import FormTextArea from "../../components/form/FormTextArea";
-
-const IncomeForm = ({ id }) => {
-  const [tabValue, setTabValue] = useState(0);
+const ExpenseForm = ({ id }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
+  const tenantDomain = useTenantDomain();
+  const [filterType, setFilterType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
 
-  const { data: singleIncome, isLoading: incomeLoading } =
-    useGetSingleIncomeQuery(id);
+  const { data: singleIncome, isLoading } = useGetSingleIncomeQuery({
+    tenantDomain,
+    id,
+  });
 
-  const { invoiceOption, jobcardOption, customerOption, vehicleOptions } =
-    useFormOptions();
+  const [createIncome] = useCreateIncomeMutation();
+  const [updateIncome] = useUpdateIncomeMutation();
+
+  const { data: allInvoices } = useGetAllInvoicesQuery({
+    tenantDomain,
+    limit,
+    page: currentPage,
+    searchTerm: filterType,
+    isRecycled: false,
+  });
+
+  const invoiceOption = useMemo(() => {
+    if (!allInvoices?.data?.invoices) return [];
+    return allInvoices.data.invoices.map((invoice) => ({
+      label: `${invoice.invoice_no} - ${invoice.Id}`,
+      _id: invoice._id,
+      // Include the full invoice data for auto-filling
+      invoiceData: invoice,
+    }));
+  }, [allInvoices?.data?.invoices]);
+
+  const defaultValues = useMemo(() => {
+    if (id && singleIncome?.data) {
+      let selectedInvoiceId = null;
+      if (singleIncome.data.invoice_id) {
+        selectedInvoiceId =
+          typeof singleIncome.data.invoice_id === "object"
+            ? singleIncome.data.invoice_id._id
+            : singleIncome.data.invoice_id;
+      }
+
+      return {
+        date: singleIncome.data.date,
+        invoice_id: selectedInvoiceId,
+        serviceIncomeAmount: singleIncome.data.serviceIncomeAmount ?? 0,
+        partsIncomeAmount: singleIncome.data.partsIncomeAmount ?? 0,
+        payment_method: singleIncome.data.payment_method || "Bkash",
+        accountNumber: singleIncome.data.accountNumber || "",
+        transactionNumber: singleIncome.data.transactionNumber || "",
+        note: singleIncome.data.note || "",
+        // FIXED: Changed field name to match useFieldArray
+        income_items: singleIncome?.data?.income_items?.map((item) => ({
+          name: item.name || "",
+          amount: item.amount?.toString() || "0",
+        })) || [{ name: "", amount: "0" }],
+      };
+    }
+
+    return {
+      date: new Date(),
+      invoice_id: null,
+      serviceIncomeAmount: 0,
+      partsIncomeAmount: 0,
+      payment_method: "Bkash",
+      accountNumber: "",
+      transactionNumber: "",
+      note: "",
+      // FIXED: Changed field name to match useFieldArray
+      income_items: [{ name: "", amount: "0" }],
+    };
+  }, [id, singleIncome?.data]);
+
+  const methods = useForm({
+    defaultValues,
+  });
 
   const {
-    methods,
-    formSubmit,
-    onSubmit,
-    populateForm,
-    createLoading,
-    updateLoading,
-    calculatedTax,
-    totalAmount,
-    watchAmount,
-    applyTax,
-    taxRate,
-  } = useIncomeForm(id);
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { isDirty },
+  } = methods;
 
-  
-  const { handleSubmit } = methods;
+  // FIXED: Changed field name to match form data
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "income_items", // Changed from "items" to "income_items"
+  });
 
-  // Update form when singleIncome data is loaded
-  useEffect(() => {
-    if (id && singleIncome?.data) {
-      populateForm(singleIncome);
-    }
-  }, [id, singleIncome, populateForm]);
+  // FIXED: Changed to watch the correct field
+  const incomeItems = watch("income_items");
+  const selectedInvoiceId = watch("invoice_id");
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  // Helper function to parse amount string and remove commas
+  const parseAmount = (amountString) => {
+    if (!amountString) return 0;
+    // Remove commas and convert to number
+    const cleanAmount = amountString.toString().replace(/,/g, "");
+    return Number(cleanAmount) || 0;
   };
 
-  // Show loading state while fetching data
-  if (id && incomeLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "50vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+  // Auto-fill service and parts income when invoice is selected
+  useEffect(() => {
+    if (selectedInvoiceId && allInvoices?.data?.invoices) {
+      const selectedInvoice = allInvoices.data.invoices.find(
+        (invoice) => invoice._id === selectedInvoiceId
+      );
+
+      if (selectedInvoice) {
+        // Parse and set service income amount
+        const serviceAmount = parseAmount(selectedInvoice.service_total);
+        const partsAmount = parseAmount(selectedInvoice.parts_total);
+
+        setValue("serviceIncomeAmount", serviceAmount);
+        setValue("partsIncomeAmount", partsAmount);
+      }
+    }
+  }, [selectedInvoiceId, allInvoices?.data?.invoices, setValue]);
+
+  useEffect(() => {
+    if (Object.keys(defaultValues).length > 0 && !isDirty) {
+      reset(defaultValues);
+    }
+  }, [defaultValues, reset, isDirty]);
+
+  // Calculate total for other income items
+
+  const handleFormSubmit = async (data) => {
+    const cleanedIncomeItems = data.income_items.map((item) => ({
+      name: item.name,
+      amount: Number(item.amount),
+    }));
+
+    const formattedDate =
+      data.date instanceof Date
+        ? data.date.toISOString().split("T")[0]
+        : data.date;
+
+    const incomeData = {
+      date: formattedDate,
+      invoice_id: data.invoice_id || "",
+      serviceIncomeAmount: Number(data.serviceIncomeAmount) || 0,
+      partsIncomeAmount: Number(data.partsIncomeAmount) || 0,
+      income_items: cleanedIncomeItems,
+      payment_method: data.payment_method,
+      accountNumber: data.accountNumber || "",
+      transactionNumber: data.transactionNumber || "",
+      note: data.note || "",
+    };
+
+    const toastId = toast.loading(
+      id ? "Updating Income..." : "Creating Income..."
     );
+
+    try {
+      let res;
+      if (id) {
+        res = await updateIncome({
+          tenantDomain,
+          id,
+          ...incomeData,
+        }).unwrap();
+      } else {
+        res = await createIncome({
+          tenantDomain,
+          incomeInfo: incomeData,
+        }).unwrap();
+      }
+
+      toast.update(toastId, {
+        render:
+          res.message || `Income ${id ? "updated" : "created"} successfully!`,
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      navigate("/dashboard/income-list");
+    } catch (error) {
+      toast.update(toastId, {
+        render:
+          `Error ${id ? "updating" : "creating"} income: ` +
+          (error?.data?.message || error?.message || "Something went wrong!"),
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
+  };
+
+  if (isLoading) {
+    return <Loading />;
   }
 
-  
   return (
-    <section className="py-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <IncomeHeader />
-
-        <StyledPaper elevation={3}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              TabIndicatorProps={{
-                style: {
-                  backgroundColor: "#42A1DA",
-                },
-              }}
+    <Box
+      sx={{
+        maxWidth: "1200px",
+        mx: "auto",
+        p: { xs: 2, md: 4 },
+        backgroundColor: "#f8fafc",
+        minHeight: "100vh",
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 4 },
+          mb: 4,
+          borderRadius: 3,
+          backgroundColor: "white",
+          border: "1px solid #e2e8f0",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: "linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4)",
+          },
+        }}
+      >
+        <Stack direction="row" spacing={3} alignItems="center">
+          <Avatar
+            sx={{
+              width: 64,
+              height: 64,
+              backgroundColor: "#3b82f6",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+            }}
+          >
+            <Receipt sx={{ fontSize: 32 }} />
+          </Avatar>
+          <Box>
+            <Typography
+              variant="h4"
+              fontWeight="700"
+              color="#1e293b"
+              sx={{ mb: 1 }}
             >
-              <StyledTab
-                icon={<FaFileInvoice />}
-                iconPosition="start"
-                label="Basic Info"
-              />
-              <StyledTab
-                icon={<FaUser />}
-                iconPosition="start"
-                label="Customer & Vehicle"
-              />
-              <StyledTab
-                icon={<FaCreditCard />}
-                iconPosition="start"
-                label="Payment Details"
-              />
-              <StyledTab
-                icon={<FaFileAlt />}
-                iconPosition="start"
-                label="Documents"
-              />
-            </Tabs>
+              {id ? "Edit Income" : "Create New Income"}
+            </Typography>
+            <Typography variant="body1" color="#64748b">
+              {id
+                ? "Update income details"
+                : "Add a new income to your records"}
+            </Typography>
           </Box>
+        </Stack>
+      </Paper>
 
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(id ? onSubmit : formSubmit)}>
-              {/* Tab 1: Basic Information */}
-              {tabValue === 0 && (
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <FaInfoCircle className="mr-2" />
-                      Basic Income Information
-                    </SectionTitle>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaReceipt className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Receipt Number
-                      </Typography>
-                    </Box>
-
-                    <TASInput
-                      name="receipt_number"
-                      label="Receipt Number"
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaTag className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Income Source
-                      </Typography>
-                    </Box>
-
-                    <FormAutocomplete
-                      name="income_source"
-                      label="Select Income Source"
-                      options={IncomeOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaFileInvoiceDollar className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Select Invoice
-                      </Typography>
-                    </Box>
-
-                    <FormAutocomplete
-                      name="invoice_number"
-                      label="Select Invoice"
-                      options={invoiceOption}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaTag className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Income Category
-                      </Typography>
-                    </Box>
-                    <FormAutocomplete
-                      name="category"
-                      label="Select Categories"
-                      options={IncomeCategoriesOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaMoneyBillWave className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Income Name
-                      </Typography>
-                    </Box>
-
-                    <TASInput
-                      name="income_name"
-                      label="Enter Income Name"
-                      placeholder="e.g., Service Fee, Parts Sale"
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaCalendarAlt className="text-[#42A1DA]  mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Transaction Date
-                      </Typography>
-                    </Box>
-                    <TASDatepicker
-                      label="Select Date"
-                      name="date"
-                      fullWidth={true}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaTools className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Service Type
-                      </Typography>
-                    </Box>
-                    <FormAutocomplete
-                      name="service_type"
-                      labelId="service-type-label"
-                      label="Select Service Type"
-                      options={ServiceTypesOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}
-                    >
-                      <FaInfoCircle className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Description
-                      </Typography>
-                    </Box>
-                    <FormTextArea
-                      name="description"
-                      label="Description"
-                      placeholder="Add additional details about this income transaction..."
-                      required={true}
-                      minRows={4}
-                    />
-                  </Grid>
-                </Grid>
-              )}
-
-              {/* Tab 2: Customer & Vehicle Information */}
-              {tabValue === 1 && (
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <FaUser className="mr-2" />
-                      Customer Information
-                    </SectionTitle>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaUser className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Customer/Company/Showroom
-                      </Typography>
-                    </Box>
-
-                    <FormAutocomplete
-                      name="customer"
-                      labelId="customer-label"
-                      label="Select Customer"
-                      options={customerOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaIdCard className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Job Card
-                      </Typography>
-                    </Box>
-
-                    <FormAutocomplete
-                      name="job_card"
-                      labelId="jobcard-label"
-                      label="Select Job Card"
-                      options={jobcardOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <FaCar className="mr-2" />
-                      Vehicle Information
-                    </SectionTitle>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaCar className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Vehicle
-                      </Typography>
-                    </Box>
-
-                    <FormAutocomplete
-                      name="vehicle"
-                      labelId="vehicle-label"
-                      label="Select Vehicle"
-                      options={vehicleOptions}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaBuilding className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Department/Branch
-                      </Typography>
-                    </Box>
-                    <TASInput
-                      name="department"
-                      label="Department/Branch"
-                      placeholder="e.g., Service Center, Main Workshop"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
-              )}
-
-              {/* Tab 3: Payment Details */}
-              {tabValue === 2 && (
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <MdOutlinePayments className="mr-2" />
-                      Payment Information
-                    </SectionTitle>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaMoneyBillWave className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Amount
-                      </Typography>
-                    </Box>
-
-                    <TASInput
-                      name="amount"
-                      label="Enter Amount"
-                      placeholder="e.g., 1500.00"
-                      fullWidth
-                      type="number"
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                      <FaCreditCard className="text-[#42A1DA] mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Payment Method
-                      </Typography>
-                    </Box>
-
-                    <FormSelect
-                      name="payment_method"
-                      labelId="payment-method-label"
-                      label="Select Payment Method"
-                      options={PaymentMethodsOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}
-                    >
-                      <FaCheckCircle className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Payment Status
-                      </Typography>
-                    </Box>
-
-                    <FormSelect
-                      name="payment_status"
-                      labelId="payment-status-label"
-                      label="Select Payment Status"
-                      options={PaymentStatusOption}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}
-                    >
-                      <FaFileAlt className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Reference Number
-                      </Typography>
-                      <Tooltip
-                        title="For bank transfers, checks, or other payment references"
-                        placement="top"
-                      >
-                        <IconButton size="small" sx={{ ml: 1 }}>
-                          <FaQuestionCircle size={14} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-
-                    <TASInput
-                      name="reference_number"
-                      label="Reference Number"
-                      placeholder="e.g., Check #, Transaction ID"
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <FaPercentage className="mr-2" />
-                      Tax Information
-                    </SectionTitle>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <TASSwitch name="tax_applied" label="Apply Tax" />
-                  </Grid>
-
-                  {applyTax && (
-                    <Grid item xs={12} md={6}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          mb: 1,
-                        }}
-                      >
-                        <FaPercentage className="text-[#42A1DA] mt-1 mr-2" />
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          Tax Rate (%)
-                        </Typography>
-                      </Box>
-                      <TASInput
-                        name="tax_rate"
-                        label="Tax Rate (%)"
-                        type="number"
-                        fullWidth
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <Grid container spacing={4}>
+            {/* Invoice & Date Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+                    <DateRange sx={{ color: "#3b82f6", fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight="600" color="#1e293b">
+                      Invoice & Date Information
+                    </Typography>
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={3}>
+                      <ExpenseAutoComplete
+                        label="Select Invoice"
+                        name="invoice_id"
+                        options={invoiceOption}
+                        size="normal"
+                        multiple={false}
                       />
                     </Grid>
-                  )}
+                    <Grid item xs={12} md={3}>
+                      <FormDatePicker
+                        size="medium"
+                        fullWidth
+                        name="date"
+                        label="Date"
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <TASInput
+                        fullWidth
+                        name="serviceIncomeAmount"
+                        label="Service Income"
+                        type="number"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AttachMoney sx={{ color: "#10b981" }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <TASInput
+                        fullWidth
+                        name="partsIncomeAmount"
+                        label="Parts Income"
+                        type="number"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AttachMoney sx={{ color: "#10b981" }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
 
-                  <Grid item xs={12}>
-                    <Paper
-                      elevation={0}
+            {/* Income Items Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mb={3}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <BusinessCenter sx={{ color: "#8b5cf6", fontSize: 24 }} />
+                      <Typography variant="h6" fontWeight="600" color="#1e293b">
+                        Other Income
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Stack spacing={3}>
+                    {fields.map((item, index) => (
+                      <Paper
+                        key={item.id}
+                        sx={{
+                          p: 3,
+                          borderRadius: 2,
+                          backgroundColor: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                        }}
+                      >
+                        <Grid container spacing={3} alignItems="center">
+                          <Grid item xs={12} md={5}>
+                            <TASInput
+                              fullWidth
+                              // FIXED: Changed field name
+                              name={`income_items[${index}].name`}
+                              label="Source of income"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Description sx={{ color: "#6b7280" }} />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={expenseInputStyle}
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={4}>
+                            <TASInput
+                              fullWidth
+                              label="Amount"
+                              // FIXED: Changed field name
+                              name={`income_items[${index}].amount`}
+                              type="number"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <AttachMoney sx={{ color: "#10b981" }} />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={expenseInputStyle}
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="center"
+                            >
+                              <IconButton
+                                color="error"
+                                onClick={() => remove(index)}
+                                disabled={fields.length === 1}
+                                sx={{
+                                  ...expenseInputStyle,
+                                  "&:hover": {
+                                    backgroundColor: "#fee2e2",
+                                  },
+                                }}
+                              >
+                                <Delete />
+                              </IconButton>
+                            </Stack>
+                          </Grid>
+                        </Grid>
+                      </Paper>
+                    ))}
+                  </Stack>
+                  <Box display="flex" justifyContent="center" mt={3}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={() => append({ name: "", amount: "0" })}
                       sx={{
-                        p: 2,
-                        mt: 2,
-                        background: "rgba(66, 161, 218, 0.05)",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(66, 161, 218, 0.2)",
+                        ...expenseInputStyle,
+                        borderColor: "#3b82f6",
+                        color: "#3b82f6",
+                        "&:hover": {
+                          backgroundColor: "#eff6ff",
+                          borderColor: "#2563eb",
+                        },
                       }}
                     >
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        gutterBottom
-                      >
-                        Payment Summary
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Typography variant="body2">Subtotal:</Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography variant="body2" align="right">
-                            ${Number(watchAmount || 0).toFixed(2)}
-                          </Typography>
-                        </Grid>
+                      Add New Item
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
 
-                        {applyTax && (
-                          <>
-                            <Grid item xs={6}>
-                              <Typography variant="body2">
-                                Tax ({taxRate}%):
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Typography variant="body2" align="right">
-                                ${calculatedTax.toFixed(2)}
-                              </Typography>
-                            </Grid>
-                          </>
-                        )}
-
-                        <Grid item xs={6}>
-                          <Typography variant="subtitle2" fontWeight="bold">
-                            Total:
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            variant="subtitle2"
-                            fontWeight="bold"
-                            align="right"
-                          >
-                            ${totalAmount.toFixed(2)}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  </Grid>
-                </Grid>
-              )}
-
-              {/* Tab 4: Documents */}
-              {tabValue === 3 && (
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <SectionTitle>
-                      <FaFileAlt className="mr-2" />
-                      Supporting Documents
-                    </SectionTitle>
-                  </Grid>
-                  <Grid item xs={12} md={12}>
-                    <TASFileupload
-                      uploadBoxStyles={{ width: "300px", ...boxStyle }}
-                      name="document"
-                      label="Upload document"
-                      icon={
-                        <CloudUpload
-                          sx={{
-                            fontSize: 40,
-                            color: theme.palette.primary.main,
-                            mb: 1,
-                          }}
-                        />
-                      }
-                      helperText="Drag and drop files here or click to browse"
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}
-                    >
-                      <FaFileInvoiceDollar className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Invoice Number
-                      </Typography>
-                    </Box>
-
-                    <TASInput
-                      name="invoice_number"
-                      label="Enter Invoice Number"
-                      placeholder="e.g., INV-2023-001"
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}
-                    >
-                      <FaInfoCircle className="text-[#42A1DA] mt-1 mr-2" />
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        Document Notes
-                      </Typography>
-                    </Box>
-                    <FormTextArea
-                      name="document_notes"
-                      placeholder="Add notes about the attached documents..."
-                      required={true}
-                      minRows={4}
-                    />
-                  </Grid>
-                </Grid>
-              )}
-
-              <Divider sx={{ my: 4 }} />
-
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+            {/* Payment & Details Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "white",
+                }}
               >
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderColor: "#42A1DA",
-                    color: "#42A1DA",
-                    borderRadius: "8px",
-                    "&:hover": {
-                      borderColor: "#2980b9",
-                      backgroundColor: "rgba(66, 161, 218, 0.1)",
-                    },
-                  }}
-                  onClick={() => {
-                    if (tabValue > 0) {
-                      setTabValue(tabValue - 1);
-                    } else {
-                      navigate("/dashboard/income-list");
-                    }
-                  }}
-                >
-                  {tabValue > 0 ? "Previous" : "Cancel"}
-                </Button>
+                <CardContent sx={{ p: 4 }}>
+                  <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+                    <Payment sx={{ color: "#8b5cf6", fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight="600" color="#1e293b">
+                      Payment Information
+                    </Typography>
+                  </Stack>
+                  <Divider sx={{ mb: 3 }} />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <TASSelect
+                        size="normal"
+                        name="payment_method"
+                        label="Payment Method"
+                        items={paymentMethods}
+                      />
+                    </Grid>
+                    {/* Conditional Payment Fields */}
+                    {["Bkash", "Nagad", "Rocket", "Other"].includes(
+                      methods.watch("payment_method")
+                    ) && (
+                      <>
+                        <Grid item xs={12} md={3}>
+                          <TASInput
+                            fullWidth
+                            name="accountNumber"
+                            label="Account Number"
+                            sx={expenseInputStyle}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={3}>
+                          <TASInput
+                            fullWidth
+                            name="transactionNumber"
+                            label="Transaction Number"
+                            sx={expenseInputStyle}
+                          />
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item xs={12}>
+                      <TASTextarea
+                        fullWidth
+                        name="note"
+                        minRows={4}
+                        placeholder="Add any additional notes about this income..."
+                        sx={expenseInputStyle}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-                {tabValue < 3 ? (
-                  <Button
-                    sx={{
-                      background:
-                        "linear-gradient(135deg, #42A1DA 0%, #2980b9 100%)",
-                      color: "white",
-                      borderRadius: "8px",
-                      "&:hover": {
-                        background:
-                          "linear-gradient(135deg, #2980b9 0%, #1e6091 100%)",
-                      },
-                    }}
-                    onClick={() => setTabValue(tabValue + 1)}
-                  >
-                    Next
-                  </Button>
-                ) : (
-                  <SubmitButton
-                    type="submit"
-                    disabled={createLoading || updateLoading}
-                    endIcon={
-                      createLoading || updateLoading ? (
-                        <CircularProgress size={20} color="inherit" />
-                      ) : (
-                        <MdSave />
-                      )
-                    }
-                  >
-                    {id
-                      ? updateLoading
-                        ? "Updating..."
-                        : "Update Income"
-                      : createLoading
-                      ? "Saving..."
-                      : "Save Income"}
-                  </SubmitButton>
-                )}
-              </Box>
-            </form>
-          </FormProvider>
-        </StyledPaper>
-      </div>
-    </section>
+          {/* Submit Button */}
+          <Box display="flex" justifyContent="center" mt={4}>
+            <Button
+              variant="contained"
+              type="submit"
+              size="large"
+              sx={{
+                ...expenseInputStyle,
+                backgroundColor: "#3b82f6",
+                "&:hover": {
+                  backgroundColor: "#2563eb",
+                },
+                px: 4,
+                py: 1.5,
+                fontSize: "1.1rem",
+                fontWeight: "600",
+                color: "#fff",
+              }}
+            >
+              {id ? "Update Income" : "Create Income"}
+            </Button>
+          </Box>
+        </form>
+      </FormProvider>
+    </Box>
   );
 };
 
-export default IncomeForm;
+export default ExpenseForm;

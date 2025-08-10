@@ -25,11 +25,8 @@ import { Close as CloseIcon } from "@mui/icons-material";
 
 export function StockMovementDialog({ open, onClose, product, onSuccess }) {
   if (!product) {
-    console.log("StockMovementDialog: product is undefined");
     return null;
   }
-
-  console.log("StockMovementDialog rendering with product:", product);
 
   const {
     name = "Unknown Product",

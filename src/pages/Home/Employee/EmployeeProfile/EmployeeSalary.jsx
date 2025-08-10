@@ -48,7 +48,7 @@ import { allMonths } from "../../../../utils/month"
 import PartialPaymentModal from "../PartialSalaryPaymentModal"
 import PaymentHistoryModal from './PaymentHistoryModal.jsx'
 
-const EmployeeSalary = ({ id }) => {
+const EmployeeSalary = ({ id, tenantDomain }) => {
   const theme = useTheme()
   const [currentPage, setCurrentPage] = useState(1)
   const [filterMonth, setFilterMonth] = useState("")
@@ -63,6 +63,7 @@ const EmployeeSalary = ({ id }) => {
   const currentYear = currentDate.getFullYear()
 
   const { data, isLoading, refetch } = useGetSalaryForProfileQuery({
+    tenantDomain,
     id,
     limit,
     page: currentPage,
@@ -492,6 +493,7 @@ const EmployeeSalary = ({ id }) => {
       {/* Partial Payment Modal */}
       {selectedSalary && (
         <PartialPaymentModal
+        tenantDomain={tenantDomain}
           open={modalOpen}
           onClose={handleCloseModal}
           employee={selectedSalary.employee}

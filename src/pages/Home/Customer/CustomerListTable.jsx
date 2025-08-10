@@ -7,15 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { HiOutlineSearch } from "react-icons/hi";
-import { Chip, Pagination, Tooltip } from "@mui/material";
+import { Pagination } from "@mui/material";
 import {
   useGetAllCustomersQuery,
   useMoveRecycledCustomerMutation,
 } from "../../../redux/api/customerApi";
 import { toast } from "react-toastify";
 import EmptyData from "../../../components/EmptyData/EmptyData";
-import { mileageStyle } from "../../../utils/customStyle";
-
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const CustomerListTable = () => {
   const textInputRef = useRef(null);
   const location = useLocation();
@@ -27,7 +26,7 @@ const CustomerListTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
-  const domain = window.location.hostname.split(".")[0];
+  const tenantDomain = useTenantDomain();
 
   const {
     data: customerData,
@@ -35,7 +34,7 @@ const CustomerListTable = () => {
     error: customerError,
     refetch,
   } = useGetAllCustomersQuery({
-    tenantDomain: domain,
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -148,7 +147,6 @@ const CustomerListTable = () => {
                     </thead>
                     <tbody>
                       {customerData?.data?.customers?.map((card, index) => {
-                        console.log(card);
                         const lastVehicle = card?.vehicles
                           ? [...card.vehicles].sort(
                               (a, b) =>

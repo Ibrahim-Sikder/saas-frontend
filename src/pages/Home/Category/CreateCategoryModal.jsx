@@ -1,22 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-
 import { toast } from "react-toastify";
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Grid,
   IconButton,
-  InputAdornment,
   Dialog,
   DialogContent,
   CircularProgress,
-  alpha,
   Fade,
-  Zoom,
 } from "@mui/material";
 import {
   Category as CategoryIcon,
@@ -25,34 +19,26 @@ import {
   Save as SaveIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useCreateCategoryMutation } from "../../../redux/api/categoryApi";
 import GarageForm from "../../../components/form/Form";
 import ImageUpload from "../../../components/form/ImageUpload";
 import TASInput from "../../../components/form/Input";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const CreateCategoryModal = ({ open, setOpen, categoryId }) => {
   const [createCategory, { isLoading, isSuccess }] =
     useCreateCategoryMutation();
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    main_category: "",
-    sub_category: "",
-    image: "",
-  });
+  const tenantDomain = useTenantDomain();
 
   const handleSubmit = async (data) => {
     try {
       const imageUrl =
         data.image && data.image.length > 0 ? data.image[0] : data?.data?.image;
-
-      console.log(data);
       const res = await createCategory({
         ...data,
         image: imageUrl,
+        tenantDomain
       }).unwrap();
-      console.log(res);
 
       if (res.success) {
         toast.success("Category create successfully!");
@@ -94,7 +80,7 @@ export const CreateCategoryModal = ({ open, setOpen, categoryId }) => {
 
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "#42A1DA",
           py: 2,
           px: 3,
           display: "flex",
@@ -186,7 +172,7 @@ export const CreateCategoryModal = ({ open, setOpen, categoryId }) => {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "#42A1DA",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     py: 1.5,
                     textTransform: "none",

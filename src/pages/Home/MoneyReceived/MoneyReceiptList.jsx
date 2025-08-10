@@ -1,10 +1,8 @@
-import { FaFileInvoice } from "react-icons/fa";
 
 import MoneyReceiptTable from "./MoneyReceiptTable";
 import { ArrowBack, ArrowForwardIos } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import { backBtnStyle } from "../../../utils/customStyle";
 
 const MoneyReceiptList = () => {
@@ -24,10 +22,10 @@ const MoneyReceiptList = () => {
           >
             Back
           </Button>
-          <HiOutlineUserGroup className="invoicIcon" />
+        
         </div>
         <div className="flex flex-wrap items-center justify-center">
-          <FaFileInvoice className="invoicIcon" />
+       
           <div className="ml-2">
             <h3 className="text-sm font-bold md:text-2xl">Money Receipt</h3>
             <span>

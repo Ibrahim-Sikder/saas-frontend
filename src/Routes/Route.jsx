@@ -19,7 +19,6 @@ import AddJobCard from "../pages/Home/AddJobCard/AddJobCard";
 import PreviewJobCard from "../pages/Home/AddJobCard/PreviewJobCard/PreviewJobCard";
 import UpdateProduct from "../pages/Home/Products/UpdateProduct";
 import UpdateRole from "../pages/Home/Role/UpdateRole";
-import Login from "../pages/Login/Login";
 import DashboardLayout from "../Layout/DashboardLayout";
 import MoneyReceived from "../pages/Home/MoneyReceived/MoneyReceived";
 import MoneyReceiptList from "../pages/Home/MoneyReceived/MoneyReceiptList";
@@ -60,12 +59,8 @@ import EmployeeOvertime from "../pages/Home/Employee/EmployeeOvertime";
 import RunningProject from "../pages/Home/Projects/RunningProject";
 import CompletedProject from "../pages/Home/Projects/CompletedProject";
 import ViewEmployeeAttendance from "../pages/Home/Attendance/ViewEmployeeAttendance";
-import Support from "../pages/Support/Support";
-import Message from "../pages/Message/Message";
-import Notification from "../pages/Notification/Notification";
 import EmployeeHoliday from "../pages/Holiday/Holiday";
-import ShiftList from "../pages/Home/Employee/ShiftAndSchedule/ShiftList";
-import PrivateRoute from "./PrivateRoute";
+
 import UpdateBillPay from "../pages/BillPay/UpdateBillPay";
 import BillPayInvoice from "../pages/BillPay/BillPayInvoice";
 import PurchaseList from "../pages/Home/Parchase/PurchasList";
@@ -103,7 +98,6 @@ import BillPayList from "../pages/BillPay/BillPayList";
 import BillPayHistory from "../pages/BillPay/BillPayHistory";
 import UpdateEmployeeSalary from "../pages/Home/Employee/UpdateEmployeeSalary";
 import Signup from "../pages/Signup/Signup";
-import LoginPage from "../pages/Login/Login2";
 import RegisterPage from "../pages/Login/Register";
 import TenantRegistrationPage from "../pages/Login/TenantRegister";
 import SubscriptionPage from "../pages/Login/Subscription";
@@ -131,7 +125,17 @@ import StockAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import AddAdjustment from "../pages/Inventory/Adjustment/AddAdjustment";
 import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import CreateTenant from "../pages/Tenant/CreateTenant";
-// import LandingPage from "../pages/Login/LandingPage";
+import LandingPage from "../pages/Login/LandingPage";
+import SubscriptionManagement from "../pages/Subscription/Subscription";
+import Login from "../pages/Login/Login";
+import AdminUserListPage from "../pages/Home/Profile/AllUserList";
+import UserProfilePage from "../pages/Home/Profile/Profile";
+import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
+import AllTenantList from "../pages/Home/Tenant/AllTenantList";
+import AllUserList from "../pages/Home/Tenant/AllUserList";
+import ContactUserList from "../pages/Home/Tenant/ContactUserList";
+import CompanyBrand from "../pages/CompanyBrand/CompanyBrand";
+import Review from "../pages/Review/Review";
 
 export const router = createBrowserRouter([
   {
@@ -140,7 +144,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Login />,
+        element: <LandingPage />,
       },
       {
         path: "signup",
@@ -148,7 +152,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "login",
-        element: <LoginPage />,
+        element: <Login />,
       },
       {
         path: "create-tenant",
@@ -161,6 +165,11 @@ export const router = createBrowserRouter([
       {
         path: "tenant",
         element: <TenantRegistrationPage />,
+      },
+
+      {
+        path: "subscription",
+        element: <SubscriptionManagement />,
       },
       {
         path: "subscription",
@@ -495,19 +504,6 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "support",
-        element: <Support />,
-      },
-
-      {
-        path: "message",
-        element: <Message />,
-      },
-      {
-        path: "notification",
-        element: <Notification />,
-      },
-      {
         path: "holiday",
         element: <EmployeeHoliday />,
       },
@@ -519,10 +515,7 @@ export const router = createBrowserRouter([
         path: "update-holiday",
         element: <UpdateHoliday />,
       },
-      {
-        path: "shift-list",
-        element: <ShiftList />,
-      },
+
       {
         path: "add-income",
         element: <Income />,
@@ -686,6 +679,38 @@ export const router = createBrowserRouter([
       {
         path: "all-customer",
         element: <AllCustomerList />,
+      },
+      {
+        path: "all-user",
+        element: <AdminUserListPage />,
+      },
+      {
+        path: "all-user",
+        element: <UserProfilePage />,
+      },
+      {
+        path: "profile-update",
+        element: <UpdateProfile />,
+      },
+      {
+        path: "all-tenant-list",
+        element: <AllTenantList />,
+      },
+      {
+        path: "all-user-list",
+        element: <AllUserList />,
+      },
+      {
+        path: "contact-customer",
+        element: <ContactUserList />,
+      },
+      {
+        path: "company-brand",
+        element: <CompanyBrand />,
+      },
+      {
+        path: "review",
+        element: <Review />,
       },
       {
         path: "backup",

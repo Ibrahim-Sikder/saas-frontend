@@ -14,43 +14,11 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 import axios from "axios" // Assuming you're using axios for API calls
 import { useGetAllHolidaysQuery } from "../../../../redux/api/holidayApi"
+import { useTenantDomain } from "../../../../hooks/useTenantDomain"
+import { GradientBorder, StyledCalendar, StyledPaper } from "../../../../utils/customStyle"
 
 const localizer = momentLocalizer(moment)
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  borderRadius: 20,
-  overflow: "hidden",
-  position: "relative",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 20px 30px rgba(0,0,0,0.1)",
-  },
-}))
-
-const GradientBorder = styled(Box)(({ theme }) => ({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  height: 4,
-  background: "linear-gradient(90deg, #42A1DA, #F77F00, #42A1DA)",
-  backgroundSize: "200% 100%",
-  animation: "gradientMove 5s ease infinite",
-}))
-
-const StyledCalendar = styled(Calendar)(({ theme }) => ({
-  "& .rbc-today": {
-    backgroundColor: theme.palette.primary.light,
-  },
-  "& .rbc-event": {
-    backgroundColor: theme.palette.secondary.main,
-  },
-  "& .rbc-header": {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-  },
-}))
 
 const EmployeeHoliday = () => {
   const [holidays, setHolidays] = useState([])
@@ -58,7 +26,10 @@ const EmployeeHoliday = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [search, SetSearch] = useState("")
   const theme = useTheme()
+    const tenantDomain = useTenantDomain();
+
   const { data, isLoading } = useGetAllHolidaysQuery({
+    tenantDomain, 
     limit: 10,
     page: currentPage,
     searchTerm: search,
@@ -100,7 +71,7 @@ const EmployeeHoliday = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <StyledPaper elevation={5}>
-            <GradientBorder />
+            <GradientBorder/>
             <Box sx={{ p: 3, height: 600 }}>
               <StyledCalendar
                 localizer={localizer}

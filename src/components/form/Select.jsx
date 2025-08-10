@@ -13,7 +13,7 @@ const TASSelect = ({
   sx,
   onChange,
   icon: Icon,
-  iconPosition = "start", // "start" or "end"
+  iconPosition = "start",
 }) => {
   const { control, formState } = useFormContext();
   const isError = formState.errors[name] !== undefined;

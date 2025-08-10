@@ -18,6 +18,8 @@ import { useGetSingleCustomerQuery } from "../../../../redux/api/customerApi";
 import Loading from "../../../../components/Loading/Loading";
 import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import CustomerNote from "./CustomerNote";
 
 const CustomerProfile = () => {
   const location = useLocation();
@@ -37,17 +39,13 @@ const CustomerProfile = () => {
     localStorage.setItem(`customer-tab-${id}`, value.toString());
   }, [value, id]);
 
-  const tenantDomain = typeof window !== "undefined"
-  ? window.location.hostname.split(".")[0]
-  : "default"
-
+  const tenantDomain = useTenantDomain();
 
   const {
     data: profileData,
     isLoading,
     error: customerError,
-  } = useGetSingleCustomerQuery({id, tenantDomain});
-  console.log(profileData);
+  } = useGetSingleCustomerQuery({ id, tenantDomain });
 
   if (isLoading) {
     return <Loading />;
@@ -155,6 +153,7 @@ const CustomerProfile = () => {
             <Tab sx={tabStyles} label="Invoice" />
             <Tab sx={tabStyles} label="Money Receipt" />
             <Tab sx={tabStyles} label="Message" />
+            <Tab sx={tabStyles} label="Note" />
           </Tabs>
         </Box>
 
@@ -168,6 +167,7 @@ const CustomerProfile = () => {
 
         <TabPanel value={value} index={2}>
           <CustomerJobCardList
+            tenantDomain={tenantDomain}
             customerId={profileData?.data?.customerId}
             user_type={profileData?.data?.user_type}
             id={id}
@@ -175,26 +175,35 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <CustomerQoutationList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={4}>
           <CustomerInvoiceList
+            tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={5}>
-          <CustomerMoneyList id={id} user_type={profileData?.data?.user_type} />
+          <CustomerMoneyList
+            tenantDomain={tenantDomain}
+            id={id}
+            user_type={profileData?.data?.user_type}
+          />
         </TabPanel>
         <TabPanel value={value} index={6}>
           <Message />
         </TabPanel>
+        <TabPanel value={value} index={7}>
+          <CustomerNote  tenantDomain={tenantDomain}  id={id}/>
+        </TabPanel>
 
         <div>
           <p className="my-5 text-center">
-            © Copyright 2024 | Trust Auto Solution | All Rights Reserved
+            © Copyright 2024 | Softypy Garage | All Rights Reserved
           </p>
         </div>
       </div>

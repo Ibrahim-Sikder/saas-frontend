@@ -12,18 +12,21 @@ const purchaseOrderApi = baseApi.injectEndpoints({
     }),
 
     getAllPurchaseOrders: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: "/purchase-orders",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["purchaseOrder"],
     }),
 
     getSinglePurchaseOrder: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchase-orders/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["purchaseOrder"],
     }),
@@ -48,9 +51,12 @@ const purchaseOrderApi = baseApi.injectEndpoints({
     }),
 
     deletePurchaseOrder: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchase-orders/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["purchaseOrder"],
     }),

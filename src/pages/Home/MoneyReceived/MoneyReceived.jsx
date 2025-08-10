@@ -23,6 +23,8 @@ import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
 import { useCreateMoneyReceiptMutation } from "../../../redux/api/money-receipt";
 import MoneyReceiptTable from "./MoneyReceiptTable";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const formatBangladeshiNumber = (num) => {
   if (!num) return "";
@@ -73,6 +75,7 @@ const MoneyReceiptView = () => {
   const location = useLocation();
   const jobNo = new URLSearchParams(location.search).get("order_no");
   const net_total = new URLSearchParams(location.search).get("net_total");
+  const tenantDomain = useTenantDomain();
 
   const parsedDate = new Date();
   const day = parsedDate.getDate().toString().padStart(2, "0");
@@ -89,6 +92,9 @@ const MoneyReceiptView = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [preview, setPreview] = useState("");
 
+    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const {
     register,
     handleSubmit,
@@ -117,8 +123,10 @@ const MoneyReceiptView = () => {
   const [createMoneyReceipt, { isLoading: createLoading }] =
     useCreateMoneyReceiptMutation();
 
-  const { data: jobCard, isLoading } =
-    useGetSingleJobCardWithJobNoQuery(job_no);
+ const { data: jobCard, isLoading } = useGetSingleJobCardWithJobNoQuery({
+  tenantDomain,
+  jobNo: job_no, 
+});
 
   const amountInWords = (amount) => {
     const numberWords = [
@@ -318,6 +326,7 @@ const MoneyReceiptView = () => {
     data.remaining = numRemaining;
 
     const values = {
+           tenantDomain,
       Id: jobCard?.data?.Id,
       user_type: jobCard?.data?.user_type,
       job_no: job_no,
@@ -418,22 +427,19 @@ const MoneyReceiptView = () => {
         <Button
           onClick={handleBack}
           startIcon={<ArrowBack />}
-          sx={{ mr: 2, color: "#fff", borderRadius:5 }}
+          sx={{ mr: 2, color: "#fff", borderRadius: 5 }}
         >
           Back
         </Button>
-        <HiOutlineUserGroup className="invoicIcon" />
       </div>
-
-
 
       <div className="md:w-[1300px] p-2 md:p-5 border border-black rounded-[5px] m-[30px] mx-auto ">
         <div className="flex items-center justify-between flex-col lg:flex-row gap-3  ">
           <div className="w-[130px] md:w-[175px]">
-            <img className="" src={logo || "/placeholder.svg"} alt="logo" />
+            <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
           </div>
           <div className="md:w-[570px] text-center text-[#0950a1]  ">
-            <h2 className="receivedTitle md:mb-2">Trust Auto Solution </h2>
+            <h2 className="receivedTitle md:mb-2">{CompanyInfoData?.data?.companyName} </h2>
             <span className="text-xs md:text-sm">
               It's trusted computerized Organization for all kinds of vehicle
               cheque up & maintenance such as computerized Engine Analysis,
@@ -444,16 +450,16 @@ const MoneyReceiptView = () => {
           <div>
             <div className="flex items-center mt-1">
               <FaGlobe className="hotlineIcon" />
-              <small className="ml-1">www.trustautosolution.com</small>
+              <small className="ml-1">{CompanyInfoData?.data?.website}</small>
             </div>
             <div className="flex items-center mt-1">
               <Email className="hotlineIcon" />
-              <small className="ml-1">trustautosolution@gmail.com</small>
+              <small className="ml-1">{CompanyInfoData?.data?.email}</small>
             </div>
             <div className="flex  mt-1">
               <FaLocationDot className="hotlineIcon"> </FaLocationDot>
               <small className="ml-1">
-                Ka-93/4/C Kuril Bishawroad, <br /> Dhaka-1212
+                {CompanyInfoData?.data?.address}
               </small>
             </div>
             <div className="flex items-center mt-1">

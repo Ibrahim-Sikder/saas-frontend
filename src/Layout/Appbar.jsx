@@ -6,55 +6,34 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCalendarDays } from "react-icons/fa6";
 import "./Layout.css";
-import Notification from "../components/Notification/Notification";
-import Message from "../components/Message/Message";
 import TopSearchbar from "../components/TopSearchbar/TopSearchbar";
 import UserProfile from "../components/UserProfile/UserProfile";
-import { Box, Button, IconButton } from "@mui/material";
-import { ExpandMore, MenuOpen } from "@mui/icons-material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Button, Chip, IconButton, Tooltip } from "@mui/material";
+import { MenuOpen } from "@mui/icons-material";
+import { btnStyle, btnStyle2 } from "../utils/customStyle";
+import { useGetAllMetaQuery } from "../redux/api/meta.api";
+import { useTenantDomain } from "../hooks/useTenantDomain";
+import Loading from "../components/Loading/Loading";
+import { useGetCompanyProfileQuery } from "../redux/api/companyProfile";
 
 const Appbar = ({ toggle, navRef, toggleSideBar }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const tenantDomain = useTenantDomain();
+  const {
+    data: allMetaData,
+    isLoading,
+    isError,
+  } = useGetAllMetaQuery({ tenantDomain });
+  console.log(allMetaData);
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+  if (isLoading) return <Loading />;
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const btnStyle = {
-    background: "rgba(255, 255, 255, 0.9)",
-    color: "#0B1F3A",
-    fontWeight: 600,
-    fontSize: {
-      xs: "13px",
-      sm: "15px",
-    },
-    width: "70%",
-    padding: "0px",
-    margin:'0 auto',
-    borderRadius: "12px",
-    border: "1px solid rgba(0,0,0,0.1)",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    textTransform: "none",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      backgroundColor: "#fff",
-      color: "#42A1DA",
-      borderColor: "#42A1DA",
-      transform: "scale(1.02)",
-    },
-  };
-  const btnStyle2 = {
-    background: "#fff",
-    width: "125px",
-    padding: "0px",
-    height: "35px",
-    "&:hover": {
-      backgroundColor: "#fff",
-      color: "#42A1DA",
-      border: "1px solid #42A1DA",
-    },
-  };
   return (
     <div className="static w-full h-16 xl:h-16">
       <div className="w-full h-16 xl:h-16 bg-[#42A1DA] fixed z-10 ">
@@ -71,7 +50,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/dashboard">
               <h3 className="ml-5 text-xl lg:text-2xl font-semibold text-white hidden xl:block">
-             SAAS APPLICATION
+                {CompanyInfoData?.data?.companyName}
               </h3>
             </Link>
             <Box
@@ -102,21 +81,78 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
               marginRight: "10px",
             }}
           >
-          <MenuOpen sx={{ fontSize: "40px" }} />
+            <MenuOpen sx={{ fontSize: "40px" }} />
             {/*<MenuOpen sx={{ fontSize: "40px" }} />*/}
-           {/* <UserProfile />            
+            {/* <UserProfile />            
             <ExpandMore/>*/}
           </IconButton>
 
           {/* Original navigation items - visible on lg screens */}
           <div className="hidden lg:flex items-center space-x-5 flex-end">
+            {allMetaData?.data?.subscriptionInfo && (
+              <>
+                {allMetaData.data.subscriptionInfo.daysRemaining > 0 ? (
+                  <Tooltip
+                    title={`Your subscription has ${allMetaData.data.subscriptionInfo.daysRemaining} day(s) remaining`}
+                    arrow
+                  >
+                    <Chip
+                      label={`${allMetaData.data.subscriptionInfo.daysRemaining} Days Left`}
+                      sx={{
+                        backgroundColor:
+                          allMetaData.data.subscriptionInfo.daysRemaining < 15
+                            ? "#f44336"
+                            : allMetaData.data.subscriptionInfo.daysRemaining <
+                              60
+                            ? "#ff9800"
+                            : "#4caf50",
+                        color: "#fff",
+                        fontWeight: 600,
+                        borderRadius: "8px",
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: "0.875rem",
+                        animation:
+                          allMetaData.data.subscriptionInfo.daysRemaining < 15
+                            ? "pulseRed 2s infinite"
+                            : allMetaData.data.subscriptionInfo.daysRemaining <
+                              60
+                            ? "pulseAmber 2s infinite"
+                            : "pulseGreen 2s infinite",
+                        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip
+                    title="Your subscription has expired. Please renew to continue."
+                    arrow
+                  >
+                    <Chip
+                      label="Subscription Expired"
+                      color="error"
+                      sx={{
+                        backgroundColor: "#b71c1c",
+                        color: "#fff",
+                        fontWeight: 600,
+                        borderRadius: "8px",
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: "0.875rem",
+                        animation: "shake 0.6s ease-in-out infinite",
+                        boxShadow: "0 0 12px rgba(244,67,54,0.6)",
+                      }}
+                    />
+                  </Tooltip>
+                )}
+              </>
+            )}
+
             <TopSearchbar />
             <Link to="/dashboard/holiday">
               <FaCalendarDays size={20} className="text-[#fff]" />
             </Link>
-            <Notification />
-            <Message />
-            <UserProfile />
+            <UserProfile tenantDomain={tenantDomain} />
           </div>
         </div>
 
@@ -164,8 +200,6 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
             >
               <FaCalendarDays size={22} className="text-white" />
             </Link>
-            <Notification />
-            <Message />
             <UserProfile />
           </div>
         </div>
