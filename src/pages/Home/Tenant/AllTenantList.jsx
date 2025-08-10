@@ -61,7 +61,7 @@ import ViewDetailsModal from "./ViewTenantModal";
 import { toast } from "react-toastify";
 import UpdateTenantModal from "./UpdateTenantModal";
 import CreateTenantModal from "./CreateTenantModal";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
 
 const AllTenantList = () => {
   const [filteredTenants, setFilteredTenants] = useState([]);
@@ -207,6 +207,7 @@ const AllTenantList = () => {
           `🎉 Subscription renewed successfully! New ${plan} plan is now active.`
         );
       }
+      
       // Close the view modal and refresh data
       setViewModalOpen(false);
       refetch();

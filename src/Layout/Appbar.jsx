@@ -24,7 +24,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
     isLoading,
     isError,
   } = useGetAllMetaQuery({ tenantDomain });
-
+  console.log(allMetaData);
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
@@ -152,7 +152,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
             <Link to="/dashboard/holiday">
               <FaCalendarDays size={20} className="text-[#fff]" />
             </Link>
-            <UserProfile tenantDomain={tenantDomain}/>
+            <UserProfile tenantDomain={tenantDomain} />
           </div>
         </div>
 

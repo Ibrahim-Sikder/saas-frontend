@@ -98,8 +98,6 @@ const UpdateTenantModal = ({
             onChange={(e, newValue) => setActiveTab(newValue)}
           >
             <Tab label="Tenant Details" />
-            <Tab label="Subscription" />
-            <Tab label="Access Control" />
           </Tabs>
 
           <Box sx={{ mt: 3 }}>

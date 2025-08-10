@@ -17,10 +17,8 @@ import {
   CurrencyExchange,
   ShoppingBag,
   Recycling,
-  Dashboard,
   DirectionsCar,
   RequestQuote,
-  ReceiptLong,
   MonetizationOn,
   Inventory,
   Inventory2,
@@ -28,9 +26,6 @@ import {
   LocalShipping,
   ShoppingCart,
   Storefront,
-  BarChart,
-  Assessment,
-  Warning,
   LocalOffer,
   Widgets,
   Difference,
@@ -39,18 +34,13 @@ import {
   AccountBalance,
   AttachMoney,
   MoneyOff,
-  Payments,
-  Savings,
   PersonAdd,
   Business,
   Store,
   EventNote,
   CalendarToday,
-  AccessTime,
   Group,
   HolidayVillage,
-  Schedule,
-  DataUsage,
   Storage,
   BackupTable,
   RestorePage,
@@ -411,7 +401,6 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -489,7 +478,6 @@ const Sidebar = ({ toggle }) => {
             ))}
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -692,7 +680,6 @@ const Sidebar = ({ toggle }) => {
             </Typography> */}
           </AccordionDetails>
         </Accordion>
-
         {/* HRM */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
@@ -769,71 +756,59 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel30"}
-          onChange={handleChange("panel30")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel2a-content"
-            id="panel2a-header"
-            className=""
+        {user.role !== "superadmin" && (
+          <Accordion
+            sx={{ paddingBottom: "10px" }}
+            className="dashboardAccordion"
+            expanded={expanded === "panel30"}
+            onChange={handleChange("panel30")}
           >
-            <Typography>
-              <div className="flex items-center dashboardItems">
-                <FaUsers size={22} />
-                <span className="ml-2">Tenant & UI Management</span>
-              </div>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserPlus className="mr-2" />
-                <NavLink to="/dashboard/all-tenant-list">
-                  All Tenant List
-                </NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserPlus className="mr-2" />
-                <NavLink to="/dashboard/contact-customer">
-                  Contact Customer List{" "}
-                </NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserPlus className="mr-2" />
-                <NavLink to="/dashboard/company-brand">
-                  Company Brand  
-                </NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserPlus className="mr-2" />
-                <NavLink to="/dashboard/review">
-                  Client Reivew  
-                </NavLink>
-              </span>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        {/* {user.role === "superadmin" && (
-          <div className="pl-4 space-y-3 mt-3 ">
-            <Link to="/dashboard/all-tenant-list">
-              <div className="flex items-center dashboardItems cursor-pointer">
-                <Logout size={22} />
-                <span className="ml-2">All Tenant List</span>
-              </div>
-            </Link>
-          </div>
-        )} */}
+            <AccordionSummary
+              sx={{ marginBottom: "-10px" }}
+              expandIcon={<ExpandLess className="accordionExpandIcon" />}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+              className=""
+            >
+              <Typography>
+                <div className="flex items-center dashboardItems">
+                  <FaUsers size={22} />
+                  <span className="ml-2">Tenant & UI Management</span>
+                </div>
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/all-tenant-list">
+                    All Tenant List
+                  </NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/contact-customer">
+                    Contact Customer List{" "}
+                  </NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/company-brand">Company Brand</NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/review">Client Reivew</NavLink>
+                </span>
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
+        )}
         <div className="pl-4 space-y-3 mt-3 ">
           <Link to="/dashboard/all-user-list">
             <div className="flex items-center dashboardItems cursor-pointer">

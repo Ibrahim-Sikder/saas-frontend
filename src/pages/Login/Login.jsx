@@ -22,6 +22,7 @@ const Login = () => {
     try {
       const res = await tenantLogin(data).unwrap();
 
+      
       if (res.success) {
         const accessToken = res?.data?.accessToken;
         const user = res?.data?.user;
