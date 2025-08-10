@@ -9,11 +9,18 @@ import { Link, useLocation } from "react-router-dom";
 import { Button, Divider } from "@mui/material";
 import { usePDF } from "react-to-pdf";
 import { formatNumber } from "../../../utils/formateSemicolon";
+import { useGetSingleInvoiceQuery } from "../../../redux/api/invoice";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Detail = () => {
   const componentRef = useRef();
   const { targetRef } = usePDF({ filename: "page.pdf" });
+  const tenantDomain = useTenantDomain();
 
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
@@ -21,24 +28,24 @@ const Detail = () => {
     content: () => componentRef.current,
   });
 
-  const [invoicePreview, setInvoicePreview] = useState({});
-  console.log("invoice", invoicePreview);
+  const [invoicePreview, setInvoicePreview] = useState({})
   const [loading, setLoading] = useState(false);
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
       ? invoicePreview?.net_total
       : invoicePreview?.due;
+
+  const { data } = useGetSingleInvoiceQuery({
+    tenantDomain,
+    id,
+  });
+
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      fetch(`${import.meta.env.VITE_API_URL}/invoices/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setInvoicePreview(data.data);
-          setLoading(false);
-        });
+    if (data?.data) {
+      setInvoicePreview(data.data);
     }
-  }, [id]);
+  }, [data]);
+
   const cleanNumber = (value) => {
     if (typeof value === "string") {
       return Number(value.replace(/[^0-9.-]+/g, ""));
@@ -58,26 +65,26 @@ const Detail = () => {
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#351E98] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src={logo} alt="logo" />
+                  <img className="w-[120px] " src= {CompanyInfoData?.data?.logo} alt="logo" />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                      Trust Auto Solution{" "}
+                     {CompanyInfoData?.data?.companyName}
                     </h2>
                     <small className="block">
-                      Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229
+                      Office:  {CompanyInfoData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> +88
-                      01821-216465
+                      <small className="font-bold">Mobile:</small> 
+                     {CompanyInfoData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                      trustautosolution@gmail.com
+                     {CompanyInfoData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                      www.trustautosolution.com
+                       {CompanyInfoData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -332,6 +339,7 @@ const Detail = () => {
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
                     {invoicePreview.vat !== 0 && <b> VAT </b>}
+                    {invoicePreview.tax !== 0 && <b> Tax </b>}
                     <b> Grand Total </b>
 
                     {advanceAmountNumber !== 0 && (
@@ -352,6 +360,9 @@ const Detail = () => {
                     )}
                     {invoicePreview.vat !== 0 && (
                       <small> : {formatNumber(invoicePreview.vat)}%</small>
+                    )}
+                    {invoicePreview.tax !== 0 && (
+                      <small> : {formatNumber(invoicePreview.tax)}%</small>
                     )}
                     <small>
                       : {formatNumber(invoicePreview.net_total)} &#2547;{" "}
@@ -392,7 +403,7 @@ const Detail = () => {
               className="text-[10px]"
               href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
                 invoicePreview._id
-              }`}
+              }?tenantDomain=${tenantDomain}`}
               target="_blank"
               rel="noreferrer"
             >

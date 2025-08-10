@@ -81,6 +81,8 @@ import AddWarehouseModal from "../../Inventory/Warehouse/AddWarehouse";
 import { CreateProductTypeModal } from "../ProductType/CreateProductTypeModal";
 import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+
 
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
@@ -118,41 +120,52 @@ export default function ProductForm({ id }) {
   const handleSupplierClose = () => setSupplierOpen(false);
   const handleUnitOpen = () => setUnitOpen(true);
   const handleUnitClose = () => setUnitOpen(false);
+  const tenantDomain = useTenantDomain();
 
   const { data: singleProduct, isLoading: singleProductLoading } =
-    useGetSingleProductQuery(id);
+    useGetSingleProductQuery({ tenantDomain, id });
+
   const [updateProduct] = useUpdateProductMutation();
   const [createProduct] = useCreateProductMutation();
   const { data } = useGetAllICategoryQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: brandData } = useGetAllIBrandQuery({
+  const { data: brandData, isLoading: brandLoading } = useGetAllIBrandQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: unitData } = useGetAllIUnitQuery({
+  const { data: unitData, isLoading: unitLoading } = useGetAllIUnitQuery({
+    tenantDomain,
     limit: 99999999999,
     page: 1,
     searchTerm: "",
   });
-  const { data: productTypeData } = useGetAllIProductTypeQuery({
-    limit: 99999999999,
-    page: 1,
-    searchTerm: "",
-  });
-  const { data: supplierData } = useGetAllSuppliersQuery({
-    limit: 1000000,
-    page: 1,
-    searchTerm: "",
-  });
-  const { data: wareHouseData } = useGetAllWarehousesQuery({
-    limit: 1000000,
-    page: 1,
-    searchTerm: "",
-  });
+  const { data: productTypeData, isLoading: productTypeLoading } =
+    useGetAllIProductTypeQuery({
+      tenantDomain,
+      limit: 99999999999,
+      page: 1,
+      searchTerm: "",
+    });
+  const { data: supplierData, isLoading: supplierLoading } =
+    useGetAllSuppliersQuery({
+      tenantDomain,
+      limit: 1000000,
+      page: 1,
+      searchTerm: "",
+    });
+  const { data: wareHouseData, isLoading: warehouseLoading } =
+    useGetAllWarehousesQuery({
+      tenantDomain,
+      limit: 1000000,
+      page: 1,
+      searchTerm: "",
+    });
 
   // Options for dropdowns
   const warehouseOptions = useMemo(() => {
@@ -252,7 +265,7 @@ export default function ProductForm({ id }) {
       expiryDate: singleProduct.data.expiryDate || "",
       manufacturingDate: singleProduct.data.manufacturingDate || null,
       shelfLife: singleProduct.data.shelfLife || "",
-      shelfLifeUnit: singleProduct.data.shelfLifeUnit || "days",
+      shelfLifeUnit: singleProduct.data.shelfLifeUnit || "Days",
       batchNumber: singleProduct.data.batchNumber || "",
       expiryAlertDays: singleProduct.data.expiryAlertDays || 30,
       category: singleProduct.data.category
@@ -339,15 +352,17 @@ export default function ProductForm({ id }) {
     }
   }, [singleProduct?.data]);
 
+  if (
+    productTypeLoading |
+    brandLoading |
+    unitLoading |
+    warehouseLoading |
+    supplierLoading
+  ) {
+    return <h4>Loading.........</h4>;
+  }
+
   const handleSubmit = async (data) => {
-    // const processDate = (dateValue) => {
-    //   if (!dateValue) return null;
-
-    //   // Parse the date with dayjs and format it consistently
-    //   const parsed = dayjs(dateValue);
-    //   return parsed.isValid() ? parsed.format("YYYY-MM-DD") : null;
-    // };
-
     try {
       const imageUrl =
         data.image && data.image.length > 0 ? data.image[0] : data?.data?.image;
@@ -431,13 +446,20 @@ export default function ProductForm({ id }) {
         isDeleted: data.isDeleted || false,
       };
       if (!id) {
-        const res = await createProduct(modifyValues).unwrap();
+        const res = await createProduct({
+          tenantDomain,
+          ...modifyValues,
+        }).unwrap();
         if (res.success) {
           toast.success("Product create successfully!");
           navigate("/dashboard/product-list");
         }
       } else {
-        const res = await updateProduct({ id, ...modifyValues }).unwrap();
+        const res = await updateProduct({
+          tenantDomain,
+          id,
+          ...modifyValues,
+        }).unwrap();
         if (res.success) {
           toast.success("Product update successfully!");
           navigate("/dashboard/product-list");
@@ -469,9 +491,13 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={6}>
             <TASInput
               name="product_name"
-              label="Product Name"
+              label={
+                <>
+                  Product Name
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Product Name"
-              required
               icon={ShoppingBag}
               iconPosition="start"
             />
@@ -479,9 +505,13 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={6}>
             <TASInput
               name="product_code"
-              label="Product Code"
+              label={
+                <>
+                  Product Code
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="e.g., OIL-2023-01"
-              required
               icon={ShoppingBag}
               iconPosition="start"
             />
@@ -494,9 +524,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="category"
-                  label="Category"
+                  label={
+                    <>
+                      Category
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="e.g., Electronics, Clothing"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={categoryOptions}
@@ -523,9 +557,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="warehouse"
-                  label="Warehouse"
+                  label={
+                    <>
+                      Warehouse
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="Select Warehouse"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={warehouseOptions}
@@ -552,9 +590,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="brand"
-                  label="Brand"
+                  label={
+                    <>
+                      Brand
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="e.g., Nike, Apple"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={brandOptions}
@@ -581,9 +623,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="product_type"
-                  label="Product Type"
+                  label={
+                    <>
+                      Product Type
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="Select Product Type"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={productTypeOptions}
@@ -610,9 +656,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="suppliers"
-                  label="Select Supplier"
+                  label={
+                    <>
+                      Select Supplier
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="Choose Supplier"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={suppliersOptions}
@@ -640,7 +690,12 @@ export default function ProductForm({ id }) {
               defaultValues={singleProduct?.data?.image}
               fullWidth
               name="image"
-              label="Upload Product Image"
+              label={
+                <>
+                  Upload product image
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
             />
           </Grid>
         </Grid>
@@ -655,7 +710,12 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="purchasePrice"
-              label="Purchase Price"
+              label={
+                <>
+                  Purchase Price
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Purchase Price"
               required
               icon={MonetizationOn}
@@ -665,7 +725,12 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="sellingPrice"
-              label="Selling Price"
+              label={
+                <>
+                  Selling Price
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Selling Price"
               required
               icon={MonetizationOn}
@@ -675,7 +740,12 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="minimumSalePrice"
-              label="Minimum Sale Price"
+              label={
+                <>
+                  Minimum Sale Price
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Minimum Sale Price"
               required
               icon={MonetizationOn}
@@ -685,7 +755,7 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="expense"
-              label="Expense"
+              
               placeholder="Expense"
               required
               icon={MonetizationOn}
@@ -698,7 +768,6 @@ export default function ProductForm({ id }) {
               name="discount"
               label="Discount"
               placeholder="Discount"
-              required
               icon={Discount}
               iconPosition="start"
               type="number"
@@ -709,7 +778,6 @@ export default function ProductForm({ id }) {
               name="product_tax"
               label="Product Tax"
               placeholder="Product Tax"
-              required
               icon={MonetizationOn}
               iconPosition="start"
               type="number"
@@ -720,7 +788,6 @@ export default function ProductForm({ id }) {
               name="tax_method"
               label="Tax Method"
               placeholder="Product Tax"
-              required
               icon={Settings}
               iconPosition="start"
               type="number"
@@ -763,7 +830,12 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="product_quantity"
-              label="Product Quantity"
+              label={
+                <>
+                  Product Quantity
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Product Quantity"
               required
               icon={Inventory}
@@ -774,7 +846,12 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="stock_alert"
-              label="Stock Alert"
+              label={
+                <>
+                  Stock Alert
+                  <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                </>
+              }
               placeholder="Minimum quantity before alert"
               required
               icon={Speed}
@@ -825,9 +902,13 @@ export default function ProductForm({ id }) {
                 <TASAutocomplete
                   size="medium"
                   name="unit"
-                  label="Unit"
+                  label={
+                    <>
+                      Unit
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="kg, pcs, liters"
-                  required
                   icon={Category}
                   iconPosition="start"
                   options={unitOptions}
@@ -850,7 +931,6 @@ export default function ProductForm({ id }) {
             <TASInput
               name="storageLocation"
               label="Storage Location"
-              required
               icon={Store}
               iconPosition="start"
             />
@@ -1016,7 +1096,6 @@ export default function ProductForm({ id }) {
                 type="number"
                 defaultValue={30}
                 fullWidth
-                required
                 icon={Notifications}
                 iconPosition="start"
                 helperText="Number of days before expiration to trigger alerts"
@@ -1069,7 +1148,6 @@ export default function ProductForm({ id }) {
             <TASInput
               name="shipping"
               label="Shipping Cost"
-              required
               icon={Store}
               iconPosition="start"
               type="number"
@@ -1079,7 +1157,6 @@ export default function ProductForm({ id }) {
             <TASInput
               name="warranty"
               label="Warranty Period"
-              required
               icon={WarningRounded}
               iconPosition="start"
               type="number"
@@ -1089,7 +1166,6 @@ export default function ProductForm({ id }) {
             <FormTextArea
               name="productDescription"
               label="Product Description"
-              required
               icon={WarningRounded}
               iconPosition="start"
               type="number"
@@ -1099,7 +1175,6 @@ export default function ProductForm({ id }) {
             <FormTextArea
               name="specifications"
               label="Technical Specifications"
-              required
               icon={WarningRounded}
               iconPosition="start"
               type="number"
@@ -1131,106 +1206,6 @@ export default function ProductForm({ id }) {
     },
   ];
 
-  // Product search component
-  const ProductSearch = () => (
-    <Paper
-      elevation={0}
-      sx={{
-        mb: 3,
-        p: 2,
-        borderRadius: 3,
-        border: "1px solid rgba(106, 27, 154, 0.1)",
-        background: "rgba(106, 27, 154, 0.02)",
-      }}
-    >
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-        Quick Product Search
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Search existing products to avoid duplicates or find similar items
-      </Typography>
-      <TextField
-        fullWidth
-        placeholder="Search by product name, code, or category..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search color="action" />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
-              {isSearching && <CircularProgress size={20} />}
-            </InputAdornment>
-          ),
-          sx: { borderRadius: "12px" },
-        }}
-      />
-      {searchResults.length > 0 && (
-        <Box sx={{ mt: 2, maxHeight: 200, overflowY: "auto" }}>
-          {searchResults.map((result) => (
-            <Box
-              key={result.id}
-              sx={{
-                p: 1.5,
-                mb: 1,
-                borderRadius: 2,
-                bgcolor: "rgba(106, 27, 154, 0.05)",
-                border: "1px solid rgba(106, 27, 154, 0.1)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                cursor: "pointer",
-                transition: "all 0.2s",
-                "&:hover": {
-                  bgcolor: "rgba(106, 27, 154, 0.1)",
-                },
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                  variant="rounded"
-                  sx={{
-                    bgcolor: "rgba(106, 27, 154, 0.1)",
-                    color: "#6a1b9a",
-                    width: 40,
-                    height: 40,
-                    mr: 2,
-                  }}
-                >
-                  <Inventory />
-                </Avatar>
-                <Box>
-                  <Typography variant="subtitle2">{result.name}</Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Chip
-                      label={result.code}
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: "0.7rem",
-                        bgcolor: "rgba(106, 27, 154, 0.1)",
-                        color: "#6a1b9a",
-                      }}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {result.category}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Typography variant="subtitle2" color="#6a1b9a" fontWeight={600}>
-                ${result.price}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      )}
-    </Paper>
-  );
-
   return singleProductLoading ? (
     <h4>Loading</h4>
   ) : (
@@ -1246,7 +1221,7 @@ export default function ProductForm({ id }) {
         {/* Header */}
         <Box
           sx={{
-            background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+            background: "#42A0D9",
             color: "white",
             py: 3,
             mb: 4,
@@ -1283,8 +1258,7 @@ export default function ProductForm({ id }) {
               Back to Product List
             </Button>
           </Box>
-          {/* Product Search */}
-          <ProductSearch />
+
           <Paper
             elevation={3}
             sx={{
@@ -1315,54 +1289,55 @@ export default function ProductForm({ id }) {
                         </Typography>
                       </StepLabel>
                       <StepContent>
-                      <div className="mt-2 mb-1">{step.content}</div>
-                      <div className="md:flex mt-4 mb-2  gap-2 space-x-2">
-                
-                        <div className="mb-2 space-x-2">
-                          <Button
-                            disabled={index === 0}
-                            onClick={handleBack}
-                            sx={{
-                              borderRadius: 100,
-                              px: 3,
-                              color: "white",
-                            }}
-                          >
-                            Back
-                          </Button>
-                          {index === steps.length - 1 ? (
+                        <div className="mt-2 mb-1">{step.content}</div>
+                        <div className="md:flex mt-4 mb-2  gap-2 space-x-2">
+                          <div className="mb-2 space-x-2">
                             <Button
-                              variant="contained"
-                              type="submit"
-                              startIcon={<SaveIcon />}
-                              disabled={submitting}
+                              disabled={index === 0}
+                              onClick={handleBack}
                               sx={{
                                 borderRadius: 100,
-                                background:
-                                  "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                                 px: 3,
                                 color: "white",
                               }}
                             >
-                              {id ? "Update Product " : "Create Product"}
+                              Back
                             </Button>
-                          ) : (
-                            <Button
-                              variant="contained"
-                              onClick={handleNext}
-                              sx={{
-                                borderRadius: 100,
-                                background:
-                                  "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
-                                px: 3,
-                                color: "white",
-                              }}
-                            >
-                              Continue
-                            </Button>
-                          )}
+                            {index === steps.length - 1 ? (
+                              <Button
+                                variant="contained"
+                                type="submit"
+                                startIcon={<SaveIcon />}
+                                disabled={submitting}
+                                sx={{
+                                  borderRadius: 100,
+                                  background:
+                                    "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                                  boxShadow:
+                                    "0 4px 10px rgba(106, 27, 154, 0.3)",
+                                  px: 3,
+                                  color: "white",
+                                }}
+                              >
+                                {id ? "Update Product " : "Create Product"}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="contained"
+                                onClick={handleNext}
+                                sx={{
+                                  borderRadius: 100,
+                                  background:
+                                    "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                                  boxShadow:
+                                    "0 4px 10px rgba(106, 27, 154, 0.3)",
+                                  px: 3,
+                                  color: "white",
+                                }}
+                              >
+                                Continue
+                              </Button>
+                            )}
                           </div>
 
                           <Button
@@ -1379,7 +1354,6 @@ export default function ProductForm({ id }) {
                           >
                             Reset
                           </Button>
-                        
                         </div>
                       </StepContent>
                     </Step>

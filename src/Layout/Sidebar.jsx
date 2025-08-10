@@ -2,7 +2,7 @@
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import "./Layout.css";
@@ -17,10 +17,8 @@ import {
   CurrencyExchange,
   ShoppingBag,
   Recycling,
-  Dashboard,
   DirectionsCar,
   RequestQuote,
-  ReceiptLong,
   MonetizationOn,
   Inventory,
   Inventory2,
@@ -28,9 +26,6 @@ import {
   LocalShipping,
   ShoppingCart,
   Storefront,
-  BarChart,
-  Assessment,
-  Warning,
   LocalOffer,
   Widgets,
   Difference,
@@ -39,18 +34,13 @@ import {
   AccountBalance,
   AttachMoney,
   MoneyOff,
-  Payments,
-  Savings,
   PersonAdd,
   Business,
   Store,
   EventNote,
   CalendarToday,
-  AccessTime,
   Group,
   HolidayVillage,
-  Schedule,
-  DataUsage,
   Storage,
   BackupTable,
   RestorePage,
@@ -101,29 +91,18 @@ import LeftHoberSidebar from "../components/Appbar/LeftHoberSidebar";
 
 const Sidebar = ({ toggle }) => {
   const [expanded, setExpanded] = useState(false);
-  {
-    /*const [nestedExpanded, setNestedExpanded] = useState({});*/
-  }
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  {
-    /* const handleNestedChange = (panel) => (event, isExpanded) => {
-    event.stopPropagation();
-    setNestedExpanded((prev) => ({
-      ...prev,
-      [panel]: isExpanded ? panel : false,
-    }));
-  };
-*/
-  }
   const navigate = useNavigate();
   const handleLogout = () => {
     Cookies.remove("tas-auth");
     navigate("/");
   };
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
     <aside className="flex ">
@@ -140,7 +119,66 @@ const Sidebar = ({ toggle }) => {
             <h3 className="text-xl font-semibold ml-2">Dashboard</h3>
           </NavLink>
         </div>
-
+        {/* Client */}
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel12"}
+          onChange={handleChange("panel12")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            className="dashboardAccordionSummary"
+          >
+            <Typography>
+              <div className="flex items-center justify-center">
+                <HiOutlineUserGroup size={22} />
+                <span className="ml-2"> Client</span>
+              </div>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <HiOutlineUserAdd className="mr-2" />
+                <NavLink to="/dashboard/add-customer">Customer Add</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <FaUserFriends className="mr-2" />
+                <NavLink to="/dashboard/customer-list">Customer List</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Business className="mr-2" />
+                <NavLink to="/dashboard/add-company"> Company Add </NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <HiOutlineOfficeBuilding className="mr-2" />
+                <NavLink to="/dashboard/company-list">Company List</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Store className="mr-2" />
+                <NavLink to="/dashboard/add-show-room"> Show Room Add</NavLink>
+              </span>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <span className="flex items-center">
+                <Storefront className="mr-2" />
+                <NavLink to="/dashboard/show-room-list">Show Room List</NavLink>
+              </span>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
         {/* Vehicle Job Card */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
@@ -363,7 +401,6 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -441,7 +478,6 @@ const Sidebar = ({ toggle }) => {
             ))}
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -524,12 +560,12 @@ const Sidebar = ({ toggle }) => {
 
           <AccordionDetails>
             <div className="accordionTypoGrapy">
-              <div className="flex items-center mb-2">
+              {/* <div className="flex items-center mb-2">
                 <Dashboard className="mr-2" />
                 <NavLink to="/dashboard/inventory-dashboard">
                   Inventory Dashboard
                 </NavLink>
-              </div>
+              </div> */}
               {[
                 {
                   icon: <Inventory2 />,
@@ -616,15 +652,15 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/expense-list">Expense List</NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Category className="mr-2" />
                 <NavLink to="/dashboard/expense-categories">
                   Expense Categories{" "}
                 </NavLink>
               </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
+            </Typography> */}
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Payments className="mr-2" />
                 <NavLink to="/dashboard/add-paybill"> Pay Bill </NavLink>
@@ -635,77 +671,15 @@ const Sidebar = ({ toggle }) => {
                 <ReceiptLong className="mr-2" />
                 <NavLink to="/dashboard/paybill">Bill List</NavLink>
               </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
+            </Typography> */}
+            {/* <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
                 <NavLink to="/dashboard/donation">Donation</NavLink>
               </div>
-            </Typography>
+            </Typography> */}
           </AccordionDetails>
         </Accordion>
-
-        {/* Client */}
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel12"}
-          onChange={handleChange("panel12")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel2a-content"
-            id="panel2a-header"
-            className="dashboardAccordionSummary"
-          >
-            <Typography>
-              <div className="flex items-center justify-center">
-                <HiOutlineUserGroup size={22} />
-                <span className="ml-2"> Client</span>
-              </div>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <HiOutlineUserAdd className="mr-2" />
-                <NavLink to="/dashboard/add-customer">Customer Add</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <FaUserFriends className="mr-2" />
-                <NavLink to="/dashboard/customer-list">Customer List</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Business className="mr-2" />
-                <NavLink to="/dashboard/add-company"> Company Add </NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <HiOutlineOfficeBuilding className="mr-2" />
-                <NavLink to="/dashboard/company-list">Company List</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Store className="mr-2" />
-                <NavLink to="/dashboard/add-show-room"> Show Room Add</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Storefront className="mr-2" />
-                <NavLink to="/dashboard/show-room-list">Show Room List</NavLink>
-              </span>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
         {/* HRM */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
@@ -742,18 +716,19 @@ const Sidebar = ({ toggle }) => {
             </Typography>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
+                <CalendarToday className="mr-2" />
+                <NavLink to="/dashboard/add-attendance">Attendance Add</NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
                 <FaCalendarAlt className="mr-2" />
                 <NavLink to="/dashboard/attendance-list">
                   Attendance List
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <CalendarToday className="mr-2" />
-                <NavLink to="/dashboard/add-attendance">Attendance Add</NavLink>
-              </div>
-            </Typography>
+
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <EventNote className="mr-2" />
@@ -772,108 +747,76 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
-            <Typography className="accordionTypoGrapy">
+            {/* <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <AccessTime className="mr-2" />
                 <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
               </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <Schedule className="mr-2" />
-                <NavLink to="/dashboard/shift-list">Shift & Schedule</NavLink>
-              </span>
-            </Typography>
+            </Typography> */}
           </AccordionDetails>
         </Accordion>
 
-        {/* Reports */}
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel14"}
-          onChange={handleChange("panel14")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel6a-content"
-            id="panel6a-header"
+        {user.role !== "superadmin" && (
+          <Accordion
+            sx={{ paddingBottom: "10px" }}
+            className="dashboardAccordion"
+            expanded={expanded === "panel30"}
+            onChange={handleChange("panel30")}
           >
-            <Typography>
-              <span className="flex items-center justify-center ">
-                <Assessment />
-                <span className="ml-2"> Reports</span>
-              </span>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <BarChart className="mr-2" />
-                <NavLink to="/dashboard/backup">Product Stock Report </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <Warning className="mr-2" />
-                <NavLink to="/dashboard/low-stock-report">
-                  Low Stock Report{" "}
-                </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <HiOutlineExclamation className="mr-2" />
-                <NavLink to="/dashboard/expired-product-report">
-                  Expired Product Report
-                </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <DataUsage className="mr-2" />
-                <NavLink to="/dashboard/restore">Daily Stock Movement</NavLink>
-              </div>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Database Backup */}
-        <Accordion
-          sx={{ paddingBottom: "10px" }}
-          className="dashboardAccordion"
-          expanded={expanded === "panel15"}
-          onChange={handleChange("panel15")}
-        >
-          <AccordionSummary
-            sx={{ marginBottom: "-10px" }}
-            expandIcon={<ExpandLess className="accordionExpandIcon" />}
-            aria-controls="panel6a-content"
-            id="panel6a-header"
-          >
-            <Typography>
-              <span className="flex items-center justify-center ">
-                <Storage />
-                <span className="ml-2"> Database Backup </span>
-              </span>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <BackupTable className="mr-2" />
-                <NavLink to="/dashboard/backup">Backup Database </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <RestorePage className="mr-2" />
-                <NavLink to="/dashboard/restore">Restore Database </NavLink>
-              </div>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+            <AccordionSummary
+              sx={{ marginBottom: "-10px" }}
+              expandIcon={<ExpandLess className="accordionExpandIcon" />}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+              className=""
+            >
+              <Typography>
+                <div className="flex items-center dashboardItems">
+                  <FaUsers size={22} />
+                  <span className="ml-2">Tenant & UI Management</span>
+                </div>
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/all-tenant-list">
+                    All Tenant List
+                  </NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/contact-customer">
+                    Contact Customer List{" "}
+                  </NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/company-brand">Company Brand</NavLink>
+                </span>
+              </Typography>
+              <Typography className="accordionTypoGrapy">
+                <span className="flex items-center">
+                  <FaUserPlus className="mr-2" />
+                  <NavLink to="/dashboard/review">Client Reivew</NavLink>
+                </span>
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
+        )}
+        <div className="pl-4 space-y-3 mt-3 ">
+          <Link to="/dashboard/all-user-list">
+            <div className="flex items-center dashboardItems cursor-pointer">
+              <Logout size={22} />
+              <span className="ml-2">All User List</span>
+            </div>
+          </Link>
+        </div>
 
         {/* Recycle Bin */}
         <Accordion
@@ -970,7 +913,40 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel15"}
+          onChange={handleChange("panel15")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel6a-content"
+            id="panel6a-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center ">
+                <Storage />
+                <span className="ml-2"> Database Backup </span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <BackupTable className="mr-2" />
+                <NavLink to="/dashboard/backup">Backup Database </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <RestorePage className="mr-2" />
+                <NavLink to="/dashboard/restore">Restore Database </NavLink>
+              </div>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
         {/* Logout */}
         <div className="pl-4 space-y-3 mt-3  mb-20 ">
           <div

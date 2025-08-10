@@ -12,8 +12,6 @@ import {
 } from "../../../redux/api/jobCard";
 import {
   Pagination,
-  Chip,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -25,6 +23,7 @@ import {
   Divider,
 } from "@mui/material";
 import { HiOutlineSearch } from "react-icons/hi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const JobcardTable = () => {
   const location = useLocation();
@@ -36,8 +35,13 @@ const JobcardTable = () => {
   const navigate = useNavigate();
 
   const limit = 10;
+  const tenantDomain = useTenantDomain();
+
+
+
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -50,10 +54,6 @@ const JobcardTable = () => {
   const [mileageDialogOpen, setMileageDialogOpen] = useState(false);
   const [selectedVehicleMileage, setSelectedVehicleMileage] = useState(null);
 
-  const handleOpenMileageDialog = (mileageHistory) => {
-    setSelectedVehicleMileage(mileageHistory);
-    setMileageDialogOpen(true);
-  };
 
   const handleCloseMileageDialog = () => {
     setMileageDialogOpen(false);
@@ -74,7 +74,7 @@ const JobcardTable = () => {
 
     if (willDelete) {
       try {
-        await movetoRecyclebinJobCard(id).unwrap();
+        await movetoRecyclebinJobCard({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -221,7 +221,6 @@ const JobcardTable = () => {
                                     />
                                   </svg>
                                 </span>
-                               
                               </Link>
                             </td>
                             <td>
@@ -229,7 +228,9 @@ const JobcardTable = () => {
                                 className="editIconWrap edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
-                                }/jobCards/jobcard/${card._id}`}
+                                }/jobCards/jobcard/${
+                                  card._id
+                                }?tenantDomain=${tenantDomain}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

@@ -9,14 +9,13 @@ import {
   FormControl,
   Grid,
   InputLabel,
-  MenuItem,
   Select,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaUsers, FaCloudUploadAlt } from "react-icons/fa";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaUsers } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { countries } from "../../../constant";
 import {
@@ -24,19 +23,18 @@ import {
   useUpdateEmployeeMutation,
 } from "../../../redux/api/employee";
 import ImageUploader from "../../../helper/uploadImage";
-import { ErrorMessage } from "../../../components/error-message";
-import Loading from "../../../components/Loading/Loading";
-import uploadFile from "../../../helper/uploadFile";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { ArrowBack } from "@mui/icons-material";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateEmployee = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const tenantDomain = useTenantDomain();
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [guardianCountryCode, setGuardianCountryCode] = useState(countries[0]);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -52,12 +50,14 @@ const UpdateEmployee = () => {
     reset,
     formState: { errors },
   } = useForm();
-
   const {
     data: singleEmployee,
     isLoading: employeeLoading,
     error: employeeError,
-  } = useGetSingleEmployeeQuery(id);
+  } = useGetSingleEmployeeQuery(
+    { tenantDomain, id },
+    { skip: !tenantDomain || !id }
+  );
 
   const [updateEmployee, { isLoading: updateLoading, error: updateError }] =
     useUpdateEmployeeMutation();
@@ -98,36 +98,20 @@ const UpdateEmployee = () => {
     }
   }, [reset, singleEmployee?.data]);
 
-  function isImage(url) {
-    return /\.(jpg|jpeg|png)$/i.test(url);
-  }
-
-  function getFileName(url) {
-    return url.split("/").pop().split(".")[0];
-  }
-
-  const handleImageUpload = async (event) => {
-    setLoading(true);
-    const file = event.target.files?.[0];
-
-    if (file) {
-      const uploadPhoto = await uploadFile(file);
-      setUrl(uploadPhoto?.secure_url);
-      setLoading(false);
-    }
-  };
   const onSubmit = async (data) => {
     data.country_code = countryCode.code;
     data.guardian_country_code = guardianCountryCode.code;
     data.image = url;
     data.nid_number = Number(data.nid_number);
 
-    const values = {
-      id,
-      data,
-    };
+    const res = await updateEmployee({
+      id: singleEmployee.data._id,
+      data: {
+        tenantDomain,
+        ...data,
+      },
+    }).unwrap();
 
-    const res = await updateEmployee(values).unwrap();
     if (res.success) {
       toast.success(res.message);
       navigate("/dashboard/employee-list");
@@ -171,9 +155,9 @@ const UpdateEmployee = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-8 ">
         <div className="productHeadWrap gap-3 ">
-          <div className="flex flex-wrap items-center justify-center">
+          <div className="flex flex-wrap">
             <Button
               onClick={handleBack}
               startIcon={<ArrowBack />}
@@ -181,10 +165,8 @@ const UpdateEmployee = () => {
             >
               Back
             </Button>
-            <HiOutlineUserGroup className="invoicIcon" />
           </div>
           <div className="flex items-center justify-center ">
-            <FaUsers size={70} className="invoicIcon" />
             <div>
               <h3 className="text-2xl font-bold"> Update Employee </h3>
             </div>
@@ -352,17 +334,6 @@ const UpdateEmployee = () => {
                         <option value="Female">Female</option>
                       </Select>
                     </FormControl>
-                  </Grid>
-
-                  <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Password"
-                      id="Password"
-                      {...register("password")}
-                      type="password"
-                      focused={singleEmployee?.data?.password || ""}
-                    />
                   </Grid>
                 </Grid>
               </Box>

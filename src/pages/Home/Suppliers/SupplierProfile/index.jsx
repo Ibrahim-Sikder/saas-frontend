@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Typography,
   IconButton,
@@ -28,7 +28,7 @@ import {
   DialogActions,
   Snackbar,
   Alert,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Message,
   Edit,
@@ -61,11 +61,11 @@ import {
   Archive,
   CloudDownload,
   Timelapse,
-} from "@mui/icons-material"
-import { useTheme } from "@mui/material/styles"
-import ProfileOverview from "./ProfileOverview"
-import SupplierProduct from "./SupplierProduct"
-import OrderTable from "./OrderTable"
+} from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
+import ProfileOverview from "./ProfileOverview";
+import SupplierProduct from "./SupplierProduct";
+import OrderTable from "./OrderTable";
 import {
   GlassCard,
   GradientBox,
@@ -76,71 +76,77 @@ import {
   StyledTab,
   StyledTabs,
   supplierData,
-} from "./supplier"
-import { useGetSupplierWithBillPayQuery } from "../../../../redux/api/supplier"
-import SupplierBillPay from "./SupplierBillPay"
+} from "./supplier";
+import { useGetSupplierWithBillPayQuery } from "../../../../redux/api/supplier";
+import SupplierBillPay from "./SupplierBillPay";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 export default function EnhancedSupplierProfile() {
-  const theme = useTheme()
-  const [tabValue, setTabValue] = useState(0)
-  const [anchorEl, setAnchorEl] = useState(null)
-  const [openDialog, setOpenDialog] = useState(false)
-  const [dialogType, setDialogType] = useState("")
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success")
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [expandedAccordion, setExpandedAccordion] = useState(false)
-  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null)
-  const id = new URLSearchParams(location.search).get("id")
-  const { data: supplierWithBillPay } = useGetSupplierWithBillPayQuery(id)
+  const theme = useTheme();
+  const [tabValue, setTabValue] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogType, setDialogType] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [expandedAccordion, setExpandedAccordion] = useState(false);
+  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
+  const id = new URLSearchParams(location.search).get("id");
+  const tenantDomain = useTenantDomain();
+
+  const { data: supplierWithBillPay } = useGetSupplierWithBillPayQuery({
+    tenantDomain,
+    id,
+  });
 
   const handleTabChange = (event, newValue) => {
-    setTabValue(newValue)
-  }
+    setTabValue(newValue);
+  };
 
   const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleOpenDialog = (type) => {
-    setDialogType(type)
-    setOpenDialog(true)
-  }
+    setDialogType(type);
+    setOpenDialog(true);
+  };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false)
-  }
+    setOpenDialog(false);
+  };
 
   const handleSnackbarClose = () => {
-    setSnackbarOpen(false)
-  }
+    setSnackbarOpen(false);
+  };
 
   const showSnackbar = (message, severity = "success") => {
-    setSnackbarMessage(message)
-    setSnackbarSeverity(severity)
-    setSnackbarOpen(true)
-  }
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen)
-  }
+    setDrawerOpen(!drawerOpen);
+  };
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordion(isExpanded ? panel : false)
-  }
+    setExpandedAccordion(isExpanded ? panel : false);
+  };
 
   const handleFilterMenuOpen = (event) => {
-    setFilterMenuAnchor(event.currentTarget)
-  }
+    setFilterMenuAnchor(event.currentTarget);
+  };
 
   const handleFilterMenuClose = () => {
-    setFilterMenuAnchor(null)
-  }
+    setFilterMenuAnchor(null);
+  };
 
   // Function to get status color
   const getStatusColor = (status) => {
@@ -152,14 +158,19 @@ export default function EnhancedSupplierProfile() {
       status === "Verified" ||
       status === "In Stock"
     ) {
-      return "green"
+      return "green";
     } else if (status === "Pending" || status === "Low Stock") {
-      return "orange"
-    } else if (status === "Inactive" || status === "Cancelled" || status === "Failed" || status === "Out of Stock") {
-      return "red"
+      return "orange";
+    } else if (
+      status === "Inactive" ||
+      status === "Cancelled" ||
+      status === "Failed" ||
+      status === "Out of Stock"
+    ) {
+      return "red";
     }
-    return "blue"
-  }
+    return "blue";
+  };
 
   // Function to get status icon
   const getStatusIcon = (status) => {
@@ -171,14 +182,19 @@ export default function EnhancedSupplierProfile() {
       status === "Verified" ||
       status === "In Stock"
     ) {
-      return <CheckCircle fontSize="small" />
+      return <CheckCircle fontSize="small" />;
     } else if (status === "Pending" || status === "Low Stock") {
-      return <Timelapse fontSize="small" />
-    } else if (status === "Inactive" || status === "Cancelled" || status === "Failed" || status === "Out of Stock") {
-      return <Cancel fontSize="small" />
+      return <Timelapse fontSize="small" />;
+    } else if (
+      status === "Inactive" ||
+      status === "Cancelled" ||
+      status === "Failed" ||
+      status === "Out of Stock"
+    ) {
+      return <Cancel fontSize="small" />;
     }
-    return <Info fontSize="small" />
-  }
+    return <Info fontSize="small" />;
+  };
 
   if (!supplierWithBillPay) {
     return (
@@ -192,7 +208,7 @@ export default function EnhancedSupplierProfile() {
       >
         <Typography variant="h5">Loading supplier data...</Typography>
       </Box>
-    )
+    );
   }
 
   return (
@@ -202,7 +218,10 @@ export default function EnhancedSupplierProfile() {
       {/* Main Content */}
       <Box sx={{ p: 3, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
         <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+          >
             <Business sx={{ mr: 1 }} /> Supplier Profile
           </Typography>
           <Button
@@ -217,13 +236,21 @@ export default function EnhancedSupplierProfile() {
           >
             Edit Profile
           </Button>
-          <Button variant="outlined" startIcon={<Print />} sx={{ ml: 1, borderRadius: 20 }}>
+          <Button
+            variant="outlined"
+            startIcon={<Print />}
+            sx={{ ml: 1, borderRadius: 20 }}
+          >
             Print
           </Button>
           <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
             <MoreVert />
           </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
             <MenuItem onClick={handleMenuClose}>
               <Archive sx={{ mr: 1, fontSize: 18 }} /> Archive Supplier
             </MenuItem>
@@ -257,8 +284,13 @@ export default function EnhancedSupplierProfile() {
               }}
             >
               <Avatar
-                src={supplierWithBillPay?.data?.supplier?.company_logo || "/placeholder.svg?height=150&width=150"}
-                alt={supplierWithBillPay?.data?.supplier?.full_name || "Supplier"}
+                src={
+                  supplierWithBillPay?.data?.supplier?.company_logo ||
+                  "/placeholder.svg?height=150&width=150"
+                }
+                alt={
+                  supplierWithBillPay?.data?.supplier?.full_name || "Supplier"
+                }
                 sx={{
                   width: 150,
                   height: 150,
@@ -271,34 +303,52 @@ export default function EnhancedSupplierProfile() {
               <Box sx={{ ml: 3, mt: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="h4" fontWeight="bold">
-                    {supplierWithBillPay?.data?.supplier?.full_name || "Loading..."}
+                    {supplierWithBillPay?.data?.supplier?.full_name ||
+                      "Loading..."}
                   </Typography>
                   <StatusChip
-                    icon={getStatusIcon(supplierWithBillPay?.data?.supplier?.supplier_status || "Pending")}
-                    label={supplierWithBillPay?.data?.supplier?.supplier_status || "Pending"}
+                    icon={getStatusIcon(
+                      supplierWithBillPay?.data?.supplier?.supplier_status ||
+                        "Pending"
+                    )}
+                    label={
+                      supplierWithBillPay?.data?.supplier?.supplier_status ||
+                      "Pending"
+                    }
                     size="small"
-                    statuscolor={getStatusColor(supplierWithBillPay?.data?.supplier?.supplier_status || "Pending")}
+                    statuscolor={getStatusColor(
+                      supplierWithBillPay?.data?.supplier?.supplier_status ||
+                        "Pending"
+                    )}
                     sx={{ ml: 2 }}
                   />
                   <Tooltip title="Verified Supplier">
                     <VerifiedUser sx={{ ml: 1, color: "#2196f3" }} />
                   </Tooltip>
                 </Box>
-                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                <Typography
+                  variant="body1"
+                  sx={{ display: "flex", alignItems: "center", mt: 0.5 }}
+                >
                   <Category sx={{ fontSize: 18, mr: 0.5, color: "#757575" }} />
-                  <span style={{ color: "#757575" }}>{supplierWithBillPay?.data?.supplier?.vendor || "Supplier"}</span>
+                  <span style={{ color: "#757575" }}>
+                    {supplierWithBillPay?.data?.supplier?.vendor || "Supplier"}
+                  </span>
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                   <StyledRating
                     name="supplier-rating"
-                    value={supplierWithBillPay?.data?.supplier?.supplier_rating || 0}
+                    value={
+                      supplierWithBillPay?.data?.supplier?.supplier_rating || 0
+                    }
                     precision={0.1}
                     readOnly
                     icon={<Star fontSize="inherit" />}
                     emptyIcon={<StarBorder fontSize="inherit" />}
                   />
                   <Typography variant="body2" sx={{ ml: 1, color: "#757575" }}>
-                    ({supplierWithBillPay?.data?.supplier?.supplier_rating || 0})
+                    ({supplierWithBillPay?.data?.supplier?.supplier_rating || 0}
+                    )
                   </Typography>
                 </Box>
               </Box>
@@ -319,7 +369,8 @@ export default function EnhancedSupplierProfile() {
                     sx={{
                       borderRadius: 20,
                       px: 3,
-                      background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                      background:
+                        "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
                       boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
                       mr: 1,
                     }}
@@ -344,7 +395,9 @@ export default function EnhancedSupplierProfile() {
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Chip
                     icon={<Phone fontSize="small" />}
-                    label={supplierWithBillPay?.data?.supplier?.phone_number || "N/A"}
+                    label={
+                      supplierWithBillPay?.data?.supplier?.phone_number || "N/A"
+                    }
                     variant="outlined"
                     sx={{ mr: 1, borderRadius: 20 }}
                     onClick={() => {}}
@@ -384,7 +437,9 @@ export default function EnhancedSupplierProfile() {
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
                     {supplierWithBillPay?.data?.supplier?.createdAt
-                      ? new Date(supplierWithBillPay?.data.supplier.createdAt).toLocaleDateString()
+                      ? new Date(
+                          supplierWithBillPay?.data.supplier.createdAt
+                        ).toLocaleDateString()
                       : "N/A"}
                   </Typography>
                 </Box>
@@ -406,7 +461,9 @@ export default function EnhancedSupplierProfile() {
                     Credit Limit
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
-                    ${supplierWithBillPay?.data?.supplier?.credit_limit?.toLocaleString() || "0"}
+                    $
+                    {supplierWithBillPay?.data?.supplier?.credit_limit?.toLocaleString() ||
+                      "0"}
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 4 }}>
@@ -416,9 +473,17 @@ export default function EnhancedSupplierProfile() {
                   <Typography
                     variant="body1"
                     fontWeight="medium"
-                    color={(supplierWithBillPay?.data?.supplier?.credit_limit || 0) < 5000 ? "error.main" : "inherit"}
+                    color={
+                      (supplierWithBillPay?.data?.supplier?.credit_limit || 0) <
+                      5000
+                        ? "error.main"
+                        : "inherit"
+                    }
                   >
-                    ${(supplierWithBillPay?.data?.supplier?.credit_limit || 0).toLocaleString()}
+                    $
+                    {(
+                      supplierWithBillPay?.data?.supplier?.credit_limit || 0
+                    ).toLocaleString()}
                   </Typography>
                 </Box>
                 <Box>
@@ -426,7 +491,8 @@ export default function EnhancedSupplierProfile() {
                     Payment Terms
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
-                    {supplierWithBillPay?.data?.supplier?.payment_terms || "N/A"}
+                    {supplierWithBillPay?.data?.supplier?.payment_terms ||
+                      "N/A"}
                   </Typography>
                 </Box>
               </Box>
@@ -445,17 +511,26 @@ export default function EnhancedSupplierProfile() {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "white" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: "white" }}
+                >
                   Total Orders
                 </Typography>
                 <LocalShippingOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
               </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", color: "white", my: 1 }}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", color: "white", my: 1 }}
+              >
                 {supplierWithBillPay?.data?.paymentStats?.totalPayments || 0}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(255,255,255,0.9)" }}
+                >
                   12% increase from last month
                 </Typography>
               </Box>
@@ -470,17 +545,26 @@ export default function EnhancedSupplierProfile() {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "white" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: "white" }}
+                >
                   Products
                 </Typography>
                 <InventoryOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
               </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", color: "white", my: 1 }}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", color: "white", my: 1 }}
+              >
                 243
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(255,255,255,0.9)" }}
+                >
                   5 new products this month
                 </Typography>
               </Box>
@@ -495,18 +579,32 @@ export default function EnhancedSupplierProfile() {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "white" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: "white" }}
+                >
                   Total Spent
                 </Typography>
                 <ReceiptLongOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
               </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", color: "white", my: 1 }}>
-                ${supplierWithBillPay?.data?.paymentStats?.totalAmount?.toLocaleString() || "0"}
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", color: "white", my: 1 }}
+              >
+                $
+                {supplierWithBillPay?.data?.paymentStats?.totalAmount?.toLocaleString() ||
+                  "0"}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-                  ${supplierWithBillPay?.data?.paymentStats?.paidAmount?.toLocaleString() || "0"} paid
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(255,255,255,0.9)" }}
+                >
+                  $
+                  {supplierWithBillPay?.data?.paymentStats?.paidAmount?.toLocaleString() ||
+                    "0"}{" "}
+                  paid
                 </Typography>
               </Box>
             </GradientBox>
@@ -520,17 +618,26 @@ export default function EnhancedSupplierProfile() {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "white" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: "white" }}
+                >
                   Performance
                 </Typography>
                 <AssessmentOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
               </Box>
-              <Typography variant="h3" sx={{ fontWeight: "bold", color: "white", my: 1 }}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", color: "white", my: 1 }}
+              >
                 91%
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(255,255,255,0.9)" }}
+                >
                   3% improvement from last quarter
                 </Typography>
               </Box>
@@ -552,12 +659,21 @@ export default function EnhancedSupplierProfile() {
             }}
           >
             <StyledTab icon={<Dashboard sx={{ mb: 0.5 }} />} label="Overview" />
-            <StyledTab icon={<LocalShipping sx={{ mb: 0.5 }} />} label="Orders" />
+            <StyledTab
+              icon={<LocalShipping sx={{ mb: 0.5 }} />}
+              label="Orders"
+            />
             <StyledTab icon={<Inventory sx={{ mb: 0.5 }} />} label="Products" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Bill Pay" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Payments" />
-            <StyledTab icon={<Description sx={{ mb: 0.5 }} />} label="Documents" />
-            <StyledTab icon={<Assessment sx={{ mb: 0.5 }} />} label="Performance" />
+            <StyledTab
+              icon={<Description sx={{ mb: 0.5 }} />}
+              label="Documents"
+            />
+            <StyledTab
+              icon={<Assessment sx={{ mb: 0.5 }} />}
+              label="Performance"
+            />
             <StyledTab icon={<Star sx={{ mb: 0.5 }} />} label="Reviews" />
           </StyledTabs>
         </Box>
@@ -585,7 +701,9 @@ export default function EnhancedSupplierProfile() {
             <Typography variant="h6" sx={{ mb: 2 }}>
               Payments History
             </Typography>
-            <Typography variant="body1">Payments content will be displayed here.</Typography>
+            <Typography variant="body1">
+              Payments content will be displayed here.
+            </Typography>
           </GlassCard>
         </Box>
 
@@ -595,7 +713,9 @@ export default function EnhancedSupplierProfile() {
             <Typography variant="h6" sx={{ mb: 2 }}>
               Documents
             </Typography>
-            <Typography variant="body1">Documents content will be displayed here.</Typography>
+            <Typography variant="body1">
+              Documents content will be displayed here.
+            </Typography>
           </GlassCard>
         </Box>
 
@@ -605,7 +725,9 @@ export default function EnhancedSupplierProfile() {
             <Typography variant="h6" sx={{ mb: 2 }}>
               Performance Metrics
             </Typography>
-            <Typography variant="body1">Performance content will be displayed here.</Typography>
+            <Typography variant="body1">
+              Performance content will be displayed here.
+            </Typography>
           </GlassCard>
         </Box>
 
@@ -615,13 +737,20 @@ export default function EnhancedSupplierProfile() {
             <Typography variant="h6" sx={{ mb: 2 }}>
               Customer Reviews
             </Typography>
-            <Typography variant="body1">Reviews content will be displayed here.</Typography>
+            <Typography variant="body1">
+              Reviews content will be displayed here.
+            </Typography>
           </GlassCard>
         </Box>
       </Box>
 
       {/* Dialogs */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {dialogType === "newOrder" && "Create New Order"}
           {dialogType === "newItem" && "Add New Inventory Item"}
@@ -672,7 +801,12 @@ export default function EnhancedSupplierProfile() {
                     <TableBody>
                       <TableRow>
                         <TableCell>
-                          <TextField select fullWidth size="small" label="Select Item">
+                          <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Select Item"
+                          >
                             {inventoryItems.map((item) => (
                               <MenuItem key={item.id} value={item.id}>
                                 {item.name}
@@ -681,7 +815,12 @@ export default function EnhancedSupplierProfile() {
                           </TextField>
                         </TableCell>
                         <TableCell>
-                          <TextField type="number" size="small" defaultValue={1} inputProps={{ min: 1 }} />
+                          <TextField
+                            type="number"
+                            size="small"
+                            defaultValue={1}
+                            inputProps={{ min: 1 }}
+                          />
                         </TableCell>
                         <TableCell>
                           <TextField
@@ -689,7 +828,11 @@ export default function EnhancedSupplierProfile() {
                             size="small"
                             defaultValue={0}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  $
+                                </InputAdornment>
+                              ),
                             }}
                           />
                         </TableCell>
@@ -730,7 +873,9 @@ export default function EnhancedSupplierProfile() {
                   type="number"
                   fullWidth
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
                   }}
                 />
               </Grid>
@@ -774,7 +919,9 @@ export default function EnhancedSupplierProfile() {
                   type="number"
                   fullWidth
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
                   }}
                 />
               </Grid>
@@ -797,12 +944,16 @@ export default function EnhancedSupplierProfile() {
           <Button
             variant="contained"
             onClick={() => {
-              handleCloseDialog()
+              handleCloseDialog();
               showSnackbar(
                 `${
-                  dialogType === "newOrder" ? "Order" : dialogType === "newItem" ? "Item" : "Payment"
-                } created successfully!`,
-              )
+                  dialogType === "newOrder"
+                    ? "Order"
+                    : dialogType === "newItem"
+                    ? "Item"
+                    : "Payment"
+                } created successfully!`
+              );
             }}
           >
             Save
@@ -817,11 +968,14 @@ export default function EnhancedSupplierProfile() {
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
-  )
+  );
 }
-

@@ -68,6 +68,8 @@ import {
   useDeleteProductMutation,
   useGetAllIProductQuery,
 } from "../../../redux/api/productApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import Loading from "../../../components/Loading/Loading";
 
 // Status component with appropriate colors
 const StatusChip = ({ status }) => {
@@ -292,7 +294,7 @@ const ProductCard = ({ product, onEdit, onDelete, onFavorite, isFavorite }) => {
           }}
         >
           <Typography variant="h6" color="#6a1b9a" fontWeight={600}>
-            {product.product_price}
+            ৳ {product?.purchasePrice}
           </Typography>
           <StatusChip status={product.status || "active"} />
         </Box>
@@ -570,13 +572,16 @@ export default function ProductList() {
   // const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
   // Query parameters
+  const tenantDomain = useTenantDomain();
+
   const queryParams = {
+    tenantDomain,
+    limit: 10,
     page: currentPage,
     searchTerm: filterType,
-    isRecycled: false,
   };
 
-  const { data, isLoading, refetch } = useGetAllIProductQuery(queryParams);
+  const { data, isLoading } = useGetAllIProductQuery(queryParams);
   const [deleteProduct] = useDeleteProductMutation();
 
   // Mock categories for filter
@@ -592,17 +597,7 @@ export default function ProductList() {
     "Transmission",
   ];
 
-  // Mock statuses for filter
   const statuses = ["active", "low_stock", "out_of_stock", "discontinued"];
-
-  // Handle menu open/close
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   // Handle filter menu
   const handleFilterMenuOpen = (event) => {
@@ -657,7 +652,6 @@ export default function ProductList() {
   // Handle search
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    console.log(search);
   };
 
   // Handle pagination
@@ -682,7 +676,7 @@ export default function ProductList() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteProduct(productToDelete).unwrap();
+      await deleteProduct({ tenantDomain, id: productToDelete }).unwrap();
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -747,67 +741,6 @@ export default function ProductList() {
     return true;
   });
 
-  const renderSkeletons = () => {
-    return Array(6)
-      .fill(0)
-      .map((_, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
-          <Card sx={{ borderRadius: 2, height: "100%" }}>
-            <Skeleton variant="rectangular" height={140} />
-            <CardContent>
-              <Skeleton variant="text" width="80%" height={30} />
-              <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-              >
-                <Skeleton variant="text" width="40%" height={20} />
-                <Skeleton variant="text" width="30%" height={20} />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Skeleton variant="text" width="30%" height={30} />
-                <Skeleton
-                  variant="rectangular"
-                  width={60}
-                  height={24}
-                  sx={{ borderRadius: 1 }}
-                />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mt: 2,
-                }}
-              >
-                <Skeleton variant="text" width="40%" height={20} />
-                <Box>
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block", mr: 1 }}
-                  />
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block" }}
-                  />
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ));
-  };
-
   return (
     <Box
       sx={{
@@ -820,7 +753,7 @@ export default function ProductList() {
       {/* Header */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           color: "white",
           py: 3,
           mb: 4,
@@ -845,27 +778,24 @@ export default function ProductList() {
       <Container maxWidth="xl" sx={{ p: { xs: 0 } }}>
         {/* Tabs and Actions */}
         <div className="mb-3">
-        <div className=" md:hidden flex justify-end mb-4 md:mb-0">
-              <Button
-                component={Link}
-                to="/dashboard/add-product"
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{
-                  borderRadius: 100,
-                  background:
-                    "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
-                  boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
-                  px: 3,
-                  color: "white",
-                }}
-              >
-                Add Product
-              </Button>
-            </div>
+          <div className=" md:hidden flex justify-end mb-4 md:mb-0">
+            <Button
+              component={Link}
+              to="/dashboard/add-product"
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                borderRadius: 100,
+                background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
+                boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
+                px: 3,
+                color: "white",
+              }}
+            >
+              Add Product
+            </Button>
+          </div>
           <Grid container spacing={2} alignItems="center">
-            
-
             <Grid item xs={12} md={8}>
               <div className="border-b-2 ">
                 <Tabs
@@ -946,7 +876,7 @@ export default function ProductList() {
                     sx={{
                       borderRadius: 100,
                       background:
-                        "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                        "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                       boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                       px: 3,
                       color: "white",
@@ -955,41 +885,6 @@ export default function ProductList() {
                     Add Product
                   </Button>
                 </div>
-                {/*
-                 <Tooltip title="More Actions">
-                  <IconButton
-                    onClick={handleMenuOpen}
-                    sx={{
-                      bgcolor: "white",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      "&:hover": {
-                        bgcolor: "white",
-                      },
-                    }}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    },
-                  }}
-                >
-                  <Divider />
-                  <MenuItem onClick={() => setSelectedProducts([])}>
-                    <ListItemIcon>
-                      <ClearIcon fontSize="small" sx={{ color: "#d32f2f" }} />
-                    </ListItemIcon>
-                    Clear Selection
-                  </MenuItem>
-                </Menu>
-                */}
               </Stack>
             </Grid>
           </Grid>
@@ -1331,9 +1226,9 @@ export default function ProductList() {
         {/* Product List */}
         <Box sx={{ mb: 4 }}>
           {isLoading ? (
-            <Grid container spacing={3}>
-              {renderSkeletons()}
-            </Grid>
+            <>
+              <Loading />
+            </>
           ) : filteredProducts.length === 0 ? (
             <Paper
               elevation={0}
@@ -1377,7 +1272,7 @@ export default function ProductList() {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     px: 3,
                   }}
@@ -1436,7 +1331,7 @@ export default function ProductList() {
                     bgcolor: "#6a1b9a",
                     color: "white",
                     "&:hover": {
-                      bgcolor: "#4a148c",
+                      bgcolor: "#42A1DA",
                     },
                   },
                 },

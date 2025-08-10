@@ -11,10 +11,10 @@ const quotationApi = baseApi.injectEndpoints({
       invalidatesTags: ["quotation"],
     }),
     getAllQuotations: builder.query({
-      query: ({ id,limit, page, searchTerm, isRecycled,status }) => ({
+      query: ({ tenantDomain,id,limit, page, searchTerm, isRecycled,status }) => ({
         url: `/quotations`,
         method: "GET",
-        params: { id ,limit, page, searchTerm,isRecycled,status },
+        params: {tenantDomain, id ,limit, page, searchTerm,isRecycled,status },
       }),
       providesTags: ["quotation"],
     }),
@@ -27,9 +27,10 @@ const quotationApi = baseApi.injectEndpoints({
     }),
 
     getSingleQuotation: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/quotations/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["quotation"],
     }),
@@ -45,42 +46,46 @@ const quotationApi = baseApi.injectEndpoints({
       invalidatesTags: ["quotation"],
     }),
     removeQuotation: builder.mutation({
-      query: (quotationInfo) => {
+      query: ({tenantDomain, quotationInfo}) => {
         return {
           url: `/quotations/remove-quotation`,
           method: "PATCH",
-          body: quotationInfo.data,
-          params: { id: quotationInfo.id },
+          body: quotationInfo?.data,
+          params: { id: quotationInfo.id , tenantDomain},
         };
       },
       invalidatesTags: ["quotation"],
     }),
 
     deleteQuotation: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/quotations/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["quotation"],
     }),
     permanantlyDeleteQuotation: builder.mutation({
-      query: (id) => ({
-        url: `/quotations/${id}`,
+      query: ({ tenantDomain, id }) => ({
+        url: `/quotations/delete-permanantly/${id}`,
         method: "DELETE",
+          params: { tenantDomain },
       }),
       invalidatesTags: ["quotation"],
     }),
     moveRecycledQuotation: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/quotations/recycle/${id}`,
         method: "PATCH",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["quotation"],
     }),
     restoreFromRecycledQuotation: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/quotations/restore/${id}`,
         method: "PATCH",
+         params: { tenantDomain },
       }),
       invalidatesTags: ["quotation"],
     }),

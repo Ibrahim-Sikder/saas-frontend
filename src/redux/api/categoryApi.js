@@ -12,17 +12,23 @@ const categoryapi = baseApi.injectEndpoints({
     }),
 
     getAllICategory: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/category`,
         method: "GET",
         params: { limit, page, searchTerm },
+        headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
       providesTags: ["category"],
     }),
     getSingleCategory: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/category/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["category"],
     }),
@@ -36,9 +42,13 @@ const categoryapi = baseApi.injectEndpoints({
     }),
 
     deleteCategory: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/category/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
+        
       }),
       invalidatesTags: ["category"],
     }),

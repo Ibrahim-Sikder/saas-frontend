@@ -27,15 +27,11 @@ import {
 } from "@mui/icons-material"
 
 export function StockDetailsDialog({ open, onClose, product }) {
-  // Early return if product is undefined or null
+
   if (!product) {
-    console.log("StockDetailsDialog: product is undefined");
+   
     return null;
   }
-
-  console.log("StockDetailsDialog rendering with product:", product);
-
-  // Safely access properties with default values
   const {
     code = "N/A",
     name = "Unknown Product",

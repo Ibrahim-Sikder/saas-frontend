@@ -3,90 +3,96 @@ import { baseApi } from "./baseApi";
 const expenseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createExpense: builder.mutation({
-      query: (expenseInfo) => ({
-        url: "/expenses",
+      query: ({ tenantDomain, expenseInfo }) => ({
+        url: `/expenses?tenantDomain=${tenantDomain}`,
         method: "POST",
         body: expenseInfo,
       }),
       invalidatesTags: ["expense"],
     }),
     getAllExpenses: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/expenses`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["expense"],
     }),
 
     getSingleExpense: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/expenses/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["expense"],
     }),
     updateExpense: builder.mutation({
-      query: ({ id, ...data }) => {
+      query: ({ tenantDomain, id, ...data }) => {
         return {
           url: `/expenses/${id}`,
           method: "PUT",
           body: data,
+          params:{tenantDomain}
         };
       },
       invalidatesTags: ["expense"],
     }),
 
     deleteExpense: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/expenses/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["expense"],
     }),
 
-    // expense category api
     createExpenseCategory: builder.mutation({
-      query: (expenseInfo) => ({
-        url: "/expenses/expense-categories/create",
+      query: ({ tenantDomain, expenseInfo }) => ({
+        url: `/expenses/expense-categories/create?tenantDomain=${tenantDomain}`,
         method: "POST",
         body: expenseInfo,
       }),
-      invalidatesTags: ["expense"],
+      invalidatesTags: ["expenseCategory"],
     }),
+
     getAllExpensesCategory: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/expenses/expense-categories/all`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
-      providesTags: ["expense"],
+      providesTags: ["expenseCategory"],
     }),
 
     getSingleExpenseCategory: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/expenses/expense-categories/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
-      providesTags: ["expense"],
+      providesTags: ["expenseCategory"],
     }),
+
     updateExpenseCategory: builder.mutation({
-      query: ({ id, ...data }) => {
+      query: ({ tenantDomain, id, ...data }) => {
         return {
-          url: `/expenses/expense-categories/update/${id}`,
+          url: `/expenses/expense-categories/update/${id}?tenantDomain=${tenantDomain}`,
           method: "PUT",
           body: data,
         };
       },
-      invalidatesTags: ["expense"],
+      invalidatesTags: ["expenseCategory"],
     }),
 
     deleteExpenseCategory: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/expenses/expense-categories/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
-      invalidatesTags: ["expense"],
+      invalidatesTags: ["expenseCategory"],
     }),
   }),
 });

@@ -75,117 +75,11 @@ import {
   useDeleteProductMutation,
   useGetAllIProductQuery,
 } from "../../redux/api/productApi";
+import { AnimatedChip, GlassCard, GradientBreadcrumbs, GradientButton, StyledDialogTitle, StyledTableHead, StyledTableRow } from "../../utils/customStyle";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 // Styled components for enhanced UI
-const GradientBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
-  padding: theme.spacing(1.5, 2),
-  borderRadius: theme.shape.borderRadius,
-  background: `linear-gradient(90deg, ${alpha(
-    theme.palette.primary.main,
-    0.12
-  )}, ${alpha(theme.palette.background.default, 0.05)})`,
-  backdropFilter: "blur(8px)",
-  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.08)}`,
-}));
 
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  "& .MuiTableCell-head": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.08),
-    color: theme.palette.primary.main,
-    fontWeight: 600,
-    borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: alpha(theme.palette.background.paper, 0.5),
-  },
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.05),
-    transition: "background-color 0.2s ease",
-  },
-  "&.expired": {
-    backgroundColor: alpha(theme.palette.error.light, 0.05),
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.error.light, 0.1),
-    },
-  },
-  "&.expiring-soon": {
-    backgroundColor: alpha(theme.palette.warning.light, 0.05),
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.warning.light, 0.1),
-    },
-  },
-  transition: "transform 0.2s ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 4px 8px ${alpha(theme.palette.text.primary, 0.1)}`,
-  },
-}));
-
-const GradientButton = styled(Button)(({ theme, color = "primary" }) => ({
-  background: `linear-gradient(45deg, ${theme.palette[color].main}, ${theme.palette[color].dark})`,
-  boxShadow: `0 4px 10px ${alpha(theme.palette[color].main, 0.3)}`,
-  transition: "all 0.3s",
-  "&:hover": {
-    boxShadow: `0 6px 15px ${alpha(theme.palette[color].main, 0.4)}`,
-    transform: "translateY(-2px)",
-  },
-}));
-
-const AnimatedChip = styled(Chip)(({ theme }) => ({
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "scale(1.05)",
-  },
-}));
-
-const StatusBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
-  },
-}));
-
-const GlassCard = styled(Card)(({ theme }) => ({
-  background: alpha(theme.palette.background.paper, 0.7),
-  backdropFilter: "blur(10px)",
-  borderRadius: theme.shape.borderRadius * 2,
-  boxShadow: `0 8px 32px ${alpha(theme.palette.text.primary, 0.1)}`,
-  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-  transition: "all 0.3s ease",
-  "&:hover": {
-    boxShadow: `0 12px 48px ${alpha(theme.palette.primary.main, 0.12)}`,
-    transform: "translateY(-5px)",
-  },
-}));
-
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  background: `linear-gradient(45deg, ${theme.palette.error.dark}, ${theme.palette.error.main})`,
-  color: theme.palette.common.white,
-  padding: theme.spacing(2),
-}));
 
 export default function ExpiredProductsPage() {
   const theme = useTheme();
@@ -215,13 +109,14 @@ export default function ExpiredProductsPage() {
   const [disposalSuccess, setDisposalSuccess] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+const tenantDomain = useTenantDomain();
 
   // Query parameters for API
   const queryParams = {
+    tenantDomain,
     page: currentPage,
     searchTerm: search,
-    isRecycled: false,
-    limit: 100, // Fetch more products to filter expired ones
+    limit: 100,
   };
 
   // Fetch products from API
@@ -231,7 +126,7 @@ export default function ExpiredProductsPage() {
     refetch,
   } = useGetAllIProductQuery(queryParams);
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
-  console.log(productData);
+ 
   // Process products to add expiry status
   const processedProducts = useMemo(() => {
     if (!productData?.data?.products) return [];
@@ -555,7 +450,7 @@ export default function ExpiredProductsPage() {
 
   return (
     <div
-      className={`bg-gradient-to-br from-[rgba(var(--background-default),0.9)] to-[rgba(var(--background-paper),0.8)] bg-[url('/placeholder.svg?height=1080&width=1920')] bg-no-repeat bg-center bg-cover  min-h-screen  p-0 md:p-3 rounded-lg mt-2 md:mt-0`}
+      className={`bg-gradient-to-br from-[rgba(var(--background-default),0.9)] to-[rgba(var(--background-paper),0.8)] bg-no-repeat bg-center bg-cover  min-h-screen  p-0 md:p-3 rounded-lg mt-2 md:mt-0`}
     >
       <Fade in={true} timeout={800}>
         <div>

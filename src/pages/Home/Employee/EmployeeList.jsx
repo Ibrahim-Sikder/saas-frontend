@@ -14,18 +14,20 @@ import {
 } from "../../../redux/api/employee";
 import Loading from "../../../components/Loading/Loading";
 import { Pagination } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const EmployeeList = () => {
   const [filterType, setFilterType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const textInputRef = useRef(null);
   const limit = 20;
-
+const tenantDomain = useTenantDomain();
   const {
     data: employeeData,
     isLoading: employeesLoading,
     error: employeesError,
   } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
@@ -44,7 +46,7 @@ const EmployeeList = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledEmployee(id).unwrap();
+        await moveRecycledEmployee({ tenantDomain, id }).unwrap();
         swal(
           "Success!",
           "Employee moved to Recycle Bin successfully.",

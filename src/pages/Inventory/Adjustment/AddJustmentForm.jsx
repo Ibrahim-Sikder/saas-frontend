@@ -52,6 +52,7 @@ import { outlinedInputWrapperSx } from "../../../utils/customStyle"
 import { StoreIcon } from "lucide-react"
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi"
 import { useGetAllStocksQuery } from "../../../redux/api/stocksApi"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 const MotionBox = motion(Box)
 const MotionCard = motion(Card)
@@ -62,20 +63,23 @@ const AddAdjustmentForm = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const navigate = useNavigate()
+   const tenantDomain = useTenantDomain();
+  
   const {
     data: productsData,
     isLoading: productsLoading,
     isFetching: productsFetching,
   } = useGetAllIProductQuery([...params])
   const { data: warehouseData } = useGetAllWarehousesQuery({
+    tenantDomain, 
     limit: 1000000,
     page: 1,
     searchTerm: "",
   })
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
+  const queryParams = { tenantDomain, page: currentPage, limit: 100, searchTerm: searchTerm }
 
   const { data: stockData, isLoading } = useGetAllStocksQuery(queryParams)
-  console.log(stockData)
+
   const wareHouseOptions = useMemo(() => {
     if (!warehouseData?.data?.warehouses) return []
     return warehouseData.data.warehouses.map((warehouse) => ({

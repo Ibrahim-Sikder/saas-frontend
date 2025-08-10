@@ -2,7 +2,6 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 "use client"
-
 import { useState, useEffect, useCallback } from "react"
 import {
   Dialog,
@@ -40,9 +39,14 @@ import InfoIcon from "@mui/icons-material/Info"
 import { useGetAllStocksQuery, useStockTransperMutation } from "../../../redux/api/stocksApi"
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi"
 import toast from "react-hot-toast"
+import { useTenantDomain } from "../../../hooks/useTenantDomain"
 
 export default function StockTransferModal({ open, onClose, onSubmit, employees }) {
-  const theme = useTheme()
+     
+
+  const theme = useTheme() 
+  const tenantDomain = useTenantDomain();
+
   const [formSubmitting, setFormSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -55,13 +59,13 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
   const [errors, setErrors] = useState({})
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
+  const queryParams = {tenantDomain, page: currentPage, limit: 100, searchTerm: searchTerm }
 
   // Fetch stock and warehouse data
   const { data: stockData, isLoading: stockLoading } = useGetAllStocksQuery(queryParams)
   const { data: warehouseResponse, isLoading: warehouseLoading } = useGetAllWarehousesQuery(queryParams)
 
-  console.log("Stock Data:", stockData)
+
   const [stockTransper, { isLoading: isTransferring }] = useStockTransperMutation()
   // Organize stock data by warehouse
   const [warehouseStocks, setWarehouseStocks] = useState({})
@@ -94,14 +98,13 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
   // Process stock data when it's loaded
   useEffect(() => {
     if (stockData && stockData.data) {
-      console.log("Processing stock data:", stockData.data)
       // Group stocks by warehouse
       const stocksByWarehouse = {}
 
       stockData.data.forEach((stockItem) => {
         // Check if stockItem has the required structure
         if (!stockItem.warehouse || !stockItem.product) {
-          console.log("Skipping invalid stock item:", stockItem)
+
           return
         }
 
@@ -128,26 +131,18 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
         }
       })
 
-      console.log("Processed warehouse stocks:", stocksByWarehouse)
       setWarehouseStocks(stocksByWarehouse)
     }
   }, [stockData])
 
   // Update available products when fromLocation changes
   useEffect(() => {
-    console.log("From location changed:", formData.fromLocation)
-    console.log("Available warehouse stocks:", warehouseStocks)
 
     if (formData.fromLocation && warehouseStocks[formData.fromLocation]) {
       const products = []
       const warehouseProducts = warehouseStocks[formData.fromLocation].products
-
-      console.log("Warehouse products:", warehouseProducts)
-
       Object.keys(warehouseProducts).forEach((productId) => {
         const product = warehouseProducts[productId]
-        console.log("Processing product:", product)
-
         if (product.currentStock > 0) {
           products.push({
             _id: productId,
@@ -165,14 +160,11 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
           })
         }
       })
-
-      console.log("Available products:", products)
       setAvailableProducts(products)
 
       // Reset transfer items when location changes
       setTransferItems([{ id: 1, product: null, quantity: 1, note: "" }])
     } else {
-      console.log("No products available or warehouse not selected")
       setAvailableProducts([])
     }
   }, [formData.fromLocation, warehouseStocks])
@@ -315,7 +307,7 @@ export default function StockTransferModal({ open, onClose, onSubmit, employees 
             date: formData.date,
           }
           try {
-            return await stockTransper(transferPayload).unwrap()
+            return await stockTransper({tenantDomain, ...transferPayload}).unwrap()
           } catch (error) {
             console.error("Error transferring item:", error)
             return { success: false, error }

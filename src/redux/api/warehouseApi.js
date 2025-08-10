@@ -12,18 +12,24 @@ const warehouseApi = baseApi.injectEndpoints({
     }),
 
     getAllWarehouses: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({tenantDomain,  limit, page, searchTerm }) => ({
         url: "/warehouse",
         method: "GET",
         params: { limit, page, searchTerm },
+        headers: {
+          "x-tenant-domain": tenantDomain,
+        },
       }),
       providesTags: ["warehouse"],
     }),
 
     getSingleWarehouse: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/warehouse/${id}`,
         method: "GET",
+         params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["warehouse"],
     }),
@@ -48,9 +54,12 @@ const warehouseApi = baseApi.injectEndpoints({
     }),
 
     deleteWarehouse: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/warehouse/${id}`,
         method: "DELETE",
+         params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["warehouse"],
     }),

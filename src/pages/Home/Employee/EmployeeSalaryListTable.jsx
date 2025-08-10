@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 "use client"
 
@@ -53,7 +54,7 @@ for (let year = 2024; year <= 2030; year++) {
   years.push({ value: String(year), label: String(year) })
 }
 
-const EnhancedEmployeeSalaryListTable = () => {
+const EnhancedEmployeeSalaryListTable = ({tenantDomain}) => {
   const theme = useTheme()
   const [filterType, setFilterType] = useState("")
   const [currentPage] = useState(1)
@@ -74,10 +75,9 @@ const EnhancedEmployeeSalaryListTable = () => {
     error: salaryError,
     refetch,
   } = useGetAllSalaryQuery({
+    tenantDomain,
     searchTerm: filterType,
   })
-
-  console.log("salary ", getAllSalary)
 
   const handleChange = (event) => {
     setFilterType(event.target.value)
@@ -116,9 +116,6 @@ const EnhancedEmployeeSalaryListTable = () => {
   }
 
   const handleOpenPaymentHistory = (salary) => {
-    console.log("Opening payment history for:", salary)
-    console.log("Payment history data:", salary.payment_history)
-
     setSelectedPaymentHistory({
       paymentHistory: salary.payment_history || [],
       employeeName: salary.full_name,
@@ -643,6 +640,7 @@ const EnhancedEmployeeSalaryListTable = () => {
         {/* Partial Payment Modal */}
         {selectedSalary && (
           <PartialPaymentModal
+          tenantDomain={tenantDomain}
             open={modalOpen}
             onClose={handleCloseModal}
             employee={selectedSalary.employee}
@@ -654,6 +652,7 @@ const EnhancedEmployeeSalaryListTable = () => {
         {/* Payment History Modal */}
         {selectedPaymentHistory && (
           <PaymentHistoryModal
+          tenantDomain={tenantDomain}
             open={paymentHistoryOpen}
             onClose={handleClosePaymentHistory}
             paymentHistory={selectedPaymentHistory.paymentHistory}

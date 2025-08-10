@@ -1,21 +1,18 @@
 /* eslint-disable no-unused-vars */
 import { FaTrashAlt, FaEdit, FaUserTie } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { NotificationAdd } from "@mui/icons-material";
-import { FaUserGear } from "react-icons/fa6";
-import { HiOutlineSearch, HiOutlineUserGroup } from "react-icons/hi";
+import { HiOutlineSearch } from "react-icons/hi";
 import { useRef, useState } from "react";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
 import { Pagination } from "@mui/material";
 import { toast } from "react-toastify";
 import {
   useGetAllCompaniesQuery,
-  useMoveRecycledCompanyMutation,
   usePermanantlyDeleteCompanyMutation,
   useRestoreFromRecycledCompanyMutation,
 } from "../../../redux/api/companyApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const RecycledbinCompanyList = () => {
   const textInputRef = useRef(null);
@@ -29,17 +26,20 @@ const RecycledbinCompanyList = () => {
   };
 
   const limit = 10;
+const tenantDomain = useTenantDomain();
 
   const {
     data: companyData,
     isLoading: companyLoading,
     refetch,
   } = useGetAllCompaniesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     searchTerm: filterType,
   });
 
+  
   const [permanantlyDeleteCompany] = usePermanantlyDeleteCompanyMutation();
   const [
     restoreFromRecycledCompany,
@@ -70,7 +70,7 @@ const RecycledbinCompanyList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledCompany(id).unwrap();
+        await restoreFromRecycledCompany({ tenantDomain, id }).unwrap();
         swal({
           title: "Restored!",
           text: "Company has been restored successfully.",
@@ -87,7 +87,7 @@ const RecycledbinCompanyList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteCompany(id).unwrap();
+        await permanantlyDeleteCompany({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Company has been permanently deleted.",
@@ -129,21 +129,9 @@ const RecycledbinCompanyList = () => {
 
   return (
     <div className="w-full mt-5 mb-24">
-      <div className="flex justify-between pb-3 border-b-2 px-2">
-        <HeaderButton />
-        <div className="flex items-end justify-end">
-          <NotificationAdd size={30} className="mr-2" />
-          <FaUserGear size={30} />
-        </div>
-      </div>
+     
       <div className="flex flex-wrap items-center justify-between my-3 mb-8">
-        <div className="flex items-center justify-center ">
-          <HiOutlineUserGroup className="invoicIcon" />
-          <div className="ml-2">
-            <h3 className="text-2xl font-bold"> Company </h3>
-            <span>Manage Company </span>
-          </div>
-        </div>
+       
         <div className="mt-2 productHome md:mt-0">
           <span>Home / </span>
           <span>Company / </span>

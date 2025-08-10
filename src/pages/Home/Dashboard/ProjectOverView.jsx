@@ -8,10 +8,12 @@ import { Link } from "react-router-dom";
 import ExpanseIncomeChart from "../../../components/Chart/ExpanseIncomeChart";
 import Loading from "../../../components/Loading/Loading";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const ProjectOverView = () => {
-  const { data: allMetaData, isLoading, isError } = useGetAllMetaQuery({});
-  if (isError) return <h2>Oops! Data not found.</h2>;
+  const tenantDomain = useTenantDomain();
+
+  const { data: allMetaData, isLoading } = useGetAllMetaQuery({ tenantDomain });
   if (isLoading) return <Loading />;
 
   const userData = [

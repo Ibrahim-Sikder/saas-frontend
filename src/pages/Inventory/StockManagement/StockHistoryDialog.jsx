@@ -98,19 +98,12 @@ export function StockHistoryDialog({ open, onClose, product }) {
     from: "",
     to: "",
   })
-
-  // Early return if product is undefined or null
   if (!product) {
-    console.log("StockHistoryDialog: product is undefined")
     return null
   }
 
-  console.log("StockHistoryDialog rendering with product:", product)
-
-  // Safely access properties with default values
   const { name = "Unknown Product", unit = "unit", originalData = {} } = product
 
-  // Get unit from nested data if available
   const unitDisplay = originalData.unit?.unit || unit
 
   // Apply filters

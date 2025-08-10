@@ -34,15 +34,17 @@ body {
   border-radius: 4px;
   width: 100%;
 }
-.quotationSelect select{
-border-top-right-radius: 4px;
-border-top-left-radius: 0px;
-border-bottom-left-radius: 0px;
+
+.quotationSelect select {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
 
 }
-.quotationSelect input{
-border-top-right-radius: 0px;
-border-bottom-right-radius: 0px;
+
+.quotationSelect input {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
 
 }
 
@@ -118,3 +120,53 @@ border-bottom-right-radius: 0px;
 
 
 
+@keyframes pulseRed {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(244, 67, 54, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+  }
+}
+
+@keyframes pulseAmber {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(255, 152, 0, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+  }
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(76, 175, 80, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}

@@ -42,14 +42,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import Lottie from "lottie-react"
 import AuthLayout from "../../auth/AuthLayout"
-// import successAnimation from "../../assets/animations/success.json"
-// import AuthLayout from "../../auth/AuthLayout"
-
-// Password strength component
 const PasswordStrength = ({ password }) => {
   const theme = useTheme()
-
-  // Calculate password strength
   const getStrength = (pass) => {
     let score = 0
 
@@ -504,7 +498,7 @@ const RegisterPage = () => {
            style={{ height: 200, width: 200, margin: "0 auto" }} />
 
           <Typography variant="h6" sx={{ mt: 2, mb: 4 }}>
-            Welcome to GarageERP Pro, {formData.fullName}!
+            Welcome to Garage Master, {formData.fullName}!
           </Typography>
 
           <Typography variant="body1" paragraph>
@@ -532,7 +526,7 @@ const RegisterPage = () => {
   }
 
   return (
-    <AuthLayout title="Create Your Account" subtitle="Join GarageERP Pro and experience premium auto solutions">
+    <AuthLayout title="Create Your Account" subtitle="Join Garage Master and experience premium auto solutions">
       {/* Stepper */}
       <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
         {steps.map((label) => (

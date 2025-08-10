@@ -10,10 +10,8 @@ import {
   Box,
   Typography,
   Button,
-  TextField,
   Grid,
   IconButton,
-  InputAdornment,
   Dialog,
   DialogContent,
   CircularProgress,
@@ -24,22 +22,23 @@ import {
 import {
   Category as CategoryIcon,
   CheckCircle as CheckCircleIcon,
-  PhotoCamera as PhotoCameraIcon,
   Save as SaveIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
-  const location = useLocation();
-  //   const id = new URLSearchParams(location.search).get("id");
-  const { data, isLoading } = useGetSingleCategoryQuery(categoryId);
+    const tenantDomain = useTenantDomain();
+
+  const { data, isLoading } = useGetSingleCategoryQuery({
+    tenantDomain,
+    id:categoryId,
+  })
 
   const [updateCategory, { isSuccess }] = useUpdateCategoryMutation();
-  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     main_category: "",
@@ -68,11 +67,11 @@ export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
         ...formData,
         image: imageToSubmit,
         id: categoryId,
+        tenantDomain,
       }).unwrap();
-      console.log(res);
+
       if (res.success) {
         toast.success("Category updated successfully!");
-        // navigate('/dashboard/category')
         setOpen();
       }
     } catch (error) {
@@ -136,7 +135,7 @@ export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
 
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 2,
           px: 3,
           display: "flex",
@@ -176,7 +175,6 @@ export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
                   name="image"
                   label="Upload Category Image"
                 />
-              
               </Grid>
 
               <Grid item xs={12}>
@@ -230,12 +228,12 @@ export const UpdateCategoryModal = ({ open, setOpen, categoryId }) => {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     py: 1.5,
                     textTransform: "none",
                     fontSize: "1rem",
-                        color:'white'
+                    color: "white",
                   }}
                 >
                   {isLoading ? "Updating..." : "Update Category"}

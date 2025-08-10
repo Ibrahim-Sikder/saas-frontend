@@ -7,12 +7,12 @@ import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { NotificationAdd } from "@mui/icons-material";
 import { Pagination } from "@mui/material";
-import HeaderButton from "../../../components/CommonButton/HeaderButton";
 import {
   useGetAllQuotationsQuery,
   usePermanantlyDeleteQuotationMutation,
   useRestoreFromRecycledQuotationMutation,
 } from "../../../redux/api/quotation";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const RecycledQuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
@@ -24,6 +24,7 @@ const RecycledQuotationList = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
+const tenantDomain = useTenantDomain();
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -35,10 +36,11 @@ const RecycledQuotationList = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
-      isRecycled:true,
+      isRecycled: true,
     });
 
   const handleDeleteOrRestore = async (id) => {
@@ -65,7 +67,10 @@ const RecycledQuotationList = () => {
 
     if (result === "restore") {
       try {
-        await restoreFromRecycledQuotation(id).unwrap();
+        await restoreFromRecycledQuotation({
+          tenantDomain,
+          id,
+        }).unwrap();
         swal({
           title: "Restored!",
           text: "Quotation has been restored successfully.",
@@ -82,7 +87,7 @@ const RecycledQuotationList = () => {
       }
     } else if (result === "delete") {
       try {
-        await permanantlyDeleteQuotation(id).unwrap();
+        await permanantlyDeleteQuotation({ tenantDomain, id }).unwrap();
         swal({
           title: "Deleted!",
           text: "Quotation has been permanently deleted.",
@@ -116,13 +121,7 @@ const RecycledQuotationList = () => {
   return (
     <div>
       <div className="overflow-x-auto mt-5">
-        <div className="flex justify-between border-b-2 pb-3">
-          <HeaderButton />
-          <div className="flex  justify-end items-end">
-            <NotificationAdd size={30} className="mr-2" />
-            <FaUserGear size={30} />
-          </div>
-        </div>
+       
 
         <div className="flex items-center justify-between my-3 mb-8">
           <div className="flex items-center justify-center ">
@@ -142,7 +141,6 @@ const RecycledQuotationList = () => {
         <div className="w-full mt-5 mb-24">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-3xl font-bold text-center ">
-     
               Recycled Bin Quotation List:
             </h3>
             <div className="flex items-center">

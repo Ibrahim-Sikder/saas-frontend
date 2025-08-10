@@ -3,44 +3,44 @@ import { baseApi } from "./baseApi";
 const incomeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createIncome: builder.mutation({
-      query: (incomeInfo) => ({
-        url: "/incomes",
+      query: ({ tenantDomain, incomeInfo }) => ({
+        url: `/incomes?tenantDomain=${tenantDomain}`,
         method: "POST",
         body: incomeInfo,
       }),
       invalidatesTags: ["income"],
     }),
     getAllIncomes: builder.query({
-      query: ({ limit, page }) => ({
+      query: ({tenantDomain,  limit, page }) => ({
         url: `/incomes`,
         method: "GET",
-        params: { limit, page },
+        params: {tenantDomain,  limit, page },
       }),
       providesTags: ["income"],
     }),
 
     getSingleIncome: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/incomes/${id}`,
         method: "GET",
+        params:{tenantDomain}
       }),
       providesTags: ["income"],
     }),
-    updateIncome: builder.mutation({
-      query: (incomeInfo) => {
-        return {
-          url: `/incomes/${incomeInfo.id}`,
-          method: "PUT",
-          body: incomeInfo.data,
-        };
-      },
-      invalidatesTags: ["income"],
-    }),
+   updateIncome: builder.mutation({
+  query: ({ id, tenantDomain, ...data }) => ({
+    url: `/incomes/${id}?tenantDomain=${tenantDomain}`,
+    method: "PUT",
+    body: data,
+  }),
+  invalidatesTags: ["income"],
+}),
 
     deleteIncome: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/incomes/${id}`,
         method: "DELETE",
+         params:{tenantDomain}
       }),
       invalidatesTags: ["income"],
     }),

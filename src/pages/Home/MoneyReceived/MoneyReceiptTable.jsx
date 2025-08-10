@@ -9,6 +9,7 @@ import {
 } from "../../../redux/api/money-receipt";
 import { Pagination } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const MoneyReceiptTable = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const MoneyReceiptTable = () => {
   const limit = 10;
   const navigate = useNavigate();
   const textInputRef = useRef(null);
+  const tenantDomain = useTenantDomain();
 
   useEffect(() => {
     if (search) {
@@ -27,13 +29,12 @@ const MoneyReceiptTable = () => {
 
   const { data: allMoneyReceipts, isLoading: moneyReceiptLoading } =
     useGetAllMoneyReceiptsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
       isRecycled: false,
     });
-
-  console.log("money receipt list this ", allMoneyReceipts);
 
   const [
     moveRecycledMoneyReceipt,
@@ -54,7 +55,7 @@ const MoneyReceiptTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledMoneyReceipt(id).unwrap();
+        await moveRecycledMoneyReceipt({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -121,7 +122,6 @@ const MoneyReceiptTable = () => {
             {allMoneyReceipts?.data?.moneyReceipts?.map((card, index) => {
               const serialNumber = (currentPage - 1) * limit + index + 1;
 
-        
               return (
                 <tr
                   key={card._id}
@@ -159,7 +159,7 @@ const MoneyReceiptTable = () => {
                       className="editIconWrap edit2"
                       href={`${
                         import.meta.env.VITE_API_URL
-                      }/money-receipts/money/${card._id}`}
+                      }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}`}
                       target="_blank"
                       rel="noreferrer"
                     >

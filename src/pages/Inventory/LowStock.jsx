@@ -53,6 +53,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import SortIcon from "@mui/icons-material/Sort"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import { useGetAllStocksQuery } from "../../redux/api/stocksApi"
+import { useTenantDomain } from "../../hooks/useTenantDomain"
 
 export default function LowStocksPage() {
   const theme = useTheme()
@@ -69,8 +70,8 @@ export default function LowStocksPage() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [processedProducts, setProcessedProducts] = useState([])
-
-  const queryParams = { page: currentPage, limit: 100, searchTerm: searchTerm }
+const tenantDomain = useTenantDomain();
+  const queryParams = {tenantDomain, page: currentPage, limit: 100, searchTerm: searchTerm }
   const { data: stockData, isLoading: stockLoading, refetch } = useGetAllStocksQuery(queryParams)
 
 

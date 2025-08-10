@@ -10,27 +10,34 @@ const vehicleApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["vehicle"],
     }),
+
     getAllVehicles: builder.query({
-      query: ({ id, limit, page, searchTerm,isRecycled }) => ({
+      query: ({ tenantDomain, id, limit, page, searchTerm, isRecycled }) => ({
         url: `/vehicles`,
         method: "GET",
-        params: { id, limit, page, searchTerm,isRecycled },
+        params: { tenantDomain, id, limit, page, searchTerm, isRecycled },
       }),
       providesTags: ["vehicle"],
     }),
 
     getSingleVehicle: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/vehicles/${id}`,
         method: "GET",
+        params: {
+          tenantDomain,
+        },
       }),
       providesTags: ["vehicle"],
     }),
 
     deleteVehicle: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/vehicles/${id}`,
         method: "DELETE",
+        params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["vehicle"],
     }),

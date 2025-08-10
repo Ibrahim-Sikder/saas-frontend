@@ -3,10 +3,10 @@ import { baseApi } from "./baseApi";
 const stockApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllStocks: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: "/stocks",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: {tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["stocks"],
     }),

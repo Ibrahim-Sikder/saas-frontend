@@ -8,7 +8,6 @@ import { useState, useEffect } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import uploadFile from "../../helpers/uploadFile"
 
-
 const ImageUpload = ({ name, label = "Upload Image", uploadBoxStyles = {}, defaultValues }) => {
   const { control, setValue, getValues } = useFormContext()
   const [imageUrls, setImageUrls] = useState(defaultValues ? [defaultValues] : [])
@@ -80,10 +79,7 @@ const ImageUpload = ({ name, label = "Upload Image", uploadBoxStyles = {}, defau
               flexDirection: "column",
               position: "relative",
               overflow: "hidden",
-              bgcolor: alpha("#6a1b9a", 0.05),
-              "&:hover": {
-                bgcolor: alpha("#6a1b9a", 0.1),
-              },
+              bgcolor: '#fff',
               ...uploadBoxStyles,
             }}
             onClick={() => document.getElementById(`${name}-input`).click()}
@@ -96,7 +92,7 @@ const ImageUpload = ({ name, label = "Upload Image", uploadBoxStyles = {}, defau
               style={{ display: "none" }}
               onChange={handleFileChange}
             />
-            <PhotoCameraIcon sx={{ fontSize: 40, color: "#6a1b9a", mb: 1 }} />
+            <PhotoCameraIcon sx={{ fontSize: 40, color: "#42A1DA", mb: 1 }} />
             <Typography variant="body2" color="text.secondary" align="center">
               {loading ? "Uploading..." : "Click to upload or drag and drop"}
               <br />
@@ -124,7 +120,7 @@ const ImageUpload = ({ name, label = "Upload Image", uploadBoxStyles = {}, defau
                     borderRadius: "12px",
                     overflow: "hidden",
                     border: "1px solid",
-                    borderColor: alpha("#6a1b9a", 0.2),
+                    borderColor: '#42A1DA',
                   }}
                 >
                   <img

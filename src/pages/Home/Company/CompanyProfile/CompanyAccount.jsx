@@ -6,12 +6,14 @@ import { HiOutlineEye } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../../utils/formateDate";
 const CompanyAccount = ({
+  tenantDomain,
   profileData,
   // jobCardData,
   // quotationData,
   // moneyReceiptData,
   // invoiceData,
 }) => {
+  
   const lastVehicle =
     profileData?.data?.vehicles?.length > 0
       ? [...profileData.data.vehicles].sort(
@@ -71,6 +73,7 @@ const CompanyAccount = ({
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )[0]
       : null;
+
 
   const beforeLastMoneyReceipt =
     profileData?.data?.moneyReceipts?.length > 0

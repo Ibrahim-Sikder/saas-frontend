@@ -45,6 +45,7 @@ import {
   useGetAllEmployeeOvertimesQuery,
 } from "../../../redux/api/overtimeApi";
 import dayjs from "dayjs";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const getStatusColor = (status) => {
   switch (status) {
     case "Approved":
@@ -58,7 +59,8 @@ const getStatusColor = (status) => {
   }
 };
 
-export default function Holiday() {
+export default function EmployeeOvertime() {
+  const tenantDomain = useTenantDomain();
   const [open, setOpen] = useState(false);
   const [leaveRequestId, setLeaveRequestId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,22 +80,14 @@ export default function Holiday() {
   const [rows, setRows] = useState([]);
 
   const { data, isLoading } = useGetAllEmployeeOvertimesQuery({
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
-  });
+  })
 
   const [deleteEmployeeOvertime] = useDeleteEmployeeOvertimeMutation();
 
-  const handleOpen = (id) => {
-    setLeaveRequestId(id);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setLeaveRequestId(null);
-  };
 
   const handleDelete = async (id) => {
     Swal.fire({
@@ -107,7 +101,7 @@ export default function Holiday() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteEmployeeOvertime(id).unwrap();
+          await deleteEmployeeOvertime({tenantDomain, id}).unwrap();
           Swal.fire(
             "Deleted!",
             "The employee overtime has been deleted.",

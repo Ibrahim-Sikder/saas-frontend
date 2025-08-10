@@ -23,12 +23,14 @@ import {
   useUpdateCustomerMutation,
 } from "../../../redux/api/customerApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateCustomer = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+
   const [customerOwnerCountryCode, setCustomerOwnerCountryCode] = useState(
     countries[0]
   );
@@ -36,13 +38,12 @@ const UpdateCustomer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
+
   const handleBrandChange = (_, newValue) => {
     const filtered = vehicleName.filter(
       (vehicle) => vehicle.label === newValue
     );
     setFilteredVehicles(filtered);
-
-    // Update vehicle brand while preserving other data
     if (newValue) {
       setGetDataWithChassisNo((prev) => ({
         ...prev,
@@ -69,12 +70,13 @@ const UpdateCustomer = () => {
     setYearSelectInput(option.label);
     setFilteredOptions([]);
   };
+  const tenantDomain = useTenantDomain();
 
   const {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleCustomerQuery(id);
+  } = useGetSingleCustomerQuery({ tenantDomain, id });
 
   const [updateCustomer, { isLoading: updateLoading, error }] =
     useUpdateCustomerMutation();
@@ -177,6 +179,8 @@ const UpdateCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
+
+
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -240,12 +244,14 @@ const UpdateCustomer = () => {
     };
 
     const updateData = {
-      id: id,
-      data: newData,
+      tenantDomain,
+      ...newData,
     };
-
     try {
-      const res = await updateCustomer(updateData).unwrap();
+      const res = await updateCustomer({
+        id: id,
+        data: updateData,
+      }).unwrap();
 
       if (res.success) {
         toast.success(res.message);
@@ -304,7 +310,7 @@ const UpdateCustomer = () => {
   }
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-10 ">
         <div className="productHeadWrap">
           <Button
             onClick={handleBack}
@@ -314,7 +320,7 @@ const UpdateCustomer = () => {
             Back
           </Button>
           <div className="flex flex-wrap items-center justify-center">
-            <HiOutlineUserGroup className="invoicIcon" />
+     
             <h3 className="text-sm font-bold md:text-2xl">Update Customer </h3>
           </div>
           <div className="productHome">
@@ -327,7 +333,7 @@ const UpdateCustomer = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-10 ">
               <Box>
-                <h3 className="mb-1 text-xl font-bold">
+                <h3 className="my-3  text-xl font-bold">
                   Customer Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -496,7 +502,7 @@ const UpdateCustomer = () => {
                 </Grid>
               </Box>
               <Box>
-                <h3 className="mb-2 text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3  text-xl font-bold">Vehicle Information </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

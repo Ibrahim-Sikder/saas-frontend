@@ -12,18 +12,19 @@ const employeeOvertimeApi = baseApi.injectEndpoints({
     }),
 
     getAllEmployeeOvertimes: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: "/employee-overtime",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: {tenantDomain,  limit, page, searchTerm },
       }),
       providesTags: ["employeeOvertime"],
     }),
 
     getSingleEmployeeOvertime: builder.query({
-      query: (overtimeId) => ({
+      query: ({tenantDomain, overtimeId}) => ({
         url: `/employee-overtime/${overtimeId}`,
         method: "GET",
+        params:{tenantDomain}
       }),
       providesTags: ["employeeOvertime"],
     }),
@@ -38,9 +39,10 @@ const employeeOvertimeApi = baseApi.injectEndpoints({
     }),
 
     deleteEmployeeOvertime: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/employee-overtime/${id}`,
         method: "DELETE",
+        params:{tenantDomain}
       }),
       invalidatesTags: ["employeeOvertime"],
     }),

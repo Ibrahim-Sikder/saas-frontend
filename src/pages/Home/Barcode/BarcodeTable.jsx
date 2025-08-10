@@ -17,10 +17,13 @@ import {
 } from "../../../redux/api/barcodeApi";
 import { theme } from "../../../Theme";
 import { Box } from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export default function BarcodeTable() {
+    const tenantDomain = useTenantDomain();
+
   const [deleteCategory] = useDeleteBarcodeMutation();
-  const { isLoading, data } = useGetAllIBarcodeQuery();
+  const { isLoading, data } = useGetAllIBarcodeQuery({tenantDomain});
   const barcodes = data?.data?.barcodes || [];
   const [printCount, setPrintCount] = useState(1);
   const [printUrl, setPrintUrl] = useState("");
@@ -109,7 +112,7 @@ export default function BarcodeTable() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteCategory(id).unwrap();
+          await deleteCategory({tenantDomain, id}).unwrap();
           Swal.fire("Deleted!", "Barcode has been deleted.", "success");
         } catch (error) {
           Swal.fire(

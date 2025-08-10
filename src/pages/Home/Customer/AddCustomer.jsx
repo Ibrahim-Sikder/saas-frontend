@@ -15,10 +15,10 @@ import {
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import { useCreateCustomerMutation } from "../../../redux/api/customerApi";
 import CustomerListTable from "./CustomerListTable";
 import { ArrowBack } from "@mui/icons-material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddCustomer = () => {
   const [registrationError, setRegistrationError] = useState("");
@@ -97,10 +97,11 @@ const AddCustomer = () => {
     });
   };
 
+  const tenantDomain = useTenantDomain();
+
   const {
     register,
     handleSubmit,
-
     setValue,
     formState: { errors },
   } = useForm();
@@ -109,17 +110,6 @@ const AddCustomer = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating Customer...");
-    const getTenantName = () => {
-      const host = window.location.hostname;
-
-      if (host.includes("localhost")) {
-        return host.split(".")[0];
-      }
-
-      return host.split(".")[0];
-    };
-
-    const tenantDomain = getTenantName();
 
     const customer = {
       company_name: data.company_name,
@@ -143,7 +133,6 @@ const AddCustomer = () => {
     data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
 
-    // Extract vehicle information
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -230,7 +219,7 @@ const AddCustomer = () => {
 
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps mt-10">
         <div className="productHeadWrap">
           <div className="flex items-center px-3">
             <Button
@@ -242,7 +231,6 @@ const AddCustomer = () => {
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center">
-            <HiOutlineUserGroup className="invoicIcon" />
             <div className="ml-2">
               <h3 className="text-sm font-bold md:text-2xl">
                 {" "}
@@ -271,7 +259,20 @@ const AddCustomer = () => {
                       <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TextField
                           fullWidth
-                          label="Customer Name (T)"
+                          label={
+                            <>
+                              Customer Name (T)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           {...register("customer_name", {
                             required: "Customer Name is required",
                           })}
@@ -290,7 +291,19 @@ const AddCustomer = () => {
                       <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TextField
                           fullWidth
-                          label="Customer Address (T) "
+                          label={
+                            <>
+                              Customer Address (T)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           {...register("customer_address", {
                             required: "Customer address is required!",
                           })}
@@ -311,13 +324,24 @@ const AddCustomer = () => {
                               selected
                               onChange={(event, newValue) => {
                                 setCountryCode(newValue);
-                                // setPhoneNumber("");
                               }}
                               renderInput={(params) => (
                                 <TextField
                                   fullWidth
                                   {...params}
-                                  label="Select Country Code"
+                                  label={
+                                    <>
+                                      Select Country Code
+                                      <span
+                                        style={{
+                                          color: "red",
+                                          fontSize: "25px",
+                                        }}
+                                      >
+                                        *
+                                      </span>
+                                    </>
+                                  }
                                   variant="outlined"
                                   error={!!errors.country_code}
                                   helperText={errors.country_code?.message}
@@ -333,7 +357,19 @@ const AddCustomer = () => {
                               })}
                               error={!!errors.customer_contact}
                               helperText={errors.customer_contact?.message}
-                              label="Customer Contact No (N)"
+                              label={
+                                <>
+                                  Customer Contact No (N)
+                                  <span
+                                    style={{
+                                      color: "red",
+                                      fontSize: "25px",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                </>
+                              }
                               variant="outlined"
                               fullWidth
                               type="tel"
@@ -447,7 +483,19 @@ const AddCustomer = () => {
                                 <TextField
                                   fullWidth
                                   {...params}
-                                  label="Car Reg No"
+                                  label={
+                                    <>
+                                      Car Reg No
+                                      <span
+                                        style={{
+                                          color: "red",
+                                          fontSize: "25px",
+                                        }}
+                                      >
+                                        *
+                                      </span>
+                                    </>
+                                  }
                                   {...register("carReg_no", {
                                     required: "Car reg no is required",
                                   })}
@@ -460,7 +508,19 @@ const AddCustomer = () => {
                           <Grid item lg={9} md={8} sm={12} xs={12}>
                             <TextField
                               fullWidth
-                              label="Car R (N)"
+                              label={
+                                <>
+                                  Car R (N)
+                                  <span
+                                    style={{
+                                      color: "red",
+                                      fontSize: "25px",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                </>
+                              }
                               {...register("car_registration_no", {
                                 pattern: {
                                   value: /^[\d-]+$/,
@@ -486,7 +546,19 @@ const AddCustomer = () => {
                       <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TextField
                           fullWidth
-                          label="Chassis No (T&N)"
+                          label={
+                            <>
+                              Chassis No (T&N)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           {...register("chassis_no", {
                             required: "Chassis no number is required!",
                           })}
@@ -498,11 +570,7 @@ const AddCustomer = () => {
                         <TextField
                           fullWidth
                           label="ENGINE NO & CC (T&N) "
-                          {...register("engine_no", {
-                            required: "Engin number is required!",
-                          })}
-                          error={!!errors.engine_no}
-                          helperText={errors.engine_no?.message}
+                          {...register("engine_no")}
                         />
                       </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -517,11 +585,7 @@ const AddCustomer = () => {
                             <TextField
                               {...params}
                               label="Vehicle Brand"
-                              {...register("vehicle_brand", {
-                                required: "Vehicle brand is required!",
-                              })}
-                              error={!!errors.vehicle_brand}
-                              helperText={errors.vehicle_brand?.message}
+                              {...register("vehicle_brand")}
                             />
                           )}
                         />
@@ -539,11 +603,7 @@ const AddCustomer = () => {
                             <TextField
                               {...params}
                               label="Vehicle Name "
-                              {...register("vehicle_name", {
-                                required: "Vehicle name is required! ",
-                              })}
-                              error={!!errors.vehicle_name}
-                              helperText={errors.vehicle_name?.message}
+                              {...register("vehicle_name")}
                             />
                           )}
                           getOptionLabel={(option) => option || ""}
@@ -590,11 +650,7 @@ const AddCustomer = () => {
                               fullWidth
                               {...params}
                               label=" Vehicle Categories "
-                              {...register("vehicle_category", {
-                                required: "Vechile categories is required!",
-                              })}
-                              error={!!errors.vehicle_category}
-                              helperText={errors.vehicle_category?.message}
+                              {...register("vehicle_category")}
                             />
                           )}
                         />
@@ -604,11 +660,7 @@ const AddCustomer = () => {
                           freeSolo
                           fullWidth
                           label="Color & Code (T&N) "
-                          {...register("color_code", {
-                            required: "Color code is required!",
-                          })}
-                          error={!!errors.color_code}
-                          helperText={errors.color_code?.message}
+                          {...register("color_code")}
                         />
                       </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -617,7 +669,7 @@ const AddCustomer = () => {
                           label="Mileage (N)"
                           {...register(
                             "mileage",
-                            { required: "Mileage is required!" },
+
                             {
                               pattern: {
                                 value: /^\d+$/,
@@ -625,8 +677,6 @@ const AddCustomer = () => {
                               },
                             }
                           )}
-                          error={!!errors.mileage}
-                          helperText={errors.mileage?.message}
                         />
                       </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -640,20 +690,32 @@ const AddCustomer = () => {
                             <TextField
                               {...params}
                               label=" Fuel Type"
-                              {...register("fuel_type", {
-                                required: "Fuel type is required!",
-                              })}
-                              error={!!errors.fuel_type}
-                              helperText={errors.fuel_type?.message}
+                              {...register("fuel_type")}
                             />
                           )}
                         />
                       </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TextField
+                          label={
+                            <>
+                              Driver Name (T)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           fullWidth
-                          label="Driver Name (T)"
-                          {...register("driver_name")}
+                          {...register("driver_name", {
+                            required: "Driver Name is required",
+                          })}
+                          error={!!errors.driver_name}
+                          helperText={errors.driver_name?.message}
                         />
                       </Grid>
 
@@ -668,13 +730,24 @@ const AddCustomer = () => {
                               value={driverCountryCode}
                               onChange={(event, newValue) => {
                                 setDriverCountryCode(newValue);
-                                // setPhoneNumber("");
                               }}
                               renderInput={(params) => (
                                 <TextField
                                   fullWidth
                                   {...params}
-                                  label="Select Country Code"
+                                  label={
+                                    <>
+                                      Select Country Code
+                                      <span
+                                        style={{
+                                          color: "red",
+                                          fontSize: "25px",
+                                        }}
+                                      >
+                                        *
+                                      </span>
+                                    </>
+                                  }
                                   variant="outlined"
                                 />
                               )}
@@ -682,8 +755,24 @@ const AddCustomer = () => {
                           </Grid>
                           <Grid item lg={9} md={8} sm={12} xs={12}>
                             <TextField
-                              {...register("driver_contact")}
-                              label="Driver Contact No (N)"
+                              {...register("driver_contact", {
+                                required: "Driver contact number is required",
+                              })}
+                              error={!!errors.driver_name}
+                              helperText={errors.driver_name?.message}
+                              label={
+                                <>
+                                  Driver Contact No (N)
+                                  <span
+                                    style={{
+                                      color: "red",
+                                      fontSize: "25px",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                </>
+                              }
                               variant="outlined"
                               fullWidth
                               type="tel"

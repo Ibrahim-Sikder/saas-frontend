@@ -28,14 +28,25 @@ import {
   tableStyle,
 } from "../../../../style/tableStyle";
 
-const SingleEmployeeLeaveList = ({ id }) => {
+const SingleEmployeeLeaveList = ({ tenantDomain, id }) => {
+
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [search, SetSearch] = useState("");
+  const [selectedLeaveRequestId, setSelectedLeaveRequestId] = useState(null)
 
-  const { data, isLoading } = useGetLeaveRequestByEmployeeIdQuery(id);
- 
+  const { data, isLoading } = useGetLeaveRequestByEmployeeIdQuery({
+    tenantDomain,
+    employeeId:id,
+  });
+
+
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+   const handleOpen = (leaveRequestId = null) => {
+    setSelectedLeaveRequestId(leaveRequestId); 
+    setOpen(true);
+  };
+   const handleAddOpen = ()=>setOpen(true)
   const handleClose = () => setOpen(false);
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -91,7 +102,7 @@ const SingleEmployeeLeaveList = ({ id }) => {
             My Leave Requests
           </Typography>
           <div
-            onClick={handleOpen}
+            onClick={handleAddOpen}
             className="relative rounded-sm my-5 flex justify-end w-full "
           >
             <button className="p-1 py-3 md:px-3 text-sm md:text-xl text-white duration-300 rounded-lg bg-sky-500 active:scale-95">
@@ -111,7 +122,7 @@ const SingleEmployeeLeaveList = ({ id }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.data?.map((row) => (
+              {data?.data?.map((row) => (
                 <TableRow
                   key={row._id}
                   sx={{
@@ -174,9 +185,10 @@ const SingleEmployeeLeaveList = ({ id }) => {
           sx={{ mt: 2, display: "flex", justifyContent: "center" }}
         />
       </Paper>
-      {open && <LeaveRequestForm onClose={handleClose} id={id} />}
+      {open && <LeaveRequestForm tenantDomain={tenantDomain} onClose={handleClose} employeeId={id}  id={selectedLeaveRequestId}/>}
     </div>
   );
 };
+
 
 export default SingleEmployeeLeaveList;

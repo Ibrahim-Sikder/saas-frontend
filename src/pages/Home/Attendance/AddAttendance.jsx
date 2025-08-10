@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-refresh/only-export-components */
-"use client"
+"use client";
 
 /* eslint-disable no-loss-of-precision */
 /* eslint-disable no-unused-vars */
-import { useState } from "react"
-import { toast } from "react-toastify"
-import dayjs from "dayjs"
+import { useState } from "react";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
 import {
   Users,
   Calendar,
@@ -19,13 +19,16 @@ import {
   UserCheck,
   UserX,
   Timer,
-} from "lucide-react"
-import AttendanceTimePicker from "./AttendanceTimePicker"
-import AttendanceOutTimePicker from "./AttendanceForOutTime"
-import { useGetAllEmployeesQuery } from "../../../redux/api/employee"
-import { useCreateAttendanceMutation, useDeleteAttendanceMutation } from "../../../redux/api/attendance"
-import TodayAttendance from "./TodayAttendance"
-import AttendanceList from "./AttendanceList"
+} from "lucide-react";
+import AttendanceTimePicker from "./AttendanceTimePicker";
+import AttendanceOutTimePicker from "./AttendanceForOutTime";
+import { useGetAllEmployeesQuery } from "../../../redux/api/employee";
+import {
+  useCreateAttendanceMutation,
+  useDeleteAttendanceMutation,
+} from "../../../redux/api/attendance";
+import TodayAttendance from "./TodayAttendance";
+import AttendanceList from "./AttendanceList";
 import {
   Table,
   TableBody,
@@ -41,7 +44,9 @@ import {
   Tooltip,
   CircularProgress,
   Chip,
-} from "@mui/material"
+} from "@mui/material";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useNavigate } from "react-router-dom";
 
 export const columns = [
   "SL No",
@@ -56,153 +61,178 @@ export const columns = [
   "Out Time",
   "Overtime",
   "Late",
-]
+];
 
 const AddAttendance = () => {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState("")
-  const limit = 9999
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const limit = 9999;
+  const tenantDomain = useTenantDomain();
+  const navigate = useNavigate()
 
   const {
     data: getAllEmployee,
     isLoading: employeesLoading,
     error: employeesError,
   } = useGetAllEmployeesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
-  })
+  });
 
-  const [createAttendance, { isLoading: createLoading, error: createError }] = useCreateAttendanceMutation()
+  const [createAttendance, { isLoading: createLoading, error: createError }] =
+    useCreateAttendanceMutation();
 
-  const [deleteAttendance, { isLoading: deleteLoading, error: deleteError }] = useDeleteAttendanceMutation()
+  const [deleteAttendance, { isLoading: deleteLoading, error: deleteError }] =
+    useDeleteAttendanceMutation();
 
-  const [presentState, setPresentState] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(false))
-  const [absentState, setAbsentState] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(false))
-  const [inTime, setInTime] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(null))
-  const [outTime, setOutTime] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(null))
-  const [overtime, setOvertime] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(null))
-  const [lateStatus, setLateStatus] = useState(new Array(getAllEmployee?.data?.employees?.length).fill(false))
+  const [presentState, setPresentState] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(false)
+  );
+  const [absentState, setAbsentState] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(false)
+  );
+  const [inTime, setInTime] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(null)
+  );
+  const [outTime, setOutTime] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(null)
+  );
+  const [overtime, setOvertime] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(null)
+  );
+  const [lateStatus, setLateStatus] = useState(
+    new Array(getAllEmployee?.data?.employees?.length).fill(false)
+  );
 
-  const parsedDate = new Date()
-  const day = parsedDate.getDate().toString().padStart(2, "0")
-  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0")
-  const year = parsedDate.getFullYear()
-  const formattedDate = `${day}-${month}-${year}`
+  const parsedDate = new Date();
+  const day = parsedDate.getDate().toString().padStart(2, "0");
+  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
+  const year = parsedDate.getFullYear();
+  const formattedDate = `${day}-${month}-${year}`;
 
   // Function to format the time
   const formatTime = (time) => {
-    if (!time) return ""
-    return dayjs(time).format("h:mmA")
-  }
+    if (!time) return "";
+    return dayjs(time).format("h:mmA");
+  };
 
   const handlePresent = (index) => {
-    const newPresentState = [...presentState]
-    const newAbsentState = [...absentState]
+    const newPresentState = [...presentState];
+    const newAbsentState = [...absentState];
 
     // Toggle present state
-    newPresentState[index] = !newPresentState[index]
+    newPresentState[index] = !newPresentState[index];
 
     // If present checkbox is checked, uncheck absent checkbox
     if (newPresentState[index]) {
-      newAbsentState[index] = false
+      newAbsentState[index] = false;
     }
 
     // Update states
-    setPresentState(newPresentState)
-    setAbsentState(newAbsentState)
-  }
+    setPresentState(newPresentState);
+    setAbsentState(newAbsentState);
+  };
 
   // Handler for absent checkbox
   const handleAbsent = (index) => {
-    const newAbsentState = [...absentState]
-    const newPresentState = [...presentState]
+    const newAbsentState = [...absentState];
+    const newPresentState = [...presentState];
 
     // Toggle absent state
-    newAbsentState[index] = !newAbsentState[index]
+    newAbsentState[index] = !newAbsentState[index];
 
     // If absent checkbox is checked, uncheck present checkbox
     if (newAbsentState[index]) {
-      newPresentState[index] = false
+      newPresentState[index] = false;
     }
 
     // Update states
-    setAbsentState(newAbsentState)
-    setPresentState(newPresentState)
-  }
+    setAbsentState(newAbsentState);
+    setPresentState(newPresentState);
+  };
 
   const handleAttendanceInTime = (index, time) => {
-    const formattedTime = formatTime(time)
+    const formattedTime = formatTime(time);
     setInTime((prevSelectedTimes) => {
-      const updatedSelectedTimes = [...prevSelectedTimes]
-      updatedSelectedTimes[index] = formattedTime
-      return updatedSelectedTimes
-    })
-  }
+      const updatedSelectedTimes = [...prevSelectedTimes];
+      updatedSelectedTimes[index] = formattedTime;
+      return updatedSelectedTimes;
+    });
+  };
 
   const handleAttendanceOutTime = (index, value) => {
-    const formattedTime = formatTime(value)
+    const formattedTime = formatTime(value);
     setOutTime((prevSelectedTimes) => {
-      const updatedSelectedTimes = [...prevSelectedTimes]
-      updatedSelectedTimes[index] = formattedTime
-      return updatedSelectedTimes
-    })
-  }
+      const updatedSelectedTimes = [...prevSelectedTimes];
+      updatedSelectedTimes[index] = formattedTime;
+      return updatedSelectedTimes;
+    });
+  };
 
   const handleAttendanceOvertime = (index, value) => {
-    const newOvertime = [...overtime]
-    newOvertime[index] = value
-    setOvertime(newOvertime)
-  }
+    const newOvertime = [...overtime];
+    newOvertime[index] = value;
+    setOvertime(newOvertime);
+  };
 
   const handleLate = (index, value) => {
-    const newLateState = [...lateStatus]
-    newLateState[index] = value
-    setLateStatus(newLateState)
-  }
+    const newLateState = [...lateStatus];
+    newLateState[index] = value;
+    setLateStatus(newLateState);
+  };
 
   const handleSubMitAttendance = async () => {
-    const newAttendanceData = getAllEmployee?.data?.employees?.map((employee, index) => {
-      return {
-        employee: employee._id,
-        full_name: employee.full_name,
-        employeeId: employee.employeeId,
-        status: employee.status,
-        designation: employee.designation,
-        date: formattedDate,
-        office_time: "10.00",
-        present: presentState[index],
-        absent: absentState[index],
-        in_time: inTime[index],
-        out_time: outTime[index],
-        overtime: overtime[index],
-        late_status: lateStatus[index],
+    const newAttendanceData = getAllEmployee?.data?.employees?.map(
+      (employee, index) => {
+        return {
+          employee: employee._id,
+          full_name: employee.full_name,
+          employeeId: employee.employeeId,
+          status: employee.status,
+          designation: employee.designation,
+          date: formattedDate,
+          office_time: "10.00",
+          present: presentState[index],
+          absent: absentState[index],
+          in_time: inTime[index],
+          out_time: outTime[index],
+          overtime: overtime[index],
+          late_status: lateStatus[index],
+        };
       }
-    })
+    );
 
     try {
-      const response = await createAttendance(newAttendanceData).unwrap()
+      const response = await createAttendance({
+        tenantDomain,
+        payload: newAttendanceData,
+      }).unwrap();
+
+
 
       if (response.success) {
-        toast.success(response.message)
+        toast.success(response.message);
+        navigate('/dashboard/attendance-list')
       }
     } catch (error) {
-      toast.error(error.message || "Something went wrong")
+      toast.error(error.message || "Something went wrong");
     }
-  }
+  };
 
   // Calculate attendance statistics
-  const totalEmployees = getAllEmployee?.data?.employees?.length || 0
-  const presentCount = presentState.filter(Boolean).length
-  const absentCount = absentState.filter(Boolean).length
-  const lateCount = lateStatus.filter(Boolean).length
+  const totalEmployees = getAllEmployee?.data?.employees?.length || 0;
+  const presentCount = presentState.filter(Boolean).length;
+  const absentCount = absentState.filter(Boolean).length;
+  const lateCount = lateStatus.filter(Boolean).length;
 
   // Filter employees based on search term
   const filteredEmployees = getAllEmployee?.data?.employees?.filter(
     (employee) =>
       employee.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.designation.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      employee.designation.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (employeesLoading) {
     return (
@@ -210,7 +240,7 @@ const AddAttendance = () => {
         <CircularProgress color="primary" />
         <span className="ml-2 text-gray-600">Loading employee data...</span>
       </div>
-    )
+    );
   }
 
   if (employeesError) {
@@ -219,7 +249,7 @@ const AddAttendance = () => {
         <AlertTriangle className="mr-2" />
         Error loading employee data. Please try again.
       </div>
-    )
+    );
   }
 
   return (
@@ -255,8 +285,12 @@ const AddAttendance = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 px-6">
         <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-indigo-500 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-500">Total Employees</p>
-            <h4 className="text-3xl font-bold text-indigo-600">{totalEmployees}</h4>
+            <p className="text-sm font-medium text-slate-500">
+              Total Employees
+            </p>
+            <h4 className="text-3xl font-bold text-indigo-600">
+              {totalEmployees}
+            </h4>
           </div>
           <div className="bg-indigo-100 p-3 rounded-full">
             <Users className="h-6 w-6 text-indigo-600" />
@@ -266,7 +300,9 @@ const AddAttendance = () => {
         <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Present</p>
-            <h4 className="text-3xl font-bold text-green-600">{presentCount}</h4>
+            <h4 className="text-3xl font-bold text-green-600">
+              {presentCount}
+            </h4>
           </div>
           <div className="bg-green-100 p-3 rounded-full">
             <CheckCircle className="h-6 w-6 text-green-600" />
@@ -330,8 +366,16 @@ const AddAttendance = () => {
                       <TableCell
                         key={index}
                         sx={{
-                          backgroundColor: index === 0 ? "#4f46e5" : `rgba(79, 70, 229, ${1 - index * 0.07})`,
-                          color: index < 8 ? "white" : index < 10 ? "#1e1b4b" : "#1e1b4b",
+                          backgroundColor:
+                            index === 0
+                              ? "#4f46e5"
+                              : `rgba(79, 70, 229, ${1 - index * 0.07})`,
+                          color:
+                            index < 8
+                              ? "white"
+                              : index < 10
+                              ? "#1e1b4b"
+                              : "#1e1b4b",
                           fontWeight: 600,
                           fontSize: "0.875rem",
                           padding: "16px",
@@ -349,7 +393,8 @@ const AddAttendance = () => {
                       <TableRow
                         key={employee._id}
                         sx={{
-                          backgroundColor: index % 2 === 0 ? "#f8fafc" : "white",
+                          backgroundColor:
+                            index % 2 === 0 ? "#f8fafc" : "white",
                           "&:hover": {
                             backgroundColor: "#eef2ff",
                           },
@@ -357,7 +402,9 @@ const AddAttendance = () => {
                         }}
                       >
                         <TableCell>
-                          <div className="font-medium text-gray-900">{index + 1}</div>
+                          <div className="font-medium text-gray-900">
+                            {index + 1}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -371,7 +418,9 @@ const AddAttendance = () => {
                             >
                               {employee.full_name.charAt(0)}
                             </Avatar>
-                            <div className="font-medium text-gray-900">{employee.full_name}</div>
+                            <div className="font-medium text-gray-900">
+                              {employee.full_name}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -386,7 +435,9 @@ const AddAttendance = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="text-gray-600">{employee.designation}</div>
+                          <div className="text-gray-600">
+                            {employee.designation}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -425,10 +476,16 @@ const AddAttendance = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <AttendanceTimePicker handleAttendanceInTime={handleAttendanceInTime} index={index} />
+                          <AttendanceTimePicker
+                            handleAttendanceInTime={handleAttendanceInTime}
+                            index={index}
+                          />
                         </TableCell>
                         <TableCell>
-                          <AttendanceOutTimePicker handleAttendanceOutTime={handleAttendanceOutTime} index={index} />
+                          <AttendanceOutTimePicker
+                            handleAttendanceOutTime={handleAttendanceOutTime}
+                            index={index}
+                          />
                         </TableCell>
                         <TableCell>
                           <TextField
@@ -436,9 +493,13 @@ const AddAttendance = () => {
                             variant="outlined"
                             size="small"
                             placeholder="Hours"
-                            onChange={(e) => handleAttendanceOvertime(index, e.target.value)}
+                            onChange={(e) =>
+                              handleAttendanceOvertime(index, e.target.value)
+                            }
                             InputProps={{
-                              startAdornment: <Timer className="h-4 w-4 text-gray-400 mr-1" />,
+                              startAdornment: (
+                                <Timer className="h-4 w-4 text-gray-400 mr-1" />
+                              ),
                             }}
                             sx={{
                               "& .MuiOutlinedInput-root": {
@@ -461,7 +522,10 @@ const AddAttendance = () => {
                                   onClick={() => handleLate(index, true)}
                                   className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center hover:bg-green-200 transition-colors"
                                 >
-                                  <XCircle className="text-green-600" size={20} />
+                                  <XCircle
+                                    className="text-green-600"
+                                    size={20}
+                                  />
                                 </div>
                               </Box>
                             </Tooltip>
@@ -478,7 +542,10 @@ const AddAttendance = () => {
                                   onClick={() => handleLate(index, false)}
                                   className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 transition-colors"
                                 >
-                                  <CheckCircle className="text-red-600" size={20} />
+                                  <CheckCircle
+                                    className="text-red-600"
+                                    size={20}
+                                  />
                                 </div>
                               </Box>
                             </Tooltip>
@@ -498,7 +565,11 @@ const AddAttendance = () => {
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
               type="submit"
             >
-              {createLoading ? <CircularProgress size={20} color="inherit" /> : <Save className="h-5 w-5" />}
+              {createLoading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <Save className="h-5 w-5" />
+              )}
               Submit Attendance
             </button>
           </div>
@@ -506,15 +577,10 @@ const AddAttendance = () => {
       </div>
 
       {/* Today's Attendance and Attendance List */}
-      <div className="mt-12">
-        <TodayAttendance />
-      </div>
-      <div className="mt-12">
-        <AttendanceList />
-      </div>
+      
+     
     </div>
-  )
-}
+  );
+};
 
-export default AddAttendance
-
+export default AddAttendance;

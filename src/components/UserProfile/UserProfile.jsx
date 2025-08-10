@@ -1,14 +1,17 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import admin from "../../../public/assets/avatar.jpg";
+import { useGetAllUserQuery } from "../../redux/api/userApi";
+import Loading from "../Loading/Loading";
 
-const UserProfile = () => {
+const UserProfile = ({ tenantDomain }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
 
   const handleLogout = () => {
     Cookies.remove("tas-auth");
@@ -40,6 +43,10 @@ const UserProfile = () => {
     };
   }, []);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Profile button */}
@@ -48,7 +55,7 @@ const UserProfile = () => {
         onClick={toggleDropdown}
       >
         <img
-          src={admin}
+          src={data?.data[0]?.image}
           alt="User"
           className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
         />
@@ -74,19 +81,13 @@ const UserProfile = () => {
               👤 My Profile
             </Link>
             <Link
-              to="/dashboard/support"
+              to="/dashboard/profile-update"
               className="block hover:text-[#42A1DA] transition-colors"
               onClick={() => setDropdownOpen(false)}
             >
-              ⚙️ Settings
+              ⚙️ Update Info
             </Link>
-            <Link
-              to="/dashboard/support"
-              className="block hover:text-[#42A1DA] transition-colors"
-              onClick={() => setDropdownOpen(false)}
-            >
-              🛠️ Support
-            </Link>
+
             <hr className="border-t" />
             <p
               onClick={handleLogout}

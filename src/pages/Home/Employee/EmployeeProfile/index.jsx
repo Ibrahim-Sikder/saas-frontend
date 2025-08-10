@@ -40,10 +40,13 @@ import EmployeeHoliday from "./EmployeeHoliday";
 import EmployeeAttendance from "./EmployeeAttendance";
 import "../Employee.css";
 import avatar from "../../../../../public/assets/chat3.jpg";
-import { AnimatedAvatar, tabsStyles, tabStyles } from "../../../../utils/customStyle";
+import {
+  AnimatedAvatar,
+  tabsStyles,
+  tabStyles,
+} from "../../../../utils/customStyle";
 import { GlassmorphicBox, StyledPaper } from "../../../../utils";
-
-
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -66,8 +69,12 @@ const EmployeeProfile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const id = new URLSearchParams(location.search).get("id");
+const tenantDomain = useTenantDomain();
 
-  const { data, isLoading, error } = useGetSingleEmployeeQuery(id);
+  const { data, isLoading, error } = useGetSingleEmployeeQuery({
+    tenantDomain,
+    id,
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -170,7 +177,6 @@ const EmployeeProfile = () => {
                 }}
               >
                 <AnimatedAvatar
-                
                   src={data?.data?.image || avatar}
                   alt={data?.data?.full_name}
                   className="profile-image-pulse"
@@ -356,7 +362,7 @@ const EmployeeProfile = () => {
             />
           </TabPanel>
           <TabPanel value={value} index={2}>
-            <SingleEmployeeLeaveList id={id} />
+            <SingleEmployeeLeaveList tenantDomain={tenantDomain} id={id} />
           </TabPanel>
           <TabPanel value={value} index={3}>
             <EmployeeHoliday id={id} />
@@ -365,15 +371,15 @@ const EmployeeProfile = () => {
             <h3 className="text-3xl font-bold">Employee Holiday</h3>
           </TabPanel>
           <TabPanel value={value} index={5}>
-            <EmployeeSalary id={id} />
+            <EmployeeSalary tenantDomain={tenantDomain} id={id} />
           </TabPanel>
           <TabPanel value={value} index={6}>
-            <EmployeeOvertime id={id} />
+            <EmployeeOvertime tenantDomain={tenantDomain} id={id} />
           </TabPanel>
 
           <div>
             <p className="my-5 text-center">
-              © Copyright 2024 | Trust Auto Solution | All Rights Reserved
+              © Copyright 2024 | Softypy Garage | All Rights Reserved
             </p>
           </div>
         </div>

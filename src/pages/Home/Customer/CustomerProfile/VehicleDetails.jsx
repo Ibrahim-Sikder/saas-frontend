@@ -17,7 +17,7 @@ import {
 } from "../../../../redux/api/vehicle";
 import { History } from "lucide-react";
 
-const VehicleDetails = ({ id, user_type }) => {
+const VehicleDetails = ({ id, user_type, tenantDomain }) => {
   const [open, setOpen] = useState(false);
   const [vehicleDetails, setVehicleDetails] = useState(false);
   const [getId, setGetId] = useState("");
@@ -42,6 +42,7 @@ const VehicleDetails = ({ id, user_type }) => {
   const textInputRef = useRef();
   const search = new URLSearchParams(location.search).get("search");
   const { data: allVehicle, isLoading } = useGetAllVehiclesQuery({
+    tenantDomain,
     id,
     limit,
     page: currentPage,
@@ -52,14 +53,7 @@ const VehicleDetails = ({ id, user_type }) => {
   const [deleteVehicle, { isLoading: deleteLoading, error: deleteError }] =
     useDeleteVehicleMutation();
 
-  const handleAllVehicle = () => {
-    setFilterType("");
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-  };
 
-  // Format date for mileage history display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -81,7 +75,7 @@ const VehicleDetails = ({ id, user_type }) => {
 
     if (willDelete) {
       try {
-        await deleteVehicle(id).unwrap();
+        await deleteVehicle({tenantDomain,id}).unwrap();
         swal("Deleted!", "Card delete successful.", "success");
       } catch (error) {
         swal("Error", "An error occurred while deleting the card.", "error");
@@ -305,6 +299,7 @@ const VehicleDetails = ({ id, user_type }) => {
 
       {vehicleDetails && (
         <VehicleDetailsModal
+        tenantDomain={tenantDomain}
           handVehicleDetailsOpen={handVehicleDetailsOpen}
           handleVehicleDetailsClose={handleVehicleDetailsClose}
           getId={getId}

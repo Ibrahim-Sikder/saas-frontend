@@ -2,24 +2,18 @@
 
 /* eslint-disable no-unused-vars */
 
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import SearchIcon from "@mui/icons-material/Search";
+import NoteIcon from "@mui/icons-material/Note";
 
 import {
-  Avatar,
-  Badge,
   Box,
   Button,
   Chip,
-  FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
-  MenuItem,
   Pagination,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -40,17 +34,11 @@ import {
 import Loading from "../../components/Loading/Loading";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteIconStyle, editIconStyle } from "../../style/tableStyle";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
-// Payment status colors
-const statusColors = {
-  paid: { bg: "#e6f7ee", color: "#0e9f6e", borderColor: "#0e9f6e" },
-  partially_paid: { bg: "#fef3c7", color: "#d97706", borderColor: "#d97706" },
-  pending: { bg: "#fee2e2", color: "#ef4444", borderColor: "#ef4444" },
-};
-
-// Payment method icons (simplified for example)
+// Payment method icons
 const getPaymentMethodIcon = (method) => {
-  switch (method) {
+  switch (method.toLowerCase()) {
     case "cash":
       return "💵";
     case "credit_card":
@@ -59,8 +47,11 @@ const getPaymentMethodIcon = (method) => {
       return "🏦";
     case "check":
       return "📝";
+    case "bkash":
     case "mobile_payment":
       return "📱";
+    case "nagad":
+      return "📲";
     default:
       return "💰";
   }
@@ -69,14 +60,14 @@ const getPaymentMethodIcon = (method) => {
 const IncomeList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
   const limit = 15;
+  const tenantDomain = useTenantDomain();
 
   const { data: allIncomes, isLoading: incomeLoading } = useGetAllIncomesQuery({
+    tenantDomain,
     limit,
     page: currentPage,
     search: searchTerm,
-    category: filterCategory !== "all" ? filterCategory : undefined,
   });
 
   const [deleteIncome, { isLoading: deleteLoading }] =
@@ -92,7 +83,7 @@ const IncomeList = () => {
 
     if (willDelete) {
       try {
-        await deleteIncome(id).unwrap();
+        await deleteIncome({ tenantDomain, id }).unwrap();
         swal("Deleted!", "Income record deleted successfully.", "success");
       } catch (error) {
         swal("Error", "An error occurred while deleting the record.", "error");
@@ -102,12 +93,7 @@ const IncomeList = () => {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on new search
-  };
-
-  const handleCategoryFilter = (e) => {
-    setFilterCategory(e.target.value);
-    setCurrentPage(1); // Reset to first page on new filter
+    setCurrentPage(1);
   };
 
   if (incomeLoading) {
@@ -165,7 +151,7 @@ const IncomeList = () => {
         }}
       >
         <TextField
-          placeholder="Search by name, invoice, or amount..."
+          placeholder="Search by invoice, amount, or method..."
           variant="outlined"
           size="small"
           value={searchTerm}
@@ -179,24 +165,6 @@ const IncomeList = () => {
             ),
           }}
         />
-
-        <FormControl size="small" sx={{ minWidth: "180px" }}>
-          <InputLabel id="category-filter-label">Filter by Category</InputLabel>
-          <Select
-            labelId="category-filter-label"
-            value={filterCategory}
-            onChange={handleCategoryFilter}
-            label="Filter by Category"
-            startAdornment={<FilterListIcon sx={{ color: "#42A1DA", mr: 1 }} />}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            <MenuItem value="service">Service</MenuItem>
-            <MenuItem value="parts">Parts</MenuItem>
-            <MenuItem value="repair">Repair</MenuItem>
-            <MenuItem value="maintenance">Maintenance</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
-          </Select>
-        </FormControl>
       </Box>
 
       <TableContainer
@@ -218,16 +186,10 @@ const IncomeList = () => {
                 SL
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Receipt/Invoice
+                Invoice
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Income Category
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Income Name
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Customer
+                Type
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 Amount
@@ -236,7 +198,10 @@ const IncomeList = () => {
                 Payment Method
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Status
+                Transaction
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Details
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 Date
@@ -249,11 +214,17 @@ const IncomeList = () => {
           <TableBody>
             {allIncomes?.data?.incomes?.map((row, index) => {
               const globalIndex = (currentPage - 1) * limit + (index + 1);
-
-              // Mock data for demonstration - in real app, use actual data from API
-              const paymentMethod = row.payment_method || "cash";
-              const paymentStatus = row.payment_status || "paid";
-              const customer = row.customer_name || "Customer";
+              const hasNote = row.note && row.note.trim() !== "";
+              
+              // Determine income type
+              let incomeType = "Other";
+              if (row.serviceIncomeAmount > 0 && row.partsIncomeAmount > 0) {
+                incomeType = "Service & Parts";
+              } else if (row.serviceIncomeAmount > 0) {
+                incomeType = "Service";
+              } else if (row.partsIncomeAmount > 0) {
+                incomeType = "Parts";
+              }
 
               return (
                 <TableRow
@@ -267,156 +238,95 @@ const IncomeList = () => {
                   <TableCell align="center">{globalIndex}</TableCell>
 
                   <TableCell align="center">
-                    <Tooltip title={row.receipt_number || "View Receipt"}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Badge
-                          color="primary"
-                          variant="dot"
-                          invisible={!row.image}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}
-                          >
-                            {row.invoice_number ||
-                              `INV-${String(globalIndex).padStart(4, "0")}`}
-                          </Typography>
-                        </Badge>
-                      </Box>
-                    </Tooltip>
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 0.5,
-                        justifyContent: "center",
-                      }}
-                    >
-                      {row?.category?.map((category, idx) => (
-                        <Chip
-                          key={idx}
-                          label={category}
-                          size="small"
-                          sx={{
-                            backgroundColor: "rgba(66, 161, 218, 0.1)",
-                            borderColor: "#42A1DA",
-                            color: "#2980b9",
-                            fontWeight: "medium",
-                            fontSize: "0.75rem",
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </TableCell>
-
-                  <TableCell align="center">{row.income_name}</TableCell>
-
-                  <TableCell align="center">
-                    <Tooltip title={`Customer: ${customer}`}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Avatar
-                          sx={{
-                            width: 28,
-                            height: 28,
-                            fontSize: "0.875rem",
-                            bgcolor: "#42A1DA",
-                            mr: 1,
-                          }}
-                        >
-                          {customer.charAt(0)}
-                        </Avatar>
-                        <Typography
-                          variant="body2"
-                          noWrap
-                          sx={{ maxWidth: "100px" }}
-                        >
-                          {customer}
-                        </Typography>
-                      </Box>
-                    </Tooltip>
-                  </TableCell>
-
-                  <TableCell align="center">
                     <Typography
                       variant="body2"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#2980b9",
-                      }}
+                      sx={{ fontFamily: "monospace", fontWeight: "medium" }}
                     >
-                      $
-                      {Number(row.amount).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                      {row.invoice_id?.invoice_no || "N/A"}
                     </Typography>
-                    {row.tax_applied && (
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        sx={{ color: "text.secondary" }}
-                      >
-                        +$
-                        {Number(row.tax_amount || 0).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}{" "}
-                        tax
-                      </Typography>
-                    )}
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Tooltip title={paymentMethod}>
-                      <Chip
-                        label={
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <span style={{ marginRight: "4px" }}>
-                              {getPaymentMethodIcon(paymentMethod)}
-                            </span>
-                            <span>{paymentMethod.replace("_", " ")}</span>
-                          </Box>
-                        }
-                        size="small"
-                        sx={{ textTransform: "capitalize" }}
-                      />
-                    </Tooltip>
                   </TableCell>
 
                   <TableCell align="center">
                     <Chip
-                      label={paymentStatus.replace("_", " ")}
+                      label={incomeType}
                       size="small"
                       sx={{
-                        backgroundColor:
-                          statusColors[paymentStatus]?.bg || "#f3f4f6",
-                        color: statusColors[paymentStatus]?.color || "#6b7280",
-                        border: `1px solid ${
-                          statusColors[paymentStatus]?.borderColor || "#d1d5db"
-                        }`,
-                        textTransform: "capitalize",
+                        backgroundColor: "#e6f2ff",
+                        color: "#42A1DA",
+                        fontWeight: "medium",
                       }}
                     />
                   </TableCell>
 
                   <TableCell align="center">
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#2980b9",
+                        }}
+                      >
+                        $
+                        {Number(row.totalAmount).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </Typography>
+                      
+                      <Box sx={{ mt: 0.5, fontSize: "0.75rem" }}>
+                        <Box fontWeight='bold'>Service Income : ${row.serviceIncomeAmount}</Box>
+                        <Box fontWeight='bold'>Parts Income : ${row.partsIncomeAmount}</Box>
+                        <Box fontWeight='bold'> Total Invoice Income: ${row.totalInvoiceIncome}</Box>
+                        <Box fontWeight='bold'>Other Income: ${row.totalOtherIncome}</Box>
+                      </Box>
+                    </Box>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ marginRight: "4px", fontSize: "1.2rem" }}>
+                        {getPaymentMethodIcon(row.payment_method)}
+                      </span>
+                      <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+                        {row.payment_method}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Box>
+                      <Typography variant="body2">
+                        {row.transactionNumber || "N/A"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        A/C: {row.accountNumber || "N/A"}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    {hasNote && (
+                      <Tooltip title={row.note} arrow>
+                        <NoteIcon fontSize="small" sx={{ color: "#42A1DA" }} />
+                      </Tooltip>
+                    )}
+                    <Box sx={{ mt: 0.5 }}>
+                      <Typography variant="caption">
+                        {row.income_items?.length || 0} items
+                      </Typography>
+                    </Box>
+                  </TableCell>
+
+                  <TableCell align="center">
                     <Typography variant="body2">
-                      {new Date(row.date).toLocaleDateString()}
+                      {new Date(row.date || row.createdAt).toLocaleDateString()}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(row.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Typography>
                   </TableCell>
 
@@ -498,15 +408,12 @@ const IncomeList = () => {
         >
           <Typography variant="body2" color="text.secondary">
             Showing {(currentPage - 1) * limit + 1} to{" "}
-            {Math.min(
-              currentPage * limit,
-              allIncomes?.data?.meta?.totalItems || 0
-            )}{" "}
-            of {allIncomes?.data?.meta?.totalItems || 0} entries
+            {Math.min(currentPage * limit, allIncomes?.data?.meta?.total || 0)}{" "}
+            of {allIncomes?.data?.meta?.total || 0} entries
           </Typography>
 
           <Pagination
-            count={allIncomes?.data?.meta?.totalPages || 1}
+            count={allIncomes?.data?.meta?.totalPage || 1}
             page={currentPage}
             color="primary"
             onChange={(_, page) => setCurrentPage(page)}

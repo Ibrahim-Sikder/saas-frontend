@@ -13,34 +13,32 @@ const customerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["customer"],
     }),
+    
     getAllCustomers: builder.query({
       query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/customers`,
         method: "GET",
-        params: {tenantDomain, limit, page, searchTerm, isRecycled },
+        params: { tenantDomain, limit, page, searchTerm, isRecycled },
       }),
       providesTags: ["customer", "vehicle", "jobCard", "quotation", "invoice"],
     }),
 
     getSingleCustomer: builder.query({
-      query: ({tenantDomain, id}) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/customers/${id}`,
         method: "GET",
-        params: {tenantDomain },
+        params: { tenantDomain },
       }),
       providesTags: ["customer", "vehicle", "jobCard", "quotation", "invoice"],
     }),
     updateCustomer: builder.mutation({
-      query: (customerInfo) => {
-        return {
-          url: `/customers/${customerInfo.id}`,
-          method: "PUT",
-          body: customerInfo.data,
-        };
-      },
+      query: ({ id, data }) => ({
+        url: `/customers/${id}`,
+        method: "PUT",
+        body: data,
+      }),
       invalidatesTags: ["customer"],
     }),
-
     deleteCustomer: builder.mutation({
       query: (id) => ({
         url: `/customers/${id}`,
@@ -49,23 +47,33 @@ const customerApi = baseApi.injectEndpoints({
       invalidatesTags: ["customer"],
     }),
     permanantlyDeleteCustomer: builder.mutation({
-      query: (id) => ({
-        url: `/customers/${id}`,
+      query: ({ tenantDomain, id }) => ({
+        url: `/customers/delete-permanantly/${id}`,
         method: "DELETE",
+          params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["customer"],
     }),
+    
     moveRecycledCustomer: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/customers/recycle/${id}`,
         method: "PATCH",
+          params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["customer"],
     }),
     restoreFromRecycledCustomer: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/customers/restore/${id}`,
         method: "PATCH",
+          params: {
+          tenantDomain,
+        },
       }),
       invalidatesTags: ["customer"],
     }),

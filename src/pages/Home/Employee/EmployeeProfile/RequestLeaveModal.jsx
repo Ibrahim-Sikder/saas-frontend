@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 /* eslint-disable no-unused-vars */
@@ -10,22 +11,17 @@ const RequestLeaveModal = ({ onClose, children }) => {
   const modalRef = useRef(null)
   const contentRef = useRef(null)
   const [mounted, setMounted] = useState(false)
-
-  // Handle mounting for smooth animations
   useEffect(() => {
     setMounted(true)
     return () => setMounted(false)
   }, [])
 
-  // Handle ESC key press to close modal
   useEffect(() => {
     const handleEscKey = (e) => {
       if (e.key === "Escape") {
         onClose()
       }
     }
-
-    // Prevent scrolling of body when modal is open
     const originalStyle = window.getComputedStyle(document.body).overflow
     document.body.style.overflow = "hidden"
 
@@ -36,15 +32,11 @@ const RequestLeaveModal = ({ onClose, children }) => {
       window.removeEventListener("keydown", handleEscKey)
     }
   }, [onClose])
-
-  // Handle click outside to close
   const handleBackdropClick = (e) => {
     if (modalRef.current === e.target) {
       onClose()
     }
   }
-
-  // Focus trap inside modal
   useEffect(() => {
     const focusableElements = contentRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',

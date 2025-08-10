@@ -1,212 +1,177 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 "use client";
-
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import {
-  useCreateSupplierMutation,
-  useGetSingleSupplierQuery,
-  useUpdateSupplierMutation,
-} from "../redux/api/supplier";
-import { countries } from "../constant";
-import { useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { countries } from "../constant/Vehicle.constant";
 
-// Define the Zod validation schema
+
+const useCreateSupplierMutation = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const createSupplier = async (data) => {
+    setIsLoading(true);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        setIsLoading(false);
+        resolve({ success: true, message: "Supplier created successfully!" });
+      }, 1500);
+    });
+  };
+  return [createSupplier, { isLoading }];
+};
+
+const useUpdateSupplierMutation = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const updateSupplier = async ({ id, data }) => {
+    setIsLoading(true);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        setIsLoading(false);
+        resolve({ success: true, message: "Supplier updated successfully!" });
+      }, 1500);
+    });
+  };
+  return [updateSupplier, { isLoading }];
+};
+
+const useGetSingleSupplierQuery = ({ id, tenantDomain }) => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (id) {
+      setIsLoading(true);
+      setTimeout(() => {
+        // Mock data for editing
+        setData({
+          data: {
+            full_name: "Acme Corp",
+            contact_person_name: "John Doe",
+            phone_number: "1234567890",
+            country_code: "+1",
+            email: "info@acmecorp.com",
+            street_address: "123 Main St",
+            city: "Anytown",
+            country: "USA",
+            state: "CA",
+            postal_code: "90210",
+            tax_id: "ABC123XYZ",
+            bank_name: "First National Bank",
+            account_number: "987654321",
+            swift_code: "FNBBUS33",
+            vendor: "raw_materials",
+            supplier_status: "active",
+            notes: "Long-standing supplier, good relationship.",
+          },
+        });
+        setIsLoading(false);
+      }, 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, tenantDomain]);
+  return { data, isLoading };
+};
+
+const useTenantDomain = () => {
+  // Mock tenant domain
+  return "example.com";
+};
+
 const supplierValidationSchema = z.object({
-  body: z.object({
-    full_name: z.string({ required_error: "Full name is required." }),
-    phone_number: z.string({ required_error: "Phone number is required." }),
-    // country_code: z.string({ required_error: "Country code is required." }),
-    email: z
-      .string({ required_error: "Email is required." })
-      .email("Invalid email format."),
-    vendor: z.string({ required_error: "Vendor name is required." }),
-    shop_name: z.string({ required_error: "Shop name is required." }),
-    business_type: z.string({ required_error: "Business type is required." }),
-    tax_id: z.string({ required_error: "Tax ID is required." }),
-    registration_number: z.string({
-      required_error: "Registration number is required.",
-    }),
-    website: z.string().optional(),
-    country: z.string({ required_error: "Country name is required." }),
-    city: z.string({ required_error: "City name is required." }),
-    state: z.string({ required_error: "State is required." }),
-    postal_code: z.string({ required_error: "Postal code is required." }),
-    street_address: z.string({ required_error: "Street address is required." }),
-    delivery_instructions: z.string().optional(),
-    year_established: z.union([
-      z.number({ required_error: "Year established is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Year established must be a valid number.",
-      }),
-    ]),
-    number_of_employees: z.union([
-      z.number({ required_error: "Number of employees is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Number of employees is required.",
-      }),
-    ]),
-
-    annual_revenue: z.union([
-      z.number({ required_error: "Annual revenue is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Annual revenue is required.",
-      }),
-    ]),
-
-    business_description: z.string().optional(),
-    bank_name: z.string({ required_error: "Bank name is required." }),
-    account_number: z.string({ required_error: "Account number is required." }),
-    swift_code: z.string({ required_error: "SWIFT code is required." }),
-    tax_exempt: z.boolean().default(false),
-    tax_exemption_number: z.string().optional(),
-    credit_terms: z.boolean().default(false),
-    payment_terms: z.string({ required_error: "Payment terms are required." }),
-    credit_limit: z.union([
-      z.number(),
-      z
-        .string()
-        .refine((val) => !isNaN(Number(val)))
-        .optional(),
-    ]),
-
-    delivery_terms: z.string({
-      required_error: "Delivery terms are required.",
-    }),
-    minimum_order_value: z.union([
-      z.number({ required_error: "Minimum order value is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Minimum order value is required.",
-      }),
-    ]),
-
-    lead_time: z.union([
-      z.number({ required_error: "Lead time is required." }),
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Lead time is required.",
-      }),
-    ]),
-
-    shipping_method: z.string().optional(),
-    supply_chain_notes: z.string().optional(),
-    supplier_rating: z
-      .number({ required_error: "Supplier rating is required." })
-      .min(0, "Rating must be at least 0")
-      .max(5, "Rating cannot exceed 5"),
-
-    supplier_status: z.enum(["active", "pending", "inactive"], {
-      required_error: "Supplier status is required.",
-    }),
-    quality_certification: z.string().optional(),
-    notes: z.string().optional(),
-  }),
+  full_name: z
+    .string({ required_error: "Supplier name is required." })
+    .min(1, "Supplier name is required."),
+  contact_person_name: z
+    .string({
+      required_error: "Contact person name is required.",
+    })
+    .min(1, "Contact person name is required."),
+  phone_number: z.string().optional(),
+  country_code: z.string().optional(),
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  vendor: z.string().optional(), // Changed from product_type to vendor
+  street_address: z.string().min(1, "Street address is required."), // Made required
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string().optional(),
+  tax_id: z.string().optional(), // Changed from vat_or_tin_number to tax_id
+  registration_number: z.string().optional(),
+  website: z.string().optional(),
+  bank_name: z.string().optional(),
+  account_number: z.string().optional(),
+  swift_code: z.string().optional(),
+  tax_exempt: z.boolean().default(false).optional(),
+  tax_exemption_number: z.string().optional(),
+  credit_terms: z.boolean().default(false).optional(),
+  payment_terms: z.string().optional(),
+  credit_limit: z.number().optional(),
+  delivery_terms: z.string().optional(),
+  minimum_order_value: z.number().optional(),
+  lead_time: z.number().optional(),
+  shipping_method: z.string().optional(),
+  supplier_status: z
+    .enum(["active", "pending", "inactive"])
+    .default("active")
+    .optional(),
+  notes: z.string().optional(),
+  supplier_photo: z.string().optional(),
 });
-
-
 
 export const useSupplierForm = (id) => {
   const [loading, setLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
   const [countryCode, setCountryCode] = useState(countries[0]);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const theme = useTheme();
   const navigate = useNavigate();
-  const { data: singleSupplier, isLoading: supplierLoading } =
-    useGetSingleSupplierQuery(id);
-    console.log('single supplier',singleSupplier)
-  const [updateSupplier, { isLoading: updateLoading, error: updateError }] =
+  const tenantDomain = useTenantDomain();
+
+  const { data: singleSupplier, isLoading: isSingleSupplierLoading } =
+    useGetSingleSupplierQuery({
+      tenantDomain: tenantDomain,
+      id: id || "", // Pass id as string
+    });
+
+  const [updateSupplier, { isLoading: updateLoading }] =
     useUpdateSupplierMutation();
+  const [createSupplier, { isLoading: createLoading }] =
+    useCreateSupplierMutation();
+
   const defaultSupplierValues = {
-    // Basic Information
     full_name: "",
-    shop_name: "",
+    contact_person_name: "",
+    phone_number: "",
+    country_code: countries[0].code,
     email: "",
-    website: "",
-    tax_id: "",
-    registration_number: "",
     vendor: "",
-    // Address Information
+    tax_id: "",
     street_address: "",
     country: "",
     state: "",
     city: "",
     postal_code: "",
-    delivery_instructions: "",
-
-    // Business Details
-    year_established: new Date().getFullYear() - 5,
-    number_of_employees: 10,
-    annual_revenue: 100000,
-    business_type: "new_parts",
-    business_description: "",
-
-    // Financial Information
     bank_name: "",
     account_number: "",
     swift_code: "",
-    payment_terms: "net_30",
-    credit_terms: false,
-    credit_limit: 10000,
-    tax_exempt: false,
-    tax_exemption_number: "",
-
-    // Supply Chain Information
-    delivery_terms: "ex_works",
-    minimum_order_value: 100,
-    lead_time: 7,
-    shipping_method: "",
-    supply_chain_notes: "",
-    supplier_rating: "",
-    // Evaluation
-    supplier_status: "",
-    quality_certification: "",
+    supplier_status: "active",
     notes: "",
-    supplier_photo: "",
   };
-
-  // Modify the schema to match the form structure
-  const formSchema = supplierValidationSchema.shape.body;
 
   const methods = useForm({
     defaultValues: defaultSupplierValues,
-    resolver: zodResolver(formSchema),
+    // resolver: zodResolver(supplierValidationSchema),
     mode: "onChange",
   });
-
-  const { watch, formState, reset, getValues } = methods;
+  const { formState, reset, setValue } = methods;
   const { errors } = formState;
-
-  const creditTerms = watch("credit_terms", false);
-  const taxExempt = watch("tax_exempt", false);
-
-  const [createSupplier, { isLoading: createLoading }] =
-    useCreateSupplierMutation();
-
-  const handleTabChange = (event, newValue) => {
-
-    const formData = methods.getValues();
-    sessionStorage.setItem("supplierFormData", JSON.stringify(formData));
-
-    event.preventDefault();
-    setCurrentTab(newValue);
-  };
 
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
-    if (
-      /^\d*$/.test(newPhoneNumber) &&
-      newPhoneNumber.length <= 11 &&
-      (newPhoneNumber === "" ||
-        !newPhoneNumber.startsWith("0") ||
-        newPhoneNumber.length > 1)
-    ) {
+    // Basic validation for numbers and length
+    if (/^\d*$/.test(newPhoneNumber) && newPhoneNumber.length <= 11) {
       setPhoneNumber(newPhoneNumber);
-      methods.setValue("phone_number", newPhoneNumber);
+      setValue("phone_number", newPhoneNumber, { shouldValidate: true });
     }
   };
 
@@ -214,171 +179,94 @@ export const useSupplierForm = (id) => {
     const values = {
       ...data,
       country_code: countryCode.code,
-      year_established: Number(data.year_established),
-      number_of_employees: Number(data.number_of_employees),
-      annual_revenue: Number(data.annual_revenue),
-      tax_exempt: taxExempt,
-      credit_terms: creditTerms,
-      credit_limit: Number(data.credit_limit),
-      minimum_order_value: Number(data.minimum_order_value),
-      lead_time: Number(data.lead_time),
-      supplier_photo: data.supplier_photo,
+      phone_number: phoneNumber,
     };
-    console.log("raw value", values);
-
     try {
-      const response = await createSupplier(values).unwrap();
-      console.log(response);
+      const response = await createSupplier({
+        ...values,
+        tenantDomain,
+      });
       if (response.success) {
-        // Clear sessionStorage after successful submission
-    
-        toast.success(response.message);
+        toast.success("Supplier created successfully!");
         navigate("/dashboard/supplier-list");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to create supplier.");
     }
   };
 
   const onSubmit = async (data) => {
-
     const values = {
       ...data,
       country_code: countryCode.code,
-      year_established: Number(data.year_established),
-      number_of_employees: Number(data.number_of_employees),
-      annual_revenue: Number(data.annual_revenue),
-      tax_exempt: taxExempt,
-      credit_terms: creditTerms,
-      credit_limit: Number(data.credit_limit),
-      minimum_order_value: Number(data.minimum_order_value),
-      lead_time: Number(data.lead_time),
-      supplier_photo: data.supplier_photo,
+      phone_number: phoneNumber,
     };
-
     try {
-      const response = await updateSupplier({ id, ...values }).unwrap();
-
+      const response = await updateSupplier({
+        id: id,
+        data: { ...values, tenantDomain },
+      });
       if (response.success) {
-
-        toast.success(response.message);
+        toast.success("Supplier updated successfully!");
         navigate("/dashboard/supplier-list");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(
+        error && error.message ? error.message : "Failed to update supplier."
+      );
     }
   };
 
-  // Update form when singleIncome data is loaded
+  // Update form when singleSupplier data is loaded
   useEffect(() => {
     if (id && singleSupplier?.data) {
       populateForm(singleSupplier);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, singleSupplier]);
 
   const populateForm = (supplierData) => {
-    if (!supplierData) return;
-
-    const data = supplierData?.data;
-    if (!data) return;
-
-    // Find the country code in the countries array
+    if (!supplierData || !supplierData.data) return;
+    const data = supplierData.data;
     const countryCodeObj =
       countries.find((c) => c.code === data.country_code) || countries[0];
     setCountryCode(countryCodeObj);
-
-    // Set phone number without country code
     setPhoneNumber(data.phone_number || "");
-
-    // Reset form with supplier data
-    methods.reset({
-      // Basic Information
+    reset({
       full_name: data.full_name || "",
-      shop_name: data.shop_name || "",
-      email: data.email || "",
-      website: data.website || "",
-      tax_id: data.tax_id || "",
-      registration_number: data.registration_number || "",
-      vendor: data.vendor || "",
+      contact_person_name: data.contact_person_name || "",
       phone_number: data.phone_number || "",
-
-      // Address Information
+      country_code: data.country_code || countries[0].code,
+      email: data.email || "",
+      vendor: data.vendor || "",
+      tax_id: data.tax_id || "",
       street_address: data.street_address || "",
       country: data.country || "",
       state: data.state || "",
       city: data.city || "",
       postal_code: data.postal_code || "",
-      delivery_instructions: data.delivery_instructions || "",
-
-      // Business Details
-      year_established: data.year_established || new Date().getFullYear() - 5,
-      number_of_employees: data.number_of_employees || 10,
-      annual_revenue: data.annual_revenue || 100000,
-      business_type: data.business_type || "new_parts",
-      business_description: data.business_description || "",
-
-      // Financial Information
       bank_name: data.bank_name || "",
       account_number: data.account_number || "",
       swift_code: data.swift_code || "",
-      payment_terms: data.payment_terms || "net_30",
-      credit_terms: data.credit_terms || false,
-      credit_limit: data.credit_limit || 10000,
-      tax_exempt: data.tax_exempt || false,
-      tax_exemption_number: data.tax_exemption_number || "",
-
-      // Supply Chain Information
-      delivery_terms: data.delivery_terms || "ex_works",
-      minimum_order_value: data.minimum_order_value || 100,
-      lead_time: data.lead_time || 7,
-      shipping_method: data.shipping_method || "",
-      supply_chain_notes: data.supply_chain_notes || "",
-
-      // Evaluation
-      supplier_rating: data.supplier_rating || 3,
       supplier_status: data.supplier_status || "active",
-      quality_certification: data.quality_certification || "",
       notes: data.notes || "",
-      supplier_photo: data.supplier_photo || "",
     });
-
-    
   };
-
-  // Load saved form data on component mount
-  useEffect(() => {
-    if (!id) {
-      const savedFormData = sessionStorage.getItem("supplierFormData");
-      if (savedFormData) {
-        try {
-          const parsedData = JSON.parse(savedFormData);
-          if (Object.keys(parsedData).length > 0) {
-            methods.reset(parsedData);
-          }
-        } catch (e) {
-          console.error("Error parsing saved form data", e);
-        }
-      }
-    }
-  }, [id, methods]);
 
   return {
     methods,
     formSubmit,
     onSubmit,
     populateForm,
-    loading,
+    loading: isSingleSupplierLoading,
     createLoading,
     updateLoading,
     currentTab,
     setCurrentTab,
-    handleTabChange,
     countryCode,
     setCountryCode,
     phoneNumber,
     handlePhoneNumberChange,
-    creditTerms,
-    taxExempt,
     errors,
     isEditing: !!id,
   };

@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material";
 import PurchaseOrderForm from "./PurchaseOrderForm";
 
-const UpdatePurchaseOrderModal = ({ open, onClose, orderId }) => {
+const UpdatePurchaseOrderModal = ({tenantDomain, open, onClose, orderId }) => {
   const theme = useTheme();
 
   return (

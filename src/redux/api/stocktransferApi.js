@@ -12,24 +12,26 @@ const stockTransferApi = baseApi.injectEndpoints({
     }),
 
     getAllStockTransfers: builder.query({
-      query: ({ limit, page, searchTerm } = {}) => ({
+      query: ({ tenantDomain, limit, page, searchTerm } = {}) => ({
         url: "/stock-transfer",
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: {tenantDomain,  limit, page, searchTerm },
       }),
       providesTags: ["stockTransfers"],
     }),
     getSingleStockTransfer: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/stock-transfer/${id}`,
         method: "GET",
+          params: { tenantDomain },
       }),
       providesTags: ["stockTransfers"],
     }),
     deleteStockTransfer: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/stock-transfer/${id}`,
         method: "DELETE",
+          params: { tenantDomain },
       }),
       invalidatesTags: ["stockTransfers"],
     }),

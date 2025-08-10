@@ -805,7 +805,7 @@ const BillPayHistory = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Rows</InputLabel>
-          <Select value={rowsPerPage.toString()} onChange={handleRowsPerPageChange} label="Rows">
+          <Select value={rowsPerPage?.toString()} onChange={handleRowsPerPageChange} label="Rows">
             <MenuItem value="5">5</MenuItem>
             <MenuItem value="10">10</MenuItem>
             <MenuItem value="25">25</MenuItem>

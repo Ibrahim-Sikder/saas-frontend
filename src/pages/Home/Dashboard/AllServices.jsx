@@ -8,17 +8,22 @@ import {
   FaUsers,
   FaWrench,
 } from "react-icons/fa";
-import { FaCarOn } from "react-icons/fa6";
 import { HiOutlineBriefcase } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import Loading from "../../../components/Loading/Loading";
 import "./AllService.css";
 import { useGetAllMetaQuery } from "../../../redux/api/meta.api";
 import { AssuredWorkload } from "@mui/icons-material";
-const AllServices = () => {
-  const { data: allMetaData, isLoading, isError } = useGetAllMetaQuery({});
+import { useTenantDomain } from "../../../../src/hooks/useTenantDomain";
 
-  if (isError) return <h2>Oops! Data not found.</h2>;
+const AllServices = () => {
+  const tenantDomain = useTenantDomain();
+  const {
+    data: allMetaData,
+    isLoading,
+    isError,
+  } = useGetAllMetaQuery({ tenantDomain });
+
   if (isLoading) return <Loading />;
 
   return (
@@ -100,7 +105,6 @@ const AllServices = () => {
               <p className="label">Total Sale </p>
             </div>
           </div>
-
 
           <div class="wave-background">
             <svg

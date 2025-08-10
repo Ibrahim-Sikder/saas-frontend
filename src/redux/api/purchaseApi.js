@@ -3,26 +3,27 @@ import { baseApi } from "./baseApi";
 const purchaseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createPurchase: builder.mutation({
-      query: (quotationInfo) => ({
+      query: (data) => ({
         url: "/purchases",
         method: "POST",
-        body: quotationInfo,
+        body: data,
       }),
       invalidatesTags: ["purchase"],
     }),
     getAllPurchases: builder.query({
-      query: ({ limit, page, searchTerm }) => ({
+      query: ({ tenantDomain, limit, page, searchTerm }) => ({
         url: `/purchases`,
         method: "GET",
-        params: { limit, page, searchTerm },
+        params: { tenantDomain, limit, page, searchTerm },
       }),
       providesTags: ["purchase"],
     }),
 
     getSinglePurchase: builder.query({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchases/${id}`,
         method: "GET",
+        params: { tenantDomain },
       }),
       providesTags: ["purchase"],
     }),
@@ -31,11 +32,11 @@ const purchaseApi = baseApi.injectEndpoints({
       query: ({ id, ...data }) => ({
         url: `/purchases/${id}`,
         method: "PUT",
-        data,
+        body: data,
       }),
-
       invalidatesTags: ["purchase"],
     }),
+
     removePurchase: builder.mutation({
       query: (purchasesInfo) => {
         return {
@@ -48,9 +49,10 @@ const purchaseApi = baseApi.injectEndpoints({
       invalidatesTags: ["purchase"],
     }),
     deletePurchase: builder.mutation({
-      query: (id) => ({
+      query: ({ tenantDomain, id }) => ({
         url: `/purchases/${id}`,
         method: "DELETE",
+        params: { tenantDomain },
       }),
       invalidatesTags: ["purchase"],
     }),

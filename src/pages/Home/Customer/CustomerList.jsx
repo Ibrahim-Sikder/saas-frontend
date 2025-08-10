@@ -28,7 +28,7 @@ const CustomerList = () => {
           </Button>
         </div>
         <div className="flex items-center justify-center ">
-          <FaUserTie className="invoicIcon" />
+      
           <div className="mt-2 md:mt-0">
             <span>
               Customer <ArrowForwardIos sx={{ fontSize: "15px" }} /> Manage

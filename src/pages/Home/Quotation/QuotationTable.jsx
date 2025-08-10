@@ -2,23 +2,29 @@
 
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaEye, FaDownload } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaEdit,
+  FaEye,
+  FaDownload,
+  FaFileInvoice,
+} from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import {
-  Box,
   IconButton,
   Pagination,
   Paper,
   TextField,
-  Typography,
+  Tooltip,
 } from "@mui/material";
 import {
   useGetAllQuotationsQuery,
   useMoveRecycledQuotationMutation,
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const QuotationTable = () => {
   const location = useLocation();
@@ -30,6 +36,7 @@ const QuotationTable = () => {
   const textInputRef = useRef(null);
   const navigate = useNavigate();
   const limit = 10;
+  const tenantDomain = useTenantDomain();
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
@@ -42,6 +49,7 @@ const QuotationTable = () => {
 
   const { data: allQuotations, isLoading: quotationLoading } =
     useGetAllQuotationsQuery({
+      tenantDomain,
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -57,7 +65,7 @@ const QuotationTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledQuotation(id).unwrap();
+        await moveRecycledQuotation({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -67,16 +75,6 @@ const QuotationTable = () => {
         swal("Error", "An error occurred while deleting the card.", "error");
       }
     }
-  };
-
-  // Format date for mileage history display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
   };
 
   useEffect(() => {
@@ -142,7 +140,7 @@ const QuotationTable = () => {
                         <th>Mobile Number</th>
                         {/* <th>Mileage History</th> */}
                         <th>Date</th>
-                        <th colSpan={4}>Action</th>
+                        <th colSpan={5}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -210,98 +208,105 @@ const QuotationTable = () => {
                             ) : (
                               <td></td>
                             )}
-
-                            {/* Mileage History Column */}
-                            {/* <td>
-                              {card.vehicle?.mileageHistory?.length > 0 ? (
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 0.5,
-                                  }}
-                                >
-                                  {card.vehicle.mileageHistory.map(
-                                    (history, idx) => (
-                                      <Tooltip
-                                        key={history._id}
-                                        title={`Recorded on: ${formatDate(
-                                          history.date
-                                        )}`}
-                                        arrow
-                                      >
-                                        <Chip
-                                          icon={<History size={16} />}
-                                          label={`${history.mileage} km`}
-                                          size="small"
-                                          color={
-                                            idx === 0 ? "primary" : "default"
-                                          }
-                                          variant={
-                                            idx === 0 ? "filled" : "outlined"
-                                          }
-                                          sx={{
-                                            fontSize: "0.75rem",
-                                            "& .MuiChip-icon": {
-                                              marginLeft: "4px",
-                                              marginRight: "-4px",
-                                              color: "white",
-                                            },
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    )
-                                  )}
-                                </Box>
-                              ) : (
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  No history
-                                </Typography>
-                              )}
-                            </td> */}
-
                             <td>{card.date}</td>
 
                             <td>
-                              <a
-                                className="editIconWrap edit2"
-                                href={`${
-                                  import.meta.env.VITE_API_URL
-                                }/quotations/quotation/${card._id}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Tooltip
+                                title="View Invoice"
+                                arrow
+                                placement="top"
                               >
-                                <FaDownload className="editIcon" />
-                              </a>
-                            </td>
-                            <td>
-                              <div
-                                onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2"
-                              >
-                                <FaEye className="editIcon" />
-                              </div>
-                            </td>
-                            <td>
-                              <div className="editIconWrap edit">
-                                <Link
-                                  to={`/dashboard/update-quotation?id=${card._id}`}
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
+                                  rel="noreferrer"
                                 >
-                                  <FaEdit className="editIcon" />
-                                </Link>
-                              </div>
+                                  <FaFileInvoice className="editIcon" />
+                                </a>
+                              </Tooltip>
                             </td>
+
                             <td>
-                              <button
-                                disabled={deleteLoading}
-                                onClick={() => handleMoveToRecycled(card._id)}
-                                className="editIconWrap"
+                              <Tooltip
+                                title="Download Quotation"
+                                arrow
+                                placement="top"
                               >
-                                <FaTrashAlt className="deleteIcon" />
-                              </button>
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`${
+                                    import.meta.env.VITE_API_URL
+                                  }/quotations/quotation/${
+                                    card._id
+                                  }?tenantDomain=${tenantDomain}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <FaDownload className="editIcon" />
+                                </a>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip title="Preview" arrow placement="top">
+                                <div
+                                  onClick={() => handleIconPreview(card._id)}
+                                  className="editIconWrap edit2"
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEye className="editIcon" />
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title="Edit Quotation"
+                                arrow
+                                placement="top"
+                              >
+                                <div className="editIconWrap edit">
+                                  <Link
+                                    to={`/dashboard/update-quotation?id=${card._id}`}
+                                  >
+                                    <FaEdit className="editIcon" />
+                                  </Link>
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title={
+                                  deleteLoading
+                                    ? "Deleting..."
+                                    : "Move to Recycled"
+                                }
+                                arrow
+                                placement="top"
+                              >
+                                <span>
+                                  {" "}
+                                  {/* Wrapper span for disabled button */}
+                                  <button
+                                    disabled={deleteLoading}
+                                    onClick={() =>
+                                      handleMoveToRecycled(card._id)
+                                    }
+                                    className="editIconWrap"
+                                    style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "none",
+                                      border: "none",
+                                      padding: 0,
+                                    }}
+                                  >
+                                    <FaTrashAlt className="deleteIcon" />
+                                  </button>
+                                </span>
+                              </Tooltip>
                             </td>
                           </tr>
                         );

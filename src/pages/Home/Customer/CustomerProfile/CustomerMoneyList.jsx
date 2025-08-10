@@ -18,7 +18,7 @@ import {
   useGetAllMoneyReceiptsQuery,
   useMoveRecycledMoneyReceiptMutation,
 } from "../../../../redux/api/money-receipt";
-const CustomerMoneyList = ({ id, user_type }) => {
+const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
 
@@ -28,6 +28,7 @@ const CustomerMoneyList = ({ id, user_type }) => {
 
   const { data: allMoneyReceipts, isLoading: moneyReceiptLoading } =
     useGetAllMoneyReceiptsQuery({
+      tenantDomain,
       id,
       limit,
       page: currentPage,
@@ -53,7 +54,7 @@ const CustomerMoneyList = ({ id, user_type }) => {
 
     if (willDelete) {
       try {
-        await moveRecycledMoneyReceipt(id).unwrap();
+        await moveRecycledMoneyReceipt({ tenantDomain, id}).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",

@@ -23,6 +23,7 @@ import {
   useUpdateShowRoomMutation,
 } from "../../../redux/api/showRoomApi";
 import Loading from "../../../components/Loading/Loading";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const UpdateShowRoom = () => {
   const location = useLocation();
@@ -38,8 +39,8 @@ const UpdateShowRoom = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [yearSelectInput, setYearSelectInput] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);
-
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+const tenantDomain = useTenantDomain();
 
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
@@ -71,8 +72,7 @@ const UpdateShowRoom = () => {
     data: singleCard,
     isLoading,
     refetch,
-  } = useGetSingleShowRoomQuery(id);
-
+  } = useGetSingleShowRoomQuery({ tenantDomain, id });
   const [updateShowroom, { isLoading: updateLoading, error }] =
     useUpdateShowRoomMutation();
 
@@ -125,6 +125,7 @@ const UpdateShowRoom = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
+
     const showroom = {
       showRoom_name: data.showRoom_name,
       vehicle_username: data.vehicle_username,
@@ -141,16 +142,12 @@ const UpdateShowRoom = () => {
     };
     data.vehicle_model = Number(data.vehicle_model);
     data.mileage = Number(data.mileage);
-
-    // Get the current mileage value
     const newMileageValue = Number(data.mileage);
 
-    // Check if we need to add a new mileage entry
     const updatedMileageHistory = [
       ...(getDataWithChassisNo.mileageHistory || []),
     ];
 
-    // Only add a new entry if it's a valid number and not already in the history
     if (!isNaN(newMileageValue) && newMileageValue > 0) {
       const mileageExists = updatedMileageHistory.some(
         (entry) => entry.mileage === newMileageValue
@@ -163,7 +160,6 @@ const UpdateShowRoom = () => {
         });
       }
     }
-    // Extract vehicle information
     const vehicle = {
       carReg_no: data.carReg_no,
       car_registration_no: data.car_registration_no,
@@ -183,13 +179,14 @@ const UpdateShowRoom = () => {
       vehicle,
     };
 
+  
     const updateData = {
-      id: id,
-      data: newData,
+      tenantDomain,
+      ...newData,
     };
 
     try {
-      const res = await updateShowroom(updateData).unwrap();
+      const res = await updateShowroom({ id: id, data: updateData }).unwrap();
       if (res.success) {
         toast.success(res.message);
         navigate("/dashboard/show-room-list");
@@ -226,7 +223,7 @@ const UpdateShowRoom = () => {
   };
   const handleOptionClick = (option) => {
     setYearSelectInput(option.label);
-    setFilteredOptions([]); // This assumes option.label is the value you want to set in the input
+    setFilteredOptions([]);
   };
 
   const handleChassisChange = (_, newValue) => {
@@ -248,7 +245,7 @@ const UpdateShowRoom = () => {
   };
   return (
     <section>
-      <div className=" addProductWraps">
+      <div className=" addProductWraps my-10 ">
         <div className="productHeadWrap">
           <div className="flex items-center justify-center ">
             <Button
@@ -258,7 +255,6 @@ const UpdateShowRoom = () => {
             >
               Back
             </Button>
-            <HiOfficeBuilding className="invoicIcon" />
           </div>
           <h3 className="text-xl font-bold md:text-2xl"> Update Show Room </h3>
           <div className="productHome">
@@ -272,7 +268,7 @@ const UpdateShowRoom = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
               <Box>
-                <h3 className="mb-1 ml-2 text-xl font-bold md:ml-0">
+                <h3 className="my-3  ml-2 text-xl font-bold md:ml-0">
                   Show Room Information{" "}
                 </h3>
                 <Grid container spacing={2}>
@@ -394,7 +390,7 @@ const UpdateShowRoom = () => {
               </Box>
 
               <Box>
-                <h3 className="mb-2 text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3 text-xl font-bold">Vehicle Information </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete

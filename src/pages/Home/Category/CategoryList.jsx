@@ -47,6 +47,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import { CreateCategoryModal } from "./CreateCategoryModal";
 import { UpdateCategoryModal } from "./UpdateCategoryModal";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 export default function CategoryList() {
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(null);
@@ -58,8 +59,10 @@ export default function CategoryList() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading, refetch } = useGetAllICategoryQuery({
+    tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
@@ -67,13 +70,7 @@ export default function CategoryList() {
   const [deleteCategory] = useDeleteCategoryMutation();
   const categories = data?.data?.categories || [];
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
@@ -86,14 +83,14 @@ export default function CategoryList() {
   const handleClose = () => setOpen(false);
   const handleUpdateClose = () => setUpdateOpen(null);
   const handleDeleteClick = (id) => {
-    console.log(id);
+ 
     setCategoryToDelete(id);
     setIsDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteCategory(categoryToDelete).unwrap();
+      await deleteCategory({ tenantDomain, id:categoryToDelete }).unwrap();
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -238,46 +235,6 @@ export default function CategoryList() {
     sub_category: category.sub_category,
   }));
 
-  // Render loading skeletons
-  const renderSkeletons = () => {
-    return Array(6)
-      .fill(0)
-      .map((_, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
-          <Card sx={{ borderRadius: 2, height: "100%" }}>
-            <Skeleton variant="rectangular" height={160} />
-            <CardContent>
-              <Skeleton variant="text" width="80%" height={30} />
-              <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mt: 2,
-                }}
-              >
-                <Skeleton variant="text" width="40%" height={20} />
-                <Box>
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block", mr: 1 }}
-                  />
-                  <Skeleton
-                    variant="circular"
-                    width={24}
-                    height={24}
-                    sx={{ display: "inline-block" }}
-                  />
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ));
-  };
 
   return (
     <Box
@@ -289,7 +246,7 @@ export default function CategoryList() {
       }}
     >
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6a1b9a] to-[#4a148c] text-white py-6 mb-6 rounded-b-[20px] shadow-[0_4px_20px_rgba(106,27,154,0.4)]">
+      <div className="bg-[#42A1DA] to-[#42A1DA] text-white py-6 mb-6 rounded-b-[20px] shadow-[0_4px_20px_rgba(106,27,154,0.4)]">
         <Container maxWidth="xl">
           <div className="flex items-center mb-4">
             <CategoryIcon className="text-[40px] mr-4" />
@@ -342,7 +299,7 @@ export default function CategoryList() {
               onClick={handleOpen}
               sx={{
                 borderRadius: 100,
-                background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                background: "#42A1DA",
                 boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                 px: 2,
                 color: "white",
@@ -369,58 +326,25 @@ export default function CategoryList() {
                 )}
               </IconButton>
             </Tooltip>
-            {/*
-                <Button
-                  aria-controls="simple-menu"
-                  aria-haspopup="true"
-                  onClick={handleMenuOpen}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 100,
-                    borderColor: "rgba(0,0,0,0.12)",
-                    color: "text.secondary",
-                    "&:hover": {
-                      bgcolor: alpha("#6a1b9a", 0.1),
-                      borderColor: "#6a1b9a",
-                    },
-                    ml: 1,
-                  }}
-                >
-                  More
-                </Button>
-                <Menu
-                  id="simple-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                      width: 200,
-                    },
-                  }}
-                ></Menu>
-                */}
+            
           </div>
         </div>
 
         <Box
           sx={{
-            width: "100%", // Takes full width of parent
-            overflow: "auto", // Enables horizontal scrolling
+            width: "100%", 
+            overflow: "auto", 
             "& .MuiDataGrid-root": {
-              minWidth: "800px", // Ensures columns can overflow (adjust as needed)
+              minWidth: "800px", 
             },
             "& .MuiDataGrid-columnHeaders": {
               position: "sticky",
               top: 0,
               zIndex: 1,
-              backgroundColor: "white", // Prevents transparency on scroll
+              backgroundColor: "white", 
             },
             "& .MuiDataGrid-virtualScroller": {
-              overflow: "visible", // Allows horizontal overflow
+              overflow: "visible",
             },
           }}
         >
@@ -461,7 +385,7 @@ export default function CategoryList() {
                     bgcolor: "#6a1b9a",
                     color: "white",
                     "&:hover": {
-                      bgcolor: "#4a148c",
+                      bgcolor: "#42A1DA",
                     },
                   },
                 },

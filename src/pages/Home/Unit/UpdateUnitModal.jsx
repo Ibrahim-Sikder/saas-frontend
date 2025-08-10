@@ -1,19 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import {
-  useGetSingleCategoryQuery,
-  useUpdateCategoryMutation,
-} from "../../../redux/api/categoryApi";
 import { toast } from "react-toastify";
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Grid,
   IconButton,
-  InputAdornment,
   Dialog,
   DialogContent,
   CircularProgress,
@@ -24,7 +18,6 @@ import {
 import {
   Category as CategoryIcon,
   CheckCircle as CheckCircleIcon,
-  PhotoCamera as PhotoCameraIcon,
   Save as SaveIcon,
   Close as CloseIcon,
   BrandingWatermark,
@@ -37,13 +30,15 @@ import {
   useGetSingleUnitQuery,
   useUpdateUnitMutation,
 } from "../../../redux/api/unitApi";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
   const location = useLocation();
   //   const id = new URLSearchParams(location.search).get("id");
-  const { data, isLoading } = useGetSingleUnitQuery(unitId);
   const [updateUnit, { isSuccess }] = useUpdateUnitMutation();
-  const navigate = useNavigate();
+  const tenantDomain = useTenantDomain();
+ 
+  const { data, isLoading } = useGetSingleUnitQuery({tenantDomain, id:unitId});
 
   const [formData, setFormData] = useState({
     unit: "",
@@ -72,8 +67,9 @@ export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
         ...formData,
         image: imageToSubmit,
         id: unitId,
+        tenantDomain,
       }).unwrap();
-      console.log(res);
+
       if (res.success) {
         toast.success("Unit updated successfully!");
         setOpen();
@@ -139,7 +135,7 @@ export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
 
       <Box
         sx={{
-          background: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+          background: "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
           py: 2,
           px: 3,
           display: "flex",
@@ -172,14 +168,7 @@ export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
         <Box sx={{ p: 3 }}>
           <GarageForm onSubmit={handleSubmit} defaultValues={defaultValues}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <ImageUpload
-                  defaultValues={data?.data?.image}
-                  fullWidth
-                  name="image"
-                  label="Upload Brand Image"
-                />
-              </Grid>
+              
 
               <Grid item xs={12}>
                 <Typography
@@ -238,7 +227,7 @@ export const UpdateUnitModal = ({ open, setOpen, unitId }) => {
                   sx={{
                     borderRadius: 100,
                     background:
-                      "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)",
+                      "linear-gradient(135deg, #6a1b9a 0%, #42A1DA 100%)",
                     boxShadow: "0 4px 10px rgba(106, 27, 154, 0.3)",
                     py: 1.5,
                     textTransform: "none",

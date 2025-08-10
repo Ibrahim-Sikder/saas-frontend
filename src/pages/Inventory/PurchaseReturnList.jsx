@@ -55,6 +55,7 @@ import {
   useDeletePurchaseReturnMutation,
   useGetAllPurchaseReturnsQuery,
 } from "../../redux/api/purchaseReturnApi";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
 export default function PurchaseReturnList() {
   const theme = useTheme();
@@ -71,6 +72,7 @@ export default function PurchaseReturnList() {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+const tenantDomain = useTenantDomain();
 
   const [search, setSearch] = useState("");
   const [deletePurchaseReturn] = useDeletePurchaseReturnMutation();
@@ -79,6 +81,7 @@ export default function PurchaseReturnList() {
     isLoading: purchaseLoading,
     refetch,
   } = useGetAllPurchaseReturnsQuery({
+    tenantDomain,
     limit: 10,
     page,
     searchTerm: search,
@@ -101,11 +104,6 @@ export default function PurchaseReturnList() {
     purchaseReturnData?.data?.returns?.filter(
       (ret) => ret.status === "cancelled"
     ).length || 0;
-
-  // const handleMenuOpen = (event, returnItem) => {
-  //   setAnchorEl(event.currentTarget);
-  //   setSelectedReturn(returnItem);
-  // };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -138,7 +136,10 @@ export default function PurchaseReturnList() {
     if (selectedReturn) {
       try {
         setIsLoading(true);
-        await deletePurchaseReturn(selectedReturn._id).unwrap();
+        await deletePurchaseReturn({
+          tenantDomain,
+          id: selectedReturn._id,
+        }).unwrap();
         toast.success("Purchase return deleted successfully!");
         refetch(); // Refresh the data after deletion
       } catch (error) {
@@ -599,7 +600,7 @@ export default function PurchaseReturnList() {
             </TableHead>
             <TableBody>
               {purchaseReturnData?.data?.returns?.map((ret) => {
-                console.log("for id ", ret);
+
                 return (
                   <TableRow
                     key={ret._id}

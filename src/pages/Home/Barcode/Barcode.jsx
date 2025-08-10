@@ -15,19 +15,19 @@ const Barcode = () => {
           </div>
           <Box
           sx={{
-            width: "100%", // Takes full width of parent
-            overflow: "auto", // Enables horizontal scrolling
+            width: "100%", 
+            overflow: "auto", 
             "& .MuiDataGrid-root": {
-              minWidth: "800px", // Ensures columns can overflow (adjust as needed)
+              minWidth: "800px", 
             },
             "& .MuiDataGrid-columnHeaders": {
               position: "sticky",
               top: 0,
               zIndex: 1,
-              backgroundColor: "white", // Prevents transparency on scroll
+              backgroundColor: "white",
             },
             "& .MuiDataGrid-virtualScroller": {
-              overflow: "visible", // Allows horizontal overflow
+              overflow: "visible",
             },
           }}
         >

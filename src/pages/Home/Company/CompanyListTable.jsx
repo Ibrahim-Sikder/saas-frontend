@@ -14,6 +14,7 @@ import {
 } from "../../../redux/api/companyApi";
 import EmptyData from "../../../components/EmptyData/EmptyData";
 import { mileageStyle } from "../../../utils/customStyle";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const CompanyListTable = () => {
   const textInputRef = useRef(null);
@@ -27,9 +28,11 @@ const CompanyListTable = () => {
   };
 
   const limit = 10;
+   const tenantDomain = useTenantDomain();
 
   const { data: companyData, isLoading: companyLoading } =
     useGetAllCompaniesQuery({
+      tenantDomain, 
       limit,
       page: currentPage,
       searchTerm: filterType,
@@ -41,27 +44,30 @@ const CompanyListTable = () => {
     { isLoading: companyDeleteLoading, error: deleteError },
   ] = useMoveRecycledCompanyMutation();
 
-  const handleMoveToRecycled = async (id) => {
-    const willDelete = await swal({
-      title: "Are you sure?",
-      text: " You want to move  this Company Recycle Bin?",
-      icon: "warning",
-      dangerMode: true,
-    });
+const handleMoveToRecycled = async (id) => {
+  const willDelete = await swal({
+    title: "Are you sure?",
+    text: "You want to move this Company to Recycle Bin?",
+    icon: "warning",
+    dangerMode: true,
+  });
 
-    if (willDelete) {
-      try {
-        await moveRecycledCompany(id).unwrap();
-        swal(
-          "Move to Recycle bin!",
-          "Move to Recycle bin successful.",
-          "success"
-        );
-      } catch (error) {
-        swal("Error", "An error occurred while deleting the card.", "error");
-      }
+  if (willDelete) {
+    try {
+      await moveRecycledCompany({ tenantDomain, id }).unwrap(); 
+      swal(
+        "Moved to Recycle Bin!",
+        "Company successfully moved to the recycle bin.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Recycling error:", error);
+      swal("Error", "An error occurred while moving the company.", "error");
     }
-  };
+  }
+};
+
+
 
   if (companyLoading) {
     return (

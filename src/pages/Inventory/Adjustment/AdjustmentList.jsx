@@ -39,6 +39,7 @@ export default function QuantityAdjustment() {
   const theme = useTheme();
   const [params, setParams] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  
 
   const { data: adjustmentData, isLoading } = useGetAllIAdjustmentQuery([
     ...params,
