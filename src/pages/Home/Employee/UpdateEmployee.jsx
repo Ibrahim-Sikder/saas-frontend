@@ -50,12 +50,14 @@ const UpdateEmployee = () => {
     reset,
     formState: { errors },
   } = useForm();
-
   const {
     data: singleEmployee,
     isLoading: employeeLoading,
     error: employeeError,
-  } = useGetSingleEmployeeQuery({ tenantDomain, id });
+  } = useGetSingleEmployeeQuery(
+    { tenantDomain, id },
+    { skip: !tenantDomain || !id }
+  );
 
   const [updateEmployee, { isLoading: updateLoading, error: updateError }] =
     useUpdateEmployeeMutation();
@@ -96,13 +98,6 @@ const UpdateEmployee = () => {
     }
   }, [reset, singleEmployee?.data]);
 
-  function isImage(url) {
-    return /\.(jpg|jpeg|png)$/i.test(url);
-  }
-
-  function getFileName(url) {
-    return url.split("/").pop().split(".")[0];
-  }
   const onSubmit = async (data) => {
     data.country_code = countryCode.code;
     data.guardian_country_code = guardianCountryCode.code;
@@ -170,10 +165,8 @@ const UpdateEmployee = () => {
             >
               Back
             </Button>
-            
           </div>
           <div className="flex items-center justify-center ">
-            
             <div>
               <h3 className="text-2xl font-bold"> Update Employee </h3>
             </div>
@@ -342,8 +335,6 @@ const UpdateEmployee = () => {
                       </Select>
                     </FormControl>
                   </Grid>
-
-                
                 </Grid>
               </Box>
               <Box sx={{ marginTop: "30px" }}>

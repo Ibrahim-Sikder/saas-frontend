@@ -39,12 +39,12 @@ const invoiceApi = baseApi.injectEndpoints({
       invalidatesTags: ["invoice"],
     }),
     removeInvoice: builder.mutation({
-      query: (invoiceInfo) => {
+      query: ({tenantDomain, invoiceInfo}) => {
         return {
           url: `/invoices/remove-invoice`,
           method: "PATCH",
           body: invoiceInfo.data,
-          params: { id: invoiceInfo.id },
+          params: { id: invoiceInfo.id, tenantDomain },
         };
       },
       invalidatesTags: ["invoice"],

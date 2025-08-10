@@ -28,15 +28,14 @@ const employeeApi = baseApi.injectEndpoints({
       }),
       providesTags: ["employee"],
     }),
- updateEmployee: builder.mutation({
-  query: ({ id, data }) => ({
-    url: `/employees/${id}`,
-    method: "PUT",
-    body: data,
-  }),
-  invalidatesTags: ["employee"],
-}),
-
+    updateEmployee: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/employees/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["employee"],
+    }),
 
     deleteEmployee: builder.mutation({
       query: ({ tenantDomain, id }) => ({

@@ -46,12 +46,12 @@ const quotationApi = baseApi.injectEndpoints({
       invalidatesTags: ["quotation"],
     }),
     removeQuotation: builder.mutation({
-      query: (quotationInfo) => {
+      query: ({tenantDomain, quotationInfo}) => {
         return {
           url: `/quotations/remove-quotation`,
           method: "PATCH",
-          body: quotationInfo.data,
-          params: { id: quotationInfo.id },
+          body: quotationInfo?.data,
+          params: { id: quotationInfo.id , tenantDomain},
         };
       },
       invalidatesTags: ["quotation"],

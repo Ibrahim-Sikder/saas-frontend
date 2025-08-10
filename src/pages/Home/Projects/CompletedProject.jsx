@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaEye } from "react-icons/fa";
+import { FaTrashAlt, FaEdit, FaEye, FaDownload } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
@@ -8,8 +8,8 @@ import {
   useGetAllInvoicesQuery,
   useMoveRecycledInvoiceMutation,
 } from "../../../redux/api/invoice";
-import { Button, Pagination } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { Button, Pagination, Tooltip } from "@mui/material";
+import { ArrowBack, Money } from "@mui/icons-material";
 import { backBtnStyle } from "../../../utils/customStyle";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
@@ -18,7 +18,7 @@ const InvoiceTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +53,7 @@ const tenantDomain = useTenantDomain();
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice({tenantDomain,id}).unwrap();
+        await moveRecycledInvoice({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -84,7 +84,6 @@ const tenantDomain = useTenantDomain();
           >
             Back
           </Button>
-         
         </div>
         <div className="productHome">
           <span>Dashboard / </span>
@@ -94,7 +93,9 @@ const tenantDomain = useTenantDomain();
       </div>
       <div className=" overflow-x-auto">
         <div className="flex flex-wrap  items-center justify-between mb-5">
-          <h3 className="mb-3 text-xl  md:text-3xl font-bold">Complete Projects List:</h3>
+          <h3 className="mb-3 text-xl  md:text-3xl font-bold">
+            Complete Projects List:
+          </h3>
           <div className="flex items-center searcList">
             <div className="searchGroup">
               <input
@@ -134,12 +135,12 @@ const tenantDomain = useTenantDomain();
                       <th>Vehicle Brand</th>
                       <th>Mobile Number</th>
                       <th>Date</th>
-                      <th colSpan={4}>Action</th>
+                      <th colSpan={5}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
-                 
+                      console.log("invoice ", card);
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
@@ -147,7 +148,9 @@ const tenantDomain = useTenantDomain();
                       const remaining = card.moneyReceipts?.[0]?.remaining;
                       const totalAmount = card.moneyReceipts?.[0]?.total_amount;
                       const advance = card.moneyReceipts?.[0]?.advance;
+                      const advance2 = Number(card?.advance) || 0;
                       const noMoney = card.moneyReceipts?.length < 0;
+                      const netTotal = Number(card.net_total) || 0;
 
                       let rowClass = "";
                       if (card.moneyReceipts.length === 0) {
@@ -160,6 +163,8 @@ const tenantDomain = useTenantDomain();
                         rowClass = "bg-[#f5365c] text-white";
                       } else if (advance === totalAmount) {
                         rowClass = "bg-[#2dce89] text-white";
+                      } else if (advance2 === netTotal) {
+                        rowClass = "bg-[#2dce89] text-white";
                       } else if (advance !== totalAmount) {
                         rowClass = "bg-[#ffad46] text-white";
                       } else {
@@ -167,7 +172,10 @@ const tenantDomain = useTenantDomain();
                       }
 
                       return (
-                        <tr key={card._id} className={`${rowClass} transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-100 hover:text-black`} >
+                        <tr
+                          key={card._id}
+                          className={`${rowClass} hover:bg-blue-300 transition-colors duration-200 hover:text-black `}
+                        >
                           <td>{globalIndex}</td>
                           <td>{card?.job_no}</td>
                           {card?.customer && (
@@ -179,16 +187,11 @@ const tenantDomain = useTenantDomain();
                           {card?.showRoom && (
                             <td>{card?.showRoom?.showRoom_name}</td>
                           )}
-                          <td>{card?.vehicle?.vehicle_name}</td>
-                          
                           <td>
-                            <span>{card?.vehicle?.carReg_no} {card?.vehicle?.car_registration_no}</span>
+                            {card?.vehicle?.carReg_no}{" "}
+                            {card?.vehicle?.car_registration_no}
                           </td>
-
-                          <td>
-                            <span>{card.vehicle?.vehicle_brand}</span>
-                          </td>
-                         {card?.customer && (
+                          {card?.customer && (
                             <td>{card?.customer?.fullCustomerNum}</td>
                           )}
                           {card?.company && (
@@ -197,44 +200,106 @@ const tenantDomain = useTenantDomain();
                           {card?.showRoom && (
                             <td>{card?.showRoom?.fullCompanyNum}</td>
                           )}
+                          <td>
+                            <span>{card.vehicle?.vehicle_name}</span>
+                          </td>
+
+                          <td>
+                            <span>{card.vehicle?.vehicle_name}</span>
+                          </td>
+
                           <td>{card.date}</td>
                           <td>
-                            <a
-                              className="bg-[#42A0D9] text-white px-3 py-2 text-[12px]  rounded-full "
-                              href={`${
-                                import.meta.env.VITE_API_URL
-                              }/invoices/invoice/${card._id}`}
-                              target="_blank"
-                              rel="noreferrer"
+                            <Tooltip
+                              title="Money Receipt"
+                              arrow
+                              placement="top"
                             >
-                              Download
-                            </a>
-                          </td>
-                          <td>
-                            <div
-                              onClick={() => handleIconPreview(card._id)}
-                              className="editIconWrap edit2"
-                            >
-                              <FaEye className="editIcon" />
-                            </div>
-                          </td>
-                          <td>
-                            <div className="editIconWrap edit">
-                              <Link
-                                to={`/dashboard/update-invoice?id=${card._id}`}
+                              <a
+                                className="editIconWrap edit2"
+                                href={`/dashboard/money-receive?order_no=${card?.job_no}&id=${card?._id}&net_total=${card?.net_total}`}
+                                rel="noreferrer"
                               >
-                                <FaEdit className="editIcon" />
-                              </Link>
-                            </div>
+                                <Money className="editIcon" />
+                              </a>
+                            </Tooltip>
                           </td>
+
                           <td>
-                            <button
-                              disabled={deleteLoading}
-                              onClick={() => handleMoveToRecycledbin(card._id)}
-                              className=" bg-white  p-1 rounded-sm "
+                            <Tooltip
+                              title="Download Invoice"
+                              arrow
+                              placement="top"
                             >
-                              <FaTrashAlt className="text-[#f5365c] size-[16px]" />
-                            </button>
+                              <a
+                                className="editIconWrap edit2"
+                                href={`${
+                                  import.meta.env.VITE_API_URL
+                                }/invoices/invoice/${
+                                  card._id
+                                }?tenantDomain=${tenantDomain}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <FaDownload className="editIcon" />
+                              </a>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip title="Preview" arrow placement="top">
+                              <div
+                                onClick={() => handleIconPreview(card._id)}
+                                className="editIconWrap edit2"
+                                style={{ cursor: "pointer" }}
+                              >
+                                <FaEye className="editIcon" />
+                              </div>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip title="Edit Invoice" arrow placement="top">
+                              <div className="editIconWrap edit">
+                                <Link
+                                  to={`/dashboard/update-invoice?id=${card._id}`}
+                                >
+                                  <FaEdit className="editIcon" />
+                                </Link>
+                              </div>
+                            </Tooltip>
+                          </td>
+
+                          <td>
+                            <Tooltip
+                              title={
+                                deleteLoading
+                                  ? "Deleting..."
+                                  : "Move to Recycled Bin"
+                              }
+                              arrow
+                              placement="top"
+                            >
+                              <span>
+                                {" "}
+                                {/* Wrap disabled button for tooltip functionality */}
+                                <button
+                                  disabled={deleteLoading}
+                                  onClick={() =>
+                                    handleMoveToRecycledbin(card._id)
+                                  }
+                                  className="bg-white p-1 rounded-sm"
+                                  style={{
+                                    cursor: deleteLoading
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    opacity: deleteLoading ? 0.7 : 1,
+                                  }}
+                                >
+                                  <FaTrashAlt className="text-[#f5365c] size-[16px]" />
+                                </button>
+                              </span>
+                            </Tooltip>
                           </td>
                         </tr>
                       );

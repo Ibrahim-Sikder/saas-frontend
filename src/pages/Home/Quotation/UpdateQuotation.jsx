@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 "use client"
+
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
@@ -31,10 +32,15 @@ const formatNumber = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
+// Function to parse formatted number back to numeric value
+const parseFormattedNumber = (formattedNum) => {
+  if (!formattedNum) return 0
+  return Number.parseFloat(formattedNum.toString().replace(/,/g, "")) || 0
+}
+
 const UpdateQuotation = () => {
   const [specificQuotation, setSpecificQuotation] = useState({})
-  console.log(specificQuotation)
-  const [value, setValue] = useState(specificQuotation?.vehicle?.carReg_no)
+  const [value, setValue] = useState("")
   const [partsTotal, setPartsTotal] = useState(0)
   const [serviceTotal, setServiceTotal] = useState(0)
   const [grandTotal, setGrandTotal] = useState(0)
@@ -48,6 +54,7 @@ const UpdateQuotation = () => {
   const [serviceAddButton, setServiceAddButton] = useState(false)
   const partsDiscountRef = useRef(null)
   const netTotalAmountRef = useRef(null)
+
   const navigate = useNavigate()
   const location = useLocation()
   const id = new URLSearchParams(location.search).get("id")
@@ -59,7 +66,6 @@ const UpdateQuotation = () => {
 
   const userTypeFromProfile = new URLSearchParams(location.search).get("user_type")
   const userFromProfile = new URLSearchParams(location.search).get("user")
-
   const [countryCode, setCountryCode] = useState(countries[0])
   const [phoneNumber, setPhoneNumber] = useState("")
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -119,11 +125,94 @@ const UpdateQuotation = () => {
   const [updateQuotation, { isLoading: updateLoading, error: updateError }] = useUpdateQuotationMutation()
   const [removeQuotation, { isLoading: removeLoading, error: removeError }] = useRemoveQuotationMutation()
 
+  const {
+    data,
+    isLoading: quotationLoading,
+    error: quotationError,
+    refetch: refetchQuotation,
+  } = useGetSingleQuotationQuery(
+    {
+      tenantDomain,
+      id,
+    },
+    {
+      skip: !id || !tenantDomain,
+    },
+  )
+
+  // Initialize form data when quotation data is loaded
   useEffect(() => {
-    if (specificQuotation?.date) {
-      setSelectedDate(specificQuotation.date)
+    if (data && typeof data === "object") {
+      const quotationData = data.data || data
+      if (quotationData && typeof quotationData === "object") {
+        setSpecificQuotation(quotationData)
+        setDiscount(quotationData.discount || "")
+        setVAT(quotationData.vat || "")
+        setTax(quotationData.tax || "")
+
+        if (quotationData.mileage) {
+          setCurrentMileage(quotationData.mileage.toString())
+        }
+
+        if (quotationData.date) {
+          setSelectedDate(quotationData.date)
+        }
+      }
     }
-  }, [specificQuotation])
+  }, [data])
+
+  // Reset form when specificQuotation changes
+  useEffect(() => {
+    if (!specificQuotation || Object.keys(specificQuotation).length === 0) {
+      return
+    }
+
+    const resetData = {
+      Id: specificQuotation?.Id,
+      job_no: specificQuotation?.job_no,
+      mileage: specificQuotation?.mileage || specificQuotation?.vehicle?.mileage,
+    }
+
+    if (specificQuotation?.user_type === "customer") {
+      Object.assign(resetData, {
+        company_name: specificQuotation?.customer?.company_name,
+        customer_name: specificQuotation?.customer?.customer_name,
+        customer_country_code: specificQuotation?.customer?.customer_country_code,
+        customer_contact: specificQuotation?.customer?.customer_contact,
+        customer_address: specificQuotation?.customer?.customer_address,
+      })
+    } else if (specificQuotation?.user_type === "company") {
+      Object.assign(resetData, {
+        company_name: specificQuotation?.company?.company_name,
+        vehicle_username: specificQuotation?.company?.vehicle_username,
+        company_address: specificQuotation?.company?.company_address,
+        company_contact: specificQuotation?.company?.company_contact,
+        company_country_code: specificQuotation?.company?.company_country_code,
+        company_email: specificQuotation?.company?.company_email,
+      })
+    } else if (specificQuotation?.user_type === "showRoom") {
+      Object.assign(resetData, {
+        showRoom_name: specificQuotation?.showRoom?.showRoom_name,
+        vehicle_username: specificQuotation?.showRoom?.vehicle_username,
+        showRoom_address: specificQuotation?.showRoom?.showRoom_address,
+        company_name: specificQuotation?.showRoom?.company_name,
+        company_contact: specificQuotation?.showRoom?.company_contact,
+        company_country_code: specificQuotation?.showRoom?.company_country_code,
+      })
+    }
+
+    // Vehicle data
+    Object.assign(resetData, {
+      carReg_no: specificQuotation?.vehicle?.carReg_no,
+      car_registration_no: specificQuotation?.vehicle?.car_registration_no,
+      engine_no: specificQuotation?.vehicle?.engine_no,
+      vehicle_brand: specificQuotation?.vehicle?.vehicle_brand,
+      vehicle_name: specificQuotation?.vehicle?.vehicle_name,
+      chassis_no: specificQuotation?.vehicle?.chassis_no,
+    })
+
+    reset(resetData)
+  }, [specificQuotation, reset])
 
   const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value
@@ -135,172 +224,310 @@ const UpdateQuotation = () => {
       setPhoneNumber(newPhoneNumber)
     }
   }
-  const handleRemove = (index) => {
-    if (!index) {
-      const list = [...items];
 
-      setItems(list);
-    } else {
-      const list = [...items];
-      list.splice(index, 1);
-      setItems(list);
-    }
-  };
-
-  const handleServiceDescriptionRemove = (index) => {
-    if (!index) {
-      const list = [...serviceItems]
-      setServiceItems(list)
-    } else {
-      const list = [...serviceItems]
-      list.splice(index, 1)
-      setServiceItems(list)
-    }
-  }
-
-  const { data } = useGetSingleQuotationQuery({
-    tenantDomain,
-    id,
-  })
-
+  // Calculate totals whenever items change
   useEffect(() => {
-    if (data?.data) {
-      setSpecificQuotation(data.data)
-      setDiscount(data.data.discount || "")
-      setVAT(data.data.vat || "")
-      setTax(data.data.tax || "")
+    const calculateTotals = () => {
+      // Calculate parts total
+      const existingPartsTotal =
+        specificQuotation?.input_data?.reduce((sum, item) => sum + (Number.parseFloat(item.total) || 0), 0) || 0
 
-      // Set the current mileage from the correct path
-      if (data.data.mileage) {
-        setCurrentMileage(data.data.mileage.toString())
-      }
+      const newPartsTotal = items.reduce((sum, item) => sum + (Number.parseFloat(item.total) || 0), 0)
+
+      // Calculate service total
+      const existingServiceTotal =
+        specificQuotation?.service_input_data?.reduce((sum, item) => sum + (Number.parseFloat(item.total) || 0), 0) || 0
+
+      const newServiceTotal = serviceItems.reduce((sum, item) => sum + (Number.parseFloat(item.total) || 0), 0)
+
+      const totalPartsAmount = existingPartsTotal + newPartsTotal
+      const totalServiceAmount = existingServiceTotal + newServiceTotal
+      const grandTotalAmount = totalPartsAmount + totalServiceAmount
+
+      setPartsTotal(totalPartsAmount)
+      setServiceTotal(totalServiceAmount)
+      setGrandTotal(grandTotalAmount)
     }
-  }, [data])
 
-  useEffect(() => {
-    if (specificQuotation?.user_type === "customer") {
-      reset({
-        Id: specificQuotation?.Id,
-        job_no: specificQuotation?.job_no,
-        company_name: specificQuotation?.customer?.company_name,
-        customer_name: specificQuotation?.customer?.customer_name,
-        customer_country_code: specificQuotation?.customer?.customer_country_code,
-        customer_contact: specificQuotation?.customer?.customer_contact,
-        customer_address: specificQuotation?.customer?.customer_address,
-        carReg_no: specificQuotation?.vehicle?.carReg_no,
-        car_registration_no: specificQuotation?.vehicle?.car_registration_no,
-        engine_no: specificQuotation?.vehicle?.engine_no,
-        vehicle_brand: specificQuotation?.vehicle?.vehicle_name,
-        vehicle_name: specificQuotation?.vehicle?.vehicle_name,
-        chassis_no: specificQuotation?.vehicle?.chassis_no,
-        // Fixed: Use the correct path for mileage
-        mileage: specificQuotation?.mileage || specificQuotation?.vehicle?.mileage,
-      })
-    }
-    if (specificQuotation?.user_type === "company") {
-      reset({
-        Id: specificQuotation?.Id,
-        job_no: specificQuotation?.job_no,
-        company_name: specificQuotation?.company?.company_name,
-        vehicle_username: specificQuotation?.company?.vehicle_username,
-        company_address: specificQuotation?.company?.company_address,
-        company_contact: specificQuotation?.company?.company_contact,
-        company_country_code: specificQuotation?.company?.company_country_code,
-        company_email: specificQuotation?.company?.company_email,
-        customer_address: specificQuotation?.company?.customer_address,
-        carReg_no: specificQuotation?.vehicle?.carReg_no,
-        car_registration_no: specificQuotation?.vehicle?.car_registration_no,
-        engine_no: specificQuotation?.vehicle?.engine_no,
-        vehicle_brand: specificQuotation?.vehicle?.vehicle_brand,
-        vehicle_name: specificQuotation?.vehicle?.vehicle_name,
-        chassis_no: specificQuotation?.vehicle?.chassis_no,
-        // Fixed: Use the correct path for mileage
-        mileage: specificQuotation?.mileage || specificQuotation?.vehicle?.mileage,
-      })
-    }
-    if (specificQuotation?.user_type === "showRoom") {
-      reset({
-        Id: specificQuotation?.Id,
-        job_no: specificQuotation?.job_no,
-        showRoom_name: specificQuotation?.showRoom?.showRoom_name,
-        vehicle_username: specificQuotation?.showRoom?.vehicle_username,
-        showRoom_address: specificQuotation?.showRoom?.showRoom_address,
-        company_name: specificQuotation?.showRoom?.company_name,
-        company_contact: phoneNumber || specificQuotation?.showRoom?.company_contact,
-        company_country_code: specificQuotation?.showRoom?.company_country_code,
-        carReg_no: specificQuotation?.vehicle?.carReg_no,
-        car_registration_no: specificQuotation?.vehicle?.car_registration_no,
-        engine_no: specificQuotation?.vehicle?.engine_no,
-        vehicle_brand: specificQuotation?.vehicle?.vehicle_brand,
-        vehicle_name: specificQuotation?.vehicle?.vehicle_name,
-        chassis_no: specificQuotation?.vehicle?.chassis_no,
-        // Fixed: Use the correct path for mileage
-        mileage: specificQuotation?.mileage || specificQuotation?.vehicle?.mileage,
-      })
-    }
-  }, [
-    phoneNumber,
-    reset,
-    specificQuotation?.Id,
-    specificQuotation?.company?.company_address,
-    specificQuotation?.company?.company_contact,
-    specificQuotation?.company?.company_country_code,
-    specificQuotation?.company?.company_email,
-    specificQuotation?.company?.company_name,
-    specificQuotation?.company?.customer_address,
-    specificQuotation?.customer?.company_name,
-    specificQuotation?.customer?.customer_address,
-    specificQuotation?.customer?.customer_contact,
-    specificQuotation?.customer?.customer_country_code,
-    specificQuotation?.customer?.customer_name,
-    specificQuotation?.job_no,
-    specificQuotation?.showRoom?.company_contact,
-    specificQuotation?.showRoom?.company_country_code,
-    specificQuotation?.showRoom?.company_name,
-    specificQuotation?.showRoom?.showRoom_address,
-    specificQuotation?.showRoom?.vehicle_username,
-    specificQuotation?.user_type,
-    specificQuotation?.vehicle?.carReg_no,
-    specificQuotation?.vehicle?.car_registration_no,
-    specificQuotation?.vehicle?.chassis_no,
-    specificQuotation?.vehicle?.engine_no,
-    // Fixed: Use the correct path for mileage
-    specificQuotation?.mileage,
-    specificQuotation?.vehicle?.mileage,
-    specificQuotation?.vehicle?.vehicle_brand,
-    specificQuotation?.vehicle?.vehicle_name,
-  ])
-
-  useEffect(() => {
-    const totalSum = specificQuotation?.input_data?.reduce((sum, item) => sum + Number(item.total), 0)
-    const totalSum2 = items.reduce((sum, item) => sum + Number(item.total), 0)
-    const serviceTotalSum = specificQuotation?.service_input_data?.reduce((sum, item) => sum + Number(item.total), 0)
-    const serviceTotalSum2 = serviceItems.reduce((sum, item) => sum + Number(item.total), 0)
-
-    const newTotalSum = isNaN(totalSum) ? 0 : totalSum
-    const newTotalSum2 = isNaN(totalSum2) ? 0 : totalSum2
-    const newServiceTotalSum = isNaN(serviceTotalSum) ? 0 : serviceTotalSum
-    const newServiceTotalSum2 = isNaN(serviceTotalSum2) ? 0 : serviceTotalSum2
-
-    const newGrandTotal = newTotalSum + newTotalSum2
-    const newServiceGrandTotal = newServiceTotalSum + newServiceTotalSum2
-    const totalGrand = Number.parseFloat(newGrandTotal + newServiceGrandTotal).toFixed(2)
-
-    setPartsTotal(newGrandTotal)
-    setServiceTotal(newServiceGrandTotal)
-    setGrandTotal(totalGrand)
+    calculateTotals()
   }, [items, serviceItems, specificQuotation?.input_data, specificQuotation?.service_input_data])
 
   const handleDateChange = (newDate) => {
     setSelectedDate(formatDate(newDate))
   }
 
+  // Fixed: Service description change handlers
+  const handleServiceDescriptionChange = (index, value) => {
+    if (!specificQuotation?.service_input_data || !Array.isArray(specificQuotation.service_input_data)) {
+      return
+    }
+
+    const newItems = [...specificQuotation.service_input_data]
+    newItems[index] = {
+      ...newItems[index],
+      description: value,
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      service_input_data: newItems,
+    }))
+
+    setActiveInputType("service")
+    setActiveInputIndex(index)
+    filterProductSuggestions(value)
+  }
+
+  const handleServiceDescriptionChange2 = (index, value) => {
+    const newItems = [...serviceItems]
+    newItems[index] = {
+      ...newItems[index],
+      description: value,
+    }
+    setServiceItems(newItems)
+
+    setActiveInputType("service")
+    setActiveInputIndex(index + (specificQuotation?.service_input_data?.length || 0))
+    filterProductSuggestions(value)
+  }
+
+  // Fixed: Parts description change handlers
+  const handleDescriptionChange = (index, value) => {
+    if (!specificQuotation?.input_data || !Array.isArray(specificQuotation.input_data)) {
+      return
+    }
+
+    const newItems = [...specificQuotation.input_data]
+    newItems[index] = {
+      ...newItems[index],
+      description: value,
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      input_data: newItems,
+    }))
+
+    setActiveInputType("parts")
+    setActiveInputIndex(index)
+    filterProductSuggestions(value)
+  }
+
+  const handleDescriptionChange2 = (index, value) => {
+    const newItems = [...items]
+    newItems[index] = {
+      ...newItems[index],
+      description: value,
+    }
+    setItems(newItems)
+
+    setActiveInputType("parts")
+    setActiveInputIndex(index + (specificQuotation?.input_data?.length || 0))
+    filterProductSuggestions(value)
+  }
+
+  // Fixed: Service quantity change handlers
+  const handleServiceQuantityChange = (index, value) => {
+    if (!specificQuotation?.service_input_data || !Array.isArray(specificQuotation.service_input_data)) {
+      return
+    }
+
+    // Allow decimal numbers
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...specificQuotation.service_input_data]
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0
+    const rate = Number.parseFloat(newItems[index].rate) || 0
+    const total = parsedQuantity * rate
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      service_input_data: newItems,
+    }))
+  }
+
+  const handleServiceQuantityChange2 = (index, value) => {
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...serviceItems]
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0
+    const rate = Number.parseFloat(newItems[index].rate) || 0
+    const total = parsedQuantity * rate
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setServiceItems(newItems)
+  }
+
+  // Fixed: Parts quantity change handlers
+  const handleQuantityChange = (index, value) => {
+    if (!specificQuotation?.input_data || !Array.isArray(specificQuotation.input_data)) {
+      return
+    }
+
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...specificQuotation.input_data]
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0
+    const rate = Number.parseFloat(newItems[index].rate) || 0
+    const total = parsedQuantity * rate
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      input_data: newItems,
+    }))
+  }
+
+  const handleQuantityChange2 = (index, value) => {
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...items]
+    const parsedQuantity = Number.parseFloat(cleanValue) || 0
+    const rate = Number.parseFloat(newItems[index].rate) || 0
+    const total = parsedQuantity * rate
+
+    newItems[index] = {
+      ...newItems[index],
+      quantity: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setItems(newItems)
+  }
+
+  // Fixed: Service rate change handlers
+  const handleServiceRateChange = (index, value) => {
+    if (!specificQuotation?.service_input_data || !Array.isArray(specificQuotation.service_input_data)) {
+      return
+    }
+
+    // Remove commas and allow only numbers and decimal points
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...specificQuotation.service_input_data]
+    const parsedRate = Number.parseFloat(cleanValue) || 0
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0
+    const total = quantity * parsedRate
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      service_input_data: newItems,
+    }))
+  }
+
+  const handleServiceRateChange2 = (index, value) => {
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...serviceItems]
+    const parsedRate = Number.parseFloat(cleanValue) || 0
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0
+    const total = quantity * parsedRate
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setServiceItems(newItems)
+  }
+
+  // Fixed: Parts rate change handlers
+  const handleRateChange = (index, value) => {
+    if (!specificQuotation?.input_data || !Array.isArray(specificQuotation.input_data)) {
+      return
+    }
+
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...specificQuotation.input_data]
+    const parsedRate = Number.parseFloat(cleanValue) || 0
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0
+    const total = quantity * parsedRate
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setSpecificQuotation((prevState) => ({
+      ...prevState,
+      input_data: newItems,
+    }))
+  }
+
+  const handleRateChange2 = (index, value) => {
+    const numericValue = value.replace(/[^0-9.]/g, "")
+    const parts = numericValue.split(".")
+    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+
+    const newItems = [...items]
+    const parsedRate = Number.parseFloat(cleanValue) || 0
+    const quantity = Number.parseFloat(newItems[index].quantity) || 0
+    const total = quantity * parsedRate
+
+    newItems[index] = {
+      ...newItems[index],
+      rate: parsedRate,
+      rateDisplay: cleanValue,
+      total: Number.parseFloat(total.toFixed(2)),
+    }
+
+    setItems(newItems)
+  }
+
+  // Unit change handlers
   const handleUnitChange = (index, value) => {
+    if (!specificQuotation?.input_data || !Array.isArray(specificQuotation.input_data)) {
+      return
+    }
+
     const newItems = [...specificQuotation.input_data]
     newItems[index] = {
       ...newItems[index],
       unit: value,
     }
+
     setSpecificQuotation((prevState) => ({
       ...prevState,
       input_data: newItems,
@@ -309,16 +536,24 @@ const UpdateQuotation = () => {
 
   const handleUnitChange2 = (index, value) => {
     const newItems = [...items]
-    newItems[index].unit = value
+    newItems[index] = {
+      ...newItems[index],
+      unit: value,
+    }
     setItems(newItems)
   }
 
   const handleServiceUnitChange = (index, value) => {
+    if (!specificQuotation?.service_input_data || !Array.isArray(specificQuotation.service_input_data)) {
+      return
+    }
+
     const newItems = [...specificQuotation.service_input_data]
     newItems[index] = {
       ...newItems[index],
       unit: value,
     }
+
     setSpecificQuotation((prevState) => ({
       ...prevState,
       service_input_data: newItems,
@@ -327,10 +562,14 @@ const UpdateQuotation = () => {
 
   const handleServiceUnitChange2 = (index, value) => {
     const newItems = [...serviceItems]
-    newItems[index].unit = value
+    newItems[index] = {
+      ...newItems[index],
+      unit: value,
+    }
     setServiceItems(newItems)
   }
 
+  // Product suggestions
   const filterProductSuggestions = (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2 || !stockData?.data) {
       setProductSuggestions([])
@@ -347,196 +586,208 @@ const UpdateQuotation = () => {
     setActiveSuggestionIndex(0)
   }
 
-  const handleServiceDescriptionChange = (index, value) => {
-    const newItems = [...specificQuotation.service_input_data]
-    newItems[index] = {
-      ...newItems[index],
-      description: value,
+  const handleSelectSuggestion = (product) => {
+    if (!product) return
+
+    const productName = product.product?.product_name || ""
+    const productPrice = Number(product.product?.sellingPrice) || 0
+    const productQuantity = product.product.product_quantity || 1
+    let productUnit = "Set"
+
+    if (product.product?.unit && typeof product.product.unit === "object") {
+      productUnit = product.product.unit.unit || "Set"
     }
-    setSpecificQuotation((prevState) => ({
-      ...prevState,
-      service_input_data: newItems,
-    }))
-    setActiveInputType("service")
-    setActiveInputIndex(index)
-    filterProductSuggestions(value)
-  }
 
-  const handleServiceDescriptionChange2 = (index, value) => {
-    const newItems = [...serviceItems]
-    newItems[index].description = value
-    setServiceItems(newItems)
-    setActiveInputType("service")
-    setActiveInputIndex(index + (specificQuotation?.service_input_data?.length || 0))
-    filterProductSuggestions(value)
-  }
+    const total = productQuantity * productPrice
 
-  const handleDescriptionChange = (index, value) => {
-    const newItems = [...specificQuotation.input_data]
-    newItems[index] = {
-      ...newItems[index],
-      description: value,
+    if (activeInputType === "service") {
+      if (activeInputIndex < (specificQuotation?.service_input_data?.length || 0)) {
+        const newItems = [...(specificQuotation.service_input_data || [])]
+        newItems[activeInputIndex] = {
+          ...newItems[activeInputIndex],
+          description: productName,
+          unit: productUnit,
+          rate: productPrice,
+          rateDisplay: productPrice.toString(),
+          quantity: productQuantity,
+          total: total,
+        }
+
+        setSpecificQuotation((prevState) => ({
+          ...prevState,
+          service_input_data: newItems,
+        }))
+      } else {
+        const actualIndex = activeInputIndex - (specificQuotation?.service_input_data?.length || 0)
+        const newItems = [...serviceItems]
+        newItems[actualIndex] = {
+          ...newItems[actualIndex],
+          description: productName,
+          unit: productUnit,
+          rate: productPrice,
+          rateDisplay: productPrice.toString(),
+          quantity: productQuantity,
+          total: total,
+        }
+        setServiceItems(newItems)
+      }
+    } else if (activeInputType === "parts") {
+      if (activeInputIndex < (specificQuotation?.input_data?.length || 0)) {
+        const newItems = [...(specificQuotation.input_data || [])]
+        newItems[activeInputIndex] = {
+          ...newItems[activeInputIndex],
+          description: productName,
+          unit: productUnit,
+          rate: productPrice,
+          rateDisplay: productPrice.toString(),
+          quantity: productQuantity,
+          total: total,
+        }
+
+        setSpecificQuotation((prevState) => ({
+          ...prevState,
+          input_data: newItems,
+        }))
+      } else {
+        const actualIndex = activeInputIndex - (specificQuotation?.input_data?.length || 0)
+        const newItems = [...items]
+        newItems[actualIndex] = {
+          ...newItems[actualIndex],
+          description: productName,
+          unit: productUnit,
+          rate: productPrice,
+          rateDisplay: productPrice.toString(),
+          quantity: productQuantity,
+          total: total,
+        }
+        setItems(newItems)
+      }
     }
-    setSpecificQuotation((prevState) => ({
-      ...prevState,
-      input_data: newItems,
-    }))
-    setActiveInputType("parts")
-    setActiveInputIndex(index)
-    filterProductSuggestions(value)
+
+    setShowSuggestions(false)
   }
 
-  const handleDescriptionChange2 = (index, value) => {
-    const newItems = [...items]
-    newItems[index].description = value
-    setItems(newItems)
-    setActiveInputType("parts")
-    setActiveInputIndex(index + (specificQuotation?.input_data?.length || 0))
-    filterProductSuggestions(value)
+  const handleSuggestionClick = (product) => {
+    handleSelectSuggestion(product)
   }
 
-  // Fixed quantity change handlers to allow decimals
-  const handleQuantityChange = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    if (!isNaN(cleanValue) && cleanValue !== "") {
-      const newItems = [...specificQuotation.input_data]
-      const parsedValue = Number.parseFloat(cleanValue) || 0
-      newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-      newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-      newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-      setSpecificQuotation((prevState) => ({
-        ...prevState,
-        input_data: newItems,
-      }))
-    }
-  }
-
-  const handleQuantityChange2 = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    const newItems = [...items]
-    const parsedValue = Number.parseFloat(cleanValue) || 0
-    newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-    newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setItems(newItems)
-  }
-
-  const handleServiceQuantityChange = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    if (!isNaN(cleanValue) && cleanValue !== "") {
-      const newItems = [...specificQuotation.service_input_data]
-      const parsedValue = Number.parseFloat(cleanValue) || 0
-      newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-      newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-      newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-      setSpecificQuotation((prevState) => ({
-        ...prevState,
-        service_input_data: newItems,
-      }))
+  // Remove handlers
+  const handleRemove = (index) => {
+    if (index === 0 && items.length === 1) {
+      // Reset the first item instead of removing it
+      setItems([
+        {
+          description: "",
+          unit: "",
+          quantity: "",
+          rate: "",
+          rateDisplay: "",
+          total: "",
+        },
+      ])
+    } else {
+      const list = [...items]
+      list.splice(index, 1)
+      setItems(list)
     }
   }
 
-  const handleServiceQuantityChange2 = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    const newItems = [...serviceItems]
-    const parsedValue = Number.parseFloat(cleanValue) || 0
-    newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-    newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
+  const handleServiceDescriptionRemove = (index) => {
+    if (index === 0 && serviceItems.length === 1) {
+      // Reset the first item instead of removing it
+      setServiceItems([
+        {
+          description: "",
+          unit: "",
+          quantity: "",
+          rate: "",
+          rateDisplay: "",
+          total: "",
+        },
+      ])
+    } else {
+      const list = [...serviceItems]
+      list.splice(index, 1)
+      setServiceItems(list)
+    }
   }
 
-  // Fixed rate change handlers to properly handle decimals without formatNumber interference
-  const handleRateChange = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+  const handleRemoveButton = async (i, name) => {
+    try {
+      setRemoveButton("remove")
+      const values = {
+        tenantDomain,
+        quotationInfo: {
+          id: id,
+          data: { index: i, quotation_name: name },
+        },
+      }
 
-    const newItems = [...specificQuotation.input_data]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setSpecificQuotation((prevState) => ({
-      ...prevState,
-      input_data: newItems,
-    }))
+      const response = await removeQuotation(values)
+
+      if (response?.data) {
+        if (response.data.success) {
+          setReload(!reload)
+          toast.success(response.data.message || "Item removed successfully")
+          refetchQuotation()
+        } else {
+          toast.error(response.data.message || "Failed to remove item")
+        }
+      } else if (response?.error) {
+        const errorMessage = response.error?.data?.message || response.error?.message || "Failed to remove item"
+        toast.error(errorMessage)
+        console.error("Remove quotation error:", response.error)
+      } else {
+        toast.error("Unexpected response format")
+        console.error("Unexpected response:", response)
+      }
+    } catch (error) {
+      console.error("Error in handleRemoveButton:", error)
+      const errorMessage = error?.data?.message || error?.message || "An error occurred while removing the item"
+      toast.error(errorMessage)
+    } finally {
+      setRemoveButton("")
+    }
   }
 
-  const handleRateChange2 = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    const newItems = [...items]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setItems(newItems)
+  // Add handlers
+  const handleAddClick = () => {
+    setItems([
+      ...items,
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
+    ])
   }
 
-  const handleServiceRateChange = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    const newItems = [...specificQuotation.service_input_data]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setSpecificQuotation((prevState) => ({
-      ...prevState,
-      service_input_data: newItems,
-    }))
+  const handleServiceDescriptionAdd = () => {
+    setServiceItems([
+      ...serviceItems,
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
+    ])
   }
 
-  const handleServiceRateChange2 = (index, value) => {
-    // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
-    // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
-
-    const newItems = [...serviceItems]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
+  const handlePartsAddButton = () => {
+    setAddButton(!addButton)
   }
 
+  const handleServiceAddButton = () => {
+    setServiceAddButton(!serviceAddButton)
+  }
+
+  // Discount, VAT, Tax handlers
   const handleDiscountChange = (value) => {
     const parsedValue = Number(value)
     if (!isNaN(parsedValue)) {
@@ -562,9 +813,6 @@ const UpdateQuotation = () => {
     let currentPartsTotal = partsTotal
     let currentServiceTotal = serviceTotal
 
-    // If partsTotal or serviceTotal are 0 (e.g., on initial load before items are re-calculated),
-    // use the values from specificQuotation if available.
-    // This ensures the initial calculation uses existing data.
     if (currentPartsTotal === 0 && specificQuotation?.parts_total) {
       currentPartsTotal = Number(specificQuotation.parts_total)
     }
@@ -574,210 +822,40 @@ const UpdateQuotation = () => {
 
     const currentGrandTotal = currentPartsTotal + currentServiceTotal
 
-    // Determine the discount value
     let effectiveDiscount = 0
     if (discount === 0 || discount > 0) {
-      // If discount is explicitly set (0 or positive number)
       effectiveDiscount = discount
     } else if (discount === "") {
-      // If discount state is empty, use existing specificQuotation discount
       effectiveDiscount = Number(specificQuotation?.discount) || 0
     }
 
-    // Apply discount
     let totalAfterDiscount = currentGrandTotal - effectiveDiscount
-    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount // Ensure total doesn't go negative
+    totalAfterDiscount = totalAfterDiscount < 0 ? 0 : totalAfterDiscount
 
-    // Determine the VAT percentage
     let effectiveVat = 0
     if (vat === 0 || vat > 0) {
-      // If vat is explicitly set (0 or positive number)
       effectiveVat = vat
     } else if (vat === "") {
-      // If vat state is empty, use existing specificQuotation vat
       effectiveVat = Number(specificQuotation?.vat) || 0
     }
 
-    // Calculate total after VAT
     const vatAmount = totalAfterDiscount * (effectiveVat / 100)
     const totalAfterVat = totalAfterDiscount + vatAmount
 
-    // Determine the Tax percentage (new logic)
     let effectiveTax = 0
     if (tax === 0 || tax > 0) {
-      // If tax is explicitly set (0 or positive number)
       effectiveTax = tax
     } else if (tax === "") {
-      // If tax state is empty, use existing specificQuotation tax
-      effectiveTax = Number(specificQuotation?.tax) || 0 // Assuming specificQuotation will have a 'tax' field
+      effectiveTax = Number(specificQuotation?.tax) || 0
     }
 
-    // Apply tax after VAT
     const taxAmount = totalAfterVat * (effectiveTax / 100)
     const finalTotal = totalAfterVat + taxAmount
 
-    // Final total with 2 decimal precision
     return Number.parseFloat(finalTotal).toFixed(2)
   }
 
-  // Fixed handleSelectSuggestion function
-  const handleSelectSuggestion = (product) => {
-    if (!product) return
-
-    // Extract product details correctly based on the data structure
-    const productName = product.product?.product_name || ""
-    const productPrice = Number(product.product?.sellingPrice) || 0
-    const productQuantity = product.product.product_quantity || 1
-
-    // Get unit from the unit object
-    let productUnit = "Set" // Default unit
-    if (product.product?.unit && typeof product.product.unit === "object") {
-      productUnit = product.product.unit.unit || "Set"
-    }
-
-    // Calculate total
-    const total = productQuantity * productPrice
-
-    if (activeInputType === "service") {
-      if (activeInputIndex < (specificQuotation?.service_input_data?.length || 0)) {
-        // For existing service items
-        const newItems = [...specificQuotation.service_input_data]
-        // Set the product details
-        newItems[activeInputIndex] = {
-          ...newItems[activeInputIndex],
-          description: productName,
-          unit: productUnit,
-          rate: productPrice,
-          rateDisplay: productPrice.toString(),
-          quantity: productQuantity,
-          total: total,
-        }
-        setSpecificQuotation((prevState) => ({
-          ...prevState,
-          service_input_data: newItems,
-        }))
-      } else {
-        // For newly added service items
-        const actualIndex = activeInputIndex - (specificQuotation?.service_input_data?.length || 0)
-        const newItems = [...serviceItems]
-        // Set the product details
-        newItems[actualIndex] = {
-          ...newItems[actualIndex],
-          description: productName,
-          unit: productUnit,
-          rate: productPrice,
-          rateDisplay: productPrice.toString(),
-          quantity: productQuantity,
-          total: total,
-        }
-        setServiceItems([...newItems])
-      }
-    } else if (activeInputType === "parts") {
-      if (activeInputIndex < (specificQuotation?.input_data?.length || 0)) {
-        // For existing parts items
-        const newItems = [...specificQuotation.input_data]
-        // Set the product details
-        newItems[activeInputIndex] = {
-          ...newItems[activeInputIndex],
-          description: productName,
-          unit: productUnit,
-          rate: productPrice,
-          rateDisplay: productPrice.toString(),
-          quantity: productQuantity,
-          total: total,
-        }
-        setSpecificQuotation((prevState) => ({
-          ...prevState,
-          input_data: newItems,
-        }))
-      } else {
-        // For newly added parts items
-        const actualIndex = activeInputIndex - (specificQuotation?.input_data?.length || 0)
-        const newItems = [...items]
-        // Set the product details
-        newItems[actualIndex] = {
-          ...newItems[actualIndex],
-          description: productName,
-          unit: productUnit,
-          rate: productPrice,
-          rateDisplay: productPrice.toString(),
-          quantity: productQuantity,
-          total: total,
-        }
-        setItems([...newItems])
-      }
-    }
-
-    // Close the suggestions dropdown
-    setShowSuggestions(false)
-  }
-
-  const handleAddClick = () => {
-    setItems([
-      ...items,
-      {
-        description: "",
-        unit: "",
-        quantity: "",
-        rate: "",
-        rateDisplay: "",
-        total: "",
-      },
-    ])
-    if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificQuotation?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
-    }
-  }
-
-  const handleServiceDescriptionAdd = () => {
-    setServiceItems([
-      ...serviceItems,
-      {
-        description: "",
-        unit: "",
-        quantity: "",
-        rate: "",
-        rateDisplay: "",
-        total: "",
-      },
-    ])
-    if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificQuotation?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
-    }
-  }
-
-  const handlePartsAddButton = () => {
-    setAddButton(!addButton)
-    if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificQuotation?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
-    }
-  }
-
-  const handleServiceAddButton = () => {
-    setServiceAddButton(!serviceAddButton)
-    if (partsDiscountRef.current) {
-      partsDiscountRef.current.value = discount ? discount : specificQuotation?.discount
-      netTotalAmountRef.current.innerText = calculateFinalTotal()
-    }
-  }
-
-  const handleRemoveButton = async (i, name) => {
-    const values = {
-      tenantDomain,
-      id: id,
-      data: { index: i, quotation_name: name },
-    };
-    const res = await removeQuotation(values).unwrap();
-    if (res.success) {
-      setReload(!reload);
-      toast.success(res.message);
-    }
-  };
-
-  
+  // Form submission
   const input_data = [
     ...(specificQuotation?.input_data || []),
     ...items
@@ -837,18 +915,12 @@ const UpdateQuotation = () => {
       data.vehicle_model = Number(data.vehicle_model)
       data.mileage = Number(data.mileage)
 
-      // Get the current mileage value
       const newMileageValue = Number(data.mileage)
-
-      // Get existing mileage history from the correct path
       const existingMileageHistory = specificQuotation?.vehicle?.mileageHistory || []
       const updatedMileageHistory = [...existingMileageHistory]
 
-      // Only add new mileage to history if it has changed and is valid
       if (mileageChanged && !isNaN(newMileageValue) && newMileageValue > 0) {
-        // Check if this mileage value already exists in history
         const mileageExists = updatedMileageHistory.some((entry) => entry.mileage === newMileageValue)
-
         if (!mileageExists) {
           updatedMileageHistory.push({
             mileage: newMileageValue,
@@ -878,7 +950,7 @@ const UpdateQuotation = () => {
         total_amount: grandTotal || specificQuotation?.total_amount,
         discount: discount === 0 || discount > 0 ? discount : specificQuotation?.discount,
         vat: vat === 0 || vat > 0 ? vat : specificQuotation?.vat,
-        tax: tax === 0 || tax > 0 ? tax : specificQuotation?.tax, // New: Include tax
+        tax: tax === 0 || tax > 0 ? tax : specificQuotation?.tax,
         net_total: calculateFinalTotal() || specificQuotation.net_total,
         input_data: input_data,
         service_input_data: service_input_data,
@@ -904,15 +976,20 @@ const UpdateQuotation = () => {
         const res = await updateQuotation(newValue).unwrap()
         if (res.success) {
           setReload(!reload)
+          toast.success("Quotation updated successfully")
         }
       }
     } catch (error) {
+      console.error("Update error:", error)
       if (error.response) {
-        setError(error.response.data.message)
+        setError(error?.response?.data?.message)
+      } else {
+        setError("An error occurred while updating the quotation")
       }
     }
   }
 
+  // Navigation handlers
   const handleGoInvoice = () => {
     handleSubmit(onSubmit)()
     navigate(`/dashboard/invoice?order_no=${specificQuotation?.job_no}&id=${id}`)
@@ -937,12 +1014,11 @@ const UpdateQuotation = () => {
     if (userTypeFromProfile === "showRoom") {
       navigate(`/dashboard/show-room-profile?id=${userFromProfile}`)
     }
-    toast.success("Quotation update successful")
   }
 
+  // Click outside handler for suggestions
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Only close suggestions if the click is outside the input field and suggestions list
       if (showSuggestions && !event.target.closest(".inputField") && !event.target.closest(".suggestion-item")) {
         setShowSuggestions(false)
       }
@@ -954,12 +1030,7 @@ const UpdateQuotation = () => {
     }
   }, [showSuggestions])
 
-  // Function to handle suggestion item click with direct event handling
-  const handleSuggestionClick = (product) => {
-    handleSelectSuggestion(product)
-  }
-
-  // Fixed: Set mileage value when specificQuotation is loaded
+  // Mileage change handler
   useEffect(() => {
     if (specificQuotation?.mileage) {
       setFormValue("mileage", specificQuotation.mileage)
@@ -967,65 +1038,78 @@ const UpdateQuotation = () => {
     }
   }, [specificQuotation?.mileage, setFormValue])
 
+  // Loading and error states
+  if (quotationLoading) {
+    return (
+      <div className="px-5 py-10">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-xl">Loading quotation data...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (quotationError) {
+    return (
+      <div className="px-5 py-10">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-xl text-red-500">
+            Error loading quotation: {quotationError?.data?.message || quotationError?.message || "Unknown error"}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!specificQuotation || Object.keys(specificQuotation).length === 0) {
+    return (
+      <div className="px-5 py-10">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-xl">No quotation data found</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="px-5 py-10">
-      <div className=" addJobCardHeads">
-        <img src={CompanyInfoData?.data?.logo || "/placeholder.svg"} alt="logo" className=" addJobLogoImg" />
-        <div>
-          <h2 className=" trustAutoTitle trustAutoTitleQutation">{CompanyInfoData?.data?.companyName}</h2>
-          <span className="text-[12px] lg:text-xl mt-5 block">Office: {CompanyInfoData?.data?.address}</span>
+      <div className="mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
+        <div className="addJobCardHeads">
+          <img src={CompanyInfoData?.data?.logo || "/placeholder.svg"} alt="logo" className="addJobLogoImg" />
+          <div>
+            <h2 className="trustAutoTitle trustAutoTitleQutation">{CompanyInfoData?.data?.companyName}</h2>
+            <span className="text-[12px] lg:text-xl mt-5 block">Office: {CompanyInfoData?.data?.address}</span>
+          </div>
+          <TrustAutoAddress />
         </div>
-        <TrustAutoAddress />
       </div>
 
       <div className="mt-5">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex md:flex-row flex-col justify-between items-center">
             <div className="hidden"></div>
-            <div className="vehicleCard">Update Quotation </div>
+            <div className="vehicleCard">Update Quotation</div>
             <div className="flex items-center gap-x-2">
-              {/* Track if user has interacted with the date picker */}
-              {!selectedDate || selectedDate === specificQuotation?.date ? (
-                <div className="flex items-center gap-x-2">
-                  <div className="border py-4 px-5 rounded-md ">{selectedDate}</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      sx={{ width: "170px" }}
-                      label="Quotation Date"
-                      value={selectedDate ? dayjs(selectedDate) : dayjs()}
-                      onChange={(newValue) => {
-                        if (newValue) {
-                          const formattedDate = newValue.format("YYYY-MM-DD")
-                          setSelectedDate(formattedDate)
-                        }
-                      }}
-                      slotProps={{
-                        textField: { fullWidth: true, variant: "outlined" },
-                      }}
-                    />
-                  </LocalizationProvider>
-                </div>
-              ) : (
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    sx={{ width: "170px" }}
-                    label="Quotation Date"
-                    value={selectedDate ? dayjs(selectedDate) : dayjs()}
-                    onChange={(newValue) => {
-                      if (newValue) {
-                        const formattedDate = newValue.format("YYYY-MM-DD")
-                        setSelectedDate(formattedDate)
-                      }
-                    }}
-                    slotProps={{
-                      textField: { fullWidth: true, variant: "outlined" },
-                    }}
-                  />
-                </LocalizationProvider>
-              )}
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  sx={{ width: "170px" }}
+                  label="Quotation Date"
+                  value={selectedDate ? dayjs(selectedDate) : dayjs()}
+                  onChange={(newValue) => {
+                    if (newValue) {
+                      const formattedDate = newValue.format("YYYY-MM-DD")
+                      setSelectedDate(formattedDate)
+                    }
+                  }}
+                  slotProps={{
+                    textField: { fullWidth: true, variant: "outlined" },
+                  }}
+                />
+              </LocalizationProvider>
             </div>
           </div>
 
+          {/* Customer Info Section */}
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 my-10">
             <Box>
               <h3 className="text-xl lg:text-3xl font-bold mb-5">Customer Info</h3>
@@ -1035,54 +1119,41 @@ const UpdateQuotation = () => {
                     fullWidth
                     label="Job Card No"
                     {...register("job_no")}
-                    focused={specificQuotation?.job_no || ""}
+                    focused={!!specificQuotation?.job_no}
                     required
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
                     label="Customer Id"
                     {...register("Id")}
-                    focused={specificQuotation?.Id || ""}
+                    focused={!!specificQuotation?.Id}
                     required
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
                     label="Company"
                     focused={
-                      specificQuotation?.customer?.company_name ||
-                      specificQuotation?.company?.company_name ||
-                      specificQuotation?.showRoom?.company_name
+                      !!(
+                        specificQuotation?.customer?.company_name ||
+                        specificQuotation?.company?.company_name ||
+                        specificQuotation?.showRoom?.company_name
+                      )
                     }
                     {...register("company_name")}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {!specificQuotation && (
-                    <TextField
-                      fullWidth
-                      label="Customer"
-                      focused={specificQuotation?.customer?.customer_name || ""}
-                      {...register("customer_name")}
-                    />
-                  )}
                   {specificQuotation?.user_type === "customer" && (
                     <TextField
                       fullWidth
                       label="Customer"
-                      focused={specificQuotation?.customer?.customer_name || ""}
+                      focused={!!specificQuotation?.customer?.customer_name}
                       {...register("customer_name")}
                     />
                   )}
@@ -1091,13 +1162,14 @@ const UpdateQuotation = () => {
                       fullWidth
                       label="Customer"
                       focused={
-                        specificQuotation?.company?.vehicle_username || specificQuotation?.showRoom?.vehicle_username
+                        !!(
+                          specificQuotation?.company?.vehicle_username || specificQuotation?.showRoom?.vehicle_username
+                        )
                       }
                       {...register("vehicle_username")}
                     />
                   )}
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="flex md:flex-row flex-col gap-0.5 items-center mt-3">
                     <Autocomplete
@@ -1108,7 +1180,7 @@ const UpdateQuotation = () => {
                       value={countryCode}
                       onChange={(event, newValue) => {
                         setCountryCode(newValue)
-                        setPhoneNumber("") // Reset the phone number when changing country codes
+                        setPhoneNumber("")
                       }}
                       renderInput={(params) => (
                         <TextField
@@ -1117,59 +1189,49 @@ const UpdateQuotation = () => {
                           {...register("customer_country_code")}
                           label="Select Country Code"
                           variant="outlined"
-                          focused={specificQuotation?.customer?.customer_country_code || ""}
+                          focused={
+                            !!(
+                              specificQuotation?.customer?.customer_country_code ||
+                              specificQuotation?.company?.company_country_code ||
+                              specificQuotation?.showRoom?.company_country_code
+                            )
+                          }
                         />
                       )}
                     />
-
-                    {!specificQuotation && (
-                      <TextField
-                        {...register("customer_contact")}
-                        variant="outlined"
-                        fullWidth
-                        type="tel"
-                        value={phoneNumber ? phoneNumber : specificQuotation?.customer?.customer_contact}
-                        onChange={handlePhoneNumberChange}
-                        placeholder="Customer Contact No (N)"
-                      />
-                    )}
-                    {specificQuotation?.user_type === "customer" && (
-                      <TextField
-                        {...register("customer_contact")}
-                        variant="outlined"
-                        fullWidth
-                        type="tel"
-                        value={phoneNumber ? phoneNumber : specificQuotation?.customer?.customer_contact}
-                        onChange={handlePhoneNumberChange}
-                        placeholder="Customer Contact No (N)"
-                        focused={specificQuotation?.customer?.customer_contact || ""}
-                      />
-                    )}
-                    {(specificQuotation?.user_type === "company" || specificQuotation?.user_type === "showRoom") && (
-                      <TextField
-                        {...register("company_contact")}
-                        variant="outlined"
-                        fullWidth
-                        type="tel"
-                        value={phoneNumber ? phoneNumber : specificQuotation?.customer?.customer_contact}
-                        onChange={handlePhoneNumberChange}
-                        placeholder="Company Contact No (N)"
-                        focused={
-                          specificQuotation?.company?.company_contact || specificQuotation?.showRoom?.company_contact
-                        }
-                      />
-                    )}
+                    <TextField
+                      {...register(
+                        specificQuotation?.user_type === "customer" ? "customer_contact" : "company_contact",
+                      )}
+                      variant="outlined"
+                      fullWidth
+                      type="tel"
+                      value={
+                        phoneNumber ||
+                        specificQuotation?.customer?.customer_contact ||
+                        specificQuotation?.company?.company_contact ||
+                        specificQuotation?.showRoom?.company_contact ||
+                        ""
+                      }
+                      onChange={handlePhoneNumberChange}
+                      placeholder="Contact No"
+                      focused={
+                        !!(
+                          specificQuotation?.customer?.customer_contact ||
+                          specificQuotation?.company?.company_contact ||
+                          specificQuotation?.showRoom?.company_contact
+                        )
+                      }
+                    />
                   </div>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {!specificQuotation && <TextField fullWidth label="Address" {...register("customer_address")} />}
                   {specificQuotation?.user_type === "customer" && (
                     <TextField
                       fullWidth
                       label="Address"
                       {...register("customer_address")}
-                      focused={specificQuotation?.customer?.customer_address}
+                      focused={!!specificQuotation?.customer?.customer_address}
                     />
                   )}
                   {specificQuotation?.user_type === "company" && (
@@ -1177,7 +1239,7 @@ const UpdateQuotation = () => {
                       fullWidth
                       label="Address"
                       {...register("company_address")}
-                      focused={specificQuotation?.company?.company_address || ""}
+                      focused={!!specificQuotation?.company?.company_address}
                     />
                   )}
                   {specificQuotation?.user_type === "showRoom" && (
@@ -1185,31 +1247,28 @@ const UpdateQuotation = () => {
                       fullWidth
                       label="Address"
                       {...register("showRoom_address")}
-                      focused={specificQuotation?.showRoom?.showRoom_address || ""}
+                      focused={!!specificQuotation?.showRoom?.showRoom_address}
                     />
                   )}
                 </Grid>
               </Grid>
             </Box>
 
+            {/* Vehicle Info Section */}
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-5 ">Vehicle Info</h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-5">Vehicle Info</h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
                     label="Chassis No"
-                    value={specificQuotation?.chassis_no}
                     {...register("chassis_no")}
-                    focused={specificQuotation?.vehicle?.chassis_no || ""}
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                    focused={!!specificQuotation?.vehicle?.chassis_no}
+                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <div className="flex mt-3  md:gap-0 gap-4 items-center">
+                  <div className="flex mt-3 md:gap-0 gap-4 items-center">
                     <Autocomplete
                       sx={{ marginRight: "5px" }}
                       freeSolo
@@ -1236,33 +1295,28 @@ const UpdateQuotation = () => {
                           {...inputProps}
                           {...register("car_registration_no")}
                           label="Car R (N)"
-                          focused={specificQuotation?.vehicle?.car_registration_no || ""}
+                          focused={!!specificQuotation?.vehicle?.car_registration_no}
                         />
                       )}
                     </InputMask>
                   </div>
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
                     label="Engine & CC"
-                    value={specificQuotation?.engine_no}
                     {...register("engine_no")}
-                    focused={specificQuotation?.vehicle?.engine_no || ""}
+                    focused={!!specificQuotation?.vehicle?.engine_no}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
                     label="Vehicle Name"
-                    value={specificQuotation?.vehicle_name}
                     {...register("vehicle_name")}
-                    focused={specificQuotation?.vehicle?.vehicle_name || ""}
+                    focused={!!specificQuotation?.vehicle?.vehicle_name}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
@@ -1271,18 +1325,14 @@ const UpdateQuotation = () => {
                     })}
                     label="Current Mileage (KM)"
                     type="number"
-                    // Fixed: Use the correct mileage value and remove conflicting props
-                    value={currentMileage || specificQuotation?.mileage || ""}
+                    focused={!!specificQuotation?.mileage}
+                    defaultValue={specificQuotation?.mileage || ""}
                     onChange={(e) => {
                       const newMileage = e.target.value
                       setCurrentMileage(newMileage)
                       setFormValue("mileage", newMileage)
-
-                      // Check if mileage has changed
-                      const lastMileage =
-                        specificQuotation?.vehicle?.mileageHistory?.slice(-1)[0]?.mileage || specificQuotation?.mileage
-
-                      if (lastMileage && Number(newMileage) !== Number(lastMileage)) {
+                      const lastMileage = specificQuotation?.vehicle?.mileageHistory?.slice(-1)[0]?.mileage
+                      if (lastMileage && Number(newMileage) !== lastMileage) {
                         setMileageChanged(true)
                       } else if (!lastMileage && newMileage) {
                         setMileageChanged(true)
@@ -1294,7 +1344,6 @@ const UpdateQuotation = () => {
                     helperText={errors.mileage?.message}
                   />
                 </Grid>
-
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mb-2">
                     <strong>Mileage History:</strong>
@@ -1334,42 +1383,179 @@ const UpdateQuotation = () => {
           </div>
 
           {/* Services Section */}
-          <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5 ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
+          <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5">
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">SL No</label>
             <label className="col-span-12 md:col-span-6 text-center">Services Description</label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block">Qty</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">Rate</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">Amount</label>
             <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block">hidden items for responsive</label>
           </div>
 
+          {/* Existing Service Items */}
           <div>
             {specificQuotation?.service_input_data?.length > 0 && (
               <>
-                {specificQuotation?.service_input_data?.map((item, i) => {
-                  return (
-                    <div key={i}>
-                      <div className="grid grid-cols-12 gap-2 items-center mt-3 ">
-                        <div className="col-span-12 md:col-span-1">
+                {specificQuotation.service_input_data.map((item, i) => (
+                  <div key={i}>
+                    <div className="grid grid-cols-12 gap-2 items-center mt-3">
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="SL No"
+                          defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-6">
+                        <div style={suggestionStyles.suggestionContainer}>
                           <input
                             className="inputField"
                             autoComplete="off"
                             type="text"
-                            placeholder="SL No "
-                            defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                            placeholder="Description"
+                            onChange={(e) => handleServiceDescriptionChange(i, e.target.value)}
+                            value={item.description || ""}
                           />
+                          {showSuggestions && activeInputType === "service" && activeInputIndex === i && (
+                            <div style={suggestionStyles.suggestionsList} className="suggestionsList">
+                              {productSuggestions.map((product, index) => (
+                                <div
+                                  key={product._id}
+                                  className="suggestion-item"
+                                  style={{
+                                    ...suggestionStyles.suggestionItem,
+                                    ...(index === activeSuggestionIndex ? suggestionStyles.suggestionItemActive : {}),
+                                  }}
+                                  onClick={() => handleSuggestionClick(product)}
+                                >
+                                  <div style={suggestionStyles.suggestionItemContent}>
+                                    <span style={suggestionStyles.suggestionItemName}>
+                                      {product.product.product_name}
+                                    </span>
+                                    <span style={suggestionStyles.suggestionItemPrice}>
+                                      ${product.product.sellingPrice}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <div className="col-span-12 md:col-span-6">
-                          <div style={suggestionStyles.suggestionContainer}>
-                            <input
-                              className="inputField"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Description"
-                              onChange={(e) => handleServiceDescriptionChange(i, e.target.value)}
-                              value={item.description}
-                            />
-                            {showSuggestions && activeInputType === "service" && activeInputIndex === i && (
+                      </div>
+                      <div className="col-span-12 md:col-span-2 flex gap-2">
+                        <div className="grid grid-cols-12 quotationSelect">
+                          <input
+                            className="inputField col-span-3"
+                            autoComplete="off"
+                            type="text"
+                            placeholder="Qty"
+                            onChange={(e) => handleServiceQuantityChange(i, e.target.value)}
+                            value={item.quantity || ""}
+                          />
+                          <select
+                            className="inputField col-span-9"
+                            onChange={(e) => handleServiceUnitChange(i, e.target.value)}
+                            value={item.unit || ""}
+                          >
+                            <option value="" disabled>
+                              Select Unit
+                            </option>
+                            {unitOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Rate"
+                          onChange={(e) => handleServiceRateChange(i, e.target.value)}
+                          value={item.rateDisplay || item.rate || ""}
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Amount"
+                          value={formatNumber(item.total)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <button
+                          type="button"
+                          disabled={removeLoading}
+                          onClick={() => handleRemoveButton(i, "service")}
+                          className="w-full bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md py-2 px-2 justify-center"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Add New Service Items */}
+          <div>
+            <div className="flex justify-end mt-2">
+              {!serviceAddButton && (
+                <button
+                  type="button"
+                  onClick={handleServiceAddButton}
+                  className="w-[135px] bg-[#42A1DA] hover:bg-[#42A1DA] text-white p-2 rounded-md"
+                >
+                  Add new
+                </button>
+              )}
+              {serviceAddButton && (
+                <button
+                  type="button"
+                  onClick={handleServiceAddButton}
+                  className="border w-[135px] border-[#42A1DA] hover:border-[#42A1DA] text-black rounded-md px-2 py-2 mb-2"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+            {serviceAddButton && (
+              <>
+                {serviceItems.map((item, i) => (
+                  <div key={i}>
+                    <div className="grid grid-cols-12 gap-2 items-center mt-3">
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="SL No"
+                          defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-6">
+                        <div style={suggestionStyles.suggestionContainer}>
+                          <input
+                            className="inputField"
+                            autoComplete="off"
+                            type="text"
+                            placeholder="Description"
+                            onChange={(e) => handleServiceDescriptionChange2(i, e.target.value)}
+                            value={item.description}
+                          />
+                          {showSuggestions &&
+                            activeInputType === "service" &&
+                            activeInputIndex === i + (specificQuotation?.service_input_data?.length || 0) && (
                               <div style={suggestionStyles.suggestionsList} className="suggestionsList">
                                 {productSuggestions.map((product, index) => (
                                   <div
@@ -1393,208 +1579,69 @@ const UpdateQuotation = () => {
                                 ))}
                               </div>
                             )}
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-2 flex gap-2">
-                          <div className="grid grid-cols-12 quotationSelect">
-                            <input
-                              className="inputField col-span-3"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Qty"
-                              onChange={(e) => handleServiceQuantityChange(i, e.target.value)}
-                              value={item.quantity}
-                            />
-                            <select
-                              className="inputField col-span-9"
-                              onChange={(e) => handleServiceUnitChange(i, e.target.value)}
-                              value={item.unit || ""}
-                            >
-                              <option value="" disabled>
-                                Select Unit
-                              </option>
-                              {unitOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Rate"
-                            onChange={(e) => handleServiceRateChange(i, e.target.value)}
-                            value={formatNumber(item.rate)}
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Amount"
-                            value={formatNumber(item.total)}
-                            readOnly
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1" onClick={() => setRemoveButton("remove")}>
-                          {items.length !== 0 && (
-                            <button
-                              disabled={removeLoading}
-                              onClick={() => handleRemoveButton(i, "service")}
-                              className="w-full  bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md  py-2 px-2 justify-center "
-                            >
-                              Remove
-                            </button>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </>
-            )}
-          </div>
-
-          <div>
-            <div className="flex justify-end mt-2 ">
-              {!serviceAddButton && (
-                <button
-                  onClick={handleServiceAddButton}
-                  className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md"
-                >
-                  Add new
-                </button>
-              )}
-              {serviceAddButton && (
-                <button
-                  onClick={handleServiceAddButton}
-                  className="border w-[135px] border-[#42A1DA] hover:border-[#42A1DA] text-black rounded-md px-2 py-2 mb-2"
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-            {serviceAddButton && (
-              <>
-                {serviceItems.map((item, i) => {
-                  return (
-                    <div key={i}>
-                      <div className="grid grid-cols-12 gap-2 items-center mt-3">
-                        <div className="col-span-12 md:col-span-1">
+                      <div className="col-span-12 md:col-span-2 flex gap-2">
+                        <div className="grid grid-cols-12 quotationSelect">
                           <input
-                            className="inputField"
+                            className="inputField col-span-3"
                             autoComplete="off"
                             type="text"
-                            placeholder="SL No "
-                            defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                            placeholder="Qty"
+                            onChange={(e) => handleServiceQuantityChange2(i, e.target.value)}
+                            value={item.quantity}
                           />
-                        </div>
-                        <div className="col-span-12 md:col-span-6">
-                          <div style={suggestionStyles.suggestionContainer}>
-                            <input
-                              className="inputField"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Description"
-                              onChange={(e) => handleServiceDescriptionChange2(i, e.target.value)}
-                              value={item.description}
-                            />
-                            {showSuggestions &&
-                              activeInputType === "service" &&
-                              activeInputIndex === i + (specificQuotation?.service_input_data?.length || 0) && (
-                                <div style={suggestionStyles.suggestionsList} className="suggestionsList">
-                                  {productSuggestions.map((product, index) => (
-                                    <div
-                                      key={product._id}
-                                      className="suggestion-item"
-                                      style={{
-                                        ...suggestionStyles.suggestionItem,
-                                        ...(index === activeSuggestionIndex
-                                          ? suggestionStyles.suggestionItemActive
-                                          : {}),
-                                      }}
-                                      onClick={() => handleSuggestionClick(product)}
-                                    >
-                                      <div style={suggestionStyles.suggestionItemContent}>
-                                        <span style={suggestionStyles.suggestionItemName}>
-                                          {product.product.product_name}
-                                        </span>
-                                        <span style={suggestionStyles.suggestionItemPrice}>
-                                          ${product.product.sellingPrice}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-2 flex gap-2">
-                          <div className="grid grid-cols-12 quotationSelect">
-                            <input
-                              className="inputField col-span-3"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Qty"
-                              onChange={(e) => handleServiceQuantityChange2(i, e.target.value)}
-                              value={item.quantity}
-                            />
-                            <select
-                              className="inputField col-span-9"
-                              onChange={(e) => handleServiceUnitChange2(i, e.target.value)}
-                              value={item.unit || ""}
-                            >
-                              <option value="" disabled>
-                                Select Unit
-                              </option>
-                              {unitOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Rate"
-                            onChange={(e) => handleServiceRateChange2(i, e.target.value)}
-                            value={formatNumber(item.rate)}
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Amount"
-                            value={formatNumber(item.total)}
-                            readOnly
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <button
-                            onClick={() => handleServiceDescriptionRemove(i)}
-                            className="w-full bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md py-2 px-2 justify-center"
+                          <select
+                            className="inputField col-span-9"
+                            onChange={(e) => handleServiceUnitChange2(i, e.target.value)}
+                            value={item.unit || ""}
                           >
-                            Remove
-                          </button>
+                            <option value="" disabled>
+                              Select Unit
+                            </option>
+                            {unitOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Rate"
+                          onChange={(e) => handleServiceRateChange2(i, e.target.value)}
+                          value={item.rateDisplay || item.rate || ""}
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Amount"
+                          value={formatNumber(item.total)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <button
+                          type="button"
+                          onClick={() => handleServiceDescriptionRemove(i)}
+                          className="w-full bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md py-2 px-2 justify-center"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                  )
-                })}
-                {/* Add Button positioned below all items */}
+                  </div>
+                ))}
                 <div className="flex justify-end mt-4">
                   <button
+                    type="button"
                     onClick={handleServiceDescriptionAdd}
                     className="w-[135px] bg-[#42A1DA] hover:bg-[#42A1DA] text-white p-2 rounded-md"
                   >
@@ -1606,44 +1653,186 @@ const UpdateQuotation = () => {
           </div>
 
           {/* Parts Section */}
-          <div className="grid grid-cols-12 gap-2 items-center font-bold mb md:mb-1 mt-5  ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
+          <div className="grid grid-cols-12 gap-2 items-center font-bold mb md:mb-1 mt-5">
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">SL No</label>
             <label className="col-span-12 md:col-span-6 text-center">Parts Description</label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
-            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">hidden items for responsive</label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block">Qty</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">Rate</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block">Amount</label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block">hidden items for responsive</label>
           </div>
 
+          {/* Existing Parts Items */}
           <div>
             {specificQuotation?.input_data?.length > 0 && (
               <>
-                {specificQuotation?.input_data?.map((item, i) => {
-                  return (
-                    <div key={i}>
-                      <div className="grid grid-cols-12 gap-2 items-center mt-3 ">
-                        <div className="col-span-12 md:col-span-1">
+                {specificQuotation.input_data.map((item, i) => (
+                  <div key={i}>
+                    <div className="grid grid-cols-12 gap-2 items-center mt-3">
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="SL No"
+                          defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                          required
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-6">
+                        <div style={suggestionStyles.suggestionContainer}>
                           <input
                             className="inputField"
                             autoComplete="off"
                             type="text"
-                            placeholder="SL No "
-                            defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                            placeholder="Description"
+                            onChange={(e) => handleDescriptionChange(i, e.target.value)}
+                            value={item.description || ""}
                             required
                           />
+                          {showSuggestions && activeInputType === "parts" && activeInputIndex === i && (
+                            <div style={suggestionStyles.suggestionsList} className="suggestionsList">
+                              {productSuggestions.map((product, index) => (
+                                <div
+                                  key={product._id}
+                                  className="suggestion-item"
+                                  style={{
+                                    ...suggestionStyles.suggestionItem,
+                                    ...(index === activeSuggestionIndex ? suggestionStyles.suggestionItemActive : {}),
+                                  }}
+                                  onClick={() => handleSuggestionClick(product)}
+                                >
+                                  <div style={suggestionStyles.suggestionItemContent}>
+                                    <span style={suggestionStyles.suggestionItemName}>
+                                      {product.product.product_name}
+                                    </span>
+                                    <span style={suggestionStyles.suggestionItemPrice}>
+                                      ${product.product.sellingPrice}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <div className="col-span-12 md:col-span-6">
-                          <div style={suggestionStyles.suggestionContainer}>
-                            <input
-                              className="inputField"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Description"
-                              onChange={(e) => handleDescriptionChange(i, e.target.value)}
-                              value={item.description}
-                              required
-                            />
-                            {showSuggestions && activeInputType === "parts" && activeInputIndex === i && (
+                      </div>
+                      <div className="col-span-12 md:col-span-2 flex gap-2">
+                        <div className="grid grid-cols-12 quotationSelect">
+                          <input
+                            className="inputField col-span-3"
+                            autoComplete="off"
+                            type="text"
+                            placeholder="Qty"
+                            onChange={(e) => handleQuantityChange(i, e.target.value)}
+                            required
+                            value={item.quantity || ""}
+                          />
+                          <select
+                            className="inputField col-span-9"
+                            onChange={(e) => handleUnitChange(i, e.target.value)}
+                            value={item.unit || ""}
+                            required
+                          >
+                            <option value="" disabled>
+                              Select Unit
+                            </option>
+                            {unitOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Rate"
+                          onChange={(e) => handleRateChange(i, e.target.value)}
+                          required
+                          value={item.rateDisplay || item.rate || ""}
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Amount"
+                          value={formatNumber(item.total)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <button
+                          type="button"
+                          disabled={removeLoading}
+                          onClick={() => handleRemoveButton(i, "parts")}
+                          className="w-full bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md py-2 px-2 justify-center"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Add New Parts Items */}
+          <div>
+            <div className="flex items-center justify-end mt-2">
+              {!addButton && (
+                <button
+                  type="button"
+                  onClick={handlePartsAddButton}
+                  className="w-[135px] bg-[#42A1DA] hover:bg-[#42A1DA] text-white p-2 rounded-md"
+                >
+                  Add new
+                </button>
+              )}
+              {addButton && (
+                <button
+                  type="button"
+                  onClick={handlePartsAddButton}
+                  className="border w-[135px] border-[#42A1DA] hover:border-[#42A1DA] text-black rounded-md px-2 py-2 mb-2"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+            {addButton && (
+              <>
+                {items.map((item, i) => (
+                  <div key={i}>
+                    <div className="grid grid-cols-12 gap-2 items-center mt-3">
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="SL No"
+                          defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
+                          required
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-6">
+                        <div style={suggestionStyles.suggestionContainer}>
+                          <input
+                            className="inputField"
+                            autoComplete="off"
+                            type="text"
+                            placeholder="Description"
+                            onChange={(e) => handleDescriptionChange2(i, e.target.value)}
+                            value={item.description}
+                            required
+                          />
+                          {showSuggestions &&
+                            activeInputType === "parts" &&
+                            activeInputIndex === i + (specificQuotation?.input_data?.length || 0) && (
                               <div style={suggestionStyles.suggestionsList} className="suggestionsList">
                                 {productSuggestions.map((product, index) => (
                                   <div
@@ -1667,237 +1856,94 @@ const UpdateQuotation = () => {
                                 ))}
                               </div>
                             )}
-                          </div>
                         </div>
-                        <div className="col-span-12 md:col-span-2 flex gap-2">
-                          <div className="grid grid-cols-12 quotationSelect">
-                            <input
-                              className="inputField col-span-3"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Qty"
-                              onChange={(e) => handleQuantityChange(i, e.target.value)}
-                              required
-                              value={item.quantity}
-                            />
-                            <select
-                              className="inputField col-span-9"
-                              onChange={(e) => handleUnitChange(i, e.target.value)}
-                              value={item.unit || ""}
-                              required
-                            >
-                              <option value="" disabled>
-                                Select Unit
-                              </option>
-                              {unitOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
+                      </div>
+                      <div className="col-span-12 md:col-span-2 flex gap-2">
+                        <div className="grid grid-cols-12 quotationSelect">
                           <input
-                            className="inputField"
+                            className="inputField col-span-3"
                             autoComplete="off"
                             type="text"
-                            placeholder="Rate"
-                            onChange={(e) => handleRateChange(i, e.target.value)}
+                            placeholder="Qty"
+                            onChange={(e) => handleQuantityChange2(i, e.target.value)}
+                            value={item.quantity}
                             required
-                            value={formatNumber(item.rate)}
                           />
+                          <select
+                            className="inputField col-span-9"
+                            onChange={(e) => handleUnitChange2(i, e.target.value)}
+                            value={item.unit || ""}
+                            required
+                          >
+                            <option value="" disabled>
+                              Select Unit
+                            </option>
+                            {unitOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Amount"
-                            value={formatNumber(item.total)}
-                            readOnly
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1" onClick={() => setRemoveButton("remove")}>
-                          {items.length !== 0 && (
-                            <button
-                              disabled={removeLoading}
-                              onClick={() => handleRemoveButton(i, "parts")}
-                              className="w-full  bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md  py-2 px-2 justify-center "
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Rate"
+                          onChange={(e) => handleRateChange2(i, e.target.value)}
+                          value={item.rateDisplay || item.rate || ""}
+                          required
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <input
+                          className="inputField"
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Amount"
+                          value={formatNumber(item.total)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-1">
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(i)}
+                          className="w-full bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md py-2 px-2 justify-center"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
-                  )
-                })}
-              </>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-end mt-2">
-              {!addButton && (
-                <button
-                  onClick={handlePartsAddButton}
-                  className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md"
-                >
-                  Add new
-                </button>
-              )}
-              {addButton && (
-                <button
-                  onClick={handlePartsAddButton}
-                  className="border w-[135px] border-[#42A1DA] hover:border-[#42A1DA] text-black rounded-md px-2 py-2 mb-2"
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-            {addButton && (
-              <>
-                {items.map((item, i) => {
-                  return (
-                    <div key={i}>
-                      <div className="grid grid-cols-12 gap-2 items-center mt-3 ">
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="SL No "
-                            defaultValue={`${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
-                            required
-                          />
+                    <div className="flex justify-end">
+                      {items.length - 1 === i && (
+                        <div onClick={handleAddClick} className="flex justify-end mt-2">
+                          <button
+                            type="button"
+                            className="w-[135px] bg-[#42A1DA] hover:bg-[#42A1DA] text-white p-2 rounded-md"
+                          >
+                            Add
+                          </button>
                         </div>
-                        <div className="col-span-12 md:col-span-6">
-                          <div style={suggestionStyles.suggestionContainer}>
-                            <input
-                              className="inputField"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Description"
-                              onChange={(e) => handleDescriptionChange2(i, e.target.value)}
-                              value={item.description}
-                              required
-                            />
-                            {showSuggestions &&
-                              activeInputType === "parts" &&
-                              activeInputIndex === i + (specificQuotation?.input_data?.length || 0) && (
-                                <div style={suggestionStyles.suggestionsList} className="suggestionsList">
-                                  {productSuggestions.map((product, index) => (
-                                    <div
-                                      key={product._id}
-                                      className="suggestion-item"
-                                      style={{
-                                        ...suggestionStyles.suggestionItem,
-                                        ...(index === activeSuggestionIndex
-                                          ? suggestionStyles.suggestionItemActive
-                                          : {}),
-                                      }}
-                                      onClick={() => handleSuggestionClick(product)}
-                                    >
-                                      <div style={suggestionStyles.suggestionItemContent}>
-                                        <span style={suggestionStyles.suggestionItemName}>
-                                          {product.product.product_name}
-                                        </span>
-                                        <span style={suggestionStyles.suggestionItemPrice}>
-                                          ${product.product.sellingPrice}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-2 flex gap-2">
-                          <div className="grid grid-cols-12 quotationSelect">
-                            <input
-                              className="inputField col-span-3"
-                              autoComplete="off"
-                              type="text"
-                              placeholder="Qty"
-                              onChange={(e) => handleQuantityChange2(i, e.target.value)}
-                              value={item.quantity}
-                              required
-                            />
-                            <select
-                              className="inputField col-span-9"
-                              onChange={(e) => handleUnitChange2(i, e.target.value)}
-                              value={item.unit || ""}
-                              required
-                            >
-                              <option value="" disabled>
-                                Select Unit
-                              </option>
-                              {unitOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Rate"
-                            onChange={(e) => handleRateChange2(i, e.target.value)}
-                            value={formatNumber(item.rate)}
-                            required
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          <input
-                            className="inputField"
-                            autoComplete="off"
-                            type="text"
-                            placeholder="Amount"
-                            value={formatNumber(item.total)}
-                            readOnly
-                          />
-                        </div>
-                        <div className="col-span-12 md:col-span-1">
-                          {items.length !== 0 && (
-                            <button
-                              onClick={() => handleRemove(i)}
-                              className="w-full  bg-[#FF4C4C] hover:bg-[#FF3333] text-white rounded-md  py-2 px-2 justify-center "
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex justify-end ">
-                        {items.length - 1 === i && (
-                          <div onClick={handleAddClick} className="flex justify-end mt-2">
-                            <button className="w-[135px] bg-[#42A1DA]  hover:bg-[#42A1DA] text-white p-2 rounded-md">
-                              Add
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
               </>
             )}
           </div>
         </form>
 
-        {/* Totals Section */}
-        <div className="discountFieldWrap mt-5 ">
+        {/* Discount and Total Section */}
+        <div className="discountFieldWrap mt-5">
           <div className="flex items-center">
-            <b> Total Amount: </b>
+            <b>Total Amount: </b>
             <span>{formatNumber(grandTotal ? grandTotal : specificQuotation?.total_amount)}</span>
           </div>
           <div>
-            <b> Discount: </b>
+            <b>Discount: </b>
             <input
               className="py-1 text-center"
               onChange={(e) => handleDiscountChange(e.target.value)}
@@ -1933,23 +1979,23 @@ const UpdateQuotation = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 buttonGroup buttonMargin">
-          <div className="flex  md:flex-row flex-wrap justify-end">
+          <div className="flex md:flex-row flex-wrap justify-end">
             <Button onClick={handleGoPreview}>Preview</Button>
             <a
-              className="bg-[#42A0D9] text-white px-3 py-2  rounded-full "
+              className="bg-[#42A0D9] text-white px-3 py-2 rounded-full"
               href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${specificQuotation?._id}`}
               target="_blank"
               rel="noreferrer"
             >
               Download
             </a>
-            <Button>Print </Button>
-            <Button onClick={handleGoInvoice}>Invoice </Button>
+            <Button>Print</Button>
+            <Button onClick={handleGoInvoice}>Invoice</Button>
           </div>
         </div>
 
         <div className="mt-10">
-          <div className="flex  justify-center align-items-center">
+          <div className="flex justify-center align-items-center">
             <Button
               sx={{ background: "#42A1DA", color: "#fff" }}
               onClick={handleOnSubmit}
