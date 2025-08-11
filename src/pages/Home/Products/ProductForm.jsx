@@ -757,7 +757,7 @@ export default function ProductForm({ id }) {
               name="expense"
               
               placeholder="Expense"
-              required
+              
               icon={MonetizationOn}
               iconPosition="start"
               type="number"
