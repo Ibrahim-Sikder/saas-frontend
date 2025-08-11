@@ -18,6 +18,7 @@ import {
 import { History } from "lucide-react";
 
 const VehicleDetails = ({ id, user_type, tenantDomain }) => {
+
   const [open, setOpen] = useState(false);
   const [vehicleDetails, setVehicleDetails] = useState(false);
   const [getId, setGetId] = useState("");
@@ -40,7 +41,6 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
   const handleVehicleDetailsClose = () => setVehicleDetails(false);
 
   const textInputRef = useRef();
-  const search = new URLSearchParams(location.search).get("search");
   const { data: allVehicle, isLoading } = useGetAllVehiclesQuery({
     tenantDomain,
     id,
@@ -294,6 +294,7 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
           onClose={handleClose}
           setReload={setReload}
           reload={reload}
+            tenantDomain={tenantDomain}
         />
       )}
 

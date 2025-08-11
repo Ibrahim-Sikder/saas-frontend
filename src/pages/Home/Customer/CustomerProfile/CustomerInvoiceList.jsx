@@ -18,7 +18,7 @@ import {
 import { Pagination } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { HiOutlinePlus } from "react-icons/hi";
-const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
+const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
   const [filterType, setFilterType] = useState("");
 
   const [limit, setLimit] = useState(10);
@@ -55,7 +55,7 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
 
     if (willDelete) {
       try {
-        await moveRecycledInvoice({tenantDomain, id}).unwrap();
+        await moveRecycledInvoice({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -66,8 +66,6 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
       }
     }
   };
-
-
 
   return (
     <div className=" mb-24 mt-10 w-full">
@@ -131,6 +129,7 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
+                      console.log("invoice", card);
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
@@ -138,7 +137,9 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
                       const remaining = card.moneyReceipts?.[0]?.remaining;
                       const totalAmount = card.moneyReceipts?.[0]?.total_amount;
                       const advance = card.moneyReceipts?.[0]?.advance;
+                      const advance2 = Number(card?.advance) || 0;
                       const noMoney = card.moneyReceipts?.length < 0;
+                      const netTotal = Number(card.net_total) || 0;
 
                       let rowClass = "";
                       if (card.moneyReceipts.length === 0) {
@@ -150,6 +151,8 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
                       ) {
                         rowClass = "bg-[#f5365c] text-white";
                       } else if (advance === totalAmount) {
+                        rowClass = "bg-[#2dce89] text-white";
+                      } else if (advance2 === netTotal) {
                         rowClass = "bg-[#2dce89] text-white";
                       } else if (advance !== totalAmount) {
                         rowClass = "bg-[#ffad46] text-white";
@@ -196,8 +199,6 @@ const CustomerInvoiceList = ({ id, user_type,tenantDomain }) => {
                             </div>
                           </td>
                           <td>
-                           
-
                             <a
                               className="editIconWrap edit2"
                               href={`${

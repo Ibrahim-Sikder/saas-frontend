@@ -64,7 +64,7 @@
 // const tenantDomain = useTenantDomain();
 
 //   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
-//   console.log("user all info", data);
+
 //   const userData = data?.data?.[0] || {};
 //   const tenantInfo = userData.tenantInfo || {};
 //   const subscription = tenantInfo.subscription || {};

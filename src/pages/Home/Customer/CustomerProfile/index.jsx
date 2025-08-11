@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { HiLocationMarker } from "react-icons/hi";
-import { HiEnvelope, HiMiniPhone } from "react-icons/hi2";
+import { HiMiniPhone } from "react-icons/hi2";
 import { ImUserTie } from "react-icons/im";
 import "../Customer.css";
 import CustomerJobCardList from "./CustomerJobCardList";
@@ -46,6 +45,8 @@ const CustomerProfile = () => {
     isLoading,
     error: customerError,
   } = useGetSingleCustomerQuery({ id, tenantDomain });
+
+  console.log("customer profile data this ", profileData);
 
   if (isLoading) {
     return <Loading />;
@@ -162,7 +163,11 @@ const CustomerProfile = () => {
         </TabPanel>
 
         <TabPanel value={value} index={1}>
-          <VehicleDetails id={id} user_type={profileData?.data?.user_type} />
+          <VehicleDetails
+            tenantDomain={tenantDomain}
+            id={id}
+            user_type={profileData?.data?.user_type}
+          />
         </TabPanel>
 
         <TabPanel value={value} index={2}>
@@ -198,7 +203,7 @@ const CustomerProfile = () => {
           <Message />
         </TabPanel>
         <TabPanel value={value} index={7}>
-          <CustomerNote  tenantDomain={tenantDomain}  id={id}/>
+          <CustomerNote tenantDomain={tenantDomain} id={id} />
         </TabPanel>
 
         <div>

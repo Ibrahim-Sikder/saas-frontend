@@ -40,7 +40,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import FlagIcon from "@mui/icons-material/Flag";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
-const JobCardForm = ({ onClose, id, user_type }) => {
+const JobCardForm = ({tenantDomain, onClose, id, user_type }) => {
   const [registrationError, setRegistrationError] = useState("");
   const [driverCountryCode, setDriverCountryCode] = useState(countries[0]);
   const location = useLocation();
@@ -55,61 +55,81 @@ const JobCardForm = ({ onClose, id, user_type }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    const toastId = toast.loading("Creating Vehicle...");
-    const submitData = {
-      Id: id,
-      user_type: user_type,
-      carReg_no: data.carReg_no,
-      vehicle_brand: data.vehicle_brand,
-      vehicle_name: data.vehicle_name,
-      car_registration_no: data.car_registration_no,
-      chassis_no: data.chassis_no,
-      engine_no: data.engine_no,
-      vehicle_category: data.vehicle_category,
-      color_code: data.color_code,
-      fuel_type: data.fuel_type,
-      vehicle_model: Number(data.vehicle_model),
-      mileageHistory: [
-        {
-          mileage: Number(data.mileage),
-          date: new Date(),
-        },
-      ],
-      driver_name: data.driver_name,
-      driver_contact: data.driver_contact,
-      driver_country_code: driverCountryCode.code,
-    };
-   
+const onSubmit = async (data) => {
+  const toastId = toast.loading("Creating Vehicle...");
 
-    try {
-      const res = await createVehicle(submitData).unwrap();
+  const submitData = {
+    Id: id,
+    user_type: user_type,
+    carReg_no: data.carReg_no,
+    vehicle_brand: data.vehicle_brand,
+    vehicle_name: data.vehicle_name,
+    car_registration_no: data.car_registration_no,
+    chassis_no: data.chassis_no,
+    engine_no: data.engine_no,
+    vehicle_category: data.vehicle_category,
+    color_code: data.color_code,
+    fuel_type: data.fuel_type,
+    vehicle_model: Number(data.vehicle_model),
+    mileageHistory: [
+      {
+        mileage: Number(data.mileage),
+        date: new Date(),
+      },
+    ],
+    driver_name: data.driver_name,
+    driver_contact: data.driver_contact,
+    driver_country_code: driverCountryCode.code,
+  };
 
-      if (res.success) {
-        toast.update(toastId, {
-          render: res.message,
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        onClose();
-      } else {
-        toast.update(toastId, {
-          render: "Failed to create vehicle!",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-      }
-    } catch (err) {
+  try {
+    const res = await createVehicle({ ...submitData, tenantDomain }).unwrap();
+
+    if (res.success) {
       toast.update(toastId, {
-        render: err?.message || "Failed to create vehicle!",
+        render: res.message,
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+      onClose();
+    } else {
+      toast.update(toastId, {
+        render: "Failed to create vehicle!",
         type: "error",
         isLoading: false,
         autoClose: 3000,
       });
     }
-  };
+  } catch (err) {
+    let errorMessage = "Failed to create vehicle!";
+
+    // Backend custom message
+    if (err?.data?.message) {
+      errorMessage = err.data.message;
+    }
+
+    // Backend errorSources array
+    if (err?.data?.errorSources?.length > 0) {
+      errorMessage = err.data.errorSources[0]?.message || errorMessage;
+    }
+
+    // Mongo duplicate key
+    if (err?.data?.err?.code === 11000) {
+      const key = Object.keys(err.data.err.keyValue)[0];
+      const value = err.data.err.keyValue[key];
+      errorMessage = `${value} is already exists`;
+    }
+
+    toast.update(toastId, {
+      render: errorMessage,
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
+  }
+};
+
 
   const [selectedBrand, setSelectedBrand] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState([]);

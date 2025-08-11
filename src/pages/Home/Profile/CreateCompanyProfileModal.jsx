@@ -54,7 +54,6 @@ export default function CompanyProfileModal({ profileData, open, onClose }) {
       ...formData,
       logo: finalLogo, 
     };
-    console.log('debug',payload)
 
     if (isUpdateMode) {
       const res = await updateCompanyProfile({

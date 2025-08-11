@@ -91,7 +91,7 @@ const AddJobCard = () => {
   const [mileageChanged, setMileageChanged] = useState(false);
 
   const [getDataWithChassisNo, setGetDataWithChassisNo] = useState("");
-  console.log("data with chassis number ", getDataWithChassisNo);
+
   const formRef = useRef();
   const textInputRef = useRef(null);
   const navigate = useNavigate();

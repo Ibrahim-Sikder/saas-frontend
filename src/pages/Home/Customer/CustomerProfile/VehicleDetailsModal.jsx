@@ -4,13 +4,21 @@ import { IoCloseSharp } from "react-icons/io5";
 import { useGetSingleVehicleQuery } from "../../../../redux/api/vehicle";
 import Loading from "../../../../components/Loading/Loading";
 
-const VehicleDetailsModal = ({ handleVehicleDetailsClose, getId, id,tenantDomain }) => {
-  
-  const { data: singleVehicle, isLoading } = useGetSingleVehicleQuery({tenantDomain, id});
-
+const VehicleDetailsModal = ({
+  handleVehicleDetailsClose,
+  getId,
+  id,
+  tenantDomain,
+}) => {
+  const { data: singleVehicle, isLoading } = useGetSingleVehicleQuery({
+    tenantDomain,
+    id: getId,
+  });
   if (isLoading) {
     return <Loading />;
   }
+
+  console.log(getId, singleVehicle);
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-50   ">

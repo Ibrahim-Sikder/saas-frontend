@@ -119,7 +119,7 @@ const InvoiceTable = () => {
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
-                      console.log("invoice ", card);
+                     
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);

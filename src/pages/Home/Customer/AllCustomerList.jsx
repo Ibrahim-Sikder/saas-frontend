@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FaTrashAlt, FaEdit, FaUserTie } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowForwardIos } from "@mui/icons-material";
@@ -8,7 +8,6 @@ import { HiOutlineSearch } from "react-icons/hi";
 import { Pagination } from "@mui/material";
 import swal from "sweetalert";
 import { toast } from "react-toastify";
-import axios from "axios";
 import Loading from "../../../components/Loading/Loading";
 import { useMoveRecycledCustomerMutation } from "../../../redux/api/customerApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
@@ -20,7 +19,6 @@ const AllCustomerList = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
-  const searchParam = new URLSearchParams(location.search).get("search");
   const ITEMS_PER_PAGE = 10;
   const tenantDomain = useTenantDomain();
 
@@ -29,7 +27,6 @@ const AllCustomerList = () => {
     isLoading,
     isError,
     error,
-    refetch,
   } = useAllCustomerQuery({
     tenantDomain,
     page: currentPage,
@@ -50,7 +47,6 @@ const AllCustomerList = () => {
     setCurrentPage(page);
   };
 
-
   const handleIconPreview = (id, userType) => {
     switch (userType) {
       case "customer":
@@ -67,7 +63,7 @@ const AllCustomerList = () => {
     }
   };
 
-  const deletePackage = async (id) => {
+  const handleMoveToRecycledBin = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",
       text: "You want to move this Customer to Recycle Bin?",
@@ -83,7 +79,6 @@ const AllCustomerList = () => {
           "Move to Recycle bin successful.",
           "success"
         );
-
       } catch (error) {
         swal("Error", "An error occurred while deleting the card.", "error");
       }
@@ -94,21 +89,20 @@ const AllCustomerList = () => {
     toast.error(deleteError?.message);
   }
 
-const handleSearch = () => {
-  setCurrentPage(1);
-};
+  const handleSearch = () => {
+    setCurrentPage(1);
+  };
 
-const handleAllCustomer = () => {
-  setFilterType("");
-  setCurrentPage(1);
-};
+  const handleAllCustomer = () => {
+    setFilterType("");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="w-full mt-5 mb-24">
       {/* Header section */}
       <div className="flex flex-wrap items-center justify-between my-3 mb-8">
         <div className="flex items-center justify-center">
-          <FaUserTie className="invoicIcon" />
           <div className="ml-2">
             <h3 className="text-2xl font-bold">Customer</h3>
             <span>
@@ -134,7 +128,7 @@ const handleAllCustomer = () => {
             All
           </button>
           <input
-            value={filterType} // Bind input to state
+            value={filterType}
             onChange={(e) => {
               setFilterType(e.target.value);
               setCurrentPage(1);
@@ -193,7 +187,7 @@ const handleAllCustomer = () => {
                   <th>Car Number</th>
                   <th>Mobile Number</th>
                   <th>User Type</th>
-                  <th colSpan={3}>Action</th>
+                  <th colSpan={2}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -241,14 +235,14 @@ const handleAllCustomer = () => {
                           </Link>
                         </div>
                       </td>
-                      <td>
+                      {/* <td>
                         <div
-                          onClick={() => deletePackage(customer?._id)}
+                          onClick={() => handleMoveToRecycledBin(customer?._id)}
                           className="editIconWrap"
                         >
                           <FaTrashAlt className="deleteIcon" />
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   );
                 })}

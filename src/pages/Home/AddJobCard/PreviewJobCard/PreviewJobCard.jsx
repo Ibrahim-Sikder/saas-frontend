@@ -30,7 +30,6 @@ const PreviewJobCard = () => {
   });
 
   const previewData = data?.data;
-  console.log("preview data", previewData);
 
   const extractTextFromHTML = (htmlString) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
