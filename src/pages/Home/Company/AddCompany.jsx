@@ -151,6 +151,7 @@ const AddCompany = () => {
       companyOwnerName: data.companyOwnerName,
       companyOwnerCountryCode: companyOwnerCountryCode.code,
       reference_name: data.reference_name,
+      whatsappNumber: data.whatsappNumber,
     };
 
     data.vehicle_model = Number(data.vehicle_model);
@@ -251,7 +252,6 @@ const AddCompany = () => {
                       onC
                       label="Vehicle User Name (T)"
                       {...register("vehicle_username")}
-                   
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -259,7 +259,6 @@ const AddCompany = () => {
                       fullWidth
                       on
                       label="Company Address (T)"
-                      
                       {...register("company_address", {
                         required: "Company address is required!",
                       })}
@@ -308,7 +307,14 @@ const AddCompany = () => {
                       </Grid>
                     </Grid>
                   </Grid>
-
+                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      on
+                      label="Whatsapp Number (N)"
+                      {...register("whatsappNumber")}
+                    />
+                  </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
                       fullWidth

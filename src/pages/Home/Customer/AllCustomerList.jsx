@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaUserTie } from "react-icons/fa";
+import { FaEdit, FaUserTie } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { HiOutlineSearch } from "react-icons/hi";
 import { Pagination } from "@mui/material";
-import swal from "sweetalert";
 import { toast } from "react-toastify";
 import Loading from "../../../components/Loading/Loading";
-import { useMoveRecycledCustomerMutation } from "../../../redux/api/customerApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useAllCustomerQuery } from "../../../redux/api/meta.api";
 
@@ -25,7 +23,6 @@ const AllCustomerList = () => {
   const {
     data: allCustomerData,
     isLoading,
-    isError,
     error,
   } = useAllCustomerQuery({
     tenantDomain,
@@ -34,11 +31,6 @@ const AllCustomerList = () => {
     searchTerm: filterType,
     isRecycled: false,
   });
-
-  const [
-    moveRecycledCustomer,
-    { isLoading: customerDeleteLoading, error: deleteError },
-  ] = useMoveRecycledCustomerMutation();
 
   const totalCount = allCustomerData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -63,31 +55,7 @@ const AllCustomerList = () => {
     }
   };
 
-  const handleMoveToRecycledBin = async (id) => {
-    const willDelete = await swal({
-      title: "Are you sure?",
-      text: "You want to move this Customer to Recycle Bin?",
-      icon: "warning",
-      dangerMode: true,
-    });
-
-    if (willDelete) {
-      try {
-        await moveRecycledCustomer({ tenantDomain, id }).unwrap();
-        swal(
-          "Move to Recycle bin!",
-          "Move to Recycle bin successful.",
-          "success"
-        );
-      } catch (error) {
-        swal("Error", "An error occurred while deleting the card.", "error");
-      }
-    }
-  };
-
-  if (deleteError) {
-    toast.error(deleteError?.message);
-  }
+  console.log("all customer this ", allCustomerData);
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -235,14 +203,6 @@ const AllCustomerList = () => {
                           </Link>
                         </div>
                       </td>
-                      {/* <td>
-                        <div
-                          onClick={() => handleMoveToRecycledBin(customer?._id)}
-                          className="editIconWrap"
-                        >
-                          <FaTrashAlt className="deleteIcon" />
-                        </div>
-                      </td> */}
                     </tr>
                   );
                 })}

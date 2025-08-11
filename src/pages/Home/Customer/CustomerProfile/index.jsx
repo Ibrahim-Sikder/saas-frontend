@@ -200,7 +200,7 @@ const CustomerProfile = () => {
           />
         </TabPanel>
         <TabPanel value={value} index={6}>
-          <Message />
+          <Message data={profileData?.data} />
         </TabPanel>
         <TabPanel value={value} index={7}>
           <CustomerNote tenantDomain={tenantDomain} id={id} />

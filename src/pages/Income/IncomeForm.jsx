@@ -75,7 +75,6 @@ const ExpenseForm = ({ id }) => {
     return allInvoices.data.invoices.map((invoice) => ({
       label: `${invoice.invoice_no} - ${invoice.Id}`,
       _id: invoice._id,
-      // Include the full invoice data for auto-filling
       invoiceData: invoice,
     }));
   }, [allInvoices?.data?.invoices]);
@@ -99,7 +98,6 @@ const ExpenseForm = ({ id }) => {
         accountNumber: singleIncome.data.accountNumber || "",
         transactionNumber: singleIncome.data.transactionNumber || "",
         note: singleIncome.data.note || "",
-        // FIXED: Changed field name to match useFieldArray
         income_items: singleIncome?.data?.income_items?.map((item) => ({
           name: item.name || "",
           amount: item.amount?.toString() || "0",
@@ -116,7 +114,6 @@ const ExpenseForm = ({ id }) => {
       accountNumber: "",
       transactionNumber: "",
       note: "",
-      // FIXED: Changed field name to match useFieldArray
       income_items: [{ name: "", amount: "0" }],
     };
   }, [id, singleIncome?.data]);
@@ -527,10 +524,14 @@ const ExpenseForm = ({ id }) => {
                         items={paymentMethods}
                       />
                     </Grid>
-                    {/* Conditional Payment Fields */}
-                    {["Bkash", "Nagad", "Rocket", "Other"].includes(
-                      methods.watch("payment_method")
-                    ) && (
+
+                    {[
+                      "Bkash",
+                      "Nagad",
+                      "Rocket",
+                      "Other",
+                      "Bank Transfer",
+                    ].includes(methods.watch("payment_method")) && (
                       <>
                         <Grid item xs={12} md={3}>
                           <TASInput
@@ -544,12 +545,26 @@ const ExpenseForm = ({ id }) => {
                           <TASInput
                             fullWidth
                             name="transactionNumber"
-                            label="Transaction Number"
+                            label="Transaction ID"
                             sx={expenseInputStyle}
                           />
                         </Grid>
                       </>
                     )}
+
+                    {["Cash"].includes(methods.watch("payment_method")) && (
+                      <>
+                        <Grid item xs={12} md={3}>
+                          <TASInput
+                            fullWidth
+                            name="referanceNo"
+                            label="Referance Number"
+                            sx={expenseInputStyle}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
                     <Grid item xs={12}>
                       <TASTextarea
                         fullWidth

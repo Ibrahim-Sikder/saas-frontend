@@ -965,7 +965,7 @@ const handleCreateSalary = async () => {
                     <TableCell sx={tableCellStyle}>
                       Total Overtime Payment
                     </TableCell>
-                    <TableCell sx={tableCellStyle}>Previous Due</TableCell>
+                    {/* <TableCell sx={tableCellStyle}>Previous Due</TableCell> */}
                     <TableCell sx={tableCellStyle}>Cut Salary</TableCell>
                     <TableCell sx={tableCellStyle}>Total Payment</TableCell>
                     <TableCell sx={tableCellStyle}>Advance</TableCell>
@@ -1238,7 +1238,7 @@ const handleCreateSalary = async () => {
                               }}
                             />
                           </TableCell>
-                          <TableCell>
+                          {/* <TableCell>
                             <TextField
                               size="small"
                               type="number"
@@ -1267,7 +1267,7 @@ const handleCreateSalary = async () => {
                                 },
                               }}
                             />
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell>
                             <TextField
                               size="small"

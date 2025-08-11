@@ -139,6 +139,7 @@ const AddShowRoom = () => {
       company_contact: data.company_contact,
       company_country_code: countryCode.code,
       company_email: data.company_email,
+      whatsappNumber: data.whatsappNumber,
       company_address: data.company_address,
       driver_name: data.driver_name,
       driver_contact: data.driver_contact,
@@ -302,6 +303,14 @@ const AddShowRoom = () => {
                       </Grid>
                     </Grid>
                   </Grid>
+                   <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <TextField
+                          fullWidth
+                          on
+                          label="Whatsapp Number (N)"
+                          {...register("whatsappNumber")}
+                        />
+                      </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
                       fullWidth

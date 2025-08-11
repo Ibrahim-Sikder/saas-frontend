@@ -16,7 +16,6 @@ import {
   vehicleTypes,
 } from "../../../constant";
 import { Autocomplete, Box, Button, Chip, Grid } from "@mui/material";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import { ArrowBack } from "@mui/icons-material";
 import {
   useGetSingleCustomerQuery,
@@ -141,6 +140,7 @@ const UpdateCustomer = () => {
         driver_country_code: singleCard?.data?.driver_country_code,
         driver_contact: driverPhoneNumber || singleCard?.data?.driver_contact,
         reference_name: singleCard?.data?.reference_name,
+        whatsappNumber: singleCard?.data?.whatsappNumber,
 
         customerOwnerPhone:
           ownerPhoneNumber || singleCard?.data?.customerOwnerPhone,
@@ -180,7 +180,6 @@ const UpdateCustomer = () => {
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating Customer...");
 
-
     const customer = {
       company_name: data.company_name,
       vehicle_username: data.vehicle_username,
@@ -197,6 +196,7 @@ const UpdateCustomer = () => {
       customerOwnerPhone: data.customerOwnerPhone,
       customerOwnerName: data.customerOwnerName,
       customerOwnerCountryCode: customerOwnerCountryCode.code,
+      whatsappNumber: data.whatsappNumber,
     };
 
     data.vehicle_model = Number(data.vehicle_model);
@@ -320,7 +320,6 @@ const UpdateCustomer = () => {
             Back
           </Button>
           <div className="flex flex-wrap items-center justify-center">
-     
             <h3 className="text-sm font-bold md:text-2xl">Update Customer </h3>
           </div>
           <div className="productHome">
@@ -409,6 +408,14 @@ const UpdateCustomer = () => {
                         />
                       </Grid>
                     </Grid>
+                  </Grid>
+                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      on
+                      label="Whatsapp Number (N)"
+                      {...register("whatsappNumber")}
+                    />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
@@ -502,7 +509,9 @@ const UpdateCustomer = () => {
                 </Grid>
               </Box>
               <Box>
-                <h3 className="my-3  text-xl font-bold">Vehicle Information </h3>
+                <h3 className="my-3  text-xl font-bold">
+                  Vehicle Information{" "}
+                </h3>
                 <Grid container spacing={2}>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Autocomplete
