@@ -4,26 +4,16 @@
 import { useState } from "react";
 import {
   Box,
-  Typography,
-  Paper,
-  Tooltip,
-  Tabs,
-  Tab,
-  Card,
-  CardContent,
   CircularProgress,
   Fade,
   Alert,
   Grid,
   Button,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   useGetAllUserQuery,
   useUpdateUserMutation,
 } from "../../../redux/api/userApi";
-
-import { toast } from "react-toastify";
 
 // Import subcomponents
 import ProfileHeader from "./ProfileHeader";
@@ -35,6 +25,7 @@ import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
 const Profile = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tenantDomain = useTenantDomain();
+  console.log("this test tenant domain ", tenantDomain);
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
   const [updateUser] = useUpdateUserMutation();
   const userData = data?.data?.[0] || {};
@@ -95,7 +86,7 @@ const Profile = () => {
     >
       {/* Header Section */}
       <ProfileHeader
-      tenantDomain={tenantDomain}
+        tenantDomain={tenantDomain}
         userData={userData}
         tenantInfo={tenantInfo}
         subscription={subscription}
