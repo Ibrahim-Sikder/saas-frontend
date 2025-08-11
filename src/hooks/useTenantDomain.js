@@ -3,22 +3,17 @@ import { useState, useEffect } from "react";
 export function getTenantDomain(hostname) {
   if (!hostname) return "";
 
+  // Handle localhost separately, remove port if any
   if (hostname.includes("localhost")) {
-    const hostWithoutPort = hostname.split(":")[0];
+    const hostWithoutPort = hostname.split(":")[0]; // e.g. garage.worldautosolution.com.localhost
     const parts = hostWithoutPort.split(".");
+    // Remove 'localhost' part (last part)
     return parts.slice(0, parts.length - 1).join(".");
   }
 
-  const parts = hostname.split(".");
-
-  // Return first subdomain if exists
-  if (parts.length > 2) {
-    return parts[0];
-  }
-
-  return "";
+  // For live domains, return the full hostname as tenant domain
+  return hostname;
 }
-
 
 export function useTenantDomain() {
   const [tenantDomain, setTenantDomain] = useState("");
