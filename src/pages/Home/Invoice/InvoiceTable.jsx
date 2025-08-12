@@ -27,10 +27,8 @@ const InvoiceTable = () => {
     navigate(`/dashboard/detail?id=${e}`);
   };
 
-  const [
-    moveRecycledInvoice,
-    { isLoading: deleteLoading, error: deleteError },
-  ] = useMoveRecycledInvoiceMutation();
+  const [moveRecycledInvoice, { isLoading: deleteLoading }] =
+    useMoveRecycledInvoiceMutation();
 
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
@@ -40,10 +38,11 @@ const InvoiceTable = () => {
       searchTerm: filterType,
       isRecycled: false,
     });
+
   const handleMoveToRecycledbin = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",
-      text: " You want to move  this invoice Recycle bin?",
+      text: "You want to move this invoice to the Recycle Bin?",
       icon: "warning",
       dangerMode: true,
     });
@@ -51,13 +50,9 @@ const InvoiceTable = () => {
     if (willDelete) {
       try {
         await moveRecycledInvoice({ tenantDomain, id }).unwrap();
-        swal(
-          "Move to Recycle bin!",
-          "Move to Recycle bin successful.",
-          "success"
-        );
+        swal("Moved!", "Invoice moved to Recycle Bin successfully.", "success");
       } catch (error) {
-        swal("Error", "An error occurred while deleting the card.", "error");
+        swal("Error", "An error occurred while deleting the invoice.", "error");
       }
     }
   };
@@ -70,9 +65,9 @@ const InvoiceTable = () => {
 
   return (
     <div className="mt-5 overflow-x-auto">
-      <div className=" overflow-x-auto">
-        <div className="flex flex-wrap  items-center justify-between mb-5">
-          <h3 className="mb-3 text-xl  md:text-3xl font-bold">
+      <div className="overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-between mb-5">
+          <h3 className="mb-3 text-xl md:text-3xl font-bold">
             Invoice List: {allInvoices?.data?.invoices?.length}
           </h3>
           <div className="flex items-center searcList">
@@ -88,9 +83,10 @@ const InvoiceTable = () => {
                 ref={textInputRef}
               />
             </div>
-            <button className="SearchBtn ">Search </button>
+            <button className="SearchBtn">Search</button>
           </div>
         </div>
+
         {invoiceLoading ? (
           <div className="flex items-center justify-center text-xl">
             <Loading />
@@ -99,27 +95,26 @@ const InvoiceTable = () => {
           <div>
             {allInvoices?.data?.invoices?.length === 0 ? (
               <div className="flex items-center justify-center h-full text-xl text-center">
-                No matching card found.
+                No matching invoice found.
               </div>
             ) : (
               <section className="tableContainer overflow-x-auto">
                 <table className="customTable">
                   <thead>
                     <tr>
-                      <th>SL No </th>
-                      <th>Order Number </th>
+                      <th>SL No</th>
+                      <th>Order Number</th>
                       <th>Customer Name</th>
-                      <th>Car Reg No </th>
+                      <th>Car Reg No</th>
                       <th>Mobile Number</th>
                       <th>Vehicle Brand</th>
-                      <th>Vehicle Name </th>
+                      <th>Vehicle Name</th>
                       <th>Date</th>
                       <th colSpan={5}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
-                     
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
@@ -128,12 +123,18 @@ const InvoiceTable = () => {
                       const totalAmount = card.moneyReceipts?.[0]?.total_amount;
                       const advance = card.moneyReceipts?.[0]?.advance;
                       const advance2 = Number(card?.advance) || 0;
-                      const noMoney = card.moneyReceipts?.length < 0;
-                      const netTotal = Number(card.net_total) || 0;
+
+                      // Convert net_total string with commas to number
+                      const netTotalNum = Number(
+                        String(card.net_total).replace(/,/g, "")
+                      );
 
                       let rowClass = "";
+
                       if (card.moneyReceipts.length === 0) {
                         rowClass = "bg-[#f5365c] text-white";
+                      } else if (advance2 === netTotalNum) {
+                        rowClass = "bg-[#2dce89] text-white";
                       } else if (
                         remaining === 0 &&
                         advance === 0 &&
@@ -141,8 +142,6 @@ const InvoiceTable = () => {
                       ) {
                         rowClass = "bg-[#f5365c] text-white";
                       } else if (advance === totalAmount) {
-                        rowClass = "bg-[#2dce89] text-white";
-                      } else if (advance2 === netTotal) {
                         rowClass = "bg-[#2dce89] text-white";
                       } else if (advance !== totalAmount) {
                         rowClass = "bg-[#ffad46] text-white";
@@ -153,7 +152,7 @@ const InvoiceTable = () => {
                       return (
                         <tr
                           key={card._id}
-                          className={`${rowClass} hover:bg-blue-300 transition-colors duration-200 hover:text-black `}
+                          className={`${rowClass} hover:bg-blue-300 transition-colors duration-200 hover:text-black`}
                         >
                           <td>{globalIndex}</td>
                           <td>{card?.job_no}</td>
@@ -182,12 +181,12 @@ const InvoiceTable = () => {
                           <td>
                             <span>{card.vehicle?.vehicle_name}</span>
                           </td>
-
                           <td>
                             <span>{card.vehicle?.vehicle_name}</span>
                           </td>
-
                           <td>{card.date}</td>
+
+                          {/* Actions */}
                           <td>
                             <Tooltip
                               title="Money Receipt"
@@ -196,7 +195,7 @@ const InvoiceTable = () => {
                             >
                               <a
                                 className="editIconWrap edit2"
-                                href={`/dashboard/money-receive?order_no=${card?.job_no}&id=${card?._id}&net_total=${card?.net_total}`}
+                                href={`/dashboard/money-receive?order_no=${card.job_no}&id=${card?._id}&net_total=${card?.net_total}`}
                                 rel="noreferrer"
                               >
                                 <Money className="editIcon" />
@@ -260,8 +259,6 @@ const InvoiceTable = () => {
                               placement="top"
                             >
                               <span>
-                                {" "}
-                                {/* Wrap disabled button for tooltip functionality */}
                                 <button
                                   disabled={deleteLoading}
                                   onClick={() =>
@@ -289,6 +286,7 @@ const InvoiceTable = () => {
             )}
           </div>
         )}
+
         <div className="flex justify-center mt-4">
           <Pagination
             count={allInvoices?.data?.meta?.totalPages}

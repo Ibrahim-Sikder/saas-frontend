@@ -110,7 +110,7 @@ const CompanyAccount = ({
             <div className="space-y-2 w-full md:w-auto">
               <div className="flex">
                 <div className="flex flex-col space-y-1 w-[150px] shrink-0">
-                  <b>Company Address</b>
+                  <b>Address</b>
                   <b>Reference Name</b>
                   <b>Date</b>
                 </div>

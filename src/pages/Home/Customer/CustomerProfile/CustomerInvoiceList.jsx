@@ -129,7 +129,7 @@ const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
-                      console.log("invoice", card);
+                
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
@@ -138,12 +138,18 @@ const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
                       const totalAmount = card.moneyReceipts?.[0]?.total_amount;
                       const advance = card.moneyReceipts?.[0]?.advance;
                       const advance2 = Number(card?.advance) || 0;
-                      const noMoney = card.moneyReceipts?.length < 0;
-                      const netTotal = Number(card.net_total) || 0;
+
+                      // Convert net_total string with commas to number
+                      const netTotalNum = Number(
+                        String(card.net_total).replace(/,/g, "")
+                      );
 
                       let rowClass = "";
+
                       if (card.moneyReceipts.length === 0) {
                         rowClass = "bg-[#f5365c] text-white";
+                      } else if (advance2 === netTotalNum) {
+                        rowClass = "bg-[#2dce89] text-white";
                       } else if (
                         remaining === 0 &&
                         advance === 0 &&
@@ -151,8 +157,6 @@ const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
                       ) {
                         rowClass = "bg-[#f5365c] text-white";
                       } else if (advance === totalAmount) {
-                        rowClass = "bg-[#2dce89] text-white";
-                      } else if (advance2 === netTotal) {
                         rowClass = "bg-[#2dce89] text-white";
                       } else if (advance !== totalAmount) {
                         rowClass = "bg-[#ffad46] text-white";

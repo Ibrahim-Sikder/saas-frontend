@@ -23,11 +23,10 @@ const ViewInvoice = () => {
           >
             Back
           </Button>
-          <HiOutlineUserGroup className="invoicIcon" />
         </div>
 
         <div className="flex items-center justify-center ">
-          <FaFileInvoice className="invoicIcon" />
+      
           <div className="ml-2">
             <h3 className="text-2xl font-bold"> Invoice </h3>
             <span>

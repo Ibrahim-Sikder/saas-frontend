@@ -98,7 +98,7 @@ const CustomerAccount = ({ profileData }) => {
                     <b>Driver Name</b>
                     <b>Driver Phone</b>
                     <b>Company Name</b>
-                    <b>Company Address</b>
+                    <b>Address</b>
                     <b>Reference Name</b>
                     <b>Date</b>
                   </div>
