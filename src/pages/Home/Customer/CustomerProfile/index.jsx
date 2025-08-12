@@ -46,8 +46,6 @@ const CustomerProfile = () => {
     error: customerError,
   } = useGetSingleCustomerQuery({ id, tenantDomain });
 
-  console.log("customer profile data this ", profileData);
-
   if (isLoading) {
     return <Loading />;
   }
@@ -159,7 +157,7 @@ const CustomerProfile = () => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <CustomerAccount profileData={profileData} />
+          <CustomerAccount  tenantDomain={tenantDomain} profileData={profileData} />
         </TabPanel>
 
         <TabPanel value={value} index={1}>

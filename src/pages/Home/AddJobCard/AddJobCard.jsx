@@ -1100,12 +1100,8 @@ const AddJobCard = () => {
                           fullWidth
                           on
                           label="Show Room Address (T)  "
-                          {...register("showRoom_address", {
-                            required: "Show room address is required! ",
-                          })}
+                          {...register("showRoom_address")}
                           focused={userDetails?.data?.showRoom_address || ""}
-                          error={!!errors.showRoom_address}
-                          helperText={errors.showRoom_address?.message}
                         />
                       </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>

@@ -47,7 +47,6 @@ const CustomerListTable = () => {
   };
 
   const handleMoveToRecyled = async (id) => {
-    console.log("id console ", id);
     const willDelete = await swal({
       title: "Are you sure?",
       text: " You want to move  this Customer Recycle Bin?",

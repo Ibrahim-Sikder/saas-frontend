@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Grid,
   Avatar,
   Button,
@@ -19,7 +18,6 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -67,9 +65,8 @@ const EmployeeProfile = () => {
   const [value, setValue] = useState(0);
   const location = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading, error } = useGetSingleEmployeeQuery({
     tenantDomain,
@@ -284,7 +281,7 @@ const tenantDomain = useTenantDomain();
                         mb: 2,
                       }}
                     >
-                      <Typography variant="h6">Salary</Typography>
+                      <Typography variant="h6">Total Salary</Typography>
                       <Avatar
                         sx={{
                           bgcolor: "secondary.light",
@@ -297,9 +294,6 @@ const tenantDomain = useTenantDomain();
                     </Box>
                     <Typography variant="h4" fontWeight="bold">
                       ৳ {totalSalary || 0}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {monthName} Paid
                     </Typography>
                   </Box>
                 </StyledPaper>
@@ -346,8 +340,6 @@ const tenantDomain = useTenantDomain();
             <Tab sx={tabStyles} label="Account" />
             <Tab sx={tabStyles} label="Attendance" />
             <Tab sx={tabStyles} label="Leave" />
-            <Tab sx={tabStyles} label="Holiday" />
-            <Tab sx={tabStyles} label="Shift & Schedule" />
             <Tab sx={tabStyles} label="Salary" />
             <Tab sx={tabStyles} label="Overtime" />
           </Tabs>
@@ -364,16 +356,11 @@ const tenantDomain = useTenantDomain();
           <TabPanel value={value} index={2}>
             <SingleEmployeeLeaveList tenantDomain={tenantDomain} id={id} />
           </TabPanel>
+
           <TabPanel value={value} index={3}>
-            <EmployeeHoliday id={id} />
-          </TabPanel>
-          <TabPanel value={value} index={4}>
-            <h3 className="text-3xl font-bold">Employee Holiday</h3>
-          </TabPanel>
-          <TabPanel value={value} index={5}>
             <EmployeeSalary tenantDomain={tenantDomain} id={id} />
           </TabPanel>
-          <TabPanel value={value} index={6}>
+          <TabPanel value={value} index={4}>
             <EmployeeOvertime tenantDomain={tenantDomain} id={id} />
           </TabPanel>
 

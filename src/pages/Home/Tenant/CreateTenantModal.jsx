@@ -299,14 +299,12 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
         },
       }
 
-      console.log('custom payload', tenantPayload)
 
       const result = await createTenant({
         payload: tenantPayload,
         plan: tenantData.selectedPlan,
       })
 
-      console.log('tenant result', result)
 
       if ("error" in result) {
         throw new Error(result.error?.data?.message || "Failed to create tenant.")

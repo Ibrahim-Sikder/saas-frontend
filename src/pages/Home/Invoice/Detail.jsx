@@ -29,7 +29,7 @@ const Detail = () => {
   });
 
   const [invoicePreview, setInvoicePreview] = useState({});
-  console.log(invoicePreview);
+
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
       ? invoicePreview?.net_total

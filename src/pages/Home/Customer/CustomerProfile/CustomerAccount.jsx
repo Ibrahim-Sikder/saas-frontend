@@ -1,14 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { FaCarSide, FaRegEdit } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 import Card from "../../../../components/Card/Card";
 import { Link } from "react-router-dom";
 import { HiOutlineEye } from "react-icons/hi";
 import { formatDate } from "../../../../utils/formateDate";
 import { useState } from "react";
 import VehicleDetailsModal from "./VehicleDetailsModal";
-const CustomerAccount = ({ profileData }) => {
-  const [open, setOpen] = useState(false);
+const CustomerAccount = ({ profileData, tenantDomain }) => {
   const [vehicleDetails, setVehicleDetails] = useState(false);
   const [getId, setGetId] = useState("");
   const handVehicleDetailsOpen = (id) => {
@@ -91,29 +90,28 @@ const CustomerAccount = ({ profileData }) => {
           <Card>
             <h3 className="mb-4 text-xl font-semibold">Contact Info</h3>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-            <div className="flex">
-                  <div className="flex flex-col space-y-1 w-[105px] ">
-                    <b>Customer Name</b>
-                    <b>Customer Phone</b>
-                    <b>Driver Name</b>
-                    <b>Driver Phone</b>
-                    <b>Company Name</b>
-                    <b>Address</b>
-                    <b>Reference Name</b>
-                    <b>Date</b>
-                  </div>
-                  <div className="flex flex-col space-y-1 capitalize">
-                    <span>: {profileData?.data?.customer_name}</span>
-                    <span>: 0{profileData?.data?.customer_contact}</span>
-                    <span>: {profileData?.data?.driver_name}</span>
-                    <span>: 0{profileData?.data?.driver_contact}</span>
-                    <span>: {profileData?.data?.company_name}</span>
-                    <span>: {profileData?.data?.company_address}</span>
-                    <span>: {profileData?.data?.reference_name}</span>
-                    <span>: {formatDate(profileData?.data?.createdAt)}</span>
-                  </div>
+              <div className="flex">
+                <div className="flex flex-col space-y-1 w-[105px] ">
+                  <b>Customer Name</b>
+                  <b>Customer Phone</b>
+                  <b>Driver Name</b>
+                  <b>Driver Phone</b>
+                  <b>Company Name</b>
+                  <b>Address</b>
+                  <b>Reference Name</b>
+                  <b>Date</b>
                 </div>
-             
+                <div className="flex flex-col space-y-1 capitalize">
+                  <span>: {profileData?.data?.customer_name}</span>
+                  <span>: 0{profileData?.data?.customer_contact}</span>
+                  <span>: {profileData?.data?.driver_name}</span>
+                  <span>: 0{profileData?.data?.driver_contact}</span>
+                  <span>: {profileData?.data?.company_name}</span>
+                  <span>: {profileData?.data?.company_address}</span>
+                  <span>: {profileData?.data?.reference_name}</span>
+                  <span>: {formatDate(profileData?.data?.createdAt)}</span>
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -703,6 +701,7 @@ const CustomerAccount = ({ profileData }) => {
           handVehicleDetailsOpen={handVehicleDetailsOpen}
           handleVehicleDetailsClose={handleVehicleDetailsClose}
           getId={getId}
+          tenantDomain={tenantDomain}
         />
       )}
     </>

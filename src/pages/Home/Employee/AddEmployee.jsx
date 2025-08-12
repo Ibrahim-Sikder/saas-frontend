@@ -155,20 +155,40 @@ const AddEmployee = () => {
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <TextField
                         fullWidth
-                        label="Full Name "
+                        label={
+                          <>
+                            Full Name
+                            <span
+                              style={{
+                                color: "red",
+                                fontSize: "25px",
+                              }}
+                            >
+                              *
+                            </span>
+                          </>
+                        }
                         id="Full Name "
-                        {...register("full_name", {
-                          required: "Name is required!",
-                        })}
-                        error={!!errors.full_name}
-                        helperText={errors.full_name?.message}
+                        {...register("full_name")}
                       />
                     </Grid>
 
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                          label="Date Of Birth "
+                          label={
+                            <>
+                              Date Of Birth
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           defaultValue={dayjs("2022-04-17")}
                           {...register("date_of_birth", {
                             required: "Date of birth is required",
@@ -176,8 +196,6 @@ const AddEmployee = () => {
                           slotProps={{
                             textField: {
                               fullWidth: true,
-                              error: !!errors.date_of_birth,
-                              helperText: errors.date_of_birth?.message,
                             },
                           }}
                         />
@@ -191,11 +209,6 @@ const AddEmployee = () => {
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
-                      {/* <TextField
-                        fullWidth
-                        label="Blood Group "
-                        {...register("blood_group")}
-                      /> */}
                       <FormControl fullWidth error={!!errors.blood_group}>
                         <InputLabel id="blood-group-select-label">
                           Blood Group
@@ -204,9 +217,7 @@ const AddEmployee = () => {
                           labelId="blood-group-select-label"
                           label="Blood Group"
                           defaultValue=""
-                          {...register("blood_group", {
-                            required: "Blood group is required",
-                          })}
+                          {...register("blood_group")}
                         >
                           <MenuItem value="" disabled>
                             Select Blood Group
@@ -222,11 +233,6 @@ const AddEmployee = () => {
                           <MenuItem value="Unknown">Unknown</MenuItem>
                           <MenuItem value="Other">Other</MenuItem>
                         </Select>
-                        {/* {errors.blood_group && (
-                          <FormHelperText>
-                            {errors.blood_group.message}
-                          </FormHelperText>
-                        )} */}
                       </FormControl>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -265,7 +271,19 @@ const AddEmployee = () => {
                               required: "Phone number is required!",
                             })}
                             fullWidth
-                            label="Phone No"
+                            label={
+                              <>
+                                Phone No
+                                <span
+                                  style={{
+                                    color: "red",
+                                    fontSize: "25px",
+                                  }}
+                                >
+                                  *
+                                </span>
+                              </>
+                            }
                             variant="outlined"
                             type="tel"
                             value={phoneNumber}
@@ -291,7 +309,19 @@ const AddEmployee = () => {
                         </InputLabel>
                         <Select
                           id="grouped-native-select"
-                          label="Select Gender"
+                          label={
+                            <>
+                              Select Gender
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           {...register("gender", {
                             required: "Gender is required!",
                           })}
@@ -305,8 +335,6 @@ const AddEmployee = () => {
                         </Select>
                       </FormControl>
                     </Grid>
-
-                    
                   </Grid>
                 </Box>
                 <Box sx={{ marginTop: "30px" }}>
@@ -317,7 +345,19 @@ const AddEmployee = () => {
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                          label="Join Date"
+                          label={
+                            <>
+                              Join Date
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           defaultValue={dayjs("2022-04-17")}
                           {...register("join_date", {
                             required: "Join date is required!",
@@ -337,12 +377,9 @@ const AddEmployee = () => {
                       <TextField
                         fullWidth
                         label="Designation  "
+                        
                         id="Designation  "
-                        {...register("designation", {
-                          required: "Designation is required!",
-                        })}
-                        error={!!errors.designation}
-                        helperText={errors.designation?.message}
+                        {...register("designation")}
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -353,11 +390,8 @@ const AddEmployee = () => {
                         <Select
                           id="grouped-native-select"
                           label="Select Employee Status"
-                          {...register("status", {
-                            required: "Status is required!",
-                          })}
-                          error={!!errors.status}
-                          helperText={errors.status?.message}
+                          {...register("status")}
+                          
                         >
                           <MenuItem value="Active">Active</MenuItem>
                           <MenuItem value="Inactive">Inactive</MenuItem>
@@ -376,22 +410,15 @@ const AddEmployee = () => {
                       <TextField
                         fullWidth
                         label="Father Name "
-                        {...register("father_name", {
-                          required: "Father name is requried! ",
-                        })}
-                        error={!!errors.father_name}
-                        helperText={errors.father_name?.message}
+                        {...register("father_name")}
+                       
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                       <TextField
                         fullWidth
                         label="Mother Name "
-                        {...register("mother_name", {
-                          required: "Mother name is required!",
-                        })}
-                        error={!!errors.mother_name}
-                        helperText={errors.mother_name?.message}
+                        {...register("mother_name")}
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -427,9 +454,7 @@ const AddEmployee = () => {
                         </Grid>
                         <Grid item lg={8} md={6} sm={9} xs={12}>
                           <TextField
-                            {...register("guardian_contact", {
-                              required: "Guardian contact number is required! ",
-                            })}
+                            {...register("guardian_contact")}
                             className="productField2"
                             label="Guardian Phone No"
                             variant="outlined"
@@ -437,8 +462,7 @@ const AddEmployee = () => {
                             type="tel"
                             value={guardianPhoneNumber}
                             onChange={handleGuardianPhoneNumberChange}
-                            error={!!errors.guardian_contact}
-                            helperText={errors.guardian_contact?.message}
+                            
                           />
                         </Grid>
                       </Grid>
@@ -477,11 +501,7 @@ const AddEmployee = () => {
                       <TextField
                         fullWidth
                         label="Permanent Address "
-                        {...register("permanent_address", {
-                          required: "Address is required!",
-                        })}
-                        error={!!errors.permanent_address}
-                        helperText={errors.permanent_address?.message}
+                        {...register("permanent_address")}
                       />
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>

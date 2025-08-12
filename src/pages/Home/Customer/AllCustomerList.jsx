@@ -55,7 +55,6 @@ const AllCustomerList = () => {
     }
   };
 
-  console.log("all customer this ", allCustomerData);
 
   const handleSearch = () => {
     setCurrentPage(1);

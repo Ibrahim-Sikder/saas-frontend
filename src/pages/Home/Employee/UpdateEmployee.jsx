@@ -9,12 +9,12 @@ import {
   FormControl,
   Grid,
   InputLabel,
+  MenuItem,
   Select,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaUsers } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { countries } from "../../../constant";
@@ -27,7 +27,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { ArrowBack } from "@mui/icons-material";
-import { HiOutlineUserGroup } from "react-icons/hi";
 import Loading from "../../../components/Loading/Loading";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
@@ -234,12 +233,32 @@ const UpdateEmployee = () => {
                     />
                   </Grid>
                   <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Blood Group "
-                      {...register("blood_group")}
-                      focused={singleEmployee?.data?.blood_group || ""}
-                    />
+                    <FormControl fullWidth error={!!errors.blood_group}>
+                      <InputLabel id="blood-group-select-label">
+                        Blood Group
+                      </InputLabel>
+                      <Select
+                        labelId="blood-group-select-label"
+                        label="Blood Group"
+                        focused={singleEmployee?.data?.blood_group || ""}
+                        {...register("blood_group")}
+                        defaultValue={singleEmployee?.data?.blood_group}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Blood Group
+                        </MenuItem>
+                        <MenuItem value="A+">A+</MenuItem>
+                        <MenuItem value="A-">A-</MenuItem>
+                        <MenuItem value="B+">B+</MenuItem>
+                        <MenuItem value="B-">B-</MenuItem>
+                        <MenuItem value="O+">O+</MenuItem>
+                        <MenuItem value="O-">O-</MenuItem>
+                        <MenuItem value="AB+">AB+</MenuItem>
+                        <MenuItem value="AB-">AB-</MenuItem>
+                        <MenuItem value="Unknown">Unknown</MenuItem>
+                        <MenuItem value="Other">Other</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item lg={6} md={6} sm={12} xs={12}>
                     <TextField

@@ -25,7 +25,6 @@ import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
 const Profile = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tenantDomain = useTenantDomain();
-  console.log("this test tenant domain ", tenantDomain);
   const { data, isLoading } = useGetAllUserQuery({ tenantDomain });
   const [updateUser] = useUpdateUserMutation();
   const userData = data?.data?.[0] || {};

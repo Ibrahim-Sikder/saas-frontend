@@ -193,7 +193,7 @@ const CompanyProfile = () => {
           <SupplierPaymentList tenantDomain={tenantDomain} />
         </TabPanel>
         <TabPanel value={value} index={7}>
-          <Message />
+          <Message data={profileData?.data} tenantDomain={tenantDomain}/>
         </TabPanel>
         <TabPanel value={value} index={8}>
           <CustomerNote tenantDomain={tenantDomain} id={id} />

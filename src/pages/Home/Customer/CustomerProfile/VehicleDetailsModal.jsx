@@ -18,8 +18,6 @@ const VehicleDetailsModal = ({
     return <Loading />;
   }
 
-  console.log(getId, singleVehicle);
-
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-50   ">
       <div className="relative left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[420px] sm:max-w-[600px] lg:max-w-[500px] p-4 max-h-[90vh] overflow-auto">
