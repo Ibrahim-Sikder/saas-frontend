@@ -283,49 +283,7 @@ const JobcardTable = () => {
           </div>
         </div>
       </div>
-      {/* Mileage History Dialog */}
-      <Dialog
-        open={mileageDialogOpen}
-        onClose={handleCloseMileageDialog}
-        aria-labelledby="mileage-history-dialog-title"
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle id="mileage-history-dialog-title">
-          Complete Mileage History
-        </DialogTitle>
-        <DialogContent>
-          <List>
-            {selectedVehicleMileage
-              ?.slice()
-              .reverse()
-              .map((history, index) => (
-                <div key={index}>
-                  <ListItem>
-                    <ListItemText
-                      primary={`${history.mileage} km`}
-                      secondary={`Recorded on: ${new Date(
-                        history.date
-                      ).toLocaleDateString()} ${new Date(
-                        history.date
-                      ).toLocaleTimeString()}`}
-                      primaryTypographyProps={{
-                        fontWeight: index === 0 ? "bold" : "normal",
-                        color: index === 0 ? "primary" : "inherit",
-                      }}
-                    />
-                  </ListItem>
-                  {index < selectedVehicleMileage.length - 1 && <Divider />}
-                </div>
-              ))}
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseMileageDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+ 
     </div>
   );
 };

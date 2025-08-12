@@ -491,11 +491,9 @@ const AddJobCard = () => {
   };
 
   const handleOptionClick = (option) => {
-    setYearSelectInput(option.value);
+    setYearSelectInput(option.label);
     setFilteredOptions([]);
-    setVModelValue("vehicle_model", option.label, {
-      shouldValidate: true,
-    });
+    setVModelValue("vehicle_model", option.label);
   };
 
   // get id
@@ -570,10 +568,19 @@ const AddJobCard = () => {
 
   const [localMileageEntries, setLocalMileageEntries] = useState([]);
 
-  // Add this useEffect to reset localMileageEntries when chassis changes
   useEffect(() => {
     setLocalMileageEntries([]);
   }, [getDataWithChassisNo]);
+
+  // vehicle model
+  useEffect(() => {
+    if (getDataWithChassisNo?.vehicle_model) {
+      setYearSelectInput(getDataWithChassisNo.vehicle_model.toString());
+      setVModelValue("vehicle_model", getDataWithChassisNo.vehicle_model);
+    } else {
+      setYearSelectInput("");
+    }
+  }, [getDataWithChassisNo?.vehicle_model, setVModelValue]);
 
   if (customerLoading || companyLoading || showroomLoading || jobCardLoading) {
     return (
@@ -1060,15 +1067,6 @@ const AddJobCard = () => {
                           />
                         </div>
                       </Grid>
-
-                      <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <TextField
-                          fullWidth
-                          label="Reference Name (T) "
-                          {...register("reference_name")}
-                          focused={userDetails?.data?.reference_name || ""}
-                        />
-                      </Grid>
                     </Grid>
                   </Box>
                 ) : newId === "showRoom" ? (
@@ -1314,13 +1312,9 @@ const AddJobCard = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
-                    {...register("engine_no", {
-                      required: "Engin no is required!",
-                    })}
+                    {...register("engine_no")}
                     label="ENGINE NO & CC (T&N) "
                     focused={getDataWithChassisNo?.engine_no || ""}
-                    error={!!errors.engine_no}
-                    helperText={errors.engine_no?.message}
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -1337,11 +1331,7 @@ const AddJobCard = () => {
                         {...params}
                         label="Vehicle Brand"
                         // focused={getDataWithChassisNo?.vehicle_brand}
-                        {...register("vehicle_brand", {
-                          required: "Vehicle brand is required!",
-                        })}
-                        error={!!errors.vehicle_brand}
-                        helperText={errors.vehicle_brand?.message}
+                        {...register("vehicle_brand")}
                       />
                     )}
                   />
@@ -1368,15 +1358,14 @@ const AddJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <div className=" relative">
+                  <div className="mt-3 relative">
                     <input
-                      // value={yearSelectInput}
                       onInput={handleYearSelectInput}
                       {...register("vehicle_model")}
                       type="text"
-                      className="border border-[#11111163] w-[100%] h-14 p-3 rounded-md"
+                      className="border border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
                       placeholder="Vehicle Model"
-                      value={getDataWithChassisNo?.vehicle_model}
+                      value={yearSelectInput}
                     />
                     {yearSelectInput && (
                       <ul className="options-list">
@@ -1415,49 +1404,14 @@ const AddJobCard = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
                     fullWidth
-                    {...register("color_code", {
-                      required: "Color code is required!",
-                    })}
+                    {...register("color_code")}
                     label="Color & Code (T&N) "
                     focused={getDataWithChassisNo?.color_code || ""}
-                    error={!!errors.color_code}
-                    helperText={errors.color_code?.message}
                   />
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {/* <TextField
-                    fullWidth
-                    {...register("mileage", {
-                      required: "Mileage is required!",
-                    })}
-                    label="Current Mileage (KM)"
-                    type="number"
-                    value={
-                      currentMileage ||
-                      (getDataWithChassisNo?.mileageHistory?.length > 0
-                        ? getDataWithChassisNo.mileageHistory[
-                            getDataWithChassisNo.mileageHistory.length - 1
-                          ].mileage
-                        : getDataWithChassisNo?.mileage || "")
-                    }
-                    onChange={(e) => {
-                      const newMileage = e.target.value;
-                      setCurrentMileage(newMileage);
-                      const lastMileage =
-                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
-                          ?.mileage;
-                      if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true);
-                      } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true);
-                      } else {
-                        setMileageChanged(false);
-                      }
-                    }}
-                    error={!!errors.mileage}
-                    helperText={errors.mileage?.message}
-                  /> */}
+                  
                   <TextField
                     fullWidth
                     {...register("mileage", {
@@ -1526,12 +1480,8 @@ const AddJobCard = () => {
                         fullWidth
                         {...params}
                         label=" Fuel Type"
-                        {...register("fuel_type", {
-                          required: "Fuel type is required!",
-                        })}
+                        {...register("fuel_type")}
                         focused={getDataWithChassisNo?.fuel_type || ""}
-                        error={!!errors.fuel_type}
-                        helperText={errors.fuel_type?.message}
                       />
                     )}
                   />
@@ -1685,12 +1635,8 @@ const AddJobCard = () => {
             <div>
               <TextField
                 className="ownerInput"
-                {...register("technician_name", {
-                  required: "Technician name is required!",
-                })}
+                {...register("technician_name")}
                 label="Technician Name (T) "
-                error={!!errors.technician_name}
-                helperText={errors.technician_name?.message}
               />
               <br />
             </div>

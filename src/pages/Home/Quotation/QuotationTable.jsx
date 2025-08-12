@@ -286,8 +286,6 @@ const QuotationTable = () => {
                                 placement="top"
                               >
                                 <span>
-                                  {" "}
-                                  {/* Wrapper span for disabled button */}
                                   <button
                                     disabled={deleteLoading}
                                     onClick={() =>

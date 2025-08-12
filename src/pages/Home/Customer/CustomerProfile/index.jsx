@@ -191,6 +191,7 @@ const CustomerProfile = () => {
             id={id}
             user_type={profileData?.data?.user_type}
           />
+          
         </TabPanel>
         <TabPanel value={value} index={5}>
           <CustomerMoneyList

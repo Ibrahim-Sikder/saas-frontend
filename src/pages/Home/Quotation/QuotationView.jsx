@@ -2,11 +2,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useRef, useState } from "react";
-import logo from "../../../../public/assets/logo.png";
 import { useReactToPrint } from "react-to-print";
 import { usePDF } from "react-to-pdf";
 import { Link, useLocation } from "react-router-dom";
-
 import "../Invoice/Invoice.css";
 import "./Quotation.css";
 import { Divider } from "@mui/material";
@@ -14,14 +12,13 @@ import Loading from "../../../components/Loading/Loading";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
-
 const Detail = () => {
   const componentRef = useRef();
   const { targetRef } = usePDF({ filename: "page.pdf" });
 
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
@@ -30,7 +27,7 @@ const tenantDomain = useTenantDomain();
     content: () => componentRef.current,
   });
 
-  const [quotationPreview, setQuotationPreview] = useState({})
+  const [quotationPreview, setQuotationPreview] = useState({});
   const [loading, setLoading] = useState(false);
   const { data } = useGetSingleQuotationQuery({
     tenantDomain,
@@ -46,7 +43,6 @@ const tenantDomain = useTenantDomain();
   if (loading) {
     return <Loading />;
   }
-
   return (
     <div ref={componentRef} className="h-screen">
       <main ref={targetRef} className="invoicePrintWrap">
@@ -55,10 +51,14 @@ const tenantDomain = useTenantDomain();
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#7493B8] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src={CompanyInfoData?.data?.logo} alt="logo" />
+                  <img
+                    className="w-[120px] "
+                    src={CompanyInfoData?.data?.logo}
+                    alt="logo"
+                  />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                     {CompanyInfoData?.data?.companyName}
+                      {CompanyInfoData?.data?.companyName}
                     </h2>
                     <small className="block mt-2">
                       Office: {CompanyInfoData?.data?.address}
@@ -66,14 +66,15 @@ const tenantDomain = useTenantDomain();
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> {CompanyInfoData?.data?.phone}
+                      <small className="font-bold">Mobile:</small>{" "}
+                      {CompanyInfoData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
                       {CompanyInfoData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                     {CompanyInfoData?.data?.website}
+                      {CompanyInfoData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -217,8 +218,7 @@ const tenantDomain = useTenantDomain();
                       <small>
                         <span className="mr-1">:</span>{" "}
                         {
-                          quotationPreview?.vehicle?.mileageHistory?.[0]
-                            ?.mileage
+                          quotationPreview?.mileage
                         }
                       </small>
                     </div>
@@ -343,7 +343,9 @@ const tenantDomain = useTenantDomain();
             </Link>
             <a
               className="bg-[#42A0D9] text-white px-2 py-1  rounded-full "
-              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${quotationPreview?._id}?tenantDomain=${tenantDomain}`}
+              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${
+                quotationPreview?._id
+              }?tenantDomain=${tenantDomain}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -352,7 +354,6 @@ const tenantDomain = useTenantDomain();
             <Link
               to={`/dashboard/invoice?order_no=${quotationPreview?.job_no}&id=${id}`}
             >
-        
               <button> Invoice </button>
             </Link>
           </div>

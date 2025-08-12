@@ -13,9 +13,8 @@ import { Pagination } from "@mui/material";
 import Loading from "../../../../components/Loading/Loading";
 import car from "../../../../../src/assets/jobcard/car-repair.png";
 import EmptyCustomerData from "../../../../components/EmptyCustomerData/EmptyCustomerData";
-const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
+const CustomerJobCardList = ({ id, customerId, user_type, tenantDomain }) => {
   const [filterType, setFilterType] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
 
@@ -47,7 +46,7 @@ const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
 
     if (willDelete) {
       try {
-        await movetoRecyclebinJobCard({tenantDomain,id}).unwrap();
+        await movetoRecyclebinJobCard({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -121,7 +120,7 @@ const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
                       <th>User type</th>
                       <th>Mobile Number</th>
                       <th>Date</th>
-                      <th colSpan={4}>Action</th>
+                      <th colSpan={5}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -151,17 +150,49 @@ const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
                           )}
 
                           <td>{card?.date}</td>
+                          <td className="text-center">
+                            <Link
+                              to={`/dashboard/qutation?order_no=${card?.job_no}`}
+                              className="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-800 transition-colors group relative"
+                            >
+                              <span className="relative inline-block">
+                                <svg
+                                  className="w-6 h-6 transform group-hover:rotate-[-5deg] transition-transform"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                  />
+                                </svg>
+                              </span>
+                              {/* Tooltip */}
+                              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                Create Quotation
+                              </span>
+                            </Link>
+                          </td>
+
                           <td>
                             <div
                               onClick={() => handleIconPreview(card._id)}
-                              className="flex items-center justify-center cursor-pointer"
+                              className="flex items-center justify-center cursor-pointer group relative"
                             >
                               <FaEye className="h-[22px] w-[22px]" />
+                              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                Preview
+                              </span>
                             </div>
                           </td>
+
                           <td>
                             <a
-                              className="editIconWrap edit2"
+                              className="editIconWrap edit2 group relative"
                               href={`${
                                 import.meta.env.VITE_API_URL
                               }/jobCards/jobcard/${card._id}`}
@@ -169,17 +200,25 @@ const CustomerJobCardList = ({ id, customerId, user_type,tenantDomain }) => {
                               rel="noreferrer"
                             >
                               <FaDownload className="editIcon" />
+                              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                Download
+                              </span>
                             </a>
                           </td>
+
                           <td>
-                            <div className="editIconWrap edit">
+                            <div className="editIconWrap edit group relative">
                               <Link
                                 to={`/dashboard/update-jobcard?id=${card._id}&user_type=${user_type}&user=${id}`}
                               >
                                 <FaEdit className="editIcon" />
                               </Link>
+                              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                Edit Job Card
+                              </span>
                             </div>
                           </td>
+
                           <td>
                             <button
                               disabled={deleteLoading}

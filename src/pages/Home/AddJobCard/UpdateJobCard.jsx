@@ -481,11 +481,9 @@ const UpdateJobCard = () => {
   };
 
   const handleOptionClick = (option) => {
-    setYearSelectInput(option.value);
+    setYearSelectInput(option.label);
     setFilteredOptions([]);
-    setVModelValue("vehicle_model", option.label, {
-      shouldValidate: true,
-    });
+    setVModelValue("vehicle_model", option.label);
   };
 
   const handleDateChange = (event) => {
@@ -544,6 +542,15 @@ const UpdateJobCard = () => {
   useEffect(() => {
     setCurrentMileage(getLatestMileage());
   }, [getDataWithChassisNo]);
+
+  useEffect(() => {
+    if (getDataWithChassisNo?.vehicle_model) {
+      setYearSelectInput(getDataWithChassisNo.vehicle_model.toString());
+      setVModelValue("vehicle_model", getDataWithChassisNo.vehicle_model);
+    } else {
+      setYearSelectInput("");
+    }
+  }, [getDataWithChassisNo?.vehicle_model, setVModelValue]);
 
   if (isLoading) {
     return (
@@ -938,15 +945,6 @@ const UpdateJobCard = () => {
                           />
                         </div>
                       </Grid>
-
-                      <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <TextField
-                          fullWidth
-                          label="Reference Name (T) "
-                          {...register("reference_name")}
-                          focused={singleCard?.company?.reference_name || ""}
-                        />
-                      </Grid>
                     </Grid>
                   </Box>
                 ) : singleCard?.user_type === "showRoom" ? (
@@ -1058,7 +1056,7 @@ const UpdateJobCard = () => {
                           fullWidth
                           label="Reference Name (T) "
                           {...register("reference_name")}
-                          focused={singleCard?.showRoom?.reference_name || ""}
+                          focused={singleCard?.company?.reference_name || ""}
                         />
                       </Grid>
                     </Grid>
@@ -1170,7 +1168,7 @@ const UpdateJobCard = () => {
                     getOptionLabel={(option) => option || ""}
                   />
                 </Grid>
-                <Grid item lg={12} md={12} sm={12} xs={12}>
+                {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mt-3 relative">
                     <input
                       // value={yearSelectInput}
@@ -1180,6 +1178,31 @@ const UpdateJobCard = () => {
                       className="border  border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
                       placeholder="Vehicle Model"
                       value={getDataWithChassisNo?.vehicle_model}
+                    />
+                    {yearSelectInput && (
+                      <ul className="options-list">
+                        {filteredOptions.map((option, index) => (
+                          <li
+                            key={index}
+                            onClick={() => handleOptionClick(option)}
+                          >
+                            {option.label}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  
+                </Grid> */}
+                <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <div className="mt-3 relative">
+                    <input
+                      onInput={handleYearSelectInput}
+                      {...register("vehicle_model")}
+                      type="text"
+                      className="border border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
+                      placeholder="Vehicle Model"
+                      value={yearSelectInput}
                     />
                     {yearSelectInput && (
                       <ul className="options-list">
@@ -1224,32 +1247,6 @@ const UpdateJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {/* <TextField
-                    fullWidth
-                    {...register("mileage", {
-                      required: "Mileage is required!",
-                    })}
-                    label="Current Mileage (KM)"
-                    type="number"
-                    focused={currentMileage || singleCard?.mileage || ""}
-                    defaultValue={currentMileage || singleCard?.mileage || ""}
-                    onChange={(e) => {
-                      const newMileage = e.target.value;
-                      setCurrentMileage(newMileage);
-                      const lastMileage =
-                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
-                          ?.mileage;
-                      if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true);
-                      } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true);
-                      } else {
-                        setMileageChanged(false);
-                      }
-                    }}
-                    error={!!errors.mileage}
-                    helperText={errors.mileage?.message}
-                  /> */}
                   <TextField
                     fullWidth
                     label="Current Mileage (KM)"

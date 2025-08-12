@@ -28,8 +28,8 @@ const Detail = () => {
     content: () => componentRef.current,
   });
 
-  const [invoicePreview, setInvoicePreview] = useState({})
-  const [loading, setLoading] = useState(false);
+  const [invoicePreview, setInvoicePreview] = useState({});
+  console.log(invoicePreview);
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
       ? invoicePreview?.net_total
@@ -65,26 +65,30 @@ const Detail = () => {
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#351E98] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src= {CompanyInfoData?.data?.logo} alt="logo" />
+                  <img
+                    className="w-[120px] "
+                    src={CompanyInfoData?.data?.logo}
+                    alt="logo"
+                  />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                     {CompanyInfoData?.data?.companyName}
+                      {CompanyInfoData?.data?.companyName}
                     </h2>
                     <small className="block">
-                      Office:  {CompanyInfoData?.data?.address}
+                      Office: {CompanyInfoData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> 
-                     {CompanyInfoData?.data?.phone}
+                      <small className="font-bold">Mobile:</small>
+                      {CompanyInfoData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                     {CompanyInfoData?.data?.email}
+                      {CompanyInfoData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                       {CompanyInfoData?.data?.website}
+                      {CompanyInfoData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -237,7 +241,7 @@ const Detail = () => {
                       <small>
                         {" "}
                         <span className="mr-1">:</span>
-                        {invoicePreview?.vehicle?.mileageHistory?.[0]?.mileage}
+                        {invoicePreview?.mileage}
                       </small>
                     </div>
                   </div>

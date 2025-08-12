@@ -71,6 +71,7 @@ export const vehicleTypes = [
   { label: "Hatchback", value: "Hatchback" },
   { label: "Microbus", value: "Microbus" },
 ];
+
 export const vehicleModels = [];
 
 for (let year = 1920; year <= 2024; year++) {
