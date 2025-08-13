@@ -37,7 +37,7 @@ const JobcardTable = () => {
     phone: profileData?.data?.phone,
     email: profileData?.data?.email,
     logo: profileData?.data?.logo[0],
-    companyNameBN:profileData?.companyNameBN, 
+    companyNameBN:profileData?.data?.companyNameBN, 
   };
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
