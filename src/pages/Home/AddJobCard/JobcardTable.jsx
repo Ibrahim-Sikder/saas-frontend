@@ -220,7 +220,9 @@ const JobcardTable = () => {
                                   import.meta.env.VITE_API_URL
                                 }/jobCards/jobcard/${
                                   card._id
-                                }?companyName=${encodeURIComponent(
+                                }?tenantDomain=${encodeURIComponent(
+                                  tenantDomain
+                                )}&companyName=${encodeURIComponent(
                                   companyProfileData?.company_name || ""
                                 )}&address=${encodeURIComponent(
                                   companyProfileData?.address || ""
