@@ -10,20 +10,10 @@ import {
   useGetAllJobCardsQuery,
   useMovetoRecyclebinJobCardMutation,
 } from "../../../redux/api/jobCard";
-import {
-  Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-} from "@mui/material";
+import { Pagination } from "@mui/material";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const JobcardTable = () => {
   const location = useLocation();
@@ -36,9 +26,11 @@ const JobcardTable = () => {
 
   const limit = 10;
   const tenantDomain = useTenantDomain();
+  const { data: companyProfileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
-
-
+  console.log("company data", companyProfileData);
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
       tenantDomain,
@@ -53,7 +45,6 @@ const JobcardTable = () => {
 
   const [mileageDialogOpen, setMileageDialogOpen] = useState(false);
   const [selectedVehicleMileage, setSelectedVehicleMileage] = useState(null);
-
 
   const handleCloseMileageDialog = () => {
     setMileageDialogOpen(false);
@@ -100,7 +91,7 @@ const JobcardTable = () => {
             <h3 className="txt-center text-xl font-bold md:text-3xl">
               Job Card List:
             </h3>
-            <div className="flex flex-wrap items-center">
+            <div className="flex  items-center">
               <input
                 onChange={(e) => {
                   setFilterType(e.target.value);
@@ -108,7 +99,7 @@ const JobcardTable = () => {
                 }}
                 type="text"
                 placeholder="Search"
-                className="border py-2 px-2 md:px-3 rounded-md border-[#ddd]"
+                className="border py-2 px-2 md:px-3 rounded-md border-[#ddd] w-[230px] md:w-full"
                 ref={textInputRef}
               />
 
@@ -144,7 +135,6 @@ const JobcardTable = () => {
                         <th>Vehicle Name</th>
                         <th>Car Reg Num </th>
                         <th>Vehicle Brand</th>
-                        {/* <th>Mileage History</th> */}
                         <th>Mobile Number</th>
                         <th>Date</th>
                         <th colSpan={5}>Action</th>
@@ -230,7 +220,17 @@ const JobcardTable = () => {
                                   import.meta.env.VITE_API_URL
                                 }/jobCards/jobcard/${
                                   card._id
-                                }?tenantDomain=${tenantDomain}`}
+                                }?companyName=${encodeURIComponent(
+                                  companyProfileData?.company_name || ""
+                                )}&address=${encodeURIComponent(
+                                  companyProfileData?.address || ""
+                                )}&phone=${encodeURIComponent(
+                                  companyProfileData?.phone || ""
+                                )}&email=${encodeURIComponent(
+                                  companyProfileData?.email || ""
+                                )}&website=${encodeURIComponent(
+                                  companyProfileData?.website || ""
+                                )}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
@@ -245,7 +245,6 @@ const JobcardTable = () => {
                                 <FaEye className="h-[22px] w-[22px]" />
                               </div>
                             </td>
-
                             <td>
                               <div className="editIconWrap edit">
                                 <Link
@@ -283,7 +282,6 @@ const JobcardTable = () => {
           </div>
         </div>
       </div>
- 
     </div>
   );
 };
