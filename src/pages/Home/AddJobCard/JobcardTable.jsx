@@ -214,19 +214,6 @@ const JobcardTable = () => {
                               </Link>
                             </td>
 
-                             {/* <td>
-                              <a
-                                className="editIconWrap edit2"
-                                href={`${
-                                  import.meta.env.VITE_API_URL
-                                }/jobCards/jobcard/${card._id}?tenantDomain=${tenantDomain}`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                <FaDownload className="editIcon" />
-                              </a>
-                            </td> */}
-
                             <td>
                               <a
                                 className="editIconWrap edit2"
@@ -234,16 +221,8 @@ const JobcardTable = () => {
                                   import.meta.env.VITE_API_URL
                                 }/jobCards/jobcard/${
                                   card._id
-                                }?tenantDomain=${tenantDomain}&companyName=${encodeURIComponent(
-                                  companyProfileData?.company_name || ""
-                                )}&address=${encodeURIComponent(
-                                  companyProfileData?.address || ""
-                                )}&phone=${encodeURIComponent(
-                                  companyProfileData?.phone || ""
-                                )}&email=${encodeURIComponent(
-                                  companyProfileData?.email || ""
-                                )}&website=${encodeURIComponent(
-                                  companyProfileData?.website || ""
+                                }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                  JSON.stringify(companyProfileData?.data)
                                 )}`}
                                 target="_blank"
                                 rel="noreferrer"
