@@ -564,7 +564,7 @@ const EmployeeProfile = () => {
                 fontWeight: "bold",
               }}
             >
-              © Copyright 2024 | Softypy Garage | All Rights Reserved
+              © Copyright 2024 | Garage Master | All Rights Reserved
             </Typography>
           </Box>
         </div>

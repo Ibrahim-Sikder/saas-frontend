@@ -207,7 +207,7 @@ const CustomerProfile = () => {
 
         <div>
           <p className="my-5 text-center">
-            © Copyright 2024 | Softypy Garage | All Rights Reserved
+            © Copyright 2024 | Garage Master | All Rights Reserved
           </p>
         </div>
       </div>

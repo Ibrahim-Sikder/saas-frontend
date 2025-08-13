@@ -213,6 +213,20 @@ const JobcardTable = () => {
                                 </span>
                               </Link>
                             </td>
+
+                             {/* <td>
+                              <a
+                                className="editIconWrap edit2"
+                                href={`${
+                                  import.meta.env.VITE_API_URL
+                                }/jobCards/jobcard/${card._id}?tenantDomain=${tenantDomain}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <FaDownload className="editIcon" />
+                              </a>
+                            </td> */}
+
                             <td>
                               <a
                                 className="editIconWrap edit2"
@@ -220,9 +234,7 @@ const JobcardTable = () => {
                                   import.meta.env.VITE_API_URL
                                 }/jobCards/jobcard/${
                                   card._id
-                                }?tenantDomain=${encodeURIComponent(
-                                  tenantDomain
-                                )}&companyName=${encodeURIComponent(
+                                }?tenantDomain=${tenantDomain}&companyName=${encodeURIComponent(
                                   companyProfileData?.company_name || ""
                                 )}&address=${encodeURIComponent(
                                   companyProfileData?.address || ""
