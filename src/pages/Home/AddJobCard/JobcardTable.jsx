@@ -26,11 +26,17 @@ const JobcardTable = () => {
 
   const limit = 10;
   const tenantDomain = useTenantDomain();
-  const { data: companyProfileData } = useGetCompanyProfileQuery({
+  const { data: profileData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
 
-  console.log("company data", companyProfileData);
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+  };
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
       tenantDomain,
@@ -222,7 +228,7 @@ const JobcardTable = () => {
                                 }/jobCards/jobcard/${
                                   card._id
                                 }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
-                                  JSON.stringify(companyProfileData?.data)
+                                  JSON.stringify(companyProfileData)
                                 )}`}
                                 target="_blank"
                                 rel="noreferrer"
