@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -26,7 +25,7 @@ import Loading from "../../../components/Loading/Loading";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import TodayAttendance from "./TodayAttendance";
 import dayjs from "dayjs";
-
+import swal from "sweetalert";
 const AttendanceList = () => {
   const [filterType, setFilterType] = useState("");
   const [stats, setStats] = useState({
@@ -55,7 +54,6 @@ const AttendanceList = () => {
   const [deleteAttendance, { isLoading }] = useDeleteAttendanceMutation();
 
   useEffect(() => {
-    // Calculate statistics when data changes
     if (allAttendance?.data?.records) {
       const totalRecords = allAttendance.data.records.length;
       const totalPresent = allAttendance.data.records.reduce(
@@ -90,21 +88,33 @@ const AttendanceList = () => {
   };
 
 const handleDeleteFilter = async (date) => {
+  const formattedDate = dayjs(date, ["DD-MM-YYYY", "DD-MM-YY"]).format("DD-MM-YYYY");
 
-  const formattedDate = dayjs(date).format("DD-MM-YYYY");
+  // Show confirmation dialog
+  const willDelete = await swal({
+    title: "Are you sure?",
+    text: `You want to delete attendance for ${formattedDate}?`,
+    icon: "warning",
+    dangerMode: true,
+    buttons: ["Cancel", "Yes, Delete"],
+  });
 
-  try {
-    const response = await deleteAttendance({
-      tenantDomain,
-      attendanceInfo: { date: formattedDate },
-    }).unwrap();
+  if (willDelete) {
+    try {
+      const response = await deleteAttendance({
+        tenantDomain,
+        date: formattedDate, // send directly
+      }).unwrap();
 
-    if (response.success) {
-      toast.success(response.message);
-      refetch();
+      if (response.success) {
+        swal("Deleted!", `Attendance for ${formattedDate} has been deleted.`, "success");
+        refetch();
+      } else {
+        swal("Error", response.message || "Failed to delete attendance", "error");
+      }
+    } catch (error) {
+      swal("Error", error.message || "Failed to delete attendance", "error");
     }
-  } catch (error) {
-    toast.error(error.message || "Failed to delete attendance");
   }
 };
 
@@ -122,7 +132,6 @@ const handleDeleteFilter = async (date) => {
       <div className="mt-12">
         <TodayAttendance />
       </div>
-
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between my-10">

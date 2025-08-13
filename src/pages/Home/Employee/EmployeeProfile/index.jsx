@@ -16,7 +16,6 @@ import {
   Divider,
   IconButton,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -34,7 +33,6 @@ import EmployeeAccount from "./EmployeeAccount";
 import SingleEmployeeLeaveList from "./SingleEmployeeLeaveList";
 import EmployeeSalary from "./EmployeeSalary";
 import EmployeeOvertime from "./EmployeeOvertime";
-import EmployeeHoliday from "./EmployeeHoliday";
 import EmployeeAttendance from "./EmployeeAttendance";
 import "../Employee.css";
 import avatar from "../../../../../public/assets/chat3.jpg";
@@ -72,7 +70,6 @@ const EmployeeProfile = () => {
     tenantDomain,
     id,
   });
-
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

@@ -37,17 +37,14 @@ const attendanceApi = baseApi.injectEndpoints({
       providesTags: ["attendance"],
     }),
 
- deleteAttendance: builder.mutation({
-  query: ({ tenantDomain, date }) => ({
-    url: "/attendances/remove",
-    method: "DELETE",
-    params: { tenantDomain, date },
-  }),
-  invalidatesTags: ["attendance"],
-}),
-
-
-
+    deleteAttendance: builder.mutation({
+      query: ({ tenantDomain, date }) => ({
+        url: "/attendances/remove",
+        method: "DELETE",
+        params: { tenantDomain, date },
+      }),
+      invalidatesTags: ["attendance"],
+    }),
   }),
 });
 

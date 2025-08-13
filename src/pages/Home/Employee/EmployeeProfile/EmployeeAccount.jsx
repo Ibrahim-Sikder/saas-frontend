@@ -3,6 +3,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 const EmployeeAccount = ({ accountInfo }) => {
   const myAttendance = accountInfo?.attendance;
+  console.log("account info", accountInfo);
 
   const absentEntries = myAttendance?.filter(
     (attendance) => attendance.absent
@@ -51,15 +52,14 @@ const EmployeeAccount = ({ accountInfo }) => {
                     value={66}
                     text={`${66}%`}
                     styles={{
-                     
                       path: {
-                        stroke: `#60BE6B`, 
+                        stroke: `#60BE6B`,
                       },
-                   
+
                       text: {
-                        fill: "#3e98c7", 
+                        fill: "#3e98c7",
                       },
-                    
+
                       trail: {
                         stroke: "#f4f4f4",
                       },
@@ -79,15 +79,14 @@ const EmployeeAccount = ({ accountInfo }) => {
                     value={96}
                     text={`${96}%`}
                     styles={{
-                 
                       path: {
-                        stroke: `#60BE6B`, 
+                        stroke: `#60BE6B`,
                       },
-              
+
                       text: {
                         fill: "#3e98c7",
                       },
-                 
+
                       trail: {
                         stroke: "#f4f4f4",
                       },
@@ -107,17 +106,16 @@ const EmployeeAccount = ({ accountInfo }) => {
                     value={absentPercentageNumber}
                     text={`${absentPercentageNumber}%`}
                     styles={{
-                 
                       path: {
                         stroke: `#F62D51`,
                       },
-                    
+
                       text: {
-                        fill: "#3e98c7", 
+                        fill: "#3e98c7",
                       },
-                  
+
                       trail: {
-                        stroke: "#f4f4f4", 
+                        stroke: "#f4f4f4",
                       },
                     }}
                   />
@@ -135,17 +133,16 @@ const EmployeeAccount = ({ accountInfo }) => {
                     value={20}
                     text={`${20}%`}
                     styles={{
- 
                       path: {
                         stroke: `#FF851A`,
                       },
-                   
+
                       text: {
-                        fill: "#3e98c7", 
+                        fill: "#3e98c7",
                       },
-                 
+
                       trail: {
-                        stroke: "#f4f4f4", 
+                        stroke: "#f4f4f4",
                       },
                     }}
                   />
@@ -163,15 +160,14 @@ const EmployeeAccount = ({ accountInfo }) => {
                     value={latePercentageNumber}
                     text={`${latePercentageNumber}%`}
                     styles={{
-                      
                       path: {
-                        stroke: `#FF851A`, 
+                        stroke: `#FF851A`,
                       },
-              
+
                       text: {
-                        fill: "#3e98c7", 
+                        fill: "#3e98c7",
                       },
-                 
+
                       trail: {
                         stroke: "#f4f4f4",
                       },

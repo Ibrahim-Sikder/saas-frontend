@@ -68,7 +68,7 @@ const AddAttendance = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const limit = 9999;
   const tenantDomain = useTenantDomain();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const {
     data: getAllEmployee,
@@ -202,18 +202,14 @@ const AddAttendance = () => {
         };
       }
     );
-
     try {
       const response = await createAttendance({
         tenantDomain,
         payload: newAttendanceData,
       }).unwrap();
-
-
-
       if (response.success) {
         toast.success(response.message);
-        navigate('/dashboard/attendance-list')
+        navigate("/dashboard/attendance-list");
       }
     } catch (error) {
       toast.error(error.message || "Something went wrong");
@@ -577,8 +573,6 @@ const AddAttendance = () => {
       </div>
 
       {/* Today's Attendance and Attendance List */}
-      
-     
     </div>
   );
 };
