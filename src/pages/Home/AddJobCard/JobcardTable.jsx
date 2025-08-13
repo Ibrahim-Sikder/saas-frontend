@@ -36,6 +36,7 @@ const JobcardTable = () => {
     website: profileData?.data?.website,
     phone: profileData?.data?.phone,
     email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0]
   };
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
@@ -48,14 +49,6 @@ const JobcardTable = () => {
 
   const [movetoRecyclebinJobCard, { isLoading: movedLoading }] =
     useMovetoRecyclebinJobCardMutation();
-
-  const [mileageDialogOpen, setMileageDialogOpen] = useState(false);
-  const [selectedVehicleMileage, setSelectedVehicleMileage] = useState(null);
-
-  const handleCloseMileageDialog = () => {
-    setMileageDialogOpen(false);
-    setSelectedVehicleMileage(null);
-  };
 
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/preview?id=${e}`);
