@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { Box, Typography, Paper, Grid, useTheme, Divider } from "@mui/material";
+import { Box, Typography, Grid, Divider } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import WeekendIcon from "@mui/icons-material/Weekend";
@@ -10,11 +10,11 @@ import { GlowingBorder, IconWrapper } from "../../../../utils/customStyle";
 import { useGetSingleEmployeeOvertimeQuery } from "../../../../redux/api/overtimeApi";
 import Loading from "../../../../components/Loading/Loading";
 
-const EmployeeOvertime = ({ tenantDomain, id }) => {
-  const theme = useTheme();
+const EmployeeOvertime = ({ accountInfo, tenantDomain, id }) => {
+  console.log("account info", accountInfo);
   const { data, isLoading } = useGetSingleEmployeeOvertimeQuery({
     tenantDomain,
-    overtimeId:id,
+    overtimeId: id,
   });
   if (isLoading) {
     return <Loading />;
