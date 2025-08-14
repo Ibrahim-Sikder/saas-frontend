@@ -19,7 +19,12 @@ import { Pagination, Tooltip } from "@mui/material";
 import { AddCircleOutline, Money } from "@mui/icons-material";
 import { HiOutlinePlus } from "react-icons/hi";
 import { getRowClass } from "../../../../utils/getRowClass";
-const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
+const CustomerInvoiceList = ({
+  id,
+  user_type,
+  tenantDomain,
+  companyProfileData,
+}) => {
   const [filterType, setFilterType] = useState("");
 
   const [limit, setLimit] = useState(10);
@@ -212,7 +217,11 @@ const CustomerInvoiceList = ({ id, user_type, tenantDomain }) => {
                                 className="editIconWrap edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
-                                }/invoices/invoice/${card._id}`}
+                                }/invoices/invoice/${
+                                  card._id
+                                }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                  JSON.stringify(companyProfileData)
+                                )}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

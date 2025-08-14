@@ -21,7 +21,7 @@ import {
 import { Pagination, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
 import { HiOutlinePlus } from "react-icons/hi";
-const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain }) => {
+const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, companyProfileData }) => {
   const [filterType, setFilterType] = useState("");
 
   const [limit, setLimit] = useState(10);
@@ -237,7 +237,9 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain }) => {
                                 className="editIconWrap edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
-                                }/quotations/quotation/${card._id}`}
+                                }/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                    JSON.stringify(companyProfileData)
+                                  )}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

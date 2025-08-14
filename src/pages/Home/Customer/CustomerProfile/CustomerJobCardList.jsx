@@ -13,7 +13,13 @@ import { Pagination } from "@mui/material";
 import Loading from "../../../../components/Loading/Loading";
 import car from "../../../../../src/assets/jobcard/car-repair.png";
 import EmptyCustomerData from "../../../../components/EmptyCustomerData/EmptyCustomerData";
-const CustomerJobCardList = ({ id, customerId, user_type, tenantDomain }) => {
+const CustomerJobCardList = ({
+  id,
+  customerId,
+  user_type,
+  tenantDomain,
+  companyProfileData,
+}) => {
   const [filterType, setFilterType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
@@ -195,7 +201,11 @@ const CustomerJobCardList = ({ id, customerId, user_type, tenantDomain }) => {
                               className="editIconWrap edit2 group relative"
                               href={`${
                                 import.meta.env.VITE_API_URL
-                              }/jobCards/jobcard/${card._id}`}
+                              }/jobCards/jobcard/${
+                                card._id
+                              }??tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                JSON.stringify(companyProfileData)
+                              )}`}
                               target="_blank"
                               rel="noreferrer"
                             >

@@ -19,6 +19,7 @@ import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 import CustomerNote from "./CustomerNote";
+import { useGetCompanyProfileQuery } from "../../../../redux/api/companyProfile";
 
 const CustomerProfile = () => {
   const location = useLocation();
@@ -46,6 +47,19 @@ const CustomerProfile = () => {
     error: customerError,
   } = useGetSingleCustomerQuery({ id, tenantDomain });
 
+  const { data } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+
+  const companyProfileData = {
+    companyName: data?.data?.companyName,
+    address: data?.data?.address,
+    website: data?.data?.website,
+    phone: data?.data?.phone,
+    email: data?.data?.email,
+    logo: data?.data?.logo[0],
+    companyNameBN: data?.data?.companyNameBN,
+  };
   if (isLoading) {
     return <Loading />;
   }
@@ -157,7 +171,10 @@ const CustomerProfile = () => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <CustomerAccount  tenantDomain={tenantDomain} profileData={profileData} />
+          <CustomerAccount
+            tenantDomain={tenantDomain}
+            profileData={profileData}
+          />
         </TabPanel>
 
         <TabPanel value={value} index={1}>
@@ -170,6 +187,7 @@ const CustomerProfile = () => {
 
         <TabPanel value={value} index={2}>
           <CustomerJobCardList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             customerId={profileData?.data?.customerId}
             user_type={profileData?.data?.user_type}
@@ -178,6 +196,7 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <CustomerQoutationList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
@@ -185,14 +204,15 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={4}>
           <CustomerInvoiceList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
-          
         </TabPanel>
         <TabPanel value={value} index={5}>
           <CustomerMoneyList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
