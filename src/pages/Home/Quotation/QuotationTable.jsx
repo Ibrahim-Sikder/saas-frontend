@@ -231,13 +231,7 @@ const QuotationTable = () => {
                               >
                                 <a
                                   className="editIconWrap edit2"
-                                  href={`/dashboard/invoice?order_no=${
-                                    card?.job_no
-                                  }&id=${
-                                    card._id
-                                  }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
-                                    JSON.stringify(companyProfileData)
-                                  )}`}
+                                  href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
                                   rel="noreferrer"
                                 >
                                   <FaFileInvoice className="editIcon" />
@@ -257,7 +251,9 @@ const QuotationTable = () => {
                                     import.meta.env.VITE_API_URL
                                   }/quotations/quotation/${
                                     card._id
-                                  }?tenantDomain=${tenantDomain}`}
+                                  }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                    JSON.stringify(companyProfileData)
+                                  )}`}
                                   target="_blank"
                                   rel="noreferrer"
                                 >
