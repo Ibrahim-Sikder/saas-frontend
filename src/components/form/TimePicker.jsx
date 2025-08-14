@@ -12,7 +12,6 @@ const TASTimePicker = ({
   fullWidth = true,
   margin = "normal",
   sx,
-  value,
   disableFuture = true,
 }) => {
   const { control } = useFormContext();
@@ -21,30 +20,29 @@ const TASTimePicker = ({
     <Controller
       name={name}
       control={control}
-      defaultValue={dayjs().format("HH:mm")}
-      render={({ field: { onChange, value, ...field } }) => {
-        const timeValue = value ? dayjs(field?.value, "HH:mm") : dayjs();
-      
+      defaultValue={dayjs().format("HH:mm")} // stored in HH:mm format
+      render={({ field: { onChange, value } }) => {
+        // Always convert stored value (string) to dayjs object for picker
+        const pickerValue = value ? dayjs(value, "HH:mm") : null;
+
         return (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <TimePicker
               label={label}
-              {...field}
-              defaultValue={value}
-              value={value ? dayjs(value, "HH:mm") : null}
+              value={pickerValue}
               onChange={(time) => {
-                const finalTime = time || dayjs();
-                onChange(finalTime.format("HH:mm"));
+                if (time && time.isValid()) {
+                  onChange(time.format("HH:mm")); // store as HH:mm string
+                } else {
+                  onChange(""); // clear value
+                }
               }}
               slotProps={{
                 textField: {
-                  required: required,
-                  sx: {
-                    ...sx,
-                  },
-
-                  fullWidth: fullWidth,
-                  margin: margin,
+                  required,
+                  sx: { ...sx },
+                  fullWidth,
+                  margin,
                 },
               }}
             />

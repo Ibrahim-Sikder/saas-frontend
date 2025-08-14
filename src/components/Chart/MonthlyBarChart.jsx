@@ -33,17 +33,21 @@ const monthNames = [
 export default function StackBars() {
   const tenantDomain = useTenantDomain();
 
-  const { data: expenseData, isLoading: expenseLoading } = useGetAllExpensesQuery({
-    tenantDomain,
-    limit: 10,
-    page: 1,
-  });
+  const { data: expenseData, isLoading: expenseLoading } =
+    useGetAllExpensesQuery({
+      tenantDomain,
+      limit: 10,
+      page: 1,
+    });
+
+  console.log("expense data ", expenseData);
 
   const { data: incomeData, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,
     limit: 10,
     page: 1,
   });
+  console.log("income data ", incomeData);
 
   if (incomeLoading || expenseLoading) {
     return <Loading />;

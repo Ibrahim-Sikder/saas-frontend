@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import React, { useState } from "react";  // Import useState
 import "./Home.css";
 import MonthlyBarChart from "../../components/Chart/MonthlyBarChart";
 import YearlyIncomeChart from "../../components/Chart/YearlyIncomeChart";
@@ -10,13 +11,13 @@ import RecentProject from "./Dashboard/RecentProject";
 import RcentQuotation from "./Dashboard/RcentQuotation";
 import RecentInvoice from "./Dashboard/RecentInvoice";
 import EmployeeStatistics from "./Dashboard/EmployeeStatistics";
-
 import { useTenantDomain } from "../../hooks/useTenantDomain";
 import { useGetAllMetaQuery } from "../../redux/api/meta.api";
 import DashboardSummary from "./Dashboard/IncomeCard";
 import Loading from "../../components/Loading/Loading";
 
 const Home = () => {
+  const [showSensitiveData, setShowSensitiveData] = useState(false);
   const tenantDomain = useTenantDomain();
   const {
     data: allMetaData,
@@ -27,6 +28,7 @@ const Home = () => {
   if (isLoading) {
     return <Loading />;
   }
+
   return (
     <div className="mt-10 ">
       <div className="flex items-center justify-between">
@@ -34,9 +36,22 @@ const Home = () => {
           <h3 className="md:text-3xl font-bold">Welcome Admin !</h3>
           <span className="text-sm">Home / Dashboard</span>
         </div>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setShowSensitiveData(!showSensitiveData)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {showSensitiveData ? "Hide Sensitive Data" : "Show Sensitive Data"}
+        </button>
       </div>
-      <AllServices />
-      <DashboardSummary data={allMetaData?.data} />
+
+      {/* Conditionally render sensitive sections */}
+      {showSensitiveData && (
+        <>
+          <AllServices />
+          <DashboardSummary data={allMetaData?.data} />
+        </>
+      )}
 
       <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />

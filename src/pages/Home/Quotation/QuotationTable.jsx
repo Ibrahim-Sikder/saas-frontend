@@ -90,6 +90,7 @@ const QuotationTable = () => {
     }
   };
 
+  console.log("all quotation data", allQuotations);
   useEffect(() => {
     if (search) {
       setFilterType(search);
@@ -165,7 +166,7 @@ const QuotationTable = () => {
                         let rowClass = "";
                         if (card.status === "running") {
                           rowClass = "bg-[#f5365c] text-white";
-                        } else if (card.status === "completed") {
+                        } else{
                           rowClass = "bg-[#2dce89] text-white";
                         }
                         return (

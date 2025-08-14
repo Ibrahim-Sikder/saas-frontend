@@ -32,6 +32,7 @@ import TASInput from "../../../components/form/Input";
 import ImageUpload from "../../../components/form/ImageUpload";
 import { toast } from "react-toastify";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import TASTimePicker from "../../../components/form/TimePicker";
 
 export default function CompanyProfileModal({ profileData, open, onClose }) {
   const tenantDomain = useTenantDomain();
@@ -42,49 +43,46 @@ export default function CompanyProfileModal({ profileData, open, onClose }) {
   const isUpdateMode = Boolean(profileData?._id);
 
   const handleSave = async (formData) => {
+    try {
+      const finalLogo =
+        Array.isArray(formData.logo) && Array.isArray(formData.logo[0])
+          ? formData.logo[0]
+          : formData.logo;
 
-  try {
+      const payload = {
+        ...formData,
+        logo: finalLogo,
+      };
 
-    const finalLogo =
-      Array.isArray(formData.logo) && Array.isArray(formData.logo[0])
-        ? formData.logo[0]
-        : formData.logo;
+      if (isUpdateMode) {
+        const res = await updateCompanyProfile({
+          tenantDomain,
+          id: profileData._id,
+          data: payload,
+        }).unwrap();
 
-    const payload = {
-      ...formData,
-      logo: finalLogo, 
-    };
+        if (res.success) {
+          toast.success("Company profile updated successfully!");
+          onClose();
+        }
+      } else {
+        const res = await createCompanyProfile({
+          tenantDomain,
+          data: payload,
+        }).unwrap();
 
-    if (isUpdateMode) {
-      const res = await updateCompanyProfile({
-        tenantDomain,
-        id: profileData._id,
-        data: payload,
-      }).unwrap();
-
-      if (res.success) {
-        toast.success("Company profile updated successfully!");
-        onClose();
+        if (res.success) {
+          toast.success("Company profile created successfully!");
+          onClose();
+        }
       }
-    } else {
-      const res = await createCompanyProfile({
-        tenantDomain,
-        data: payload,
-      }).unwrap();
-
-      if (res.success) {
-        toast.success("Company profile created successfully!");
-        onClose();
-      }
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        isUpdateMode ? "Failed to update profile" : "Failed to create profile"
+      );
     }
-  } catch (err) {
-    console.error(err);
-    toast.error(
-      isUpdateMode ? "Failed to update profile" : "Failed to create profile"
-    );
-  }
-};
-
+  };
 
   const handleClose = () => onClose();
 
@@ -98,6 +96,7 @@ export default function CompanyProfileModal({ profileData, open, onClose }) {
     phone: profileData?.phone || "",
     website: profileData?.website || "",
     whatsapp: profileData?.whatsapp || "",
+    officeTime: profileData?.officeTime || 10.00 ,
   };
 
   return (
@@ -206,6 +205,13 @@ export default function CompanyProfileModal({ profileData, open, onClose }) {
                   <TASInput
                     name="website"
                     label="Website URL"
+                    icon={WebsiteIcon}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TASTimePicker
+                    name="officeTime"
+                    label="Start Time"
                     icon={WebsiteIcon}
                   />
                 </Grid>

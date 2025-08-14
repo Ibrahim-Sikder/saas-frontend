@@ -6,11 +6,10 @@ import {
   TrendingUp,
   TrendingDown,
   Receipt,
-  Assessment,
+
 } from "@mui/icons-material";
 
 const DashboardSummary = ({ data }) => {
-
 
   return (
     <Box p={2}>
@@ -22,7 +21,7 @@ const DashboardSummary = ({ data }) => {
           </Typography>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Card sx={{ backgroundColor: "#e8f5e9", boxShadow: 3 }}>
             <CardContent>
               <Box display="flex" alignItems="center" gap={1}>
@@ -36,7 +35,7 @@ const DashboardSummary = ({ data }) => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Card sx={{ backgroundColor: "#f1f8e9", boxShadow: 3 }}>
             <CardContent>
               <Box display="flex" alignItems="center" gap={1}>
@@ -50,29 +49,15 @@ const DashboardSummary = ({ data }) => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Card sx={{ backgroundColor: "#fff3e0", boxShadow: 3 }}>
             <CardContent>
               <Box display="flex" alignItems="center" gap={1}>
                 <Receipt color="warning" />
-                <Typography fontWeight="bold">Service Income</Typography>
+                <Typography fontWeight="bold">Other Income</Typography>
               </Box>
               <Typography variant="h6">
-                ৳ {data?.incomes?.serviceIncomeAmount.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Card sx={{ backgroundColor: "#ede7f6", boxShadow: 3 }}>
-            <CardContent>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Assessment color="primary" />
-                <Typography fontWeight="bold">Parts Income</Typography>
-              </Box>
-              <Typography variant="h6">
-                ৳ {data?.incomes?.partsIncomeAmount.toLocaleString()}
+                ৳ {data?.incomes?.totalOtherIncome.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
@@ -116,7 +101,7 @@ const DashboardSummary = ({ data }) => {
         <Grid item xs={12} md={4}>
           <Card sx={{ backgroundColor: "#f3e5f5", boxShadow: 3 }}>
             <CardContent>
-              <Typography fontWeight="bold">Total Other Expense</Typography>
+              <Typography fontWeight="bold">Other Expense</Typography>
               <Typography variant="h6">
                 ৳ {data?.expense?.totalOtherExpense.toLocaleString()}
               </Typography>

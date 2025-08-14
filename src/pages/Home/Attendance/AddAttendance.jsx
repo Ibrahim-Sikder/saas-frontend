@@ -47,6 +47,7 @@ import {
 } from "@mui/material";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useNavigate } from "react-router-dom";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 export const columns = [
   "SL No",
@@ -78,6 +79,9 @@ const AddAttendance = () => {
     tenantDomain,
     limit,
     page: currentPage,
+  });
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
   });
 
   const [createAttendance, { isLoading: createLoading, error: createError }] =
@@ -468,7 +472,7 @@ const AddAttendance = () => {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4 text-indigo-500" />
-                            <span>10:00 AM</span>
+                            <span>{profileData?.data?.officeTime}</span>
                           </div>
                         </TableCell>
                         <TableCell>

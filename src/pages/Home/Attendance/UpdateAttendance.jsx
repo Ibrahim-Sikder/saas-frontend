@@ -45,6 +45,7 @@ import {
 import Loading from "../../../components/Loading/Loading";
 import { columns } from "./AddAttendance";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const UpdateAttendance = () => {
   const location = useLocation();
@@ -72,12 +73,15 @@ const UpdateAttendance = () => {
   const [lateStatus, setLateStatus] = useState(
     new Array(employeeAttendance?.length).fill(false)
   );
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
   const {
     data: singleAttendance,
     isLoading: singleAttendanceLoading,
     error: singleAttendanceError,
     refetch,
-  } = useGetSingleAttendanceQuery({tenantDomain, date});
+  } = useGetSingleAttendanceQuery({ tenantDomain, date });
 
   const [updateAttendance, { isLoading: updateLoading, error: updateError }] =
     useCreateAttendanceMutation();
@@ -204,8 +208,10 @@ const UpdateAttendance = () => {
     );
 
     try {
-      const response = await updateAttendance({   tenantDomain,
-      payload: newAttendanceData,}).unwrap();
+      const response = await updateAttendance({
+        tenantDomain,
+        payload: newAttendanceData,
+      }).unwrap();
       if (response.success) {
         toast.success("Attendance update successful.");
         navigate("/dashboard/attendance-list");
@@ -437,7 +443,7 @@ const UpdateAttendance = () => {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4 text-indigo-500" />
-                        <span>10:00 AM</span>
+                        <span>{profileData?.data?.officeTime}</span>
                       </div>
                     </TableCell>
                     <TableCell>

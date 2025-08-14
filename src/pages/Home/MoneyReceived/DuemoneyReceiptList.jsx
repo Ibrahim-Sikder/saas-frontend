@@ -1,4 +1,4 @@
-import { FaDownload, FaFileInvoice } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { FaTrashAlt, FaEdit, FaEye } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -94,7 +94,6 @@ const DuemoneyReceiptList = () => {
     <div className="mt-5 overflow-x-auto">
       <div className="flex items-center justify-between mt-5 mb-8">
         <div className="flex flex-wrap items-center justify-center">
-          <FaFileInvoice className="invoicIcon" />
           <div className="ml-2">
             <h3 className="text-sm font-bold md:text-2xl">Money Receipt</h3>
             <span>
