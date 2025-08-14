@@ -29,6 +29,16 @@ const PreviewJobCard = () => {
     content: () => componentRef.current,
   });
 
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
+
   const previewData = data?.data;
 
   const extractTextFromHTML = (htmlString) => {
@@ -478,7 +488,9 @@ const PreviewJobCard = () => {
           className="bg-[#42A0D9] text-white px-3 py-2  rounded-full mx-2 "
           href={`${import.meta.env.VITE_API_URL}/jobCards/jobcard/${
             previewData?._id
-          }?tenantDomain=${tenantDomain}`}
+          }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+            JSON.stringify(companyProfileData)
+          )}`}
           target="_blank"
           rel="noreferrer"
         >
