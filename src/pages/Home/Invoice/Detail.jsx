@@ -21,6 +21,16 @@ const Detail = () => {
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
@@ -407,7 +417,9 @@ const Detail = () => {
               className="text-[10px]"
               href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
                 invoicePreview._id
-              }?tenantDomain=${tenantDomain}`}
+              }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                JSON.stringify(companyProfileData)
+              )}`}
               target="_blank"
               rel="noreferrer"
             >
