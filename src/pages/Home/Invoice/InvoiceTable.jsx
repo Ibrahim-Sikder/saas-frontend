@@ -12,6 +12,7 @@ import { Pagination, Tooltip } from "@mui/material";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { Money } from "@mui/icons-material";
 import { getRowClass } from "../../../utils/getRowClass";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const InvoiceTable = () => {
   const location = useLocation();
@@ -30,7 +31,19 @@ const InvoiceTable = () => {
 
   const [moveRecycledInvoice, { isLoading: deleteLoading }] =
     useMoveRecycledInvoiceMutation();
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
   const { data: allInvoices, isLoading: invoiceLoading } =
     useGetAllInvoicesQuery({
       tenantDomain,
@@ -120,7 +133,7 @@ const InvoiceTable = () => {
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
 
-                        const rowClass = getRowClass(card);
+                      const rowClass = getRowClass(card);
 
                       return (
                         <tr
@@ -188,7 +201,9 @@ const InvoiceTable = () => {
                                   import.meta.env.VITE_API_URL
                                 }/invoices/invoice/${
                                   card._id
-                                }?tenantDomain=${tenantDomain}`}
+                                }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                  JSON.stringify(companyProfileData)
+                                )}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
