@@ -19,10 +19,19 @@ const Detail = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = useTenantDomain();
-
-  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+  const { data: profileData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
@@ -53,28 +62,28 @@ const Detail = () => {
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
                   <img
                     className="w-[120px] "
-                    src={CompanyInfoData?.data?.logo}
+                    src={profileData?.data?.logo}
                     alt="logo"
                   />
                   <div>
                     <h2 className="trustAutoTitle qoutationTitle">
-                      {CompanyInfoData?.data?.companyName}
+                      {profileData?.data?.companyName}
                     </h2>
                     <small className="block mt-2">
-                      Office: {CompanyInfoData?.data?.address}
+                      Office: {profileData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
                       <small className="font-bold">Mobile:</small>{" "}
-                      {CompanyInfoData?.data?.phone}
+                      {profileData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                      {CompanyInfoData?.data?.email}
+                      {profileData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                      {CompanyInfoData?.data?.website}
+                      {profileData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -217,9 +226,7 @@ const Detail = () => {
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}
-                        {
-                          quotationPreview?.mileage
-                        }
+                        {quotationPreview?.mileage}
                       </small>
                     </div>
                   </div>
@@ -345,7 +352,9 @@ const Detail = () => {
               className="bg-[#42A0D9] text-white px-2 py-1  rounded-full "
               href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${
                 quotationPreview?._id
-              }?tenantDomain=${tenantDomain}`}
+              }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                JSON.stringify(companyProfileData)
+              )}`}
               target="_blank"
               rel="noreferrer"
             >
