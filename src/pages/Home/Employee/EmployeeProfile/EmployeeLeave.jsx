@@ -84,6 +84,10 @@ const EmployeeLeave = () => {
     searchTerm: search,
   });
 
+  console.log('all leave data', data)
+
+
+
 
   return (
     <div className="w-full mt-5 mb-24">

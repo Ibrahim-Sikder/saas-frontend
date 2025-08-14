@@ -35,7 +35,7 @@ const DashboardLeave = () => {
   }
 
   const leaveRequests = data?.data?.leaveRequests || [];
-  console.log("check leave", data);
+
 
   const getStatusStyles = (status) => {
     switch (status) {

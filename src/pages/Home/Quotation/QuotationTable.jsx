@@ -90,7 +90,6 @@ const QuotationTable = () => {
     }
   };
 
-  console.log("all quotation data", allQuotations);
   useEffect(() => {
     if (search) {
       setFilterType(search);
