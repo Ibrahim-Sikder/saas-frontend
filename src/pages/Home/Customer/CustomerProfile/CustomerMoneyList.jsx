@@ -18,7 +18,7 @@ import {
   useGetAllMoneyReceiptsQuery,
   useMoveRecycledMoneyReceiptMutation,
 } from "../../../../redux/api/money-receipt";
-const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
+const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
 
@@ -178,7 +178,9 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
                         className="editIconWrap edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
-                        }/money-receipts/money/${card._id}`}
+                        }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                        JSON.stringify(companyProfileData)
+                      )}`}
                         target="_blank"
                         rel="noreferrer"
                       >

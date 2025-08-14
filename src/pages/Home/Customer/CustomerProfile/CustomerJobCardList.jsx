@@ -203,7 +203,7 @@ const CustomerJobCardList = ({
                                 import.meta.env.VITE_API_URL
                               }/jobCards/jobcard/${
                                 card._id
-                              }??tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                              }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
                                 JSON.stringify(companyProfileData)
                               )}`}
                               target="_blank"
