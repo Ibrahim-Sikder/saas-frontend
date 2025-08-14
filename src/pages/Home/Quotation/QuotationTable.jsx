@@ -25,6 +25,7 @@ import {
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const QuotationTable = () => {
   const location = useLocation();
@@ -41,7 +42,19 @@ const QuotationTable = () => {
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
   };
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
   const [
     moveRecycledQuotation,
     { idLoading: deleteLoading, error: deleteError },
@@ -218,7 +231,13 @@ const QuotationTable = () => {
                               >
                                 <a
                                   className="editIconWrap edit2"
-                                  href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
+                                  href={`/dashboard/invoice?order_no=${
+                                    card?.job_no
+                                  }&id=${
+                                    card._id
+                                  }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                    JSON.stringify(companyProfileData)
+                                  )}`}
                                   rel="noreferrer"
                                 >
                                   <FaFileInvoice className="editIcon" />
