@@ -180,6 +180,7 @@ const MoneyReceiptTable = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
+                      
                       <FaDownload className="editIcon" />
                     </a>
                   </td>

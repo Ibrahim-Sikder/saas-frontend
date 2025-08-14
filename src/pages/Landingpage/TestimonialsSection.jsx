@@ -139,15 +139,7 @@ const TestimonialsSection = ({ testimonials }) => {
                       fontSize: "1.1rem",
                       position: "relative",
                       color: alpha("#ffffff", 0.9),
-                      "&::before": {
-                        content: '"',
-                        fontSize: "4rem",
-                        position: "absolute",
-                        top: -20,
-                        left: -10,
-                        color: alpha("#06b6d4", 0.2),
-                        fontFamily: "serif",
-                      },
+                     
                     }}
                   >
                     {testimonial.content}
