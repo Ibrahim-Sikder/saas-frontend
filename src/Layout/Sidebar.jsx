@@ -560,12 +560,7 @@ const Sidebar = ({ toggle }) => {
 
           <AccordionDetails>
             <div className="accordionTypoGrapy">
-              {/* <div className="flex items-center mb-2">
-                <Dashboard className="mr-2" />
-                <NavLink to="/dashboard/inventory-dashboard">
-                  Inventory Dashboard
-                </NavLink>
-              </div> */}
+              
               {[
                 {
                   icon: <Inventory2 />,
@@ -747,16 +742,11 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
-            {/* <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <AccessTime className="mr-2" />
-                <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
-              </span>
-            </Typography> */}
+            
           </AccordionDetails>
         </Accordion>
 
-        {user.role !== "superadmin" && (
+        {user.role == "superadmin" && (
           <Accordion
             sx={{ paddingBottom: "10px" }}
             className="dashboardAccordion"
