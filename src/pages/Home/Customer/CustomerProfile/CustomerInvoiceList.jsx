@@ -135,6 +135,10 @@ const CustomerInvoiceList = ({
                   </thead>
                   <tbody>
                     {allInvoices?.data?.invoices?.map((card, index) => {
+                      const net_total =
+                        card?.net_total === card?.advance
+                          ? card?.net_total
+                          : card?.due;
                       const globalIndex =
                         (allInvoices?.data?.meta?.currentPage - 1) * limit +
                         (index + 1);
@@ -178,7 +182,7 @@ const CustomerInvoiceList = ({
                             >
                               <a
                                 className="editIconWrap edit2"
-                                href={`/dashboard/money-receive?order_no=${card.job_no}&id=${card?._id}&net_total=${card?.net_total}`}
+                                href={`/dashboard/money-receive?order_no=${card.job_no}&id=${card?._id}&net_total=${net_total}`}
                                 rel="noreferrer"
                               >
                                 <Money className="editIcon" />

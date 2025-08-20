@@ -67,20 +67,14 @@ const Detail = () => {
                   />
                   <div>
                     <div className="flex-1 text-center">
-                    {/* Bangla Company Name - Larger */}
-                    {profileData?.data?.companyNameBN && (
                       <h2 className="trustAutoTitle">
                         {profileData?.data?.companyNameBN}
                       </h2>
-                    )}
 
-                    {/* English Company Name - Smaller */}
-                    {profileData?.data?.companyName && (
-                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold ">
                         ({profileData?.data?.companyName})
                       </h3>
-                    )}
-                  </div>
+                    </div>
                     <small className="block mt-2">
                       Office: {profileData?.data?.address}
                     </small>

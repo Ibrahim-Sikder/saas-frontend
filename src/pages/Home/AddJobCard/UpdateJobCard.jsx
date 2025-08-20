@@ -570,9 +570,15 @@ const UpdateJobCard = () => {
             className=" addJobLogoImg"
           />
           <div>
-            <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              {CompanyInfoData?.data?.companyName}
-            </h2>
+            <div className="flex-1 text-center">
+              <h2 className="trustAutoTitle">
+                {CompanyInfoData?.data?.companyNameBN}
+              </h2>
+              <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                ({CompanyInfoData?.data?.companyName})
+              </h3>
+            </div>
+
             <span className="text-[12px] lg:text-xl mt-5 block">
               Office: {CompanyInfoData?.data?.address}
             </span>
@@ -1168,32 +1174,7 @@ const UpdateJobCard = () => {
                     getOptionLabel={(option) => option || ""}
                   />
                 </Grid>
-                {/* <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <div className="mt-3 relative">
-                    <input
-                      // value={yearSelectInput}
-                      onInput={handleYearSelectInput}
-                      {...register("vehicle_model")}
-                      type="text"
-                      className="border  border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
-                      placeholder="Vehicle Model"
-                      value={getDataWithChassisNo?.vehicle_model}
-                    />
-                    {yearSelectInput && (
-                      <ul className="options-list">
-                        {filteredOptions.map((option, index) => (
-                          <li
-                            key={index}
-                            onClick={() => handleOptionClick(option)}
-                          >
-                            {option.label}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  
-                </Grid> */}
+
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mt-3 relative">
                     <input

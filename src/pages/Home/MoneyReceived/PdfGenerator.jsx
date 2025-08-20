@@ -72,7 +72,7 @@ const PdfGenerator = () => {
                   <h2 className="text-3xl">
                     {CompanyInfoData?.data?.companyNameBN}
                   </h2>
-                  <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                  <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
                     ({CompanyInfoData?.data?.companyName})
                   </h3>
                 </div>

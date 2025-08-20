@@ -28,7 +28,7 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const UpdateMoneyReceipt = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
- const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const userTypeFromProfile = new URLSearchParams(location.search).get(
     "user_type"
@@ -38,7 +38,7 @@ const UpdateMoneyReceipt = () => {
   const { data: singleMoneyReceipt, refetch } = useGetSingleMoneyReceiptQuery({
     tenantDomain,
     id,
-  })
+  });
 
   const [updateMoneyReceipt, { isLoading: updateLoading, error: updateError }] =
     useUpdateMoneyReceiptMutation();
@@ -47,9 +47,9 @@ const UpdateMoneyReceipt = () => {
   const [remaining, setRemaining] = useState(
     singleMoneyReceipt?.data?.remaining
   );
-      const { data: CompanyInfoData } = useGetCompanyProfileQuery({
-      tenantDomain,
-    });
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [billNo, setBillNo] = useState("Final Payment against bill no");
@@ -427,8 +427,15 @@ const UpdateMoneyReceipt = () => {
             <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
           </div>
           <div className="moneyHead ">
-            <h2 className="receivedTitle ">{CompanyInfoData?.data?.companyName}</h2>
-            <small className="block mt-3 ">
+            <div className="flex-1 text-center">
+              <h2 className="text-3xl">
+                {CompanyInfoData?.data?.companyNameBN}
+              </h2>
+              <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                ({CompanyInfoData?.data?.companyName})
+              </h3>
+            </div>
+            <small className="block mt-2">
               It's trusted computerized Organization for all kinds of vehicle
               check up & maintenance such as computerized Engine Analysis,
               Engine tune up, Denting, Painting, Engine, AC, Electrical Works &
@@ -446,9 +453,7 @@ const UpdateMoneyReceipt = () => {
             </div>
             <div className="flex  mt-1">
               <FaLocationDot className="hotlineIcon"> </FaLocationDot>
-              <small className="ml-1">
-               {CompanyInfoData?.data?.address}
-              </small>
+              <small className="ml-1">{CompanyInfoData?.data?.address}</small>
             </div>
             <div className="flex items-center mt-1">
               <WhatsApp className="hotlineIcon" />

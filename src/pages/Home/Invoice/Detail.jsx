@@ -82,14 +82,14 @@ const Detail = () => {
                   />
                   <div>
                     <div className="flex-1 text-center">
-                   
-                    <h2 className="trustAutoTitle">
+                      <h2 className="trustAutoTitle">
                         {CompanyInfoData?.data?.companyNameBN}
                       </h2>
-                    <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
                         ({CompanyInfoData?.data?.companyName})
                       </h3>
-                  </div>
+                    </div>
+
                     <small className="block">
                       Office: {CompanyInfoData?.data?.address}
                     </small>
