@@ -1,6 +1,8 @@
+
+
 @media print {
     @page {
-      margin: 20px; 
+      margin: 0px; 
     }
   
     .no-top-margin {

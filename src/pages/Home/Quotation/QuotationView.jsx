@@ -53,8 +53,8 @@ const Detail = () => {
     return <Loading />;
   }
   return (
-    <div ref={componentRef} className="h-screen">
-      <main ref={targetRef} className="invoicePrintWrap">
+    <div ref={componentRef}>
+      <main className="invoicePrintWrap">
         <div>
           <div className="pb-5 px-5 invoicePrint">
             <div>
@@ -66,9 +66,21 @@ const Detail = () => {
                     alt="logo"
                   />
                   <div>
-                    <h2 className="trustAutoTitle qoutationTitle">
-                      {profileData?.data?.companyName}
-                    </h2>
+                    <div className="flex-1 text-center">
+                    {/* Bangla Company Name - Larger */}
+                    {profileData?.data?.companyNameBN && (
+                      <h2 className="trustAutoTitle">
+                        {profileData?.data?.companyNameBN}
+                      </h2>
+                    )}
+
+                    {/* English Company Name - Smaller */}
+                    {profileData?.data?.companyName && (
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                        ({profileData?.data?.companyName})
+                      </h3>
+                    )}
+                  </div>
                     <small className="block mt-2">
                       Office: {profileData?.data?.address}
                     </small>

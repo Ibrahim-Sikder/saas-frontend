@@ -68,9 +68,14 @@ const PdfGenerator = () => {
               </div>
 
               <div className="moneyHead moneyHead2">
-                <h2 className="receivedTitle receivedTitle2">
-                  {CompanyInfoData?.data?.companyName}
-                </h2>
+                <div className="flex-1 text-center">
+                  <h2 className="text-3xl">
+                    {CompanyInfoData?.data?.companyNameBN}
+                  </h2>
+                  <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                    ({CompanyInfoData?.data?.companyName})
+                  </h3>
+                </div>
                 <span className="mt-5 block">
                   It's trusted computerized Organization for all kinds of
                   vehicle Cheque up & maintenance such as computerized Engine

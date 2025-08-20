@@ -81,9 +81,15 @@ const Detail = () => {
                     alt="logo"
                   />
                   <div>
-                    <h2 className="trustAutoTitle qoutationTitle">
-                      {CompanyInfoData?.data?.companyName}
-                    </h2>
+                    <div className="flex-1 text-center">
+                   
+                    <h2 className="trustAutoTitle">
+                        {CompanyInfoData?.data?.companyNameBN}
+                      </h2>
+                    <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                        ({CompanyInfoData?.data?.companyName})
+                      </h3>
+                  </div>
                     <small className="block">
                       Office: {CompanyInfoData?.data?.address}
                     </small>

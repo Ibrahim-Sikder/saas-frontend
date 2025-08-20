@@ -104,19 +104,12 @@ const PreviewJobCard = () => {
                   />
 
                   <div className="flex-1 text-center">
-                    {/* Bangla Company Name - Larger */}
-                    {CompanyInfoData?.data?.companyNameBN && (
-                      <h2 className="trustAutoTitle">
-                        {CompanyInfoData?.data?.companyNameBN}
-                      </h2>
-                    )}
-
-                    {/* English Company Name - Smaller */}
-                    {CompanyInfoData?.data?.companyName && (
-                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
-                        ({CompanyInfoData?.data?.companyName})
-                      </h3>
-                    )}
+                    <h2 className="trustAutoTitle">
+                      {CompanyInfoData?.data?.companyNameBN}
+                    </h2>
+                    <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                      ({CompanyInfoData?.data?.companyName})
+                    </h3>
                   </div>
 
                   {/* Spacer for flex alignment */}
