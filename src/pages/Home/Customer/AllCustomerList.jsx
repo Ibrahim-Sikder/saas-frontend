@@ -35,6 +35,8 @@ const AllCustomerList = () => {
   const totalCount = allCustomerData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
+  console.log("all customer ", allCustomerData);
+
   const handlePageChange = (_, page) => {
     setCurrentPage(page);
   };
@@ -54,7 +56,6 @@ const AllCustomerList = () => {
         toast.error("Invalid user type");
     }
   };
-
 
   const handleSearch = () => {
     setCurrentPage(1);

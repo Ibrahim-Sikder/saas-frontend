@@ -1,6 +1,6 @@
 .trustAutoTitle {
 	font-family: 'Merriweather', serif;
-	font-size: 55px;
+	font-size: 40px;
 	font-weight: 900;
 	color: #4671A1;
 }
@@ -10,7 +10,7 @@
 }
 
 .printTitle {
-	font-size: 62px !important;
+	font-size: 45px !important;
 }
 .jobInput {
 	width: 84px;

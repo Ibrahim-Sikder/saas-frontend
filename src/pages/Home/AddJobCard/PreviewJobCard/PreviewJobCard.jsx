@@ -96,7 +96,7 @@ const PreviewJobCard = () => {
           <div className="headerContainer">
             <div className="mx-auto text-center border-b-[2px] ">
               <div className="mx-auto text-center border-b-[2px] border-[#110255] py-2">
-                <div className="flex  md:flex-row justify-between items-center">
+                <div className="flex flex-row justify-between items-center">
                   <img
                     className="w-[110px] mb-2 md:mb-0"
                     src={CompanyInfoData?.data?.logo[0]}
@@ -106,14 +106,14 @@ const PreviewJobCard = () => {
                   <div className="flex-1 text-center">
                     {/* Bangla Company Name - Larger */}
                     {CompanyInfoData?.data?.companyNameBN && (
-                      <h2 className="text-3xl md:text-4xl font-bold bangla-font">
+                      <h2 className="trustAutoTitle">
                         {CompanyInfoData?.data?.companyNameBN}
                       </h2>
                     )}
 
                     {/* English Company Name - Smaller */}
                     {CompanyInfoData?.data?.companyName && (
-                      <h3 className="text-lg md:text-xl english-font mt-1">
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
                         ({CompanyInfoData?.data?.companyName})
                       </h3>
                     )}
