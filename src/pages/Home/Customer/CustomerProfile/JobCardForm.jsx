@@ -35,6 +35,7 @@ import GarageForm from "../../../../components/form/Form";
 import FormAutocomplete from "../../../../components/form/FormAutocomplete";
 import FormInput from "../../../../components/form/Input";
 import AutocompleteSelect from "../../../../components/form/AutocompleteSelect";
+import MaskedInput from "../../../../components/form/InputMask";
 
 const JobCardForm = ({
   tenantDomain,
@@ -118,7 +119,6 @@ const JobCardForm = ({
       vehicleModelValue = undefined;
     }
 
-    // --- Final payload ---
     const submitData = {
       Id: id,
       user_type: user_type,
@@ -174,7 +174,7 @@ const JobCardForm = ({
       } else {
         res = await createVehicle({
           tenantDomain,
-          data: submitData,
+          vehicleInfo: submitData,
         }).unwrap();
       }
 
@@ -220,7 +220,6 @@ const JobCardForm = ({
     }
   };
 
-
   const defaultvalues = {
     carReg_no: vehicleData?.carReg_no
       ? Array.isArray(vehicleData?.carReg_no)
@@ -264,7 +263,7 @@ const JobCardForm = ({
     driver_name: vehicleData?.driver_name || "",
     driver_contact: vehicleData?.driver_contact || "",
     driver_country_code: vehicleData?.driver_country_code || "",
-    
+
     mileage: vehicleData?.mileage || "",
   };
 
@@ -285,7 +284,7 @@ const JobCardForm = ({
                 />
               </Grid>
               <Grid item lg={12} md={12} sm={12} xs={12}>
-                <FormInput
+                {/* <FormInput
                   name="car_registration_no"
                   fullWidth
                   size="medium"
@@ -293,8 +292,27 @@ const JobCardForm = ({
                   icon={DirectionsCarIcon}
                   iconPosition="start"
                   margin="none"
+                /> */}
+                <MaskedInput
+                  name="car_registration_no"
+                  label="Car R (N)"
+                  mask="99-9999"
+                  maskChar={null}
+                  icon={<DirectionsCarIcon />}
+                  iconPosition="start"
+                  margin="none"
+                  rules={{
+                    required: "Car registration number is required",
+                    validate: (value) => {
+                      if (value && value.includes("_")) {
+                        return "Please complete the car registration number";
+                      }
+                      return true;
+                    },
+                  }}
                 />
               </Grid>
+
               <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormInput
                   fullWidth

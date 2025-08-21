@@ -2,14 +2,25 @@ import { baseApi } from "./baseApi";
 
 const vehicleApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createVehicle: builder.mutation({
-      query: (vehicleInfo) => ({
-        url: "/vehicles",
-        method: "POST",
-        body: vehicleInfo,
-      }),
-      invalidatesTags: ["vehicle"],
-    }),
+createVehicle: builder.mutation({
+  query: ({ tenantDomain, vehicleInfo }) => {
+    // Debug logs
+    console.log("🔍 createVehicle called with:", { tenantDomain, vehicleInfo });
+
+    const request = {
+      url: "/vehicles",
+      method: "POST",
+      body: vehicleInfo,
+      params: { tenantDomain },
+    };
+
+    console.log("📤 Request payload:", request);
+
+    return request;
+  },
+  invalidatesTags: ["vehicle"],
+}),
+
 
     getAllVehicles: builder.query({
       query: ({ tenantDomain, id, limit, page, searchTerm, isRecycled }) => ({
@@ -45,7 +56,7 @@ const vehicleApi = baseApi.injectEndpoints({
       query: ({ tenantDomain, id, vehicleInfo }) => ({
         url: `/vehicles/${id}`,
         method: "PATCH",
-        body: vehicleInfo, // now correctly passed from params
+        body: vehicleInfo,
         params: {
           tenantDomain,
         },
