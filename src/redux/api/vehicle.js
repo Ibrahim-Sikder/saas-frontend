@@ -41,6 +41,17 @@ const vehicleApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["vehicle"],
     }),
+    updateVehicle: builder.mutation({
+      query: ({ tenantDomain, id, vehicleInfo }) => ({
+        url: `/vehicles/${id}`,
+        method: "PATCH",
+        body: vehicleInfo, // now correctly passed from params
+        params: {
+          tenantDomain,
+        },
+      }),
+      invalidatesTags: ["vehicle"],
+    }),
   }),
 });
 
@@ -49,4 +60,5 @@ export const {
   useGetAllVehiclesQuery,
   useGetSingleVehicleQuery,
   useDeleteVehicleMutation,
+  useUpdateVehicleMutation,
 } = vehicleApi;

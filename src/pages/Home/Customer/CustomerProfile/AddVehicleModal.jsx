@@ -2,7 +2,8 @@
 import { IoCloseSharp } from "react-icons/io5";
 import JobCardForm from "./JobCardForm";
 
-const AddVehicleModal = ({ tenantDomain, onClose, reload, setReload, id, user_type }) => {
+const AddVehicleModal = ({ tenantDomain, onClose, reload, setReload, id, user_type, vehicleData }) => {
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div
@@ -18,6 +19,7 @@ const AddVehicleModal = ({ tenantDomain, onClose, reload, setReload, id, user_ty
         </div>
         <div className="overflow-y-auto flex-grow">
           <JobCardForm
+          vehicleData={vehicleData}
             tenantDomain={tenantDomain}
             user_type={user_type}
             id={id}

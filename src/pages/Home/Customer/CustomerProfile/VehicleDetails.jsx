@@ -2,7 +2,7 @@
 
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaEye, FaTrashAlt, FaEdit } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlinePlus, HiOutlineSearch } from "react-icons/hi";
 import AddVehicleModal from "./AddVehicleModal";
@@ -18,27 +18,40 @@ import {
 import { History } from "lucide-react";
 
 const VehicleDetails = ({ id, user_type, tenantDomain }) => {
-
   const [open, setOpen] = useState(false);
   const [vehicleDetails, setVehicleDetails] = useState(false);
   const [getId, setGetId] = useState("");
-
+  const [vehicleToEdit, setVehicleToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
   const [limit, setLimit] = useState(10);
-
   const [reload, setReload] = useState(false);
-
   const [filterType, setFilterType] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => {
+    setIsEditing(false);
+    setVehicleToEdit(null);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setIsEditing(false);
+    setVehicleToEdit(null);
+  };
 
   const handVehicleDetailsOpen = (id) => {
     setVehicleDetails(true);
     setGetId(id);
   };
+
   const handleVehicleDetailsClose = () => setVehicleDetails(false);
+
+  const handleEditOpen = (vehicle) => {
+    setVehicleToEdit(vehicle);
+    setIsEditing(true);
+    setOpen(true);
+  };
 
   const textInputRef = useRef();
   const { data: allVehicle, isLoading } = useGetAllVehiclesQuery({
@@ -53,7 +66,6 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
   const [deleteVehicle, { isLoading: deleteLoading, error: deleteError }] =
     useDeleteVehicleMutation();
 
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -65,20 +77,22 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
     });
   };
 
-  const deletePackage = async (id) => {
+  const deletePackage = async (vehicleId) => {
     const willDelete = await swal({
       title: "Are you sure?",
-      text: "Are you sure that you want to delete this card?",
+      text: "Are you sure that you want to delete this vehicle?",
       icon: "warning",
       dangerMode: true,
+      buttons: ["Cancel", "Delete"],
     });
 
     if (willDelete) {
       try {
-        await deleteVehicle({tenantDomain,id}).unwrap();
-        swal("Deleted!", "Card delete successful.", "success");
+        await deleteVehicle({ tenantDomain, id: vehicleId }).unwrap();
+        swal("Deleted!", "Vehicle deleted successfully.", "success");
+        setReload(!reload);
       } catch (error) {
-        swal("Error", "An error occurred while deleting the card.", "error");
+        swal("Error", "An error occurred while deleting the vehicle.", "error");
       }
     }
   };
@@ -175,7 +189,7 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
                       <th>Engine & CC</th>
                       <th>Vehicle Name</th>
                       <th>Mileage History</th>
-                      <th colSpan={2}>Action</th>
+                      <th colSpan={3}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -189,7 +203,9 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
                           className="hover:bg-blue-300 transition-colors duration-200 hover:text-white"
                         >
                           <td>{globalIndex}</td>
-                          <td>{card?.carReg_no} {card?.car_registration_no}</td>
+                          <td>
+                            {card?.carReg_no} {card?.car_registration_no}
+                          </td>
                           <td>{card.chassis_no}</td>
                           <td>{card.engine_no}</td>
                           <td>{card.vehicle_name}</td>
@@ -246,6 +262,7 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
                             )}
                           </td>
 
+                          {/* View Button */}
                           <td>
                             <div
                               onClick={() => handVehicleDetailsOpen(card._id)}
@@ -255,6 +272,17 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
                             </div>
                           </td>
 
+                          {/* Edit Button */}
+                          <td>
+                            <div
+                              onClick={() => handleEditOpen(card)}
+                              className="flex justify-center items-center cursor-pointer"
+                            >
+                              <FaEdit className="text-green-600" size={24} />
+                            </div>
+                          </td>
+
+                          {/* Delete Button */}
                           <td>
                             <button
                               disabled={deleteLoading}
@@ -294,13 +322,15 @@ const VehicleDetails = ({ id, user_type, tenantDomain }) => {
           onClose={handleClose}
           setReload={setReload}
           reload={reload}
-            tenantDomain={tenantDomain}
+          tenantDomain={tenantDomain}
+          vehicleData={vehicleToEdit}
+          isEditing={isEditing}
         />
       )}
 
       {vehicleDetails && (
         <VehicleDetailsModal
-        tenantDomain={tenantDomain}
+          tenantDomain={tenantDomain}
           handVehicleDetailsOpen={handVehicleDetailsOpen}
           handleVehicleDetailsClose={handleVehicleDetailsClose}
           getId={getId}

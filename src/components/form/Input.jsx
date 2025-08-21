@@ -21,7 +21,7 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const TASInput = ({
+const FormInput = ({
   name,
   label,
   size = "medium",
@@ -86,4 +86,4 @@ const TASInput = ({
   );
 };
 
-export default TASInput;
+export default FormInput;
