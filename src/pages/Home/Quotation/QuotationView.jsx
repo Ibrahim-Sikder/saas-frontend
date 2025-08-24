@@ -12,6 +12,7 @@ import Loading from "../../../components/Loading/Loading";
 import { useGetSingleQuotationQuery } from "../../../redux/api/quotation";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+
 const Detail = () => {
   const componentRef = useRef();
   const location = useLocation();
@@ -215,8 +216,8 @@ const Detail = () => {
                     <div className="invoiceCustomerInfo">
                       <small>
                         <span className="mr-1">:</span>
-                        {quotationPreview?.vehicle?.carReg_no} 
-                         <span> {quotationPreview?.vehicle?.fullRegNum}</span>
+                        {quotationPreview?.vehicle?.carReg_no}
+                        <span> {quotationPreview?.vehicle?.fullRegNum}</span>
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}
@@ -321,7 +322,9 @@ const Detail = () => {
                       <b>Sub Total </b>
                       {quotationPreview?.discount !== 0 && <b> Discount </b>}
                       {quotationPreview?.vat !== 0 && <b> VAT </b>}
-                      {quotationPreview?.tax !== 0 && <b> Tax </b>}
+                      {quotationPreview?.tax !== 0 && (
+                        <b> Tax included ({quotationPreview?.tax}%) </b>
+                      )}
                       <b> Grand Total </b>
                     </div>
                     <div>
