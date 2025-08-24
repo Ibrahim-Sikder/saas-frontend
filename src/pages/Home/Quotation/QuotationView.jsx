@@ -14,8 +14,6 @@ import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const Detail = () => {
   const componentRef = useRef();
-  const { targetRef } = usePDF({ filename: "page.pdf" });
-
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = useTenantDomain();
@@ -52,6 +50,7 @@ const Detail = () => {
   if (loading) {
     return <Loading />;
   }
+
   return (
     <div ref={componentRef}>
       <main className="invoicePrintWrap">
@@ -215,8 +214,9 @@ const Detail = () => {
                     </div>
                     <div className="invoiceCustomerInfo">
                       <small>
-                        <span className="mr-1">:</span>{" "}
-                        {quotationPreview?.vehicle?.fullRegNum}
+                        <span className="mr-1">:</span>
+                        {quotationPreview?.vehicle?.carReg_no} 
+                         <span> {quotationPreview?.vehicle?.fullRegNum}</span>
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}

@@ -37,7 +37,7 @@ const JobcardTable = () => {
     phone: profileData?.data?.phone,
     email: profileData?.data?.email,
     logo: profileData?.data?.logo[0],
-    companyNameBN:profileData?.data?.companyNameBN, 
+    companyNameBN: profileData?.data?.companyNameBN,
   };
   const { data: allJobCards, isLoading: jobCardLoading } =
     useGetAllJobCardsQuery({
@@ -82,7 +82,6 @@ const JobcardTable = () => {
       setFilterType(search);
     }
   }, [search]);
-
   return (
     <div>
       <div className="mt-5 overflow-x-auto">

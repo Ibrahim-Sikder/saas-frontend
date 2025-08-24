@@ -1583,7 +1583,7 @@ const Invoice = () => {
                 <span>{formatNumber(calculateFinalTotal())}</span>
               </div>
             </div>
-            <div>
+            {/* <div>
               <b className="mr-2">Advance: </b>
               <input
                 className="text-center"
@@ -1596,7 +1596,7 @@ const Invoice = () => {
                 type="text"
                 placeholder="Advance"
               />
-            </div>
+            </div> */}
             <div>
               <div className="flex items-center ml-3 ">
                 <b className="mr-2">Due:</b>

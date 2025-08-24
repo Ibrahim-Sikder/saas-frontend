@@ -237,7 +237,8 @@ const Detail = () => {
                       <small>
                         {" "}
                         <span className="mr-1">:</span>{" "}
-                        {invoicePreview?.vehicle?.fullRegNum}
+                        {invoicePreview?.vehicle?.carReg_no}
+                        <span> {invoicePreview?.vehicle?.fullRegNum}</span>
                       </small>
                       <small>
                         {" "}
@@ -359,7 +360,9 @@ const Detail = () => {
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
                     {invoicePreview.vat !== 0 && <b> VAT </b>}
-                    {invoicePreview.tax !== 0 && <b> Tax </b>}
+                    {invoicePreview.tax !== 0 && (
+                      <b> Tax included ({invoicePreview.tax}%) </b>
+                    )}
                     <b> Grand Total </b>
 
                     {advanceAmountNumber !== 0 && (
@@ -385,7 +388,7 @@ const Detail = () => {
                       <small> : {formatNumber(invoicePreview.tax)}%</small>
                     )}
                     <small>
-                      : {formatNumber(invoicePreview.net_total)} &#2547;{" "}
+                      : {formatNumber(invoicePreview.net_total)} &#2547;
                     </small>
                     {advanceAmountNumber !== 0 && (
                       <>
@@ -394,8 +397,7 @@ const Detail = () => {
                         </small>
                         {!isFullyPaid && invoicePreview.due !== 0 && (
                           <small>
-                            {" "}
-                            : {formatNumber(invoicePreview.due)} &#2547;{" "}
+                            : {formatNumber(invoicePreview.due)} &#2547;
                           </small>
                         )}
                       </>
