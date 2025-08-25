@@ -160,9 +160,6 @@ const JobCardForm = ({
         data.driver_country_code?.value || data.driver_country_code,
     };
 
-    console.log("submit data", submitData);
-    console.log("raw data", data);
-
     try {
       let res;
       if (vehicleId) {
@@ -278,24 +275,26 @@ const JobCardForm = ({
               <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormAutocomplete
                   name="carReg_no"
-                  label="Vehicle Reg No"
+        
+                  label={
+                    <>
+                    Vehicle Reg No
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   placeholder="Vehicle Reg No"
                   options={carRegOptions}
                 />
               </Grid>
               <Grid item lg={12} md={12} sm={12} xs={12}>
-                {/* <FormInput
-                  name="car_registration_no"
-                  fullWidth
-                  size="medium"
-                  label="Car R (N)"
-                  icon={DirectionsCarIcon}
-                  iconPosition="start"
-                  margin="none"
-                /> */}
                 <MaskedInput
                   name="car_registration_no"
-                  label="Car R (N)"
+                  label={
+                    <>
+                      Car R (N)
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   mask="99-9999"
                   maskChar={null}
                   icon={<DirectionsCarIcon />}
@@ -317,7 +316,12 @@ const JobCardForm = ({
                 <FormInput
                   fullWidth
                   size="medium"
-                  label="Chassis No (T&N)"
+                  label={
+                    <>
+                     Chassis No (T&N)
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   name="chassis_no"
                   icon={SettingsIcon}
                   iconPosition="start"
