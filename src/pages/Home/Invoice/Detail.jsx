@@ -39,7 +39,7 @@ const Detail = () => {
   });
 
   const [invoicePreview, setInvoicePreview] = useState({});
-
+console.log(invoicePreview)
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
       ? invoicePreview?.net_total
@@ -359,9 +359,9 @@ const Detail = () => {
                   <div>
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
-                    {invoicePreview.vat !== 0 && <b> VAT </b>}
-                    {invoicePreview.tax !== 0 && (
-                      <b> Tax included ({invoicePreview.tax}%) </b>
+                    {invoicePreview.vat > 0 && <b> VAT </b>}
+                    {invoicePreview.tax > 0 && (
+                      <b> Tax included  </b>
                     )}
                     <b> Grand Total </b>
 
@@ -376,7 +376,7 @@ const Detail = () => {
                   </div>
                   <div>
                     <small> : {formatNumber(totalAmountNumber)} &#2547; </small>
-                    {invoicePreview.discount !== 0 && (
+                    {invoicePreview.discount > 0 && (
                       <small>
                         : {formatNumber(invoicePreview.discount)} &#2547;
                       </small>
@@ -384,11 +384,11 @@ const Detail = () => {
                     {invoicePreview.vat !== 0 && (
                       <small> : {formatNumber(invoicePreview.vat)}%</small>
                     )}
-                    {invoicePreview.tax !== 0 && (
-                      <small> : {formatNumber(invoicePreview.tax)}%</small>
+                    {invoicePreview.tax > 0 && (
+                      <small> : {formatNumber(invoicePreview.tax)}% </small>
                     )}
                     <small>
-                      : {formatNumber(invoicePreview.net_total)} &#2547;
+                      : {formatNumber(invoicePreview.total_amount)} &#2547;
                     </small>
                     {advanceAmountNumber !== 0 && (
                       <>
