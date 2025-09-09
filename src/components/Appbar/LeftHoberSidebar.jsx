@@ -208,15 +208,7 @@ const LeftHoberSidebar = () => {
           <b className="toolTip">Data Backup </b>
         </div>
       </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/support">
-            <FaHeadset className="tooltipIcon" />
-          </NavLink>
-
-          <b className="toolTip">Support </b>
-        </div>
-      </div>
+      
       <div className="mt-[14px]">
         <div onClick={handleLogout} className="toolTipWrap">
           <Logout className="tooltipIcon" />
