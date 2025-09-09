@@ -41,6 +41,7 @@ const PdfGenerator = () => {
     }
   );
 
+  console.log("single money", singleMoneyReceipt);
   if (isLoading) {
     return <Loading />;
   }
@@ -140,7 +141,7 @@ const PdfGenerator = () => {
                     </label>
                   )}
                   <span className="text-sm">
-                    {singleMoneyReceipt?.data?.job_no}
+                    {singleMoneyReceipt?.data?.invoice?.invoice_no}
                   </span>
                 </div>
                 <div className="flex items-center justify-center receivedField">

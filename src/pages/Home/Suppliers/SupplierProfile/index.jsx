@@ -90,9 +90,6 @@ export default function EnhancedSupplierProfile() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [expandedAccordion, setExpandedAccordion] = useState(false);
-  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = useTenantDomain();
 
@@ -113,11 +110,6 @@ export default function EnhancedSupplierProfile() {
     setAnchorEl(null);
   };
 
-  const handleOpenDialog = (type) => {
-    setDialogType(type);
-    setOpenDialog(true);
-  };
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
@@ -132,23 +124,6 @@ export default function EnhancedSupplierProfile() {
     setSnackbarOpen(true);
   };
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordion(isExpanded ? panel : false);
-  };
-
-  const handleFilterMenuOpen = (event) => {
-    setFilterMenuAnchor(event.currentTarget);
-  };
-
-  const handleFilterMenuClose = () => {
-    setFilterMenuAnchor(null);
-  };
-
-  // Function to get status color
   const getStatusColor = (status) => {
     if (
       status === "Active" ||
@@ -695,6 +670,7 @@ export default function EnhancedSupplierProfile() {
         <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
           <SupplierBillPay supplierWithBillPay={supplierWithBillPay?.data} />
         </Box>
+        
         <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
           {/* Payments Tab Content */}
           <GlassCard>
@@ -961,21 +937,6 @@ export default function EnhancedSupplierProfile() {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

@@ -80,7 +80,6 @@ import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
-
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
@@ -121,7 +120,7 @@ export default function ProductForm({ id }) {
 
   const { data: singleProduct, isLoading: singleProductLoading } =
     useGetSingleProductQuery({ tenantDomain, id });
-
+  console.log(singleProduct);
   const [updateProduct] = useUpdateProductMutation();
   const [createProduct] = useCreateProductMutation();
   const { data } = useGetAllICategoryQuery({
@@ -752,9 +751,7 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="expense"
-              
               placeholder="Expense"
-              
               icon={MonetizationOn}
               iconPosition="start"
               type="number"
@@ -1176,27 +1173,6 @@ export default function ProductForm({ id }) {
               iconPosition="start"
               type="number"
             />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel id="is-deleted-label">Is Deleted</InputLabel>
-              <Select
-                labelId="is-deleted-label"
-                name="isDeleted"
-                defaultValue={false}
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Settings />
-                  </InputAdornment>
-                }
-              >
-                <MenuItem value={true}>Yes</MenuItem>
-                <MenuItem value={false}>No</MenuItem>
-              </Select>
-              <FormHelperText>
-                Mark as deleted without removing from database
-              </FormHelperText>
-            </FormControl>
           </Grid>
         </Grid>
       ),

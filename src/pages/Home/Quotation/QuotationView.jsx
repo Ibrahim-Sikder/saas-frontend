@@ -323,7 +323,7 @@ const Detail = () => {
                       {quotationPreview?.discount !== 0 && <b> Discount </b>}
                       {quotationPreview?.vat !== 0 && <b> VAT </b>}
                       {quotationPreview?.tax !== 0 && (
-                        <b> Tax included ({quotationPreview?.tax}%) </b>
+                        <b> Tax included </b>
                       )}
                       <b> Grand Total </b>
                     </div>
