@@ -62,7 +62,6 @@ import {
   CloudDownload,
   Timelapse,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
 import ProfileOverview from "./ProfileOverview";
 import SupplierProduct from "./SupplierProduct";
 import OrderTable from "./OrderTable";
@@ -77,19 +76,18 @@ import {
   StyledTabs,
   supplierData,
 } from "./supplier";
-import { useGetSupplierWithBillPayQuery } from "../../../../redux/api/supplier";
+import {
+  useGetSingleSupplierQuery,
+  useGetSupplierWithBillPayQuery,
+} from "../../../../redux/api/supplier";
 import SupplierBillPay from "./SupplierBillPay";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 export default function EnhancedSupplierProfile() {
-  const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = useTenantDomain();
 
@@ -97,7 +95,11 @@ export default function EnhancedSupplierProfile() {
     tenantDomain,
     id,
   });
-
+  const { data: singleSupplier } = useGetSingleSupplierQuery({
+    tenantDomain,
+    id,
+  });
+  console.log("single supplier this is  ", singleSupplier);
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -112,16 +114,6 @@ export default function EnhancedSupplierProfile() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
   };
 
   const getStatusColor = (status) => {
@@ -670,7 +662,7 @@ export default function EnhancedSupplierProfile() {
         <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
           <SupplierBillPay supplierWithBillPay={supplierWithBillPay?.data} />
         </Box>
-        
+
         <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
           {/* Payments Tab Content */}
           <GlassCard>
@@ -921,22 +913,12 @@ export default function EnhancedSupplierProfile() {
             variant="contained"
             onClick={() => {
               handleCloseDialog();
-              showSnackbar(
-                `${
-                  dialogType === "newOrder"
-                    ? "Order"
-                    : dialogType === "newItem"
-                    ? "Item"
-                    : "Payment"
-                } created successfully!`
-              );
             }}
           >
             Save
           </Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 }

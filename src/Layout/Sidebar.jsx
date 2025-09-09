@@ -367,7 +367,7 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-        <Accordion
+        {/* <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel17"}
@@ -400,8 +400,8 @@ const Sidebar = ({ toggle }) => {
               </div>
             </Typography>
           </AccordionDetails>
-        </Accordion>
-        <Accordion
+        </Accordion> */}
+        {/* <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel-product"}
@@ -477,8 +477,8 @@ const Sidebar = ({ toggle }) => {
               </Typography>
             ))}
           </AccordionDetails>
-        </Accordion>
-        <Accordion
+        </Accordion> */}
+        {/* <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel18"}
@@ -536,9 +536,9 @@ const Sidebar = ({ toggle }) => {
               </div>
             </Typography>
           </AccordionDetails>
-        </Accordion>
+        </Accordion> */}
         {/* Inventory */}
-        <Accordion
+        {/* <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel6"}
@@ -600,7 +600,7 @@ const Sidebar = ({ toggle }) => {
               ))}
             </div>
           </AccordionDetails>
-        </Accordion>
+        </Accordion> */}
 
         {/* Finance */}
         <Accordion
