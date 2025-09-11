@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 "use client";
 
@@ -48,64 +49,10 @@ import {
   StyledIconButton,
   StyledTableContainer,
 } from "../../../../utils/customStyle";
+import ProductForm from "../../Products/ProductForm";
 
-// Mock data for supplier products
-const mockProducts = [
-  {
-    id: "P001",
-    name: "Premium Brake Pads",
-    category: "Brake System",
-    price: 89.99,
-    stock: 150,
-    minStock: 50,
-    lastOrdered: "2025-03-15",
-    rating: 4.8,
-  },
-  {
-    id: "P002",
-    name: "High-Performance Oil Filter",
-    category: "Engine",
-    price: 15.99,
-    stock: 300,
-    minStock: 100,
-    lastOrdered: "2025-03-10",
-    rating: 4.5,
-  },
-  {
-    id: "P003",
-    name: "LED Headlight Set",
-    category: "Lighting",
-    price: 199.99,
-    stock: 75,
-    minStock: 30,
-    lastOrdered: "2025-03-05",
-    rating: 4.9,
-  },
-  {
-    id: "P004",
-    name: 'Alloy Wheel Set (18")',
-    category: "Wheels & Tires",
-    price: 599.99,
-    stock: 40,
-    minStock: 20,
-    lastOrdered: "2025-02-28",
-    rating: 4.7,
-  },
-  {
-    id: "P005",
-    name: "Performance Exhaust System",
-    category: "Exhaust",
-    price: 349.99,
-    stock: 25,
-    minStock: 15,
-    lastOrdered: "2025-02-20",
-    rating: 4.6,
-  },
-];
-
-const SupplierBillPay = () => {
+const SupplierProduct = ({ productData }) => {
   const theme = useTheme();
-  const [products, setProducts] = useState(mockProducts);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [sortAnchorEl, setSortAnchorEl] = useState(null);
@@ -125,7 +72,6 @@ const SupplierBillPay = () => {
     setSortAnchorEl(event.currentTarget);
   };
 
-  
   const handleSortClose = () => {
     setSortAnchorEl(null);
   };
@@ -145,17 +91,21 @@ const SupplierBillPay = () => {
     setSelectedProduct(null);
   };
 
-  const getStockStatus = (stock, minStock) => {
+  const getStockStatus = (stock, alertLevel) => {
     if (stock === 0) return "out-of-stock";
-    if (stock <= minStock) return "low-stock";
+    if (stock <= alertLevel) return "low-stock";
     return "in-stock";
   };
 
-  const filteredProducts = products.filter(
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const filteredProducts = productData?.filter(
     (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.id.toLowerCase().includes(searchTerm.toLowerCase())
+      product?.product_name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      product?.product_code?.toLowerCase()?.includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -257,31 +207,31 @@ const SupplierBillPay = () => {
         <Table sx={{ minWidth: 700 }} aria-label="product table">
           <TableHead>
             <TableRow>
-              <TableCell>Product ID</TableCell>
+              <TableCell>Product Code</TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Category</TableCell>
+              <TableCell>Batch Number</TableCell>
               <TableCell align="right">Price</TableCell>
               <TableCell align="right">Stock</TableCell>
-              <TableCell>Last Ordered</TableCell>
-              <TableCell align="right">Rating</TableCell>
+              <TableCell>Expiry Date</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredProducts.map((product) => (
-              <TableRow key={product.id}>
+            {filteredProducts?.map((product) => (
+              <TableRow key={product._id}>
                 <TableCell component="th" scope="row">
-                  {product.id}
+                  {product.product_code}
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Category
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
-                    {product.name}
+                    {product.product_name}
                   </Box>
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
+                <TableCell>{product.batchNumber}</TableCell>
                 <TableCell align="right">
                   <Box
                     sx={{
@@ -291,7 +241,7 @@ const SupplierBillPay = () => {
                     }}
                   >
                     <AttachMoney sx={{ color: theme.palette.success.main }} />
-                    {product.price.toFixed(2)}
+                    {product.sellingPrice.toFixed(2)}
                   </Box>
                 </TableCell>
                 <TableCell align="right">
@@ -304,10 +254,10 @@ const SupplierBillPay = () => {
                   >
                     <Inventory sx={{ mr: 1, color: theme.palette.info.main }} />
                     <StyledChip
-                      label={`${product.stock} pcs`}
+                      label={`${product.product_quantity} pcs`}
                       className={getStockStatus(
-                        product.stock,
-                        product.minStock
+                        product.product_quantity,
+                        product.stock_alert
                       )}
                     />
                   </Box>
@@ -317,20 +267,14 @@ const SupplierBillPay = () => {
                     <CalendarToday
                       sx={{ mr: 1, color: theme.palette.secondary.main }}
                     />
-                    {product.lastOrdered}
+                    {formatDate(product.expiryDate)}
                   </Box>
                 </TableCell>
-                <TableCell align="right">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <Star sx={{ mr: 0.5, color: theme.palette.warning.main }} />
-                    {product.rating.toFixed(1)}
-                  </Box>
+                <TableCell>
+                  <StyledChip
+                    label={product.productStatus}
+                    className={product.productStatus}
+                  />
                 </TableCell>
                 <TableCell align="center">
                   <Tooltip title="View Details">
@@ -338,20 +282,6 @@ const SupplierBillPay = () => {
                       onClick={() => handleProductAction("view", product)}
                     >
                       <Visibility />
-                    </StyledIconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit Product">
-                    <StyledIconButton
-                      onClick={() => handleProductAction("edit", product)}
-                    >
-                      <Edit />
-                    </StyledIconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete Product">
-                    <StyledIconButton
-                      onClick={() => handleProductAction("delete", product)}
-                    >
-                      <Delete />
                     </StyledIconButton>
                   </Tooltip>
                 </TableCell>
@@ -365,7 +295,7 @@ const SupplierBillPay = () => {
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
       >
         <DialogTitle>
@@ -375,13 +305,8 @@ const SupplierBillPay = () => {
           {dialogAction === "delete" && "Delete Product"}
         </DialogTitle>
         <DialogContent>
-          {/* Add your form fields or product details here based on the dialogAction */}
-          {dialogAction === "delete" && (
-            <Typography>
-              Are you sure you want to delete the product:{" "}
-              {selectedProduct?.name}?
-            </Typography>
-          )}
+         <ProductForm/>
+          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
@@ -402,4 +327,4 @@ const SupplierBillPay = () => {
   );
 };
 
-export default SupplierBillPay;
+export default SupplierProduct;

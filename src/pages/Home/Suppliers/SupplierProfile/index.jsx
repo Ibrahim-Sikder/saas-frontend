@@ -82,6 +82,7 @@ import {
 } from "../../../../redux/api/supplier";
 import SupplierBillPay from "./SupplierBillPay";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import PurchaseOrderModal from "../../../Inventory/PurchaseModal";
 
 export default function EnhancedSupplierProfile() {
   const [tabValue, setTabValue] = useState(0);
@@ -90,16 +91,21 @@ export default function EnhancedSupplierProfile() {
   const [dialogType, setDialogType] = useState("");
   const id = new URLSearchParams(location.search).get("id");
   const tenantDomain = useTenantDomain();
-
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handlePurchaseClose = () => setOpen(false);
   const { data: supplierWithBillPay } = useGetSupplierWithBillPayQuery({
     tenantDomain,
     id,
   });
-  const { data: singleSupplier } = useGetSingleSupplierQuery({
+  const { data: singleSupplierResponse } = useGetSingleSupplierQuery({
     tenantDomain,
     id,
   });
-  console.log("single supplier this is  ", singleSupplier);
+
+  // Extract the supplier data from the response
+  const singleSupplier = singleSupplierResponse?.data;
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -119,6 +125,7 @@ export default function EnhancedSupplierProfile() {
   const getStatusColor = (status) => {
     if (
       status === "Active" ||
+      status === "active" ||
       status === "Delivered" ||
       status === "Completed" ||
       status === "Paid" ||
@@ -143,6 +150,7 @@ export default function EnhancedSupplierProfile() {
   const getStatusIcon = (status) => {
     if (
       status === "Active" ||
+      status === "active" ||
       status === "Delivered" ||
       status === "Completed" ||
       status === "Paid" ||
@@ -163,7 +171,7 @@ export default function EnhancedSupplierProfile() {
     return <Info fontSize="small" />;
   };
 
-  if (!supplierWithBillPay) {
+  if (!supplierWithBillPay || !singleSupplier) {
     return (
       <Box
         sx={{
@@ -177,7 +185,6 @@ export default function EnhancedSupplierProfile() {
       </Box>
     );
   }
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Header */}
@@ -191,25 +198,8 @@ export default function EnhancedSupplierProfile() {
           >
             <Business sx={{ mr: 1 }} /> Supplier Profile
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<Edit />}
-            sx={{
-              ml: "auto",
-              borderRadius: 20,
-              background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
-              boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
-            }}
-          >
-            Edit Profile
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Print />}
-            sx={{ ml: 1, borderRadius: 20 }}
-          >
-            Print
-          </Button>
+         
+         
           <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
             <MoreVert />
           </IconButton>
@@ -252,12 +242,10 @@ export default function EnhancedSupplierProfile() {
             >
               <Avatar
                 src={
-                  supplierWithBillPay?.data?.supplier?.company_logo ||
+                  singleSupplier?.company_logo ||
                   "/placeholder.svg?height=150&width=150"
                 }
-                alt={
-                  supplierWithBillPay?.data?.supplier?.full_name || "Supplier"
-                }
+                alt={singleSupplier?.full_name || "Supplier"}
                 sx={{
                   width: 150,
                   height: 150,
@@ -270,22 +258,16 @@ export default function EnhancedSupplierProfile() {
               <Box sx={{ ml: 3, mt: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="h4" fontWeight="bold">
-                    {supplierWithBillPay?.data?.supplier?.full_name ||
-                      "Loading..."}
+                    {singleSupplier?.full_name || "Loading..."}
                   </Typography>
                   <StatusChip
                     icon={getStatusIcon(
-                      supplierWithBillPay?.data?.supplier?.supplier_status ||
-                        "Pending"
+                      singleSupplier?.supplier_status || "Pending"
                     )}
-                    label={
-                      supplierWithBillPay?.data?.supplier?.supplier_status ||
-                      "Pending"
-                    }
+                    label={singleSupplier?.supplier_status || "Pending"}
                     size="small"
                     statuscolor={getStatusColor(
-                      supplierWithBillPay?.data?.supplier?.supplier_status ||
-                        "Pending"
+                      singleSupplier?.supplier_status || "Pending"
                     )}
                     sx={{ ml: 2 }}
                   />
@@ -299,23 +281,20 @@ export default function EnhancedSupplierProfile() {
                 >
                   <Category sx={{ fontSize: 18, mr: 0.5, color: "#757575" }} />
                   <span style={{ color: "#757575" }}>
-                    {supplierWithBillPay?.data?.supplier?.vendor || "Supplier"}
+                    {singleSupplier?.vendor || "Supplier"}
                   </span>
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                   <StyledRating
                     name="supplier-rating"
-                    value={
-                      supplierWithBillPay?.data?.supplier?.supplier_rating || 0
-                    }
+                    value={singleSupplier?.supplier_rating || 0}
                     precision={0.1}
                     readOnly
                     icon={<Star fontSize="inherit" />}
                     emptyIcon={<StarBorder fontSize="inherit" />}
                   />
                   <Typography variant="body2" sx={{ ml: 1, color: "#757575" }}>
-                    ({supplierWithBillPay?.data?.supplier?.supplier_rating || 0}
-                    )
+                    ({singleSupplier?.supplier_rating || 0})
                   </Typography>
                 </Box>
               </Box>
@@ -330,7 +309,13 @@ export default function EnhancedSupplierProfile() {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
+                  {open && <PurchaseOrderModal
+        open={open}
+        onClose={handlePurchaseClose}
+          tenantDomain={tenantDomain}
+      />}
                   <Button
+                    onClick={handleOpen}
                     variant="contained"
                     startIcon={<ShoppingCart />}
                     sx={{
@@ -344,34 +329,19 @@ export default function EnhancedSupplierProfile() {
                   >
                     New Order
                   </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={<Message />}
-                    sx={{
-                      borderRadius: 20,
-                      px: 3,
-                      backgroundColor: "#4CAF50",
-                      "&:hover": {
-                        backgroundColor: "#388E3C",
-                      },
-                    }}
-                  >
-                    Message
-                  </Button>
+                 
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Chip
                     icon={<Phone fontSize="small" />}
-                    label={
-                      supplierWithBillPay?.data?.supplier?.phone_number || "N/A"
-                    }
+                    label={singleSupplier?.phone_number || "N/A"}
                     variant="outlined"
                     sx={{ mr: 1, borderRadius: 20 }}
                     onClick={() => {}}
                   />
                   <Chip
                     icon={<Email fontSize="small" />}
-                    label={supplierWithBillPay?.data?.supplier?.email || "N/A"}
+                    label={singleSupplier?.email || "N/A"}
                     variant="outlined"
                     sx={{ borderRadius: 20 }}
                     onClick={() => {}}
@@ -395,7 +365,7 @@ export default function EnhancedSupplierProfile() {
                     Supplier ID
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
-                    {supplierWithBillPay?.data?.supplier?.supplierId || "N/A"}
+                    {singleSupplier?.supplierId || "N/A"}
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 4 }}>
@@ -403,10 +373,8 @@ export default function EnhancedSupplierProfile() {
                     Joined
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
-                    {supplierWithBillPay?.data?.supplier?.createdAt
-                      ? new Date(
-                          supplierWithBillPay?.data.supplier.createdAt
-                        ).toLocaleDateString()
+                    {singleSupplier?.createdAt
+                      ? new Date(singleSupplier.createdAt).toLocaleDateString()
                       : "N/A"}
                   </Typography>
                 </Box>
@@ -415,54 +383,14 @@ export default function EnhancedSupplierProfile() {
                     Tax ID
                   </Typography>
                   <Typography variant="body1" fontWeight="medium">
-                    {supplierWithBillPay?.data?.supplier?.tax_id || "N/A"}
+                    {singleSupplier?.tax_id || "N/A"}
                   </Typography>
                 </Box>
               </Box>
 
-              <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+           
 
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ mr: 4 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Credit Limit
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    $
-                    {supplierWithBillPay?.data?.supplier?.credit_limit?.toLocaleString() ||
-                      "0"}
-                  </Typography>
-                </Box>
-                <Box sx={{ mr: 4 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Available Credit
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    fontWeight="medium"
-                    color={
-                      (supplierWithBillPay?.data?.supplier?.credit_limit || 0) <
-                      5000
-                        ? "error.main"
-                        : "inherit"
-                    }
-                  >
-                    $
-                    {(
-                      supplierWithBillPay?.data?.supplier?.credit_limit || 0
-                    ).toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Payment Terms
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {supplierWithBillPay?.data?.supplier?.payment_terms ||
-                      "N/A"}
-                  </Typography>
-                </Box>
-              </Box>
+            
             </Box>
           </Box>
         </GlassCard>
@@ -490,7 +418,7 @@ export default function EnhancedSupplierProfile() {
                 variant="h3"
                 sx={{ fontWeight: "bold", color: "white", my: 1 }}
               >
-                {supplierWithBillPay?.data?.paymentStats?.totalPayments || 0}
+                {singleSupplier?.orders?.length || 0}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
@@ -524,7 +452,7 @@ export default function EnhancedSupplierProfile() {
                 variant="h3"
                 sx={{ fontWeight: "bold", color: "white", my: 1 }}
               >
-                243
+                {singleSupplier?.products?.length || 0}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
@@ -558,7 +486,7 @@ export default function EnhancedSupplierProfile() {
                 variant="h3"
                 sx={{ fontWeight: "bold", color: "white", my: 1 }}
               >
-                $
+                ৳
                 {supplierWithBillPay?.data?.paymentStats?.totalAmount?.toLocaleString() ||
                   "0"}
               </Typography>
@@ -568,7 +496,7 @@ export default function EnhancedSupplierProfile() {
                   variant="body2"
                   sx={{ color: "rgba(255,255,255,0.9)" }}
                 >
-                  $
+                  ৳
                   {supplierWithBillPay?.data?.paymentStats?.paidAmount?.toLocaleString() ||
                     "0"}{" "}
                   paid
@@ -632,8 +560,8 @@ export default function EnhancedSupplierProfile() {
             />
             <StyledTab icon={<Inventory sx={{ mb: 0.5 }} />} label="Products" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Bill Pay" />
-            <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Payments" />
-            <StyledTab
+            {/* <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Payments" /> */}
+            {/* <StyledTab
               icon={<Description sx={{ mb: 0.5 }} />}
               label="Documents"
             />
@@ -641,24 +569,25 @@ export default function EnhancedSupplierProfile() {
               icon={<Assessment sx={{ mb: 0.5 }} />}
               label="Performance"
             />
-            <StyledTab icon={<Star sx={{ mb: 0.5 }} />} label="Reviews" />
+            <StyledTab icon={<Star sx={{ mb: 0.5 }} />} label="Reviews" /> */}
           </StyledTabs>
         </Box>
 
         {/* Tab Content */}
         <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
-          <ProfileOverview supplierWithBillPay={supplierWithBillPay?.data} />
+          <ProfileOverview data={singleSupplier} />
         </Box>
 
         {/* Orders Tab Content */}
         <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
-          <OrderTable />
+          <OrderTable orderData={singleSupplier?.orders} />
         </Box>
 
-        {/* Footer */}
+        {/* Products Tab Content */}
         <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
-          <SupplierProduct />
+          <SupplierProduct productData={singleSupplier?.products} />
         </Box>
+
         <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
           <SupplierBillPay supplierWithBillPay={supplierWithBillPay?.data} />
         </Box>
@@ -798,13 +727,13 @@ export default function EnhancedSupplierProfile() {
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  $
+                                  ৳
                                 </InputAdornment>
                               ),
                             }}
                           />
                         </TableCell>
-                        <TableCell>$0.00</TableCell>
+                        <TableCell>৳0.00</TableCell>
                         <TableCell>
                           <IconButton size="small">
                             <Delete fontSize="small" />
@@ -842,7 +771,7 @@ export default function EnhancedSupplierProfile() {
                   fullWidth
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">$</InputAdornment>
+                      <InputAdornment position="start">৳</InputAdornment>
                     ),
                   }}
                 />
@@ -876,7 +805,7 @@ export default function EnhancedSupplierProfile() {
                 <TextField select label="Reference Order" fullWidth>
                   {recentOrders.map((order) => (
                     <MenuItem key={order.id} value={order.id}>
-                      {order.id} - ${order.amount}
+                      {order.id} - ৳{order.amount}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -888,7 +817,7 @@ export default function EnhancedSupplierProfile() {
                   fullWidth
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">$</InputAdornment>
+                      <InputAdornment position="start">৳</InputAdornment>
                     ),
                   }}
                 />

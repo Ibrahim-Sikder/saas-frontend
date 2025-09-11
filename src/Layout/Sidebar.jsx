@@ -48,6 +48,9 @@ import {
   Assignment,
   Add,
   List,
+  Savings,
+  Payments,
+  ReceiptLong,
 } from "@mui/icons-material";
 
 import {
@@ -328,6 +331,7 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
 
+        {/* Projects */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -366,7 +370,242 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-   
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel17"}
+          onChange={handleChange("panel17")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel6a-content"
+            id="panel6a-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center ">
+                <LocalShipping />
+                <span className="ml-2"> Suppliers </span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <PersonAdd className="mr-2" />
+                <NavLink to="/dashboard/add-supplier">Add Supplier </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <FaTruck className="mr-2" />
+                <NavLink to="/dashboard/supplier-list">Supplier List </NavLink>
+              </div>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel-product"}
+          onChange={handleChange("panel-product")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel-product-content"
+            id="panel-product-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center">
+                <Inventory />
+                <span className="ml-2">Product</span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            {[
+              {
+                icon: <Add className="mr-2" />,
+                text: "Product Add",
+                link: "/dashboard/add-product",
+              },
+              {
+                icon: <List className="mr-2" />,
+                text: "Product List",
+                link: "/dashboard/product-list",
+              },
+              {
+                icon: <Category className="mr-2" />,
+                text: "Product Type",
+                link: "/dashboard/product-type",
+              },
+              {
+                icon: <HiOutlineExclamation className="mr-2" />,
+                text: "Expired Product",
+                link: "/dashboard/expired-products",
+              },
+              {
+                icon: <FaTags className="mr-2" />,
+                text: "Category",
+                link: "/dashboard/category",
+              },
+              {
+                icon: <LocalOffer className="mr-2" />,
+                text: "Brand",
+                link: "/dashboard/brand",
+              },
+              {
+                icon: <Widgets className="mr-2" />,
+                text: "Unit",
+                link: "/dashboard/unit",
+              },
+              {
+                icon: <Difference className="mr-2" />,
+                text: "Variant Attributes",
+                link: "/dashboard/variants",
+              },
+              {
+                icon: <FaBarcode className="mr-2" />,
+                text: "Generate Barcode",
+                link: "/dashboard/barcode",
+              },
+            ].map((item, idx) => (
+              <Typography key={idx} className="accordionTypoGrapy">
+                <div className="flex items-center">
+                  {item.icon}
+                  <NavLink to={item.link}>{item.text}</NavLink>
+                </div>
+              </Typography>
+            ))}
+          </AccordionDetails>
+        </Accordion> 
+         <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel18"}
+          onChange={handleChange("panel18")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel6a-content"
+            id="panel6a-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center ">
+                <ShoppingCart />
+                <span className="ml-2"> Purchase </span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <PointOfSale className="mr-2" />
+                <NavLink to="/dashboard/purchase-order">
+                  Purchase Order{" "}
+                </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <AddShoppingCart className="mr-2" />
+                <NavLink to="/dashboard/add-purchase">Purchase Add </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <FaTruck className="mr-2" />
+                <NavLink to="/dashboard/purchase-list">Purchase List </NavLink>
+              </div>
+            </Typography>
+
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <HiOutlineReceiptRefund className="mr-2" />
+                <NavLink to="/dashboard/purchase-return">
+                  Purchase Return{" "}
+                </NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <HiOutlineClipboardList className="mr-2" />
+                <NavLink to="/dashboard/purchase-history">
+                  Purchase History{" "}
+                </NavLink>
+              </div>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        {/* Inventory */}
+         <Accordion
+          sx={{ paddingBottom: "10px" }}
+          className="dashboardAccordion"
+          expanded={expanded === "panel6"}
+          onChange={handleChange("panel6")}
+        >
+          <AccordionSummary
+            sx={{ marginBottom: "-10px" }}
+            expandIcon={<ExpandLess className="accordionExpandIcon" />}
+            aria-controls="panel6a-content"
+            id="panel6a-header"
+          >
+            <Typography>
+              <span className="flex items-center justify-center">
+                <ShoppingBag />
+                <span className="ml-2">Inventory</span>
+              </span>
+            </Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <div className="accordionTypoGrapy">
+              
+              {[
+                {
+                  icon: <Inventory2 />,
+                  text: "Mange Stock",
+                  link: "/dashboard/stock",
+                },
+                {
+                  icon: <HiOutlineSwitchHorizontal />,
+                  text: "Manage Warehouse",
+                  link: "/dashboard/warehouse",
+                },
+                {
+                  icon: <HiOutlineSwitchHorizontal />,
+                  text: "Stock Transfer",
+                  link: "/dashboard/stock-transfer",
+                },
+                {
+                  icon: <HiOutlineSwitchHorizontal />,
+                  text: "Quantity Adjustment",
+                  link: "/dashboard/quantity-adjustment",
+                },
+                {
+                  icon: <HiOutlineShieldCheck />,
+                  text: "Warranties",
+                  link: "/dashboard/warranties",
+                },
+                {
+                  icon: <FaExclamationTriangle />,
+                  text: "Low Stock Alert",
+                  link: "/dashboard/low-stocks",
+                },
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center mb-2">
+                  <span className="mr-2">{item.icon}</span>
+                  <NavLink to={item.link}>{item.text}</NavLink>
+                </div>
+              ))}
+            </div>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Finance */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -411,15 +650,15 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/expense-list">Expense List</NavLink>
               </div>
             </Typography>
-            {/* <Typography className="accordionTypoGrapy">
+            <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Category className="mr-2" />
                 <NavLink to="/dashboard/expense-categories">
                   Expense Categories{" "}
                 </NavLink>
               </div>
-            </Typography> */}
-            {/* <Typography className="accordionTypoGrapy">
+            </Typography>
+            <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Payments className="mr-2" />
                 <NavLink to="/dashboard/add-paybill"> Pay Bill </NavLink>
@@ -430,13 +669,13 @@ const Sidebar = ({ toggle }) => {
                 <ReceiptLong className="mr-2" />
                 <NavLink to="/dashboard/paybill">Bill List</NavLink>
               </div>
-            </Typography> */}
-            {/* <Typography className="accordionTypoGrapy">
+            </Typography>
+            <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
                 <NavLink to="/dashboard/donation">Donation</NavLink>
               </div>
-            </Typography> */}
+            </Typography>
           </AccordionDetails>
         </Accordion>
         {/* HRM */}
@@ -506,7 +745,6 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
-            
           </AccordionDetails>
         </Accordion>
 
@@ -572,6 +810,7 @@ const Sidebar = ({ toggle }) => {
           </Link>
         </div>
 
+        {/* Recycle Bin */}
         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
@@ -700,7 +939,7 @@ const Sidebar = ({ toggle }) => {
             </Typography>
           </AccordionDetails>
         </Accordion>
-
+        {/* Logout */}
         <div className="pl-4 space-y-3 mt-3  mb-20 ">
           <div
             onClick={handleLogout}
@@ -711,7 +950,7 @@ const Sidebar = ({ toggle }) => {
           </div>
         </div>
       </div>
-
+      {/* bar here  */}
       <div
         className={`${toggle ? `rightSideBarWrap` : `activeRightSideBarWrap`}`}
       >
