@@ -83,6 +83,7 @@ import {
 import SupplierBillPay from "./SupplierBillPay";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 import PurchaseOrderModal from "../../../Inventory/PurchaseModal";
+import { getStatusColor, getStatusIcon } from "../../../../constant/constant";
 
 export default function EnhancedSupplierProfile() {
   const [tabValue, setTabValue] = useState(0);
@@ -122,69 +123,6 @@ export default function EnhancedSupplierProfile() {
     setOpenDialog(false);
   };
 
-  const getStatusColor = (status) => {
-    if (
-      status === "Active" ||
-      status === "active" ||
-      status === "Delivered" ||
-      status === "Completed" ||
-      status === "Paid" ||
-      status === "Verified" ||
-      status === "In Stock"
-    ) {
-      return "green";
-    } else if (status === "Pending" || status === "Low Stock") {
-      return "orange";
-    } else if (
-      status === "Inactive" ||
-      status === "Cancelled" ||
-      status === "Failed" ||
-      status === "Out of Stock"
-    ) {
-      return "red";
-    }
-    return "blue";
-  };
-
-  // Function to get status icon
-  const getStatusIcon = (status) => {
-    if (
-      status === "Active" ||
-      status === "active" ||
-      status === "Delivered" ||
-      status === "Completed" ||
-      status === "Paid" ||
-      status === "Verified" ||
-      status === "In Stock"
-    ) {
-      return <CheckCircle fontSize="small" />;
-    } else if (status === "Pending" || status === "Low Stock") {
-      return <Timelapse fontSize="small" />;
-    } else if (
-      status === "Inactive" ||
-      status === "Cancelled" ||
-      status === "Failed" ||
-      status === "Out of Stock"
-    ) {
-      return <Cancel fontSize="small" />;
-    }
-    return <Info fontSize="small" />;
-  };
-
-  if (!supplierWithBillPay || !singleSupplier) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Typography variant="h5">Loading supplier data...</Typography>
-      </Box>
-    );
-  }
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Header */}
@@ -198,8 +136,7 @@ export default function EnhancedSupplierProfile() {
           >
             <Business sx={{ mr: 1 }} /> Supplier Profile
           </Typography>
-         
-         
+
           <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
             <MoreVert />
           </IconButton>
@@ -309,11 +246,13 @@ export default function EnhancedSupplierProfile() {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {open && <PurchaseOrderModal
-        open={open}
-        onClose={handlePurchaseClose}
-          tenantDomain={tenantDomain}
-      />}
+                  {open && (
+                    <PurchaseOrderModal
+                      open={open}
+                      onClose={handlePurchaseClose}
+                      tenantDomain={tenantDomain}
+                    />
+                  )}
                   <Button
                     onClick={handleOpen}
                     variant="contained"
@@ -329,7 +268,6 @@ export default function EnhancedSupplierProfile() {
                   >
                     New Order
                   </Button>
-                 
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Chip
@@ -387,10 +325,6 @@ export default function EnhancedSupplierProfile() {
                   </Typography>
                 </Box>
               </Box>
-
-           
-
-            
             </Box>
           </Box>
         </GlassCard>
@@ -575,7 +509,7 @@ export default function EnhancedSupplierProfile() {
 
         {/* Tab Content */}
         <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
-          <ProfileOverview data={singleSupplier} />
+          <ProfileOverview supplier={singleSupplier} />
         </Box>
 
         {/* Orders Tab Content */}
@@ -640,214 +574,6 @@ export default function EnhancedSupplierProfile() {
           </GlassCard>
         </Box>
       </Box>
-
-      {/* Dialogs */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          {dialogType === "newOrder" && "Create New Order"}
-          {dialogType === "newItem" && "Add New Inventory Item"}
-          {dialogType === "newPayment" && "Record New Payment"}
-        </DialogTitle>
-        <DialogContent>
-          {dialogType === "newOrder" && (
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Order Date"
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  defaultValue={new Date().toISOString().split("T")[0]}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Expected Delivery Date"
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Notes" multiline rows={3} fullWidth />
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  Order Items
-                </Typography>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Item</TableCell>
-                        <TableCell>Quantity</TableCell>
-                        <TableCell>Unit Price</TableCell>
-                        <TableCell>Total</TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <TextField
-                            select
-                            fullWidth
-                            size="small"
-                            label="Select Item"
-                          >
-                            {inventoryItems.map((item) => (
-                              <MenuItem key={item.id} value={item.id}>
-                                {item.name}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            type="number"
-                            size="small"
-                            defaultValue={1}
-                            inputProps={{ min: 1 }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            type="number"
-                            size="small"
-                            defaultValue={0}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  ৳
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>৳0.00</TableCell>
-                        <TableCell>
-                          <IconButton size="small">
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <Button startIcon={<Add />} sx={{ mt: 1 }}>
-                  Add Item
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-
-          {dialogType === "newItem" && (
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} md={6}>
-                <TextField label="Item Name" fullWidth />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField select label="Category" fullWidth>
-                  {supplierData.categories.map((category, index) => (
-                    <MenuItem key={index} value={category}>
-                      {category}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  label="Price"
-                  type="number"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">৳</InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField label="Current Stock" type="number" fullWidth />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField label="Minimum Stock" type="number" fullWidth />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Description" multiline rows={3} fullWidth />
-              </Grid>
-            </Grid>
-          )}
-
-          {dialogType === "newPayment" && (
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Payment Date"
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  defaultValue={new Date().toISOString().split("T")[0]}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField select label="Reference Order" fullWidth>
-                  {recentOrders.map((order) => (
-                    <MenuItem key={order.id} value={order.id}>
-                      {order.id} - ৳{order.amount}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Amount"
-                  type="number"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">৳</InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField select label="Payment Method" fullWidth>
-                  <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-                  <MenuItem value="Credit Card">Credit Card</MenuItem>
-                  <MenuItem value="Cash">Cash</MenuItem>
-                  <MenuItem value="Check">Check</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Notes" multiline rows={3} fullWidth />
-              </Grid>
-            </Grid>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              handleCloseDialog();
-            }}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

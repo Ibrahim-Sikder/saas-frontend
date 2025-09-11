@@ -11,6 +11,13 @@ import {
   Paper,
   Grid,
   Chip,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Divider,
   List,
   ListItem,
@@ -21,38 +28,35 @@ import {
   Edit,
   LocationOn,
   Business,
+  LocalShipping,
+  Inventory,
   Assessment,
+  MoreVert,
+  Add,
+  Visibility,
   CheckCircle,
   Cancel,
   Info,
   AccountBalance,
   Category,
+  Payments,
   ContactPhone,
+  Handshake,
   Timelapse,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useTheme } from "@mui/material/styles";
 
-const ProfileOverview = ({ data }) => {
+const ProfileOverview = ({ supplier }) => {
   // Use the supplier data directly
-  const supplier = data;
-  const { billPayments, paymentStats } = data;
-  
-  // Add this after the useState declarations
-  const paymentSummary = {
-    totalPayments: paymentStats?.totalPayments || 0,
-    totalAmount: paymentStats?.totalAmount || 0,
-    paidAmount: paymentStats?.paidAmount || 0,
-    pendingAmount: paymentStats?.pendingAmount || 0,
-    pendingCount: paymentStats?.pendingCount || 0,
-  };
-  
+
+  console.log("supplier over", supplier);
   // Add this after the useState declarations
   const performanceMetrics = [
     {
       label: "Quality",
-      value: supplier.supplier_rating
-        ? (supplier.supplier_rating * 20).toFixed(0)
+      value: supplier?.supplier_rating
+        ? (supplier?.supplier_rating * 20).toFixed(0)
         : "75",
       color: "#4CAF50",
     },
@@ -60,7 +64,7 @@ const ProfileOverview = ({ data }) => {
     { label: "Price", value: "70", color: "#FF9800" },
     { label: "Service", value: "85", color: "#9C27B0" },
   ];
-  
+
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -84,7 +88,7 @@ const ProfileOverview = ({ data }) => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  
+
   const GlassCard = styled(Paper)(({ theme }) => ({
     background: "rgba(255, 255, 255, 0.8)",
     backdropFilter: "blur(10px)",
@@ -118,7 +122,7 @@ const ProfileOverview = ({ data }) => {
     }
     return <Info fontSize="small" />;
   };
-  
+
   // Function to get status color
   const getStatusColor = (status) => {
     if (
@@ -171,7 +175,7 @@ const ProfileOverview = ({ data }) => {
       transform: "translateY(-5px)",
     },
   }));
-  
+
   const StatusChip = styled(Chip)(({ theme, statuscolor }) => ({
     fontWeight: 600,
     backgroundColor:
@@ -199,7 +203,7 @@ const ProfileOverview = ({ data }) => {
     setDialogType(type);
     setOpenDialog(true);
   };
-  
+
   return (
     <Grid container spacing={3}>
       {/* Supplier Information */}
@@ -228,7 +232,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Company Name"
-                secondary={supplier.vendor || "N/A"}
+                secondary={supplier?.vendor || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -244,7 +248,9 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Contact Person"
-                secondary={supplier.contact_person_name || supplier.full_name || "N/A"}
+                secondary={
+                  supplier?.contact_person_name || supplier?.full_name || "N/A"
+                }
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -260,7 +266,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Email"
-                secondary={supplier.email || "N/A"}
+                secondary={supplier?.email || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -276,7 +282,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Phone"
-                secondary={supplier.phone_number || "N/A"}
+                secondary={supplier?.phone_number || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -292,7 +298,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Alternate Phone"
-                secondary={supplier.full_Phone_number || "N/A"}
+                secondary={supplier?.full_Phone_number || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -308,7 +314,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Business License"
-                secondary={supplier.tax_id || "N/A"}
+                secondary={supplier?.tax_id || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -326,10 +332,10 @@ const ProfileOverview = ({ data }) => {
                 primary="Status"
                 secondary={
                   <StatusChip
-                    icon={getStatusIcon(supplier.supplier_status)}
-                    label={supplier.supplier_status}
+                    icon={getStatusIcon(supplier?.supplier_status)}
+                    label={supplier?.supplier_status}
                     size="small"
-                    statuscolor={getStatusColor(supplier.supplier_status)}
+                    statuscolor={getStatusColor(supplier?.supplier_status)}
                   />
                 }
                 primaryTypographyProps={{
@@ -369,7 +375,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Address"
-                secondary={supplier.street_address || "N/A"}
+                secondary={supplier?.street_address || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -385,7 +391,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="City"
-                secondary={supplier.city || "N/A"}
+                secondary={supplier?.city || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -401,7 +407,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="State"
-                secondary={supplier.state || "N/A"}
+                secondary={supplier?.state || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -417,7 +423,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Country"
-                secondary={supplier.country || "N/A"}
+                secondary={supplier?.country || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -433,7 +439,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Postal Code"
-                secondary={supplier.postal_code || "N/A"}
+                secondary={supplier?.postal_code || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -473,7 +479,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Bank Name"
-                secondary={supplier.bank_name || "N/A"}
+                secondary={supplier?.bank_name || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -489,7 +495,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Account Number"
-                secondary={supplier.account_number || "N/A"}
+                secondary={supplier?.account_number || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -505,7 +511,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Account Holder"
-                secondary={supplier.full_name || "N/A"}
+                secondary={supplier?.full_name || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -521,7 +527,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Swift Code"
-                secondary={supplier.swift_code || "N/A"}
+                secondary={supplier?.swift_code || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -563,7 +569,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Vendor Type"
-                secondary={supplier.vendor || "N/A"}
+                secondary={supplier?.vendor || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -579,7 +585,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Supplier ID"
-                secondary={supplier.supplierId || "N/A"}
+                secondary={supplier?.supplierId || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -595,7 +601,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Tax ID"
-                secondary={supplier.tax_id || "N/A"}
+                secondary={supplier?.tax_id || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -635,7 +641,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Primary Contact"
-                secondary={supplier.full_name || "N/A"}
+                secondary={supplier?.full_name || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -651,7 +657,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Phone"
-                secondary={supplier.phone_number || "N/A"}
+                secondary={supplier?.phone_number || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
@@ -667,7 +673,7 @@ const ProfileOverview = ({ data }) => {
             <ListItem sx={{ px: 0, py: 1 }}>
               <ListItemText
                 primary="Email"
-                secondary={supplier.email || "N/A"}
+                secondary={supplier?.email || "N/A"}
                 primaryTypographyProps={{
                   color: "text.secondary",
                   variant: "body2",
