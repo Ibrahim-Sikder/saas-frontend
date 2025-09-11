@@ -3,7 +3,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 
-import { useState } from "react";
 import {
   Typography,
   IconButton,
@@ -46,11 +45,14 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useTheme } from "@mui/material/styles";
+import {
+  GlassCard2,
+  StatusChip,
+  SupplierScoreCard,
+} from "../../../../utils/customStyle";
+import { getStatusColor, getStatusIcon } from "../../../../constant/constant";
 
 const ProfileOverview = ({ supplier }) => {
-  // Use the supplier data directly
-
-  console.log("supplier over", supplier);
   // Add this after the useState declarations
   const performanceMetrics = [
     {
@@ -65,150 +67,11 @@ const ProfileOverview = ({ supplier }) => {
     { label: "Service", value: "85", color: "#9C27B0" },
   ];
 
-  const theme = useTheme();
-  const [tabValue, setTabValue] = useState(0);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogType, setDialogType] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [expandedAccordion, setExpandedAccordion] = useState(false);
-  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const GlassCard = styled(Paper)(({ theme }) => ({
-    background: "rgba(255, 255, 255, 0.8)",
-    backdropFilter: "blur(10px)",
-    borderRadius: 16,
-    boxShadow: "0 8px 32px rgba(31, 38, 135, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.18)",
-    padding: theme.spacing(3),
-  }));
-
-  // Function to get status icon
-  const getStatusIcon = (status) => {
-    if (
-      status === "Active" ||
-      status === "Delivered" ||
-      status === "Completed" ||
-      status === "Paid" ||
-      status === "Verified" ||
-      status === "In Stock" ||
-      status === "active"
-    ) {
-      return <CheckCircle fontSize="small" />;
-    } else if (status === "Pending" || status === "Low Stock") {
-      return <Timelapse fontSize="small" />;
-    } else if (
-      status === "Inactive" ||
-      status === "Cancelled" ||
-      status === "Failed" ||
-      status === "Out of Stock"
-    ) {
-      return <Cancel fontSize="small" />;
-    }
-    return <Info fontSize="small" />;
-  };
-
-  // Function to get status color
-  const getStatusColor = (status) => {
-    if (
-      status === "Active" ||
-      status === "Delivered" ||
-      status === "Completed" ||
-      status === "Paid" ||
-      status === "Verified" ||
-      status === "In Stock" ||
-      status === "active"
-    ) {
-      return "green";
-    } else if (status === "Pending" || status === "Low Stock") {
-      return "orange";
-    } else if (
-      status === "Inactive" ||
-      status === "Cancelled" ||
-      status === "Failed" ||
-      status === "Out of Stock"
-    ) {
-      return "red";
-    }
-    return "blue";
-  };
-
-  const SupplierScoreCard = styled(Box)(({ theme, score }) => ({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing(2),
-    borderRadius: 16,
-    backgroundColor:
-      score >= 80
-        ? "rgba(46, 125, 50, 0.1)"
-        : score >= 60
-        ? "rgba(237, 108, 2, 0.1)"
-        : "rgba(211, 47, 47, 0.1)",
-    color: score >= 80 ? "#2e7d32" : score >= 60 ? "#ed6c02" : "#d32f2f",
-    border: `1px solid ${
-      score >= 80
-        ? "rgba(46, 125, 50, 0.3)"
-        : score >= 60
-        ? "rgba(237, 108, 2, 0.3)"
-        : "rgba(211, 47, 47, 0.3)"
-    }`,
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-    transition: "transform 0.3s ease",
-    "&:hover": {
-      transform: "translateY(-5px)",
-    },
-  }));
-
-  const StatusChip = styled(Chip)(({ theme, statuscolor }) => ({
-    fontWeight: 600,
-    backgroundColor:
-      statuscolor === "green"
-        ? "rgba(46, 125, 50, 0.1)"
-        : statuscolor === "orange"
-        ? "rgba(237, 108, 2, 0.1)"
-        : statuscolor === "red"
-        ? "rgba(211, 47, 47, 0.1)"
-        : "rgba(25, 118, 210, 0.1)",
-    color:
-      statuscolor === "green"
-        ? "#2e7d32"
-        : statuscolor === "orange"
-        ? "#ed6c02"
-        : statuscolor === "red"
-        ? "#d32f2f"
-        : "#1976d2",
-    "& .MuiChip-icon": {
-      color: "inherit",
-    },
-  }));
-
-  const handleOpenDialog = (type) => {
-    setDialogType(type);
-    setOpenDialog(true);
-  };
-
   return (
     <Grid container spacing={3}>
       {/* Supplier Information */}
       <Grid item xs={12} md={4}>
-        <GlassCard sx={{ height: "100%" }}>
+        <GlassCard2 sx={{ height: "100%" }}>
           <Box
             sx={{
               display: "flex",
@@ -345,12 +208,12 @@ const ProfileOverview = ({ supplier }) => {
               />
             </ListItem>
           </List>
-        </GlassCard>
+        </GlassCard2>
       </Grid>
 
       {/* Address & Payment Information */}
       <Grid item xs={12} md={4}>
-        <GlassCard sx={{ mb: 3 }}>
+        <GlassCard2 sx={{ mb: 3 }}>
           <Box
             sx={{
               display: "flex",
@@ -452,9 +315,9 @@ const ProfileOverview = ({ supplier }) => {
               />
             </ListItem>
           </List>
-        </GlassCard>
+        </GlassCard2>
 
-        <GlassCard>
+        <GlassCard2>
           <Box
             sx={{
               display: "flex",
@@ -540,12 +403,12 @@ const ProfileOverview = ({ supplier }) => {
               />
             </ListItem>
           </List>
-        </GlassCard>
+        </GlassCard2>
       </Grid>
 
       {/* Categories & Emergency Contact */}
       <Grid item xs={12} md={4}>
-        <GlassCard sx={{ mb: 3 }}>
+        <GlassCard2 sx={{ mb: 3 }}>
           <Box
             sx={{
               display: "flex",
@@ -614,9 +477,9 @@ const ProfileOverview = ({ supplier }) => {
               />
             </ListItem>
           </List>
-        </GlassCard>
+        </GlassCard2>
 
-        <GlassCard sx={{ mb: 3 }}>
+        <GlassCard2 sx={{ mb: 3 }}>
           <Box
             sx={{
               display: "flex",
@@ -686,9 +549,9 @@ const ProfileOverview = ({ supplier }) => {
               />
             </ListItem>
           </List>
-        </GlassCard>
+        </GlassCard2>
 
-        <GlassCard>
+        <GlassCard2>
           <Box
             sx={{
               display: "flex",
@@ -745,7 +608,7 @@ const ProfileOverview = ({ supplier }) => {
               </Grid>
             ))}
           </Grid>
-        </GlassCard>
+        </GlassCard2>
       </Grid>
     </Grid>
   );
