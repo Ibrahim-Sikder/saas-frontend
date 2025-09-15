@@ -1,7 +1,6 @@
+/* eslint-disable react/prop-types */
 "use client"
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import { useState } from "react"
 import { useGetSalaryForProfileQuery } from "../../../../redux/api/salary"
 import {
@@ -52,6 +51,7 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
   const theme = useTheme()
   const [currentPage, setCurrentPage] = useState(1)
   const [filterMonth, setFilterMonth] = useState("")
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear())
   const [selectedSalary, setSelectedSalary] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [paymentHistoryOpen, setPaymentHistoryOpen] = useState(false)
@@ -67,7 +67,8 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
     id,
     limit,
     page: currentPage,
-    searchTerm: filterMonth,
+    month: filterMonth,
+    year: filterYear,
   })
 
   const handleMonthChange = (event) => {
@@ -75,13 +76,18 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
     setCurrentPage(1)
   }
 
+  const handleYearChange = (event) => {
+    setFilterYear(event.target.value)
+    setCurrentPage(1)
+  }
+
   const handleResetFilter = () => {
     setFilterMonth("")
+    setFilterYear(currentYear)
     setCurrentPage(1)
   }
 
   const handleOpenPaymentModal = (salary) => {
-    // Use the actual data structure from API
     const transformedSalary = {
       _id: salary._id,
       month_of_salary: salary.month_of_salary,
@@ -187,7 +193,7 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
               Salary History with Payment Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {filterMonth ? filterMonth : currentMonth} {currentYear} - Employee ID: {id}
+              {filterMonth ? filterMonth : currentMonth} {filterYear} - Employee ID: {id}
             </Typography>
           </Grid>
           <Grid item>
@@ -222,6 +228,22 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md={4}>
+          <FormControl fullWidth>
+            <InputLabel id="year-select-label">Filter by Year</InputLabel>
+            <Select
+              labelId="year-select-label"
+              id="year-select"
+              value={filterYear}
+              label="Filter by Year"
+              onChange={handleYearChange}
+            >
+              <MenuItem value={currentYear - 1}>{currentYear - 1}</MenuItem>
+              <MenuItem value={currentYear}>{currentYear}</MenuItem>
+              <MenuItem value={currentYear + 1}>{currentYear + 1}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} md={4}>
           <Button
             variant="outlined"
             color="secondary"
@@ -230,7 +252,7 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
             fullWidth
             sx={{ height: "56px" }}
           >
-            Reset Filter
+            Reset Filters
           </Button>
         </Grid>
       </Grid>
@@ -264,212 +286,226 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data?.data?.salaries?.map((salary) => {
-                  // Remove the calculation lines and use direct fields:
-                  const paidAmount = salary.paid_amount || 0
-                  const dueAmount = salary.due_amount || 0
-                  const paymentProgress = getPaymentProgress(paidAmount, salary.total_payment)
-                  const paymentStatus = getPaymentStatusDisplay(salary)
+                {data?.data?.salaries?.length > 0 ? (
+                  data.data.salaries.map((salary) => {
+                    const paidAmount = salary.paid_amount || 0
+                    const dueAmount = salary.due_amount || 0
+                    const paymentProgress = getPaymentProgress(paidAmount, salary.total_payment)
+                    const paymentStatus = getPaymentStatusDisplay(salary)
 
-                  return (
-                    <TableRow
-                      key={salary._id}
-                      sx={{
-                        "&:nth-of-type(odd)": {
-                          backgroundColor: theme.palette.action.hover,
-                        },
-                        "&:hover": {
-                          backgroundColor: theme.palette.action.selected,
-                        },
-                      }}
-                    >
-                      <TableCell>
-                        <Chip size="small" label={salary.employeeId} variant="outlined" color="primary" />
-                      </TableCell>
+                    return (
+                      <TableRow
+                        key={salary._id}
+                        sx={{
+                          "&:nth-of-type(odd)": {
+                            backgroundColor: theme.palette.action.hover,
+                          },
+                          "&:hover": {
+                            backgroundColor: theme.palette.action.selected,
+                          },
+                        }}
+                      >
+                        <TableCell>
+                          <Chip size="small" label={salary.employeeId} variant="outlined" color="primary" />
+                        </TableCell>
 
-                      <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <CalendarMonth fontSize="small" color="primary" sx={{ mr: 1 }} />
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {salary.month_of_salary}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {salary.year_of_salary}
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <CalendarMonth fontSize="small" color="primary" sx={{ mr: 1 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {salary.month_of_salary}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {salary.year_of_salary}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <AttachMoney fontSize="small" color="primary" sx={{ mr: 1 }} />
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: salary.bonus > 0 ? "bold" : "normal",
+                              }}
+                            >
+                              {salary.bonus || "0"}
                             </Typography>
                           </Box>
-                        </Box>
-                      </TableCell>
+                        </TableCell>
 
-                      <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <AttachMoney fontSize="small" color="primary" sx={{ mr: 1 }} />
-                          <Typography
-                            variant="body2"
+                        <TableCell>
+                          <Box
                             sx={{
-                              fontWeight: salary.bonus > 0 ? "bold" : "normal",
+                              display: "flex",
+                              alignItems: "center",
+                              flexDirection: "column",
+                              gap: 0.5,
                             }}
                           >
-                            {salary.bonus || "0"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
+                            <Chip
+                              size="small"
+                              icon={<TimerOutlined />}
+                              label={`${salary.total_overtime || "0"}h`}
+                              color={salary.total_overtime > 0 ? "success" : "default"}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                              ৳{salary.overtime_amount || "0"}
+                            </Typography>
+                          </Box>
+                        </TableCell>
 
-                      <TableCell>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            flexDirection: "column",
-                            gap: 0.5,
-                          }}
-                        >
-                          <Chip
-                            size="small"
-                            icon={<TimerOutlined />}
-                            label={`${salary.total_overtime || "0"}h`}
-                            color={salary.total_overtime > 0 ? "success" : "default"}
-                          />
-                          <Typography variant="caption" color="text.secondary">
-                            ৳{salary.overtime_amount || "0"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <AttachMoney fontSize="small" color="success" sx={{ mr: 1 }} />
+                            <Typography variant="body2" fontWeight="bold">
+                              {salary.salary_amount || "0"}
+                            </Typography>
+                          </Box>
+                        </TableCell>
 
-                      <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <AttachMoney fontSize="small" color="success" sx={{ mr: 1 }} />
-                          <Typography variant="body2" fontWeight="bold">
-                            {salary.salary_amount || "0"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-
-                      <TableCell>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            bgcolor: "primary.light",
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                          }}
-                        >
-                          <MonetizationOn fontSize="small" color="primary" sx={{ mr: 1 }} />
-                          <Typography variant="body2" fontWeight="bold" color="primary.main">
-                            {salary.total_payment || "0"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          fontWeight="bold"
-                          color="success.main"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                          }}
-                        >
-                          <AttachMoney fontSize="small" />
-                          {paidAmount.toLocaleString()}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          fontWeight="bold"
-                          color={dueAmount > 0 ? "error.main" : "success.main"}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                          }}
-                        >
-                          <AttachMoney fontSize="small" />
-                          {dueAmount.toLocaleString()}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell>
-                        <Box sx={{ width: "120px" }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={paymentProgress}
+                        <TableCell>
+                          <Box
                             sx={{
-                              height: 8,
-                              borderRadius: 4,
-                              mb: 0.5,
+                              display: "flex",
+                              alignItems: "center",
+                              bgcolor: "primary.light",
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
                             }}
-                            color={paymentStatus.status === "completed" ? "success" : "primary"}
-                          />
-                          <Typography variant="caption" color="text.secondary">
-                            {Math.round(paymentProgress)}%
+                          >
+                            <MonetizationOn fontSize="small" color="primary" sx={{ mr: 1 }} />
+                            <Typography variant="body2" fontWeight="bold" color="primary.main">
+                              {salary.total_payment || "0"}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            fontWeight="bold"
+                            color="success.main"
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <AttachMoney fontSize="small" />
+                            {paidAmount.toLocaleString()}
                           </Typography>
-                        </Box>
-                      </TableCell>
+                        </TableCell>
 
-                      <TableCell>
-                        <Chip
-                          icon={paymentStatus.icon}
-                          label={paymentStatus.label}
-                          color={paymentStatus.color}
-                          size="small"
-                          variant={paymentStatus.status === "completed" ? "filled" : "outlined"}
-                        />
-                      </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            fontWeight="bold"
+                            color={dueAmount > 0 ? "error.main" : "success.main"}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <AttachMoney fontSize="small" />
+                            {dueAmount.toLocaleString()}
+                          </Typography>
+                        </TableCell>
 
-                      <TableCell>
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                          <Tooltip title={dueAmount <= 0 ? "Fully Paid" : "Add Payment"}>
-                            <span>
+                        <TableCell>
+                          <Box sx={{ width: "120px" }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={paymentProgress}
+                              sx={{
+                                height: 8,
+                                borderRadius: 4,
+                                mb: 0.5,
+                              }}
+                              color={paymentStatus.status === "completed" ? "success" : "primary"}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                              {Math.round(paymentProgress)}%
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Chip
+                            icon={paymentStatus.icon}
+                            label={paymentStatus.label}
+                            color={paymentStatus.color}
+                            size="small"
+                            variant={paymentStatus.status === "completed" ? "filled" : "outlined"}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                            <Tooltip title={dueAmount <= 0 ? "Fully Paid" : "Add Payment"}>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  color="primary"
+                                  onClick={() => handleOpenPaymentModal(salary)}
+                                  disabled={dueAmount <= 0}
+                                  sx={{
+                                    bgcolor: theme.palette.primary.light + "20",
+                                    "&:hover": {
+                                      bgcolor: theme.palette.primary.light + "40",
+                                    },
+                                    "&:disabled": {
+                                      bgcolor: theme.palette.grey[200],
+                                    },
+                                  }}
+                                >
+                                  <Add fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+
+                            <Tooltip title="Payment History">
                               <IconButton
                                 size="small"
-                                color="primary"
-                                onClick={() => handleOpenPaymentModal(salary)}
-                                disabled={dueAmount <= 0}
+                                color="info"
+                                onClick={() => handleOpenPaymentHistory(salary)}
                                 sx={{
-                                  bgcolor: theme.palette.primary.light + "20",
+                                  bgcolor: theme.palette.info.light + "20",
                                   "&:hover": {
-                                    bgcolor: theme.palette.primary.light + "40",
-                                  },
-                                  "&:disabled": {
-                                    bgcolor: theme.palette.grey[200],
+                                    bgcolor: theme.palette.info.light + "40",
                                   },
                                 }}
                               >
-                                <Add fontSize="small" />
+                                <History fontSize="small" />
                               </IconButton>
-                            </span>
-                          </Tooltip>
-
-                          <Tooltip title="Payment History">
-                            <IconButton
-                              size="small"
-                              color="info"
-                              onClick={() => handleOpenPaymentHistory(salary)}
-                              sx={{
-                                bgcolor: theme.palette.info.light + "20",
-                                "&:hover": {
-                                  bgcolor: theme.palette.info.light + "40",
-                                },
-                              }}
-                            >
-                              <History fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-
-                         
-                         
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
+                      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <MonetizationOn sx={{ fontSize: 60, color: "text.disabled", mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary">
+                          No salary records found
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          {filterMonth || filterYear !== currentYear
+                            ? "Try adjusting your filters or try a different search"
+                            : "No salary records available for this employee"}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -490,10 +526,9 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
         </Box>
       )}
 
-      {/* Partial Payment Modal */}
       {selectedSalary && (
         <PartialPaymentModal
-        tenantDomain={tenantDomain}
+          tenantDomain={tenantDomain}
           open={modalOpen}
           onClose={handleCloseModal}
           employee={selectedSalary.employee}
@@ -502,7 +537,6 @@ const EmployeeSalary = ({ id, tenantDomain }) => {
         />
       )}
 
-      {/* Payment History Modal */}
       {selectedPaymentHistory && (
         <PaymentHistoryModal
           open={paymentHistoryOpen}

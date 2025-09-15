@@ -360,9 +360,7 @@ const Detail = () => {
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
                     {invoicePreview.vat > 0 && <b> VAT </b>}
-                    {invoicePreview.tax > 0 && (
-                      <b> Tax included  </b>
-                    )}
+                    {invoicePreview.tax > 0 && <b> Tax included </b>}
                     <b> Grand Total </b>
 
                     {advanceAmountNumber !== 0 && (
@@ -375,7 +373,12 @@ const Detail = () => {
                     )}
                   </div>
                   <div>
-                    <small> : {formatNumber(invoicePreview?.total_amount)} &#2547; </small>
+                    <small>
+                      {" "}
+                      : {formatNumber(
+                        invoicePreview?.total_amount
+                      )} &#2547;{" "}
+                    </small>
                     {invoicePreview.discount > 0 && (
                       <small>
                         : {formatNumber(invoicePreview.discount)} &#2547;
@@ -409,6 +412,19 @@ const Detail = () => {
               <div className="mt-5 text-[12px]">
                 <b className="">In words:</b>{" "}
                 {invoicePreview?.net_total_in_words}
+              </div>
+            </div>
+            {/* Signature Section */}
+            <div className="flex justify-between mt-16 mb-5 text-[12px]">
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
               </div>
             </div>
           </div>

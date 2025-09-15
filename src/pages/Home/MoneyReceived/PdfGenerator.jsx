@@ -349,9 +349,20 @@ const PdfGenerator = () => {
                 </span>
               </div>
             </div>
-            <div className="mt-5">
-              <small className="signature">Authorized Signature</small>
+
+             <div className="flex justify-between mt-16 mb-5 text-[12px] ">
+              <div className="text-center signature">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center signature">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
+              </div>
             </div>
+           
           </div>
         </div>
       </div>

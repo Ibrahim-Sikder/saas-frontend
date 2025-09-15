@@ -348,7 +348,21 @@ const Detail = () => {
                 {quotationPreview?.net_total_in_words}
               </div>
             </div>
+            {/* Signature Section */}
+            <div className="flex justify-between mt-16 mb-5 text-[12px]">
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
+              </div>
+            </div>
           </div>
+          
         </div>
         <div>
           <div className="printInvoiceBtnGroup">

@@ -21,30 +21,29 @@ const salaryApi = baseApi.injectEndpoints({
     }),
 
     getAllSalary: builder.query({
-      query: ({ tenantDomain, searchTerm }) => ({
+      query: ({ tenantDomain, searchTerm, month, year, day, limit, page }) => ({
         url: `/salary/all`,
         method: "GET",
-        params: { tenantDomain, searchTerm },
+        params: { tenantDomain, searchTerm, month, year, day, limit, page },
       }),
       providesTags: ["salary"],
     }),
-    getSingleSalary: builder.query({
-      query: ({ tenantDomain, id }) => {
-        
-        return {
-          url: `/salary/single/${id}`,
-          method: "GET",
-          params: { tenantDomain },
-        };
-      },
-    }),
+
+getSingleSalary: builder.query({
+  query: ({ tenantDomain, id, month, year, day }) => ({
+    url: `/salary/single/${id}`,
+    method: "GET",
+    params: { tenantDomain, month, year, day },
+  }),
+}),
+
 
     upateSalary: builder.mutation({
       query: ({ id, data, tenantDomain }) => ({
         url: `/salary/${id}`,
         method: "PATCH",
         body: data,
-        params:{tenantDomain}
+        params: { tenantDomain },
       }),
       providesTags: ["salary"],
     }),
