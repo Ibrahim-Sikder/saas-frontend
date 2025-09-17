@@ -1570,14 +1570,7 @@ const AddJobCard = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item lg={12} md={12} sm={12} xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Reference Name (T) "
-                    {...register("reference_name")}
-                    focused={userDetails?.data?.reference_name || ""}
-                  />
-                </Grid>
+               
               </Grid>
             </Box>
           </div>

@@ -165,6 +165,7 @@ const ExpenseForm = ({ id }) => {
       note: data.note || "",
     };
 
+
     const toastId = toast.loading(
       id ? "Updating Expense..." : "Creating Expense..."
     );
@@ -195,9 +196,7 @@ const ExpenseForm = ({ id }) => {
       navigate("/dashboard/expense-list");
     } catch (error) {
       toast.update(toastId, {
-        render:
-          `Error ${id ? "updating" : "creating"} expense: ` +
-          (error?.data?.message || error?.message || "Something went wrong!"),
+        render:   (error?.data?.message || error?.message || "Something went wrong!"),
         type: "error",
         isLoading: false,
         autoClose: 3000,
@@ -380,7 +379,7 @@ const ExpenseForm = ({ id }) => {
                             <TASInput
                               fullWidth
                               name={`items[${index}].name`}
-                              label={`Item ${index + 1} Name`}
+                              label={`Expense Item Name`}
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
@@ -396,7 +395,7 @@ const ExpenseForm = ({ id }) => {
                               fullWidth
                               label="Amount"
                               name={`items[${index}].amount`}
-                              type="number"
+                              
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">

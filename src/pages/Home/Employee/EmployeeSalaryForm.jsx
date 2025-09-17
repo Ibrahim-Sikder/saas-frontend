@@ -68,14 +68,15 @@ for (let year = 2024; year <= 2030; year++) {
 const initialSelectedOption = allMonths[new Date().getMonth()];
 const currentYear = new Date().getFullYear().toString();
 
-const EmployeeSalaryForm = () => {
+const EmployeeSalaryForm = ({ id }) => {
+  console.log(id);
   const tenantDomain = useTenantDomain();
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
   const limit = 100;
   const location = useLocation();
-  const id = new URLSearchParams(location.search).get("id");
+  // const id = new URLSearchParams(location.search).get("id");
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
@@ -93,6 +94,7 @@ const EmployeeSalaryForm = () => {
 
   const { data: singleSalary, isLoading: singleSalaryLoading } =
     useGetSingleSalaryQuery({ tenantDomain, id }, { skip: !id });
+  console.log('single salary console this  ',singleSalary);
   const [createSalary, { isLoading: createLoading, error: createError }] =
     useCreateSalaryMutation();
   const [updateSalary, { isLoading: updateLoading, error: updateError }] =
@@ -190,57 +192,51 @@ const EmployeeSalaryForm = () => {
       const dueArray = new Array(employeeCount).fill(0);
       const paidArray = new Array(employeeCount).fill(false);
 
-      // Process ALL salary records and populate corresponding employee data
+      // Create a map for quick lookup of salary data by employee ID
+      const salaryMap = {};
       salariesArray.forEach((salaryData) => {
-        // Find the employee index that matches this salary data
-        let targetEmployeeId = null;
+        let employeeId = null;
+
+        // Extract employee ID from different possible formats
         if (
           salaryData.employee &&
           typeof salaryData.employee === "object" &&
           salaryData.employee._id
         ) {
-          // Employee is an object with _id
-          targetEmployeeId = salaryData.employee._id;
+          employeeId = salaryData.employee._id;
         } else if (typeof salaryData.employee === "string") {
-          // Employee is just an ID string
-          targetEmployeeId = salaryData.employee;
+          employeeId = salaryData.employee;
         } else if (salaryData.employeeId) {
-          // Try to find by employeeId field
+          // Find employee by employeeId if _id is not available
           const foundEmployee = employees.find(
             (emp) => emp.employeeId === salaryData.employeeId
           );
-          targetEmployeeId = foundEmployee?._id;
+          employeeId = foundEmployee?._id;
         }
 
-        const targetEmployeeIndex = targetEmployeeId
-          ? employees.findIndex((emp) => emp._id === targetEmployeeId)
-          : -1;
+        if (employeeId) {
+          salaryMap[employeeId] = salaryData;
+        }
+      });
 
-        // Set the specific employee's data if found
-        if (targetEmployeeIndex !== -1) {
-          monthArray[targetEmployeeIndex] =
+      // Process each employee and set their salary data if available
+      employees.forEach((employee, index) => {
+        const salaryData = salaryMap[employee._id];
+        if (salaryData) {
+          monthArray[index] =
             salaryData.month_of_salary || initialSelectedOption;
-          yearArray[targetEmployeeIndex] =
-            salaryData.year_of_salary || currentYear;
-          bonusArray[targetEmployeeIndex] = salaryData.bonus || 0;
-          overtimeAmountArray[targetEmployeeIndex] =
-            salaryData.overtime_rate || salaryData.overtime_amount || 0;
-          overtimeHoursArray[targetEmployeeIndex] =
-            salaryData.total_overtime || 0;
-          salaryAmountArray[targetEmployeeIndex] =
-            salaryData.salary_amount || 0;
-          previousDueArray[targetEmployeeIndex] = salaryData.previous_due || 0;
-          salaryCutArray[targetEmployeeIndex] = salaryData.cut_salary || 0;
-          totalPaymentArray[targetEmployeeIndex] =
-            salaryData.total_payment || 0;
-          advanceArray[targetEmployeeIndex] = salaryData.advance || 0;
-          payArray[targetEmployeeIndex] = salaryData.pay || 0;
-          dueArray[targetEmployeeIndex] =
-            salaryData.due_amount || salaryData.due || 0;
-          paidArray[targetEmployeeIndex] =
-            salaryData.payment_status === "completed";
-        } else {
-          console.warn(`Employee not found for salary data:`, salaryData);
+          yearArray[index] = salaryData.year_of_salary || currentYear;
+          bonusArray[index] = salaryData.bonus || 0;
+          overtimeAmountArray[index] = salaryData.overtime_rate || 0;
+          overtimeHoursArray[index] = salaryData.total_overtime || 0;
+          salaryAmountArray[index] = salaryData.salary_amount || 0;
+          previousDueArray[index] = salaryData.previous_due || 0;
+          salaryCutArray[index] = salaryData.cut_salary || 0;
+          totalPaymentArray[index] = salaryData.total_payment || 0;
+          advanceArray[index] = salaryData.advance || 0;
+          payArray[index] = salaryData.pay || 0;
+          dueArray[index] = salaryData.due_amount || salaryData.due || 0;
+          paidArray[index] = salaryData.payment_status === "completed";
         }
       });
 
@@ -259,6 +255,7 @@ const EmployeeSalaryForm = () => {
       setDue(dueArray);
       setPaid(paidArray);
     } catch (error) {
+      console.error("Error loading salary data:", error);
       toast.error("Error loading salary data");
       initializeWithDefaults(employeeCount);
     }
@@ -586,6 +583,8 @@ const EmployeeSalaryForm = () => {
           due_amount: dueAmount,
           payment_status: paymentStatus,
         };
+
+        console.log(updateData);
 
         return updateSalary({
           tenantDomain,

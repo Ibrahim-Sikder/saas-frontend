@@ -1,183 +1,480 @@
+"use client";
+
 /* eslint-disable react/prop-types */
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Chip,
+  useTheme,
+  useMediaQuery,
+  LinearProgress,
+  alpha,
+  Tooltip,
+  Paper,
+  Tabs,
+  Tab,
+  Avatar,
+} from "@mui/material";
 import {
   AttachMoney,
   TrendingUp,
   TrendingDown,
   Receipt,
   AccountBalance,
+  AccountTree,
+  Payments,
+  VolunteerActivism,
+  InfoOutlined,
+  CalendarMonth,
+  ShowChart,
+  PieChart,
+  StackedLineChart,
 } from "@mui/icons-material";
 
-const DashboardSummary = ({ data }) => {
-  // Calculate net profit
-  const totalIncome = data?.incomes?.totalIncomeAmount || 0;
-  const totalExpense = data?.expense?.totalExpenseAmount || 0;
-  const netProfit = totalIncome - totalExpense;
+const DashboardSummary = ({ accountSummary }) => {
+  console.log(accountSummary);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [timeRange, setTimeRange] = useState("monthly");
+
+  const getDataByTimeRange = (category, subCategory = null) => {
+    if (!accountSummary?.data?.[category]) return subCategory ? 0 : {};
+
+    const categoryData = accountSummary.data[category];
+
+    // Handle direct number values (donation, salary, netProfit)
+    if (typeof categoryData[timeRange] === "number") {
+      return subCategory ? categoryData[timeRange] : categoryData[timeRange];
+    }
+
+    // Handle object values (income, expense)
+    if (typeof categoryData[timeRange] === "object") {
+      if (subCategory) {
+        return categoryData[timeRange]?.[subCategory] || 0;
+      }
+      return categoryData[timeRange] || {};
+    }
+
+    return subCategory ? 0 : {};
+  };
+
+  // Get all data for the selected time range
+  const incomeData = getDataByTimeRange("income");
+  const expenseData = getDataByTimeRange("expense");
+  const donationAmount = getDataByTimeRange("donation");
+  const salaryAmount = getDataByTimeRange("salary");
+  const netProfitAmount = getDataByTimeRange("netProfit");
+
+  // Calculate values
+  const totalIncome = incomeData.totalAmount || 0;
+  const totalExpense = expenseData.totalAmount || 0;
+  const netProfit = netProfitAmount || totalIncome - totalExpense;
   const profitColor = netProfit >= 0 ? "success" : "error";
   const profitIcon = netProfit >= 0 ? <TrendingUp /> : <TrendingDown />;
   const profitLabel = netProfit >= 0 ? "Profit" : "Loss";
 
-  return (
-    <Box p={2}>
-      <Grid container spacing={3}>
-       
+  // Calculate percentages for progress indicators
+  const maxValue = Math.max(totalIncome, totalExpense);
+  const incomePercentage = maxValue > 0 ? (totalIncome / maxValue) * 100 : 0;
+  const expensePercentage = maxValue > 0 ? (totalExpense / maxValue) * 100 : 0;
 
-        {/* === Income & Expense Overviews - RIGHT SIDE === */}
-        <Grid item xs={12} md={8}>
-          {/* === Expense Overview === */}
-          <Box mt={3}>
-            <Typography variant="h5" fontWeight="bold" color="red" mb={2}>
-              💸 Expense Overview
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#ffebee", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <TrendingDown color="error" />
-                      <Typography fontWeight="bold">Total Expense</Typography>
-                    </Box>
-                    <Typography variant="h6">
-                      ৳{" "}
-                      {data?.expense?.totalExpenseAmount?.toLocaleString() ||
-                        "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+  // Time range selector
+  const TimeRangeSelector = () => (
+    <Paper
+      sx={{
+        p: 1,
+        mb: 3,
+        display: "flex",
+        justifyContent: "center",
+        background: alpha(theme.palette.primary.main, 0.05),
+      }}
+    >
+      <Tabs
+        value={timeRange}
+        onChange={(e, newValue) => setTimeRange(newValue)}
+        sx={{
+          "& .MuiTab-root": {
+            minWidth: "auto",
+            px: 3,
+            py: 1,
+            fontSize: "0.875rem",
+            fontWeight: "bold",
+          },
+          "& .Mui-selected": {
+            color: theme.palette.primary.main,
+          },
+        }}
+        centered
+      >
+        <Tab icon={<CalendarMonth />} label="Monthly" value="monthly" />
+        <Tab icon={<StackedLineChart />} label="Yearly" value="yearly" />
+        <Tab icon={<PieChart />} label="Total" value="total" />
+      </Tabs>
+    </Paper>
+  );
 
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#fbe9e7", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Receipt color="error" />
-                      <Typography fontWeight="bold">Invoice Cost</Typography>
-                    </Box>
-                    <Typography variant="h6">
-                      ৳{" "}
-                      {data?.expense?.totalInvoiceCost?.toLocaleString() || "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#f3e5f5", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Receipt color="secondary" />
-                      <Typography fontWeight="bold">Other Expense</Typography>
-                    </Box>
-                    <Typography variant="h6">
-                      ৳{" "}
-                      {data?.expense?.totalOtherExpense?.toLocaleString() ||
-                        "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-          {/* === Income Overview === */}
-          <Box mb={3}>
-            <Typography variant="h5" fontWeight="bold" color="green" mb={2}>
-              💰 Income Overview
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#e8f5e9", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <AttachMoney color="success" />
-                      <Typography fontWeight="bold">Total Income</Typography>
-                    </Box>
-                    <Typography variant="h6" fontWeight="bold">
-                      ৳{" "}
-                      {data?.incomes?.totalIncomeAmount?.toLocaleString() ||
-                        "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#f1f8e9", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <TrendingUp color="success" />
-                      <Typography fontWeight="bold">Invoice Income</Typography>
-                    </Box>
-                    <Typography variant="h6">
-                      ৳{" "}
-                      {data?.incomes?.totalInvoiceIncome?.toLocaleString() ||
-                        "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: "#fff3e0", boxShadow: 3 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Receipt color="warning" />
-                      <Typography fontWeight="bold">Other Income</Typography>
-                    </Box>
-                    <Typography variant="h6">
-                      ৳{" "}
-                      {data?.incomes?.totalOtherIncome?.toLocaleString() || "0"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
-         {/* === Financial Performance Highlight - LEFT SIDE === */}
-        <Grid item xs={12} md={4}>
-          <Typography variant="h5" fontWeight="bold" color="primary" mb={2}>
-            📊 Financial Performance
-          </Typography>
-
-          <Card
+  // StatCard component for consistent styling
+  const StatCard = ({ title, value, icon, color, subtitle, progress }) => (
+    <Card
+      sx={{
+        height: "100%",
+        transition: "all 0.3s ease",
+        background: `linear-gradient(135deg, ${alpha(
+          theme.palette[color].main,
+          0.1
+        )} 0%, ${alpha(theme.palette[color].main, 0.05)} 100%)`,
+        border: `1px solid ${alpha(theme.palette[color].main, 0.2)}`,
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: theme.shadows[8],
+          border: `1px solid ${alpha(theme.palette[color].main, 0.4)}`,
+        },
+      }}
+    >
+      <CardContent sx={{ p: 2 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          mb={1}
+        >
+          <Avatar
             sx={{
-              backgroundColor: netProfit >= 0 ? "#e8f5e9" : "#ffebee",
-              boxShadow: 5,
-              borderLeft: `5px solid ${netProfit >= 0 ? "#4caf50" : "#f44336"}`,
-              height: "80%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
+              bgcolor: alpha(theme.palette[color].main, 0.2),
+              width: 40,
+              height: 40,
             }}
           >
-            <CardContent>
-              <Box display="flex" alignItems="center" gap={1}>
-                <AccountBalance color={profitColor} />
-                <Typography fontWeight="bold">Net {profitLabel}</Typography>
-              </Box>
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                color={profitColor}
-                sx={{ mt: 2, mb: 1 }}
-              >
-                {profitIcon} ৳ {Math.abs(netProfit).toLocaleString()}
-              </Typography>
-              <Box display="flex" alignItems="center" mt={2}>
-                <Typography variant="body2" color="text.secondary">
-                  <Box component="span" color="success.main">
-                    Income: ৳ {totalIncome.toLocaleString()}
-                  </Box>
-                  &nbsp;&nbsp;|&nbsp;&nbsp;
-                  <Box component="span" color="error.main">
-                    Expense: ৳ {totalExpense.toLocaleString()}
-                  </Box>
+            {icon}
+          </Avatar>
+          <Tooltip title={title}>
+            <InfoOutlined sx={{ fontSize: 16, color: "text.secondary" }} />
+          </Tooltip>
+        </Box>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          gutterBottom
+          sx={{ color: `${color}.main` }}
+        >
+          ৳ {value.toLocaleString()}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography variant="caption" color="text.secondary">
+            {subtitle}
+          </Typography>
+        )}
+        {progress && (
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{
+              mt: 1,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: alpha(theme.palette[color].main, 0.2),
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: theme.palette[color].main,
+              },
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <Box p={isMobile ? 1 : 3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={1}
+        flexDirection={isMobile ? "column" : "row"}
+      >
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          color="primary"
+          gutterBottom={isMobile}
+        >
+          Financial Dashboard
+        </Typography>
+        <Chip
+          icon={<CalendarMonth />}
+          label={`${
+            timeRange.charAt(0).toUpperCase() + timeRange.slice(1)
+          } View`}
+          color="primary"
+          variant="outlined"
+        />
+      </Box>
+
+      <TimeRangeSelector />
+
+      <Grid container spacing={3}>
+        {/* Financial Performance Highlight */}
+        <Grid item xs={12} lg={4}>
+          <Paper
+            sx={{
+              p: 3,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              background: alpha(theme.palette.primary.main, 0.03),
+              borderRadius: 3,
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={3}>
+              <Avatar sx={{ bgcolor: "primary.main", mr: 2 }}>
+                <AccountBalance />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" fontWeight="bold" color="primary.dark">
+                  Financial Performance
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {timeRange} summary
                 </Typography>
               </Box>
-            </CardContent>
-          </Card>
+            </Box>
+
+            <Card
+              sx={{
+                flexGrow: 1,
+                background: `linear-gradient(135deg, ${alpha(
+                  theme.palette[profitColor].main,
+                  0.1
+                )} 0%, ${alpha(theme.palette[profitColor].main, 0.05)} 100%)`,
+                boxShadow: "none",
+                border: `1px solid ${alpha(
+                  theme.palette[profitColor].main,
+                  0.2
+                )}`,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                p: 3,
+                mb: 2,
+                borderRadius: 3,
+              }}
+            >
+              <Box textAlign="center">
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(theme.palette[profitColor].main, 0.2),
+                    width: 60,
+                    height: 60,
+                    mx: "auto",
+                    mb: 2,
+                  }}
+                >
+                  <Box sx={{ color: `${profitColor}.main`, fontSize: 30 }}>
+                    {profitIcon}
+                  </Box>
+                </Avatar>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  color={`${profitColor}.main`}
+                  gutterBottom
+                >
+                  ৳ {Math.abs(netProfit).toLocaleString()}
+                </Typography>
+                <Chip
+                  label={`Net ${profitLabel}`}
+                  color={profitColor}
+                  sx={{ mb: 3 }}
+                />
+
+                <Box mt={3} px={2}>
+                  <Box display="flex" justifyContent="space-between" mb={2}>
+                    <Typography
+                      variant="body2"
+                      color="success.main"
+                      fontWeight="medium"
+                    >
+                      Income
+                    </Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      ৳ {totalIncome.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography
+                      variant="body2"
+                      color="error.main"
+                      fontWeight="medium"
+                    >
+                      Expense
+                    </Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      ৳ {totalExpense.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <StatCard
+                  title="Donations"
+                  value={donationAmount}
+                  icon={<VolunteerActivism color="primary" />}
+                  color="primary"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <StatCard
+                  title="Salary"
+                  value={salaryAmount}
+                  icon={<Payments color="warning" />}
+                  color="warning"
+                />
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+
+        {/* Income Overview */}
+        <Grid item xs={12} md={6} lg={4}>
+          <Paper
+            sx={{
+              p: 3,
+              background: alpha(theme.palette.success.light, 0.05),
+              mb: 3,
+              borderRadius: 3,
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={3}>
+              <Avatar sx={{ bgcolor: "success.main", mr: 2 }}>
+                <AttachMoney />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" fontWeight="bold" color="success.dark">
+                  Income Overview
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {timeRange} income
+                </Typography>
+              </Box>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <StatCard
+                  title="Total Income"
+                  value={totalIncome}
+                  icon={<AttachMoney color="success" />}
+                  color="success"
+                  progress={incomePercentage}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatCard
+                  title="Service Income"
+                  value={incomeData.serviceIncomeAmount || 0}
+                  icon={<AccountTree color="info" />}
+                  color="info"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatCard
+                  title="Parts Income"
+                  value={incomeData.partsIncomeAmount || 0}
+                  icon={<Receipt color="warning" />}
+                  color="warning"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <StatCard
+                  title="Other Income"
+                  value={incomeData.totalOtherIncome || 0}
+                  icon={<TrendingUp color="secondary" />}
+                  color="secondary"
+                />
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+
+        {/* Expense Overview */}
+        <Grid item xs={12} md={6} lg={4}>
+          <Paper
+            sx={{
+              p: 3,
+              background: alpha(theme.palette.error.light, 0.05),
+              borderRadius: 3,
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={3}>
+              <Avatar sx={{ bgcolor: "error.main", mr: 2 }}>
+                <TrendingDown />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" fontWeight="bold" color="error.dark">
+                  Expense Overview
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {timeRange} expenses
+                </Typography>
+              </Box>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <StatCard
+                  title="Total Expense"
+                  value={totalExpense}
+                  icon={<TrendingDown color="error" />}
+                  color="error"
+                  progress={expensePercentage}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatCard
+                  title="Invoice Cost"
+                  value={expenseData.invoiceCost || 0}
+                  icon={<Receipt color="error" />}
+                  color="error"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatCard
+                  title="Other Expense"
+                  value={expenseData.totalOtherExpense || 0}
+                  icon={<Receipt color="secondary" />}
+                  color="secondary"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <StatCard
+                  title="Salary Expense"
+                  value={salaryAmount}
+                  icon={<Payments color="warning" />}
+                  color="warning"
+                />
+              </Grid>
+            </Grid>
+          </Paper>
         </Grid>
       </Grid>
+
+      {/* Summary Footer */}
+      <Box mt={3} display="flex" justifyContent="center">
+        <Chip
+          icon={<ShowChart />}
+          label={`Financial summary for ${timeRange} view`}
+          variant="outlined"
+          color="primary"
+        />
+      </Box>
     </Box>
   );
 };

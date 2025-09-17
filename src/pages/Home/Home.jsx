@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";  // Import useState
+import React, { useState } from "react"; // Import useState
 import "./Home.css";
 import MonthlyBarChart from "../../components/Chart/MonthlyBarChart";
 import YearlyIncomeChart from "../../components/Chart/YearlyIncomeChart";
@@ -12,7 +12,10 @@ import RcentQuotation from "./Dashboard/RcentQuotation";
 import RecentInvoice from "./Dashboard/RecentInvoice";
 import EmployeeStatistics from "./Dashboard/EmployeeStatistics";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
-import { useGetAllMetaQuery } from "../../redux/api/meta.api";
+import {
+  useAccountSummaryQuery,
+  useGetAllMetaQuery,
+} from "../../redux/api/meta.api";
 import DashboardSummary from "./Dashboard/IncomeCard";
 import Loading from "../../components/Loading/Loading";
 
@@ -24,6 +27,7 @@ const Home = () => {
     isLoading,
     isError,
   } = useGetAllMetaQuery({ tenantDomain });
+  const { data: accountSummary } = useAccountSummaryQuery({ tenantDomain });
 
   if (isLoading) {
     return <Loading />;
@@ -49,7 +53,7 @@ const Home = () => {
       {showSensitiveData && (
         <>
           <AllServices />
-          <DashboardSummary data={allMetaData?.data} />
+          <DashboardSummary data={allMetaData?.data} accountSummary={accountSummary}/>
         </>
       )}
 

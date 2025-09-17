@@ -136,6 +136,8 @@ import AllUserList from "../pages/Home/Tenant/AllUserList";
 import ContactUserList from "../pages/Home/Tenant/ContactUserList";
 import CompanyBrand from "../pages/CompanyBrand/CompanyBrand";
 import Review from "../pages/Review/Review";
+import DonationList from "../pages/Donation/DonationList";
+import UpdateDonation from "../pages/Donation/UpdateDonation";
 
 export const router = createBrowserRouter([
   {
@@ -532,6 +534,14 @@ export const router = createBrowserRouter([
       {
         path: "donation",
         element: <Donation />,
+      },
+      {
+        path: "donation-list",
+        element: <DonationList />,
+      },
+      {
+        path: "update-donation",
+        element: <UpdateDonation />,
       },
       {
         path: "category",

@@ -658,18 +658,7 @@ const Sidebar = ({ toggle }) => {
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <Payments className="mr-2" />
-                <NavLink to="/dashboard/add-paybill"> Pay Bill </NavLink>
-              </div>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <ReceiptLong className="mr-2" />
-                <NavLink to="/dashboard/paybill">Bill List</NavLink>
-              </div>
-            </Typography>
+          
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
@@ -733,12 +722,7 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-leave">Leave</NavLink>
               </span>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <HolidayVillage className="mr-2" />
-                <NavLink to="/dashboard/holiday">Holiday</NavLink>
-              </span>
-            </Typography>
+          
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <AttachMoney className="mr-2" />
