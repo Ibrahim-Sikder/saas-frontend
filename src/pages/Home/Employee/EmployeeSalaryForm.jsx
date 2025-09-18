@@ -10,8 +10,8 @@ import "./Employee.css";
 import { useGetAllEmployeesQuery } from "../../../redux/api/employee";
 import {
   useCreateSalaryMutation,
-  useGetSingleSalaryQuery,
   useUpateSalaryMutation,
+  useGetSalaryByMonthQuery,
 } from "../../../redux/api/salary";
 import {
   Box,
@@ -37,7 +37,6 @@ import {
   Typography,
   useTheme,
   Alert,
-  CircularProgress,
   Autocomplete,
   Avatar,
 } from "@mui/material";
@@ -58,6 +57,7 @@ import {
 import { allMonths } from "../../../utils/month";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import Loading from "../../../components/Loading/Loading";
 
 // Constants
 const years = [{ value: "Select Year", label: "Select Year" }];
@@ -69,14 +69,15 @@ const initialSelectedOption = allMonths[new Date().getMonth()];
 const currentYear = new Date().getFullYear().toString();
 
 const EmployeeSalaryForm = ({ id }) => {
-  console.log(id);
+  const location = useLocation();
+  const month = new URLSearchParams(location.search).get("month");
+
   const tenantDomain = useTenantDomain();
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState(initialSelectedOption);
   const limit = 100;
-  const location = useLocation();
-  // const id = new URLSearchParams(location.search).get("id");
+
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
@@ -93,8 +94,8 @@ const EmployeeSalaryForm = ({ id }) => {
     });
 
   const { data: singleSalary, isLoading: singleSalaryLoading } =
-    useGetSingleSalaryQuery({ tenantDomain, id }, { skip: !id });
-  console.log('single salary console this  ',singleSalary);
+    useGetSalaryByMonthQuery({ tenantDomain, month });
+
   const [createSalary, { isLoading: createLoading, error: createError }] =
     useCreateSalaryMutation();
   const [updateSalary, { isLoading: updateLoading, error: updateError }] =
@@ -165,7 +166,7 @@ const EmployeeSalaryForm = ({ id }) => {
   // Initialize with ALL salary data for edit mode
   const initializeWithAllSalaryData = (employeeCount) => {
     try {
-      const salariesArray = singleSalary.data?.salaries;
+      const salariesArray = singleSalary.data;
       if (
         !salariesArray ||
         !Array.isArray(salariesArray) ||
@@ -227,7 +228,7 @@ const EmployeeSalaryForm = ({ id }) => {
             salaryData.month_of_salary || initialSelectedOption;
           yearArray[index] = salaryData.year_of_salary || currentYear;
           bonusArray[index] = salaryData.bonus || 0;
-          overtimeAmountArray[index] = salaryData.overtime_rate || 0;
+          overtimeAmountArray[index] = salaryData.overtime_rate || 0; // Change to overtime_rate
           overtimeHoursArray[index] = salaryData.total_overtime || 0;
           salaryAmountArray[index] = salaryData.salary_amount || 0;
           previousDueArray[index] = salaryData.previous_due || 0;
@@ -456,64 +457,63 @@ const EmployeeSalaryForm = ({ id }) => {
     return calculateOvertimeHours(employee);
   };
 
-  const handleCreateSalary = async () => {
-    const newSalaryData =
-      filteredEmployees?.map((employee, index) => {
-        const originalIndex = getOriginalEmployeeIndex(employee);
-        const overtimeHoursVal = getOvertimeHours(employee, originalIndex);
-        const overtimePayment = calculateOvertimePayment(
-          overtimeHoursVal,
-          overtimeAmount[originalIndex] || 0
-        );
-        const totalPaymentAmount = totalPayment[originalIndex] || 0;
-        const paidAmount =
-          (advance[originalIndex] || 0) + (pay[originalIndex] || 0);
-        const dueAmount = totalPaymentAmount - paidAmount;
-        const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
+const handleCreateSalary = async () => {
+  const newSalaryData =
+    filteredEmployees?.map((employee, index) => {
+      const originalIndex = getOriginalEmployeeIndex(employee);
+      const overtimeHoursVal = getOvertimeHours(employee, originalIndex);
+      const overtimeRate = overtimeAmount[originalIndex] || 0;
+      const overtimePayment = calculateOvertimePayment(overtimeHoursVal, overtimeRate);
+      const totalPaymentAmount = totalPayment[originalIndex] || 0;
+      const paidAmount =
+        (advance[originalIndex] || 0) + (pay[originalIndex] || 0);
+      const dueAmount = totalPaymentAmount - paidAmount;
+      const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
 
-        return {
-          employee: employee._id,
-          full_name: employee.full_name,
-          employeeId: employee.employeeId,
-          month_of_salary:
-            selectedOption[originalIndex] || initialSelectedOption,
-          year_of_salary: selectedYear[originalIndex] || currentYear,
-          bonus: bonus[originalIndex] || 0,
-          total_overtime: overtimeHoursVal,
-          overtime_rate: overtimeAmount[originalIndex] || 0,
-          overtime_amount: overtimePayment,
-          salary_amount: salaryAmount[originalIndex] || 0,
-          previous_due: previousDue[originalIndex] || 0,
-          cut_salary: salaryCut[originalIndex] || 0,
-          total_payment: totalPaymentAmount,
-          advance: advance[originalIndex] || 0,
-          pay: pay[originalIndex] || 0,
-          due: dueAmount,
-          paid: paidAmount,
-          paid_amount: paidAmount,
-          due_amount: dueAmount,
-          payment_status: paymentStatus,
-        };
-      }) || [];
+      return {
+        employee: employee._id,
+        full_name: employee.full_name,
+        employeeId: employee.employeeId,
+        month_of_salary:
+          selectedOption[originalIndex] || initialSelectedOption,
+        year_of_salary: selectedYear[originalIndex] || currentYear,
+        bonus: bonus[originalIndex] || 0,
+        total_overtime: overtimeHoursVal,
+        overtime_rate: overtimeRate, // Add this field
+        overtime_amount: overtimePayment,
+        salary_amount: salaryAmount[originalIndex] || 0,
+        previous_due: previousDue[originalIndex] || 0,
+        cut_salary: salaryCut[originalIndex] || 0,
+        total_payment: totalPaymentAmount,
+        advance: advance[originalIndex] || 0,
+        pay: pay[originalIndex] || 0,
+        due: dueAmount,
+        paid: paidAmount,
+        paid_amount: paidAmount,
+        due_amount: dueAmount,
+        payment_status: paymentStatus,
+      };
+    }) || [];
 
-    try {
-      const response = await createSalary({
-        tenantDomain,
-        salaries: newSalaryData,
-      }).unwrap();
+  try {
+    const response = await createSalary({
+      tenantDomain,
+      salaries: newSalaryData,
+    }).unwrap();
 
-      if (response.success) {
-        toast.success(response.message);
-        navigate("/dashboard/employee-salary");
-      }
-    } catch (error) {
-      handleApiError(error);
+    if (response.success) {
+      toast.success(response.message);
+      navigate("/dashboard/employee-salary");
     }
-  };
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 
   const handleUpdateAllSalaries = async () => {
     try {
-      const salariesArray = singleSalary.data?.salaries;
+      const salariesArray = singleSalary.data;
 
       if (!salariesArray || !Array.isArray(salariesArray)) {
         toast.error("Invalid salary data structure");
@@ -540,11 +540,20 @@ const EmployeeSalaryForm = ({ id }) => {
           targetEmployeeId = foundEmployee?._id;
         }
 
-        const targetEmployeeIndex = targetEmployeeId
-          ? employees.findIndex((emp) => emp._id === targetEmployeeId)
-          : -1;
+        if (!targetEmployeeId) {
+          console.warn(
+            "Could not find employee ID for salary record:",
+            salaryData
+          );
+          return null;
+        }
+
+        const targetEmployeeIndex = employees.findIndex(
+          (emp) => emp._id === targetEmployeeId
+        );
 
         if (targetEmployeeIndex === -1) {
+          console.warn("Employee not found for salary record:", salaryData);
           return null;
         }
 
@@ -554,37 +563,36 @@ const EmployeeSalaryForm = ({ id }) => {
         const dueAmount = totalPaymentAmount - paidAmount;
         const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
 
-        const updateData = {
-          month_of_salary:
-            selectedOption[targetEmployeeIndex] || initialSelectedOption,
-          year_of_salary: selectedYear[targetEmployeeIndex] || currentYear,
-          bonus: bonus[targetEmployeeIndex] || 0,
-          total_overtime: getOvertimeHours(
+       const updateData = {
+        month_of_salary:
+          selectedOption[targetEmployeeIndex] || initialSelectedOption,
+        year_of_salary: selectedYear[targetEmployeeIndex] || currentYear,
+        bonus: bonus[targetEmployeeIndex] || 0,
+        total_overtime: getOvertimeHours(
+          employees[targetEmployeeIndex],
+          targetEmployeeIndex
+        ),
+        overtime_rate: overtimeAmount[targetEmployeeIndex] || 0, // Add this field
+        overtime_amount: calculateOvertimePayment(
+          getOvertimeHours(
             employees[targetEmployeeIndex],
             targetEmployeeIndex
           ),
-          overtime_rate: overtimeAmount[targetEmployeeIndex] || 0,
-          overtime_amount: calculateOvertimePayment(
-            getOvertimeHours(
-              employees[targetEmployeeIndex],
-              targetEmployeeIndex
-            ),
-            overtimeAmount[targetEmployeeIndex] || 0
-          ),
-          salary_amount: salaryAmount[targetEmployeeIndex] || 0,
-          previous_due: previousDue[targetEmployeeIndex] || 0,
-          cut_salary: salaryCut[targetEmployeeIndex] || 0,
-          total_payment: totalPaymentAmount,
-          advance: advance[targetEmployeeIndex] || 0,
-          pay: pay[targetEmployeeIndex] || 0,
-          due: dueAmount,
-          paid: paidAmount,
-          paid_amount: paidAmount,
-          due_amount: dueAmount,
-          payment_status: paymentStatus,
-        };
+          overtimeAmount[targetEmployeeIndex] || 0
+        ),
+        salary_amount: salaryAmount[targetEmployeeIndex] || 0,
+        previous_due: previousDue[targetEmployeeIndex] || 0,
+        cut_salary: salaryCut[targetEmployeeIndex] || 0,
+        total_payment: totalPaymentAmount,
+        advance: advance[targetEmployeeIndex] || 0,
+        pay: pay[targetEmployeeIndex] || 0,
+        due: dueAmount,
+        paid: paidAmount,
+        paid_amount: paidAmount,
+        due_amount: dueAmount,
+        payment_status: paymentStatus,
+      };
 
-        console.log(updateData);
 
         return updateSalary({
           tenantDomain,
@@ -654,8 +662,8 @@ const EmployeeSalaryForm = ({ id }) => {
   };
 
   const getEmployeesWithSalaryData = () => {
-    if (!isEditMode || !singleSalary?.data?.salaries) return [];
-    const salariesArray = singleSalary.data.salaries;
+    if (!isEditMode || !singleSalary?.data) return [];
+    const salariesArray = singleSalary.data;
     const employees = getAllEmployee?.data?.employees || [];
     return salariesArray
       .map((salaryData) => {
@@ -680,20 +688,7 @@ const EmployeeSalaryForm = ({ id }) => {
   };
 
   if (employeesLoading || (isEditMode && singleSalaryLoading)) {
-    return (
-      <Container maxWidth="7xl">
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "400px",
-          }}
-        >
-          <CircularProgress size={60} />
-        </Box>
-      </Container>
-    );
+    return <Loading />;
   }
 
   // Check if we have the required data
@@ -717,6 +712,7 @@ const EmployeeSalaryForm = ({ id }) => {
     top: 0,
     zIndex: 1,
   };
+
   return (
     <Container maxWidth="7xl">
       <Box sx={{ pt: 4, pb: 8 }}>
@@ -742,10 +738,10 @@ const EmployeeSalaryForm = ({ id }) => {
               <Typography variant="body2" color="text.secondary">
                 Dashboard / Employee Salary {isEditMode ? "/ Update" : ""}
               </Typography>
-              {isEditMode && singleSalary?.data?.salaries && (
+              {isEditMode && singleSalary?.data && (
                 <Chip
                   icon={<Edit />}
-                  label={`Editing ${singleSalary.data.salaries.length} salary record(s)`}
+                  label={`Editing ${singleSalary.data.length} salary record(s)`}
                   color="warning"
                   variant="outlined"
                   sx={{ mt: 1 }}
@@ -858,16 +854,13 @@ const EmployeeSalaryForm = ({ id }) => {
           </CardContent>
         </Card>
 
-        {isEditMode && singleSalary?.data?.salaries && (
+        {isEditMode && singleSalary?.data && (
           <Alert severity="info" sx={{ mb: 3 }}>
             You are editing{" "}
+            <strong>{singleSalary.data.length} salary record(s)</strong> for{" "}
             <strong>
-              {singleSalary.data.salaries.length} salary record(s)
-            </strong>{" "}
-            for{" "}
-            <strong>
-              {singleSalary.data.salaries[0]?.month_of_salary}{" "}
-              {singleSalary.data.salaries[0]?.year_of_salary}
+              {singleSalary.data[0]?.month_of_salary}{" "}
+              {singleSalary.data[0]?.year_of_salary}
             </strong>
             . All loaded salary data will be updated.
           </Alert>

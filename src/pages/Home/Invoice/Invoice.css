@@ -27,7 +27,7 @@
 }
 
 
-.customerInfoWrapss{
+.customerInfoWrapss {
   width: 714px;
 
 
@@ -124,12 +124,13 @@
 .text-left {
   font-size: 12px;
 }
+
 .invoiceTable2 {
   width: 100%;
   table-layout: fixed;
 }
 
-.invoiceTable2  td {
+.invoiceTable2 td {
   word-wrap: break-word;
   white-space: normal;
 }
@@ -280,6 +281,7 @@
     flex-wrap: wrap;
     gap: 5px;
   }
+
   .addInvoiceItem {
     left: -93%;
   }
@@ -404,28 +406,7 @@
 
 }
 
-@media print {
-  body {
-    background-color: #fff;
-  }
 
-  .invoicePrintWrap {
-    background-color: #fff;
-    padding: 0;
-  }
-
-  .buttonGroup,
-  .printInvoiceBtnGroup {
-    display: none;
-  }
-
-  .invoiceTable2 th,
-  .invoiceTable2 td {
-    padding: 2px;
-    margin: 0;
-    font-size: 10px;
-  }
-}
 
 .invoicTable td,
 .invoicTable th,
@@ -490,4 +471,128 @@
 .invoiceInformaiton {
   width: 90% !important;
   margin: 0 auto;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0; /* উপরের, নিচের, ডান-বাম সব মার্জিন 0 */
+  }
+
+  body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .invoicePrintWrap,
+  .invoicePrintWrap * {
+    visibility: visible;
+  }
+
+  .invoicePrintWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .invoicePrint {
+    width: 210mm !important;   /* A4 width */
+    min-height: 297mm !important; /* A4 height */
+    margin: 0 auto !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    padding: 10mm !important;
+    display: block !important;
+  }
+
+  /* Hide unnecessary buttons */
+  .buttonGroup,
+  .printInvoiceBtnGroup,
+  .SearchBtn,
+  .submitQutationBtn {
+    display: none !important;
+  }
+
+  /* Table styles */
+  .invoiceTable2,
+  .invoicTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .invoiceTable2 th,
+  .invoiceTable2 td,
+  .invoicTable th,
+  .invoicTable td {
+    border: 1px solid #000 !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+
+  .invoiceTable2 th {
+    background: #4670a1c0 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Fix header */
+  .invoiceHeader {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-direction: row !important;
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0; /* পুরো মার্জিন 0 */
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .invoicePrintWrap, .invoicePrintWrap * {
+    visibility: visible;
+  }
+
+  .invoicePrintWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .invoicePrint {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    background: #fff !important;
+    padding: 10mm !important;
+  }
 }

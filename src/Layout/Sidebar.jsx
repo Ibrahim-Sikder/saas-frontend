@@ -662,7 +662,13 @@ const Sidebar = ({ toggle }) => {
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
-                <NavLink to="/dashboard/donation">Donation</NavLink>
+                <NavLink to="/dashboard/donation">Donation Add</NavLink>
+              </div>
+            </Typography>
+            <Typography className="accordionTypoGrapy">
+              <div className="flex items-center">
+                <Savings className="mr-2" />
+                <NavLink to="/dashboard/donation-list">Donation List</NavLink>
               </div>
             </Typography>
           </AccordionDetails>

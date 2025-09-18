@@ -34,9 +34,28 @@ const Detail = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
+const handlePrint = useReactToPrint({
+  content: () => componentRef.current,
+  pageStyle: `
+    @page {
+      size: A4;
+      margin: 0; 
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .invoicePrintWrap {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  `
+});
+
 
   const [invoicePreview, setInvoicePreview] = useState({});
 

@@ -757,7 +757,7 @@ const EnhancedEmployeeSalaryListTable = ({ tenantDomain }) => {
                                     size="small"
                                     color="warning"
                                     onClick={() => {
-                                      window.location.href = `/dashboard/employee-salary-update?id=${salary._id}`;
+                                      window.location.href = `/dashboard/employee-salary-update?id=${salary._id}&month=${salary.month_of_salary}`;
                                     }}
                                     sx={{
                                       bgcolor:

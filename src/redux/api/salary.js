@@ -28,6 +28,14 @@ const salaryApi = baseApi.injectEndpoints({
       }),
       providesTags: ["salary"],
     }),
+    getSalaryByMonth: builder.query({
+      query: ({ tenantDomain, month}) => ({
+        url: '/salary/salary-month',
+        method: "GET",
+        params: { tenantDomain, month },
+      }),
+      providesTags: ["salary"],
+    }),
 
     getSingleSalary: builder.query({
       query: ({ tenantDomain, id, month, year, day }) => ({
@@ -74,4 +82,5 @@ export const {
   usePartialyPaymentMutation,
   useDeleteSalaryMutation,
   useUpateSalaryMutation,
+  useGetSalaryByMonthQuery
 } = salaryApi;

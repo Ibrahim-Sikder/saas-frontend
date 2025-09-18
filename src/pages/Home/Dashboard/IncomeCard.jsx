@@ -71,7 +71,7 @@ const DashboardSummary = ({ accountSummary }) => {
 
   // Calculate values
   const totalIncome = incomeData.totalAmount || 0;
-  const totalExpense = expenseData.totalAmount || 0;
+  const totalExpense = accountSummary?.data?.netTotalExpense?.total || 0 ;
   const netProfit = netProfitAmount || totalIncome - totalExpense;
   const profitColor = netProfit >= 0 ? "success" : "error";
   const profitIcon = netProfit >= 0 ? <TrendingUp /> : <TrendingDown />;
@@ -205,7 +205,7 @@ const DashboardSummary = ({ accountSummary }) => {
           color="primary"
           gutterBottom={isMobile}
         >
-          Financial Dashboard
+          Financial Overview
         </Typography>
         <Chip
           icon={<CalendarMonth />}
