@@ -71,6 +71,8 @@ const EmployeeProfile = () => {
     tenantDomain,
     id,
   });
+
+  console.log("employee profile", data);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

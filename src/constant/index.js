@@ -100,3 +100,20 @@ export const applicableEmployeeOption = [
   "Contract Employees",
 ];
 
+
+export const columns = [
+  "SL No",
+  "Employee",
+  "ID",
+  "Designation",
+  "Date",
+  "Present",
+  "Absence",
+  "Office Time",
+  "In Time",
+  "Out Time",
+  "Overtime",
+  "Late",
+];
+
+export const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
