@@ -1,4 +1,5 @@
-"use client"
+/* eslint-disable no-unused-vars */
+"use client";
 
 import {
   Box,
@@ -7,41 +8,46 @@ import {
   Stack,
   Chip,
   Typography,
-  Grid,
   Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Avatar,
-  Skeleton,
-} from "@mui/material"
-import { ControlPoint, Payment, TrendingUp, Receipt } from "@mui/icons-material"
-import { Link } from "react-router-dom"
-import EditIcon from "@mui/icons-material/Edit"
-import IconButton from "@mui/material/IconButton"
-import DeleteIcon from "@mui/icons-material/Delete"
-import Swal from "sweetalert2"
-import { useState } from "react"
-import { useDeleteExpenseMutation, useGetAllExpensesQuery } from "../../../redux/api/expense"
-import { useTenantDomain } from "../../../hooks/useTenantDomain"
+} from "@mui/material";
+import { ControlPoint, Payment } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Swal from "sweetalert2";
+import { useState } from "react";
+import {
+  useDeleteExpenseMutation,
+  useGetAllExpensesQuery,
+} from "../../../redux/api/expense";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import Loading from "../../../components/Loading/Loading";
+import { useAccountSummaryQuery } from "../../../redux/api/meta.api";
+import StatisticsCard from "./StatisticsCard";
+import ExpenseBreakDown from "./ExpenseBreakDown";
 
 export default function ExpenseList() {
-  const tenantDomain = useTenantDomain()
-  const [currentPage, setCurrentPage] = useState(1)
-  const [search, setSearch] = useState("")
+  const tenantDomain = useTenantDomain();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
 
+  const { data: accountSummary} =
+    useAccountSummaryQuery({ tenantDomain });
   const { data, isLoading } = useGetAllExpensesQuery({
     tenantDomain,
     limit: 10,
     page: currentPage,
     searchTerm: search,
-  })
+  });
 
-  const [deleteExpense] = useDeleteExpenseMutation()
+  const [deleteExpense] = useDeleteExpenseMutation();
 
   const handleDelete = async (id) => {
     Swal.fire({
@@ -55,124 +61,73 @@ export default function ExpenseList() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteExpense({ tenantDomain, id }).unwrap()
-          Swal.fire("Deleted!", "The expense has been deleted.", "success")
+          await deleteExpense({ tenantDomain, id }).unwrap();
+          Swal.fire("Deleted!", "The expense has been deleted.", "success");
         } catch (error) {
-          Swal.fire("Error!", "An error occurred while deleting the expense.", "error")
+          Swal.fire(
+            "Error!",
+            "An error occurred while deleting the expense.",
+            "error"
+          );
         }
       }
-    })
-  }
+    });
+  };
 
   const rows =
     data?.data?.expenses?.map((expense) => ({
       id: expense._id,
       date: expense.date,
       reference_no: expense.transactionNumber,
-      amount: expense.totalAmount, // Use totalAmount instead of invoiceCost
+      amount: expense.totalAmount,
       payment_method: expense.payment_method,
       invoice_id: expense.invoice_id,
       note: expense.note,
       expense_items: expense.expense_items,
-    })) || []
+    })) || [];
 
   const handleSearch = (e) => {
-    setSearch(e.target.value)
-  }
+    setSearch(e.target.value);
+  };
 
   const handlePageChange = (event, page) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
-  const { meta = {} } = data?.data || {}
-  const { totalPage = 1, total = 0 } = meta
-  const totalAmount = rows.reduce((sum, expense) => sum + (expense.amount || 0), 0)
+  const { meta = {} } = data?.data || {};
+  const { totalPage = 1, total = 0 } = meta;
 
-  const LoadingSkeleton = () => (
-    <>
-      {[...Array(5)].map((_, index) => (
-        <TableRow key={index}>
-          <TableCell>
-            <Skeleton variant="text" width={100} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="rectangular" width={80} height={24} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="text" width={80} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="text" width={100} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="text" width={120} />
-          </TableCell>
-          <TableCell>
-            <Skeleton variant="rectangular" width={80} height={32} />
-          </TableCell>
-        </TableRow>
-      ))}
-    </>
-  )
+  // Extract expense data from account summary
+  const expenseData = accountSummary?.data?.expense || {};
+
+  const totalExpense = expenseData.total?.totalAmount || 0;
+  const invoiceCost = expenseData.monthly?.invoiceCost || 0;
+  const otherExpense = expenseData.monthly?.totalOtherExpense || 0;
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#f8fafc", minHeight: "100vh" }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b", mb: 1 }}>
-          Expense Management
-        </Typography>
-        <Typography variant="body1" sx={{ color: "#64748b" }}>
-          Dashboard › Expenses › Expense List
-        </Typography>
-      </Box>
 
+     
       {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} lg={3}>
-          <Card sx={{ borderRadius: 3, border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Box>
-                  <Typography variant="body2" sx={{ color: "#64748b", mb: 1 }}>
-                    Total Expenses
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: "#059669" }}>
-                    ${totalAmount.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Avatar sx={{ bgcolor: "#dcfce7", color: "#059669", width: 48, height: 48 }}>
-                  <TrendingUp />
-                </Avatar>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <Card sx={{ borderRadius: 3, border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Box>
-                  <Typography variant="body2" sx={{ color: "#64748b", mb: 1 }}>
-                    Total Records
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: "#2563eb" }}>
-                    {total}
-                  </Typography>
-                </Box>
-                <Avatar sx={{ bgcolor: "#dbeafe", color: "#2563eb", width: 48, height: 48 }}>
-                  <Receipt />
-                </Avatar>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatisticsCard accountSummary={accountSummary} />
 
+      {/* Expense Breakdown Card */}
+      <ExpenseBreakDown accountSummary={accountSummary} />
       {/* Main Table */}
-      <Card sx={{ borderRadius: 3, border: "1px solid #e2e8f0", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
+      <Card
+        sx={{
+          borderRadius: 3,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
+        }}
+      >
         <Box sx={{ p: 3, borderBottom: "1px solid #e2e8f0" }}>
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={3}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={3}
+          >
             <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
               Expense List
             </Typography>
@@ -221,17 +176,40 @@ export default function ExpenseList() {
           <Table sx={{ minWidth: 800 }}>
             <TableHead>
               <TableRow sx={{ bgcolor: "#f8fafc" }}>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Reference</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Total Amount</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Payment Method</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>Expense Items</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2, textAlign: "center" }}>Actions</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>
+                  Date
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>
+                  Reference
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>
+                  Total Amount
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>
+                  Payment Method
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "#374151", py: 2 }}>
+                  Expense Items
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: "#374151",
+                    py: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
-                <LoadingSkeleton />
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ textAlign: "center", py: 6 }}>
+                    <Loading />
+                  </TableCell>
+                </TableRow>
               ) : rows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} sx={{ textAlign: "center", py: 6 }}>
@@ -253,7 +231,10 @@ export default function ExpenseList() {
                     }}
                   >
                     <TableCell sx={{ py: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: "#374151" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 500, color: "#374151" }}
+                      >
                         {row.date
                           ? new Date(row.date).toLocaleDateString("en-US", {
                               year: "numeric",
@@ -276,8 +257,15 @@ export default function ExpenseList() {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#059669", fontSize: "0.95rem" }}>
-                        ${row.amount?.toLocaleString() || "0"}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#059669",
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        ৳{row.amount?.toLocaleString() || "0"}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
@@ -294,12 +282,15 @@ export default function ExpenseList() {
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {Array.isArray(row.expense_items) && row.expense_items.length > 0 ? (
+                        {Array.isArray(row.expense_items) &&
+                        row.expense_items.length > 0 ? (
                           <>
                             {row.expense_items.slice(0, 2).map((item, idx) => (
                               <Chip
                                 key={idx}
-                                label={`${item.name}: $${item.amount?.toLocaleString() || "0"}`}
+                                label={`${item.name}: ${
+                                  item.amount?.toLocaleString() || "0"
+                                }`}
                                 size="small"
                                 sx={{
                                   bgcolor: "#fef3c7",
@@ -312,7 +303,7 @@ export default function ExpenseList() {
                             ))}
                             {row.expense_items.length > 2 && (
                               <Chip
-                                label={`+${row.expense_items.length - 2} items`}
+                                label={`+৳{row.expense_items.length - 2} items`}
                                 size="small"
                                 sx={{
                                   bgcolor: "#f3f4f6",
@@ -331,10 +322,14 @@ export default function ExpenseList() {
                       </Box>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
-                      <Stack direction="row" spacing={1} justifyContent="center">
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        justifyContent="center"
+                      >
                         <IconButton
                           component={Link}
-                          to={`/dashboard/update-expense/?id=${row.id}`}
+                          to={`/dashboard/update-expense/?id=৳{row.id}`}
                           size="small"
                           sx={{
                             bgcolor: "#eff6ff",
@@ -365,7 +360,14 @@ export default function ExpenseList() {
         </TableContainer>
 
         {totalPage > 1 && (
-          <Box sx={{ p: 3, display: "flex", justifyContent: "flex-end", borderTop: "1px solid #e2e8f0" }}>
+          <Box
+            sx={{
+              p: 3,
+              display: "flex",
+              justifyContent: "flex-end",
+              borderTop: "1px solid #e2e8f0",
+            }}
+          >
             <Pagination
               count={totalPage}
               page={currentPage}
@@ -383,5 +385,5 @@ export default function ExpenseList() {
         )}
       </Card>
     </Box>
-  )
+  );
 }

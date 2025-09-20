@@ -25,6 +25,7 @@ import {
 } from "../../../redux/api/quotation";
 import { Search } from "lucide-react";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const QuotationTable = () => {
   const location = useLocation();
@@ -41,7 +42,19 @@ const QuotationTable = () => {
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/quotation-view?id=${e}`);
   };
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
   const [
     moveRecycledQuotation,
     { idLoading: deleteLoading, error: deleteError },
@@ -152,7 +165,7 @@ const QuotationTable = () => {
                         let rowClass = "";
                         if (card.status === "running") {
                           rowClass = "bg-[#f5365c] text-white";
-                        } else if (card.status === "completed") {
+                        } else{
                           rowClass = "bg-[#2dce89] text-white";
                         }
                         return (
@@ -238,7 +251,9 @@ const QuotationTable = () => {
                                     import.meta.env.VITE_API_URL
                                   }/quotations/quotation/${
                                     card._id
-                                  }?tenantDomain=${tenantDomain}`}
+                                  }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                    JSON.stringify(companyProfileData)
+                                  )}`}
                                   target="_blank"
                                   rel="noreferrer"
                                 >
@@ -286,8 +301,6 @@ const QuotationTable = () => {
                                 placement="top"
                               >
                                 <span>
-                                  {" "}
-                                  {/* Wrapper span for disabled button */}
                                   <button
                                     disabled={deleteLoading}
                                     onClick={() =>

@@ -21,15 +21,44 @@ const Detail = () => {
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
 
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
+const handlePrint = useReactToPrint({
+  content: () => componentRef.current,
+  pageStyle: `
+    @page {
+      size: A4;
+      margin: 0; 
+    }
 
-  const [invoicePreview, setInvoicePreview] = useState({})
-  const [loading, setLoading] = useState(false);
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .invoicePrintWrap {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  `
+});
+
+
+  const [invoicePreview, setInvoicePreview] = useState({});
+
   const net_total =
     invoicePreview?.net_total === invoicePreview?.advance
       ? invoicePreview?.net_total
@@ -65,26 +94,36 @@ const Detail = () => {
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#351E98] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src= {CompanyInfoData?.data?.logo} alt="logo" />
+                  <img
+                    className="w-[120px] "
+                    src={CompanyInfoData?.data?.logo}
+                    alt="logo"
+                  />
                   <div>
-                    <h2 className="trustAutoTitle qoutationTitle">
-                     {CompanyInfoData?.data?.companyName}
-                    </h2>
+                    <div className="flex-1 text-center">
+                      <h2 className="trustAutoTitle">
+                        {CompanyInfoData?.data?.companyNameBN}
+                      </h2>
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                        ({CompanyInfoData?.data?.companyName})
+                      </h3>
+                    </div>
+
                     <small className="block">
-                      Office:  {CompanyInfoData?.data?.address}
+                      Office: {CompanyInfoData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> 
-                     {CompanyInfoData?.data?.phone}
+                      <small className="font-bold">Mobile:</small>
+                      {CompanyInfoData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                     {CompanyInfoData?.data?.email}
+                      {CompanyInfoData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                       {CompanyInfoData?.data?.website}
+                      {CompanyInfoData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -217,7 +256,8 @@ const Detail = () => {
                       <small>
                         {" "}
                         <span className="mr-1">:</span>{" "}
-                        {invoicePreview?.vehicle?.fullRegNum}
+                        {invoicePreview?.vehicle?.carReg_no}
+                        <span> {invoicePreview?.vehicle?.fullRegNum}</span>
                       </small>
                       <small>
                         {" "}
@@ -237,7 +277,7 @@ const Detail = () => {
                       <small>
                         {" "}
                         <span className="mr-1">:</span>
-                        {invoicePreview?.vehicle?.mileageHistory?.[0]?.mileage}
+                        {invoicePreview?.mileage}
                       </small>
                     </div>
                   </div>
@@ -338,8 +378,8 @@ const Detail = () => {
                   <div>
                     <b>Sub Total </b>
                     {invoicePreview.discount !== 0 && <b> Discount </b>}
-                    {invoicePreview.vat !== 0 && <b> VAT </b>}
-                    {invoicePreview.tax !== 0 && <b> Tax </b>}
+                    {invoicePreview.vat > 0 && <b> VAT </b>}
+                    {invoicePreview.tax > 0 && <b> Tax included </b>}
                     <b> Grand Total </b>
 
                     {advanceAmountNumber !== 0 && (
@@ -352,8 +392,13 @@ const Detail = () => {
                     )}
                   </div>
                   <div>
-                    <small> : {formatNumber(totalAmountNumber)} &#2547; </small>
-                    {invoicePreview.discount !== 0 && (
+                    <small>
+                      {" "}
+                      : {formatNumber(
+                        invoicePreview?.total_amount
+                      )} &#2547;{" "}
+                    </small>
+                    {invoicePreview.discount > 0 && (
                       <small>
                         : {formatNumber(invoicePreview.discount)} &#2547;
                       </small>
@@ -361,11 +406,11 @@ const Detail = () => {
                     {invoicePreview.vat !== 0 && (
                       <small> : {formatNumber(invoicePreview.vat)}%</small>
                     )}
-                    {invoicePreview.tax !== 0 && (
-                      <small> : {formatNumber(invoicePreview.tax)}%</small>
+                    {invoicePreview.tax > 0 && (
+                      <small> : {formatNumber(invoicePreview.tax)}% </small>
                     )}
                     <small>
-                      : {formatNumber(invoicePreview.net_total)} &#2547;{" "}
+                      : {formatNumber(invoicePreview.net_total)} &#2547;
                     </small>
                     {advanceAmountNumber !== 0 && (
                       <>
@@ -374,8 +419,7 @@ const Detail = () => {
                         </small>
                         {!isFullyPaid && invoicePreview.due !== 0 && (
                           <small>
-                            {" "}
-                            : {formatNumber(invoicePreview.due)} &#2547;{" "}
+                            : {formatNumber(invoicePreview.due)} &#2547;
                           </small>
                         )}
                       </>
@@ -387,6 +431,19 @@ const Detail = () => {
               <div className="mt-5 text-[12px]">
                 <b className="">In words:</b>{" "}
                 {invoicePreview?.net_total_in_words}
+              </div>
+            </div>
+            {/* Signature Section */}
+            <div className="flex justify-between mt-16 mb-5 text-[12px]">
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
               </div>
             </div>
           </div>
@@ -403,7 +460,9 @@ const Detail = () => {
               className="text-[10px]"
               href={`${import.meta.env.VITE_API_URL}/invoices/invoice/${
                 invoicePreview._id
-              }?tenantDomain=${tenantDomain}`}
+              }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                JSON.stringify(companyProfileData)
+              )}`}
               target="_blank"
               rel="noreferrer"
             >

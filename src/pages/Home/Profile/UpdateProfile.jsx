@@ -50,6 +50,7 @@ export default function CompanyProfileDisplay() {
     setModalOpen(true);
   };
 
+
   const handleUpdateModal = () => {
     setSelectedProfile(profileData);
     setModalOpen(true);
@@ -147,7 +148,7 @@ export default function CompanyProfileDisplay() {
                 size="large"
                 sx={{
                   ...buttonStyle,
-                  backgroundColor: "#1976d2", // blue
+                  backgroundColor: "#1976d2", 
                   "&:hover": { backgroundColor: "#115293" },
                 }}
               >
@@ -264,6 +265,12 @@ export default function CompanyProfileDisplay() {
                   icon={WebsiteIcon}
                   label="Website"
                   value={profileData?.website}
+                  isLink
+                />
+                <InfoItem
+                  icon={WebsiteIcon}
+                  label="Office Time"
+                  value={profileData?.officeTime}
                   isLink
                 />
                 <InfoItem

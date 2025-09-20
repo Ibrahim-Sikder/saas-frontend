@@ -32,10 +32,11 @@ const purchaseOrderApi = baseApi.injectEndpoints({
     }),
 
     updatePurchaseOrder: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ tenantDomain, id, ...data }) => ({
         url: `/purchase-orders/${id}`,
         method: "PUT",
         body: data,
+        params:{tenantDomain}
       }),
       invalidatesTags: ["purchaseOrder"],
     }),

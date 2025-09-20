@@ -1349,15 +1349,52 @@ export const buttonStyle = {
     boxShadow: `0 20px 50px ${alpha("#06b6d4", 0.5)}`,
   },
 };
-  export const expenseInputStyle = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
-      "&:hover .MuiOutlinedInput-notchedOutline": {
-        borderColor: "#3b82f6",
-      },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-        borderColor: "#3b82f6",
-        borderWidth: 2,
-      },
+export const expenseInputStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 2,
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#3b82f6",
     },
-  };
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#3b82f6",
+      borderWidth: 2,
+    },
+  },
+};
+
+export const SupplierScoreCard = styled(Box)(({ theme, score }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: theme.spacing(2),
+  borderRadius: 16,
+  backgroundColor:
+    score >= 80
+      ? "rgba(46, 125, 50, 0.1)"
+      : score >= 60
+      ? "rgba(237, 108, 2, 0.1)"
+      : "rgba(211, 47, 47, 0.1)",
+  color: score >= 80 ? "#2e7d32" : score >= 60 ? "#ed6c02" : "#d32f2f",
+  border: `1px solid ${
+    score >= 80
+      ? "rgba(46, 125, 50, 0.3)"
+      : score >= 60
+      ? "rgba(237, 108, 2, 0.3)"
+      : "rgba(211, 47, 47, 0.3)"
+  }`,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+  transition: "transform 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-5px)",
+  },
+}));
+
+export const GlassCard2 = styled(Paper)(({ theme }) => ({
+  background: "rgba(255, 255, 255, 0.8)",
+  backdropFilter: "blur(10px)",
+  borderRadius: 16,
+  boxShadow: "0 8px 32px rgba(31, 38, 135, 0.1)",
+  border: "1px solid rgba(255, 255, 255, 0.18)",
+  padding: theme.spacing(3),
+}));

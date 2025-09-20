@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import { useEffect, useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaUserTie } from "react-icons/fa";
+import { useRef, useState } from "react";
+import { FaEdit, FaUserTie } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { HiOutlineSearch } from "react-icons/hi";
 import { Pagination } from "@mui/material";
-import swal from "sweetalert";
 import { toast } from "react-toastify";
-import axios from "axios";
 import Loading from "../../../components/Loading/Loading";
-import { useMoveRecycledCustomerMutation } from "../../../redux/api/customerApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useAllCustomerQuery } from "../../../redux/api/meta.api";
 
@@ -20,16 +17,13 @@ const AllCustomerList = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
-  const searchParam = new URLSearchParams(location.search).get("search");
   const ITEMS_PER_PAGE = 10;
   const tenantDomain = useTenantDomain();
 
   const {
     data: allCustomerData,
     isLoading,
-    isError,
     error,
-    refetch,
   } = useAllCustomerQuery({
     tenantDomain,
     page: currentPage,
@@ -38,18 +32,13 @@ const AllCustomerList = () => {
     isRecycled: false,
   });
 
-  const [
-    moveRecycledCustomer,
-    { isLoading: customerDeleteLoading, error: deleteError },
-  ] = useMoveRecycledCustomerMutation();
-
   const totalCount = allCustomerData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
 
   const handlePageChange = (_, page) => {
     setCurrentPage(page);
   };
-
 
   const handleIconPreview = (id, userType) => {
     switch (userType) {
@@ -67,48 +56,20 @@ const AllCustomerList = () => {
     }
   };
 
-  const deletePackage = async (id) => {
-    const willDelete = await swal({
-      title: "Are you sure?",
-      text: "You want to move this Customer to Recycle Bin?",
-      icon: "warning",
-      dangerMode: true,
-    });
-
-    if (willDelete) {
-      try {
-        await moveRecycledCustomer({ tenantDomain, id }).unwrap();
-        swal(
-          "Move to Recycle bin!",
-          "Move to Recycle bin successful.",
-          "success"
-        );
-
-      } catch (error) {
-        swal("Error", "An error occurred while deleting the card.", "error");
-      }
-    }
+  const handleSearch = () => {
+    setCurrentPage(1);
   };
 
-  if (deleteError) {
-    toast.error(deleteError?.message);
-  }
-
-const handleSearch = () => {
-  setCurrentPage(1);
-};
-
-const handleAllCustomer = () => {
-  setFilterType("");
-  setCurrentPage(1);
-};
+  const handleAllCustomer = () => {
+    setFilterType("");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="w-full mt-5 mb-24">
       {/* Header section */}
       <div className="flex flex-wrap items-center justify-between my-3 mb-8">
         <div className="flex items-center justify-center">
-          <FaUserTie className="invoicIcon" />
           <div className="ml-2">
             <h3 className="text-2xl font-bold">Customer</h3>
             <span>
@@ -134,7 +95,7 @@ const handleAllCustomer = () => {
             All
           </button>
           <input
-            value={filterType} // Bind input to state
+            value={filterType}
             onChange={(e) => {
               setFilterType(e.target.value);
               setCurrentPage(1);
@@ -193,7 +154,7 @@ const handleAllCustomer = () => {
                   <th>Car Number</th>
                   <th>Mobile Number</th>
                   <th>User Type</th>
-                  <th colSpan={3}>Action</th>
+                  <th colSpan={2}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,14 +200,6 @@ const handleAllCustomer = () => {
                           >
                             <FaEdit className="editIcon" />
                           </Link>
-                        </div>
-                      </td>
-                      <td>
-                        <div
-                          onClick={() => deletePackage(customer?._id)}
-                          className="editIconWrap"
-                        >
-                          <FaTrashAlt className="deleteIcon" />
                         </div>
                       </td>
                     </tr>

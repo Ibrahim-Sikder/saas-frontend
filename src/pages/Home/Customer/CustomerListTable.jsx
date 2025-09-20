@@ -28,18 +28,14 @@ const CustomerListTable = () => {
   const limit = 10;
   const tenantDomain = useTenantDomain();
 
-  const {
-    data: customerData,
-    isLoading: customerLoading,
-    error: customerError,
-    refetch,
-  } = useGetAllCustomersQuery({
-    tenantDomain,
-    limit,
-    page: currentPage,
-    searchTerm: filterType,
-    isRecycled: false,
-  });
+  const { data: customerData, isLoading: customerLoading } =
+    useGetAllCustomersQuery({
+      tenantDomain,
+      limit,
+      page: currentPage,
+      searchTerm: filterType,
+      isRecycled: false,
+    });
 
   const [
     moveRecycledCustomer,
@@ -60,7 +56,7 @@ const CustomerListTable = () => {
 
     if (willDelete) {
       try {
-        await moveRecycledCustomer({ tenantDomain: domain, id }).unwrap();
+        await moveRecycledCustomer({ tenantDomain, id }).unwrap();
         swal(
           "Move to Recycle bin!",
           "Move to Recycle bin successful.",
@@ -75,13 +71,6 @@ const CustomerListTable = () => {
   if (deleteError) {
     toast.error(error?.message);
   }
-
-  const handleAllCustomer = () => {
-    setFilterType("");
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-  };
 
   useEffect(() => {
     if (search) {
@@ -175,37 +164,6 @@ const CustomerListTable = () => {
                               ))}
                             </td>
 
-                            {/* <td>
-                              {card?.vehicles?.slice(0,1)?.map((vehicle, idx) => (
-                                <div key={idx} className="flex flex-wrap gap-1">
-                                  {vehicle?.mileageHistory?.length > 0 ? (
-                                    vehicle.mileageHistory.map(
-                                      (history, historyIdx) => (
-                                        <Tooltip
-                                          key={historyIdx}
-                                          title={new Date(
-                                            history.date
-                                          ).toLocaleDateString()}
-                                          arrow
-                                        >
-                                          <Chip
-                                            bg="primary"
-                                            color="primary"
-                                            label={`${history.mileage} km`}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={mileageStyle}
-                                          />
-                                        </Tooltip>
-                                      )
-                                    )
-                                  ) : (
-                                    <span>No mileage data</span>
-                                  )}
-                                </div>
-                              ))}
-                            </td> */}
-
                             <td>{card?.fullCustomerNum}</td>
 
                             <td>{lastVehicle?.vehicle_name}</td>
@@ -231,7 +189,7 @@ const CustomerListTable = () => {
                             <td>
                               <div
                                 onClick={() => handleMoveToRecyled(card?._id)}
-                                className="editIconWrap"
+                                className="editIconWrap cursor-pointer "
                               >
                                 <FaTrashAlt className="deleteIcon" />
                               </div>

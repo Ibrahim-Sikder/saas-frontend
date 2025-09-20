@@ -18,7 +18,7 @@ import {
   useGetAllMoneyReceiptsQuery,
   useMoveRecycledMoneyReceiptMutation,
 } from "../../../../redux/api/money-receipt";
-const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
+const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
 
@@ -35,6 +35,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
       searchTerm: filterType,
       isRecycled: false,
     });
+
   const [
     moveRecycledMoneyReceipt,
     { isLoading: deleteLoading, error: deleteError },
@@ -146,7 +147,15 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
                 return (
                   <tr
                     key={card._id}
-                    className={`${rowClass} hover:bg-blue-300 transition-colors duration-200 hover:text-white`}
+                          className={`${
+                    card.paymentColor === "#2dce89"
+                      ? "bg-[#2dce89] text-white"
+                      : card.paymentColor === "#f5365c"
+                      ? "bg-[#f5365c] text-white"
+                      : card.paymentColor === "#ffad46"
+                      ? "bg-[#ffad46] text-black"
+                      : ""
+                  } transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-100 hover:text-black`}
                   >
                     <td>{globalIndex}</td>
                     <td>{card.thanks_from}</td>
@@ -169,7 +178,9 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain }) => {
                         className="editIconWrap edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
-                        }/money-receipts/money/${card._id}`}
+                        }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                        JSON.stringify(companyProfileData)
+                      )}`}
                         target="_blank"
                         rel="noreferrer"
                       >

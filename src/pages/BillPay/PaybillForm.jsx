@@ -1033,7 +1033,7 @@ const PaybillForm = ({ id }) => {
                             icon={
                               discountType === "percentage"
                                 ? FaPercentage
-                                : AttachMoneyIcon
+                                : FaPercentage
                             }
                             iconPosition="start"
                             error={!!errors.discount_value}
@@ -1047,7 +1047,7 @@ const PaybillForm = ({ id }) => {
                             label="Calculated Discount"
                             disabled
                             value={watch("discount_amount") || "0.00"}
-                            icon={AttachMoneyIcon}
+                           
                             iconPosition="start"
                           />
                         </Grid>

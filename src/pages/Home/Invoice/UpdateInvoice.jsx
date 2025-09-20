@@ -914,9 +914,15 @@ const UpdateInvoice = () => {
           className=" addJobLogoImg"
         />
         <div>
-          <h2 className=" trustAutoTitle trustAutoTitleQutation">
-            {CompanyInfoData?.data?.companyName}
-          </h2>
+          <div className="flex-1 text-center">
+            <h2 className="trustAutoTitle">
+              {CompanyInfoData?.data?.companyNameBN}
+            </h2>
+            <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+              ({CompanyInfoData?.data?.companyName})
+            </h3>
+          </div>
+
           <span className="text-[12px] lg:text-xl mt-5 block">
             Office: {CompanyInfoData?.data?.address}
           </span>

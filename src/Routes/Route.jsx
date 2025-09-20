@@ -110,7 +110,6 @@ import Warranties from "../pages/Inventory/Warranties";
 import StockPage from "../pages/Inventory/Stock";
 import RemoveStock from "../pages/Inventory/RemoveStock";
 import PurchaseReturn from "../pages/Inventory/PurchaseReturn";
-import PurchaseOrder from "../pages/Inventory/PurchaseOrder";
 import PurchaseHistory from "../pages/Inventory/PurchaseHistory";
 import StockTransferPage from "../pages/Inventory/StockTransper";
 import ExpiredProductsReportPage from "../pages/Reports/ExpiredProductReport";
@@ -136,6 +135,9 @@ import AllUserList from "../pages/Home/Tenant/AllUserList";
 import ContactUserList from "../pages/Home/Tenant/ContactUserList";
 import CompanyBrand from "../pages/CompanyBrand/CompanyBrand";
 import Review from "../pages/Review/Review";
+import DonationList from "../pages/Donation/DonationList";
+import UpdateDonation from "../pages/Donation/UpdateDonation";
+import PurchaseOrder from "../pages/Inventory/PurchaseOrder/PurchaseOrder";
 
 export const router = createBrowserRouter([
   {
@@ -534,6 +536,14 @@ export const router = createBrowserRouter([
         element: <Donation />,
       },
       {
+        path: "donation-list",
+        element: <DonationList />,
+      },
+      {
+        path: "update-donation",
+        element: <UpdateDonation />,
+      },
+      {
         path: "category",
         element: <CategoryList />,
       },
@@ -625,7 +635,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "purchase-order",
-        element: <PurchaseOrder />,
+        element: <PurchaseOrder/>,
       },
       {
         path: "purchase-return-add",

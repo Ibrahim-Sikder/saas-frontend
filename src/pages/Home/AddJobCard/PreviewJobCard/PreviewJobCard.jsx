@@ -29,8 +29,17 @@ const PreviewJobCard = () => {
     content: () => componentRef.current,
   });
 
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
+
   const previewData = data?.data;
-  console.log("preview data", previewData);
 
   const extractTextFromHTML = (htmlString) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
@@ -87,7 +96,7 @@ const PreviewJobCard = () => {
           <div className="headerContainer">
             <div className="mx-auto text-center border-b-[2px] ">
               <div className="mx-auto text-center border-b-[2px] border-[#110255] py-2">
-                <div className="flex  md:flex-row justify-between items-center">
+                <div className="flex flex-row justify-between items-center">
                   <img
                     className="w-[110px] mb-2 md:mb-0"
                     src={CompanyInfoData?.data?.logo[0]}
@@ -95,19 +104,12 @@ const PreviewJobCard = () => {
                   />
 
                   <div className="flex-1 text-center">
-                    {/* Bangla Company Name - Larger */}
-                    {CompanyInfoData?.data?.companyNameBN && (
-                      <h2 className="text-3xl md:text-4xl font-bold bangla-font">
-                        {CompanyInfoData?.data?.companyNameBN}
-                      </h2>
-                    )}
-
-                    {/* English Company Name - Smaller */}
-                    {CompanyInfoData?.data?.companyName && (
-                      <h3 className="text-lg md:text-xl english-font mt-1">
-                        ({CompanyInfoData?.data?.companyName})
-                      </h3>
-                    )}
+                    <h2 className="trustAutoTitle">
+                      {CompanyInfoData?.data?.companyNameBN}
+                    </h2>
+                    <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1]">
+                      ({CompanyInfoData?.data?.companyName})
+                    </h3>
                   </div>
 
                   {/* Spacer for flex alignment */}
@@ -479,7 +481,9 @@ const PreviewJobCard = () => {
           className="bg-[#42A0D9] text-white px-3 py-2  rounded-full mx-2 "
           href={`${import.meta.env.VITE_API_URL}/jobCards/jobcard/${
             previewData?._id
-          }?tenantDomain=${tenantDomain}`}
+          }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+            JSON.stringify(companyProfileData)
+          )}`}
           target="_blank"
           rel="noreferrer"
         >

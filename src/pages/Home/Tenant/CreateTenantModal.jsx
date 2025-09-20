@@ -50,7 +50,7 @@ import {
   ArrowForward,
   ArrowBack,
   Payment,
-  AttachMoney,
+  
 } from "@mui/icons-material"
 import { toast } from "react-toastify"
 import { useCreateTenantMutation } from "../../../redux/api/tenantApi"
@@ -299,10 +299,12 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
         },
       }
 
+
       const result = await createTenant({
         payload: tenantPayload,
         plan: tenantData.selectedPlan,
       })
+
 
       if ("error" in result) {
         throw new Error(result.error?.data?.message || "Failed to create tenant.")
@@ -722,7 +724,7 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
             </Typography>
             <Paper variant="outlined" sx={{ p: 3, mt: 2, bgcolor: "grey.50" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <AttachMoney color="primary" sx={{ mr: 1 }} />
+               ৳
                 <Typography variant="h6">Total Amount: ${tenantData.amount.toFixed(2)}</Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">

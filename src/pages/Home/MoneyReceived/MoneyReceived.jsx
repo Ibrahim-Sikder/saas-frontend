@@ -92,7 +92,7 @@ const MoneyReceiptView = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [preview, setPreview] = useState("");
 
-    const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
   const {
@@ -123,10 +123,10 @@ const MoneyReceiptView = () => {
   const [createMoneyReceipt, { isLoading: createLoading }] =
     useCreateMoneyReceiptMutation();
 
- const { data: jobCard, isLoading } = useGetSingleJobCardWithJobNoQuery({
-  tenantDomain,
-  jobNo: job_no, 
-});
+  const { data: jobCard, isLoading } = useGetSingleJobCardWithJobNoQuery({
+    tenantDomain,
+    jobNo: job_no,
+  });
 
   const amountInWords = (amount) => {
     const numberWords = [
@@ -326,7 +326,7 @@ const MoneyReceiptView = () => {
     data.remaining = numRemaining;
 
     const values = {
-           tenantDomain,
+      tenantDomain,
       Id: jobCard?.data?.Id,
       user_type: jobCard?.data?.user_type,
       job_no: job_no,
@@ -439,14 +439,22 @@ const MoneyReceiptView = () => {
             <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
           </div>
           <div className="md:w-[570px] text-center text-[#0950a1]  ">
-            <h2 className="receivedTitle md:mb-2">{CompanyInfoData?.data?.companyName} </h2>
-            <span className="text-xs md:text-sm">
+            <div className="flex-1 text-center">
+              <h2 className="text-3xl">
+                {CompanyInfoData?.data?.companyNameBN}
+              </h2>
+              <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                ({CompanyInfoData?.data?.companyName})
+              </h3>
+            </div>
+            <span className="block mt-2">
               It's trusted computerized Organization for all kinds of vehicle
               cheque up & maintenance such as computerized Engine Analysis,
               Engine tune up, Denting, Painting, Engine, AC, Electrical Works &
               Car Wash.{" "}
             </span>
           </div>
+
           <div>
             <div className="flex items-center mt-1">
               <FaGlobe className="hotlineIcon" />
@@ -458,9 +466,7 @@ const MoneyReceiptView = () => {
             </div>
             <div className="flex  mt-1">
               <FaLocationDot className="hotlineIcon"> </FaLocationDot>
-              <small className="ml-1">
-                {CompanyInfoData?.data?.address}
-              </small>
+              <small className="ml-1">{CompanyInfoData?.data?.address}</small>
             </div>
             <div className="flex items-center mt-1">
               <WhatsApp className="hotlineIcon" />
@@ -862,11 +868,7 @@ const MoneyReceiptView = () => {
                       value={formattedAdvance}
                       onChange={(e) => handleAdvanceChange(e.target.value)}
                     />
-                    {/* {errors.advance && advance === null && (
-                      <span className="text-sm text-red-400">
-                        This field is required
-                      </span>
-                    )} */}
+                    
                   </div>
                 </div>
                 <div className="flex lg:flex-row  flex-col ">

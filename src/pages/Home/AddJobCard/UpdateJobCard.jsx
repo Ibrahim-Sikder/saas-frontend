@@ -481,11 +481,9 @@ const UpdateJobCard = () => {
   };
 
   const handleOptionClick = (option) => {
-    setYearSelectInput(option.value);
+    setYearSelectInput(option.label);
     setFilteredOptions([]);
-    setVModelValue("vehicle_model", option.label, {
-      shouldValidate: true,
-    });
+    setVModelValue("vehicle_model", option.label);
   };
 
   const handleDateChange = (event) => {
@@ -545,6 +543,15 @@ const UpdateJobCard = () => {
     setCurrentMileage(getLatestMileage());
   }, [getDataWithChassisNo]);
 
+  useEffect(() => {
+    if (getDataWithChassisNo?.vehicle_model) {
+      setYearSelectInput(getDataWithChassisNo.vehicle_model.toString());
+      setVModelValue("vehicle_model", getDataWithChassisNo.vehicle_model);
+    } else {
+      setYearSelectInput("");
+    }
+  }, [getDataWithChassisNo?.vehicle_model, setVModelValue]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center text-xl">
@@ -563,9 +570,15 @@ const UpdateJobCard = () => {
             className=" addJobLogoImg"
           />
           <div>
-            <h2 className=" trustAutoTitle trustAutoTitleQutation">
-              {CompanyInfoData?.data?.companyName}
-            </h2>
+            <div className="flex-1 text-center">
+              <h2 className="trustAutoTitle">
+                {CompanyInfoData?.data?.companyNameBN}
+              </h2>
+              <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                ({CompanyInfoData?.data?.companyName})
+              </h3>
+            </div>
+
             <span className="text-[12px] lg:text-xl mt-5 block">
               Office: {CompanyInfoData?.data?.address}
             </span>
@@ -938,15 +951,6 @@ const UpdateJobCard = () => {
                           />
                         </div>
                       </Grid>
-
-                      <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <TextField
-                          fullWidth
-                          label="Reference Name (T) "
-                          {...register("reference_name")}
-                          focused={singleCard?.company?.reference_name || ""}
-                        />
-                      </Grid>
                     </Grid>
                   </Box>
                 ) : singleCard?.user_type === "showRoom" ? (
@@ -1058,7 +1062,7 @@ const UpdateJobCard = () => {
                           fullWidth
                           label="Reference Name (T) "
                           {...register("reference_name")}
-                          focused={singleCard?.showRoom?.reference_name || ""}
+                          focused={singleCard?.company?.reference_name || ""}
                         />
                       </Grid>
                     </Grid>
@@ -1170,16 +1174,16 @@ const UpdateJobCard = () => {
                     getOptionLabel={(option) => option || ""}
                   />
                 </Grid>
+
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <div className="mt-3 relative">
                     <input
-                      // value={yearSelectInput}
                       onInput={handleYearSelectInput}
                       {...register("vehicle_model")}
                       type="text"
-                      className="border  border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
+                      className="border border-[#11111163] mb-5 w-[100%] h-14 p-3 rounded-md"
                       placeholder="Vehicle Model"
-                      value={getDataWithChassisNo?.vehicle_model}
+                      value={yearSelectInput}
                     />
                     {yearSelectInput && (
                       <ul className="options-list">
@@ -1224,32 +1228,6 @@ const UpdateJobCard = () => {
                   />
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {/* <TextField
-                    fullWidth
-                    {...register("mileage", {
-                      required: "Mileage is required!",
-                    })}
-                    label="Current Mileage (KM)"
-                    type="number"
-                    focused={currentMileage || singleCard?.mileage || ""}
-                    defaultValue={currentMileage || singleCard?.mileage || ""}
-                    onChange={(e) => {
-                      const newMileage = e.target.value;
-                      setCurrentMileage(newMileage);
-                      const lastMileage =
-                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
-                          ?.mileage;
-                      if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true);
-                      } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true);
-                      } else {
-                        setMileageChanged(false);
-                      }
-                    }}
-                    error={!!errors.mileage}
-                    helperText={errors.mileage?.message}
-                  /> */}
                   <TextField
                     fullWidth
                     label="Current Mileage (KM)"

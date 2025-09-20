@@ -35,6 +35,8 @@ import Loading from "../../components/Loading/Loading";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteIconStyle, editIconStyle } from "../../style/tableStyle";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
+import { useAccountSummaryQuery } from "../../redux/api/meta.api";
+import IncomeStatisticsCard from "./IncomeStatisticsCard";
 
 // Payment method icons
 const getPaymentMethodIcon = (method) => {
@@ -62,6 +64,7 @@ const IncomeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const limit = 15;
   const tenantDomain = useTenantDomain();
+  const { data: accountSummary } = useAccountSummaryQuery({ tenantDomain });
 
   const { data: allIncomes, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,
@@ -109,6 +112,7 @@ const IncomeList = () => {
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
       }}
     >
+      <IncomeStatisticsCard accountSummary={accountSummary} />
       <Box
         sx={{
           display: "flex",
@@ -215,7 +219,7 @@ const IncomeList = () => {
             {allIncomes?.data?.incomes?.map((row, index) => {
               const globalIndex = (currentPage - 1) * limit + (index + 1);
               const hasNote = row.note && row.note.trim() !== "";
-              
+
               // Determine income type
               let incomeType = "Other";
               if (row.serviceIncomeAmount > 0 && row.partsIncomeAmount > 0) {
@@ -273,22 +277,40 @@ const IncomeList = () => {
                           maximumFractionDigits: 2,
                         })}
                       </Typography>
-                      
+
                       <Box sx={{ mt: 0.5, fontSize: "0.75rem" }}>
-                        <Box fontWeight='bold'>Service Income : ${row.serviceIncomeAmount}</Box>
-                        <Box fontWeight='bold'>Parts Income : ${row.partsIncomeAmount}</Box>
-                        <Box fontWeight='bold'> Total Invoice Income: ${row.totalInvoiceIncome}</Box>
-                        <Box fontWeight='bold'>Other Income: ${row.totalOtherIncome}</Box>
+                        <Box fontWeight="bold">
+                          Service Income : ${row.serviceIncomeAmount}
+                        </Box>
+                        <Box fontWeight="bold">
+                          Parts Income : ${row.partsIncomeAmount}
+                        </Box>
+                        <Box fontWeight="bold">
+                          {" "}
+                          Total Invoice Income: ${row.totalInvoiceIncome}
+                        </Box>
+                        <Box fontWeight="bold">
+                          Other Income: ${row.totalOtherIncome}
+                        </Box>
                       </Box>
                     </Box>
                   </TableCell>
 
                   <TableCell align="center">
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <span style={{ marginRight: "4px", fontSize: "1.2rem" }}>
                         {getPaymentMethodIcon(row.payment_method)}
                       </span>
-                      <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ textTransform: "capitalize" }}
+                      >
                         {row.payment_method}
                       </Typography>
                     </Box>

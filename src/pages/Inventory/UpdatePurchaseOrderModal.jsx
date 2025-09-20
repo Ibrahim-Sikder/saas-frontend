@@ -75,7 +75,7 @@ const UpdatePurchaseOrderModal = ({tenantDomain, open, onClose, orderId }) => {
       </DialogTitle>
 
       <DialogContent dividers sx={{ p: 8 }}>
-        <PurchaseOrderForm orderId={orderId} onClose={onClose} />
+        <PurchaseOrderForm tenantDomain={tenantDomain} orderId={orderId} onClose={onClose} />
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>

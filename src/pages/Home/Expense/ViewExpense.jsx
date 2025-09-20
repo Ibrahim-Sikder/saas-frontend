@@ -213,7 +213,7 @@ const ViewExpense = () => {
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
                   <img className="w-[120px] " src={logo} alt="logo" />
                   <div>
-                  <h2 className="trustAutoTitle qoutationTitle">Softypy Garage </h2>
+                  <h2 className="trustAutoTitle qoutationTitle">Garage Master </h2>
                     <small className="block">Office: Ka-93/4/C, Kuril Bishawroad, Dhaka-1229</small>
                   </div>
                   <div className="text-left">
@@ -410,7 +410,7 @@ const ViewExpense = () => {
                         <b className="text-sm customerSignatur">
                           Customer Signature :{" "}
                         </b>
-                        <b className="text-sm customerSignatur">Softypy Garage</b>
+                        <b className="text-sm customerSignatur">Garage Master</b>
                       </div>
                     )}
                     

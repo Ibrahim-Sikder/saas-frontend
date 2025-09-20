@@ -139,6 +139,7 @@ const AddShowRoom = () => {
       company_contact: data.company_contact,
       company_country_code: countryCode.code,
       company_email: data.company_email,
+      whatsappNumber: data.whatsappNumber,
       company_address: data.company_address,
       driver_name: data.driver_name,
       driver_contact: data.driver_contact,
@@ -230,7 +231,19 @@ const AddShowRoom = () => {
                     <TextField
                       fullWidth
                       on
-                      label="Show Room Name (T)"
+                      label={
+                        <>
+                          Show Room Name (T)
+                          <span
+                            style={{
+                              color: "red",
+                              fontSize: "25px",
+                            }}
+                          >
+                            *
+                          </span>
+                        </>
+                      }
                       {...register("showRoom_name", {
                         required: "Show room name is required! ",
                       })}
@@ -243,11 +256,7 @@ const AddShowRoom = () => {
                       fullWidth
                       onC
                       label="Show Room Owner Name (T)"
-                      {...register("vehicle_username", {
-                        required: "Vehicle user name is required!",
-                      })}
-                      error={!!errors.showRoom_name}
-                      helperText={errors.showRoom_name?.message}
+                      {...register("vehicle_username")}
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -301,6 +310,14 @@ const AddShowRoom = () => {
                         />
                       </Grid>
                     </Grid>
+                  </Grid>
+                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      on
+                      label="Whatsapp Number (N)"
+                      {...register("whatsappNumber")}
+                    />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField

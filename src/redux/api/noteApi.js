@@ -11,15 +11,6 @@ const noteApi = baseApi.injectEndpoints({
       invalidatesTags: ["note"],
     }),
 
-    // getAllNotes: builder.query({
-    //   query: ({ tenantDomain, limit, page }) => ({
-    //     url: `/notes`,
-    //     method: "GET",
-    //     params: { tenantDomain, limit, page },
-    //   }),
-    //   providesTags: ["note"],
-    // }),
-
     getAllNotes: builder.query({
       query: ({
         tenantDomain,

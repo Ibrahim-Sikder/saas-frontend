@@ -21,27 +21,36 @@ const salaryApi = baseApi.injectEndpoints({
     }),
 
     getAllSalary: builder.query({
-      query: ({ tenantDomain, searchTerm }) => ({
+      query: ({ tenantDomain, searchTerm, month, year, day, limit, page }) => ({
         url: `/salary/all`,
         method: "GET",
-        params: { tenantDomain, searchTerm },
+        params: { tenantDomain, searchTerm, month, year, day, limit, page },
+      }),
+      providesTags: ["salary"],
+    }),
+    getSalaryByMonth: builder.query({
+      query: ({ tenantDomain, month}) => ({
+        url: '/salary/salary-month',
+        method: "GET",
+        params: { tenantDomain, month },
       }),
       providesTags: ["salary"],
     }),
 
     getSingleSalary: builder.query({
-      query: ({ tenantDomain, id }) => ({
+      query: ({ tenantDomain, id, month, year, day }) => ({
         url: `/salary/single/${id}`,
         method: "GET",
-        params: { tenantDomain },
+        params: { tenantDomain, month, year, day },
       }),
-      providesTags: ["salary"],
     }),
+
     upateSalary: builder.mutation({
-      query: ({ id, data }) => ({
+      query: ({ id, data, tenantDomain }) => ({
         url: `/salary/${id}`,
         method: "PATCH",
         body: data,
+        params: { tenantDomain },
       }),
       providesTags: ["salary"],
     }),
@@ -55,10 +64,10 @@ const salaryApi = baseApi.injectEndpoints({
       invalidatesTags: ["salary"],
     }),
     getSalaryForProfile: builder.query({
-      query: ({ tenantDomain, id, limit, page }) => ({
+      query: ({ tenantDomain, id, limit, page, month, year, day }) => ({
         url: "/salary/all-salary",
         method: "GET",
-        params: { tenantDomain, id, limit, page },
+        params: { tenantDomain, id, limit, page, month, year, day },
       }),
       invalidatesTags: ["salary"],
     }),
@@ -73,4 +82,5 @@ export const {
   usePartialyPaymentMutation,
   useDeleteSalaryMutation,
   useUpateSalaryMutation,
+  useGetSalaryByMonthQuery
 } = salaryApi;

@@ -1,17 +1,9 @@
+/* eslint-disable react/prop-types */
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { SxProps } from '@mui/material';
 import React from 'react';
 
-type TModalProps = {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  title: string;
-  children: React.ReactNode;
-  width?: string | number;
-  sx?: SxProps;
-};
 
 
 export default function TASRightSideModal({
@@ -21,14 +13,14 @@ export default function TASRightSideModal({
   children,
   width = '900px', 
   sx,
-}: TModalProps) {
-  const toggleDrawer = (open: boolean) => (
-    event: React.KeyboardEvent | React.MouseEvent
+}) {
+  const toggleDrawer = (open) => (
+    event
   ) => {
     if (
       event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' ||
-        (event as React.KeyboardEvent).key === 'Shift')
+      ((event).key === 'Tab' ||
+        (event).key === 'Shift')
     ) {
       return;
     }

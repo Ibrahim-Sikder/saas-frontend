@@ -10,6 +10,14 @@ const metaApi = baseApi.injectEndpoints({
       }),
       providesTags: ["meta"],
     }),
+    accountSummary: builder.query({
+      query: ({ tenantDomain }) => ({
+        url: `/meta/accounting-summary`,
+        method: "GET",
+        params: { tenantDomain },
+      }),
+      providesTags: ["meta"],
+    }),
     allCustomer: builder.query({
       query: ({
         tenantDomain,
@@ -33,4 +41,4 @@ const metaApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetAllMetaQuery, useAllCustomerQuery } = metaApi;
+export const { useGetAllMetaQuery, useAllCustomerQuery, useAccountSummaryQuery } = metaApi;

@@ -26,11 +26,11 @@ export default function YearlyIncomeChart() {
   const [radius, setRadius] = React.useState(50);
   const [itemNb, setItemNb] = React.useState(12);
   const [skipAnimation, setSkipAnimation] = React.useState(false);
-   const tenantDomain = useTenantDomain();
- 
+  const tenantDomain = useTenantDomain();
+  
   const { data: incomeData, isLoading: incomeLoading } = useGetAllIncomesQuery({
     tenantDomain,
-    limit: 10,
+    limit: 100,  // Increased limit to get more data
     page: 1,
   });
 
@@ -50,10 +50,30 @@ export default function YearlyIncomeChart() {
     );
   }
 
-  const monthlyIncom = incomeList.map((income) => income.amount || 0);
+  // Initialize monthly totals with zeros
+  const monthlyTotals = Array(12).fill(0);
+  const currentYear = new Date().getFullYear();
 
-  const dynamicData = monthlyIncom.map((amount, index) => ({
-    label: monthNames[index] || `Month ${index + 1}`,
+  // Process each income record
+  incomeList.forEach(income => {
+    // Use date field if available, fallback to createdAt
+    const dateStr = income.date || income.createdAt;
+    if (!dateStr) return;
+    
+    const date = new Date(dateStr);
+    if (isNaN(date)) return;
+    
+    // Only process records from current year
+    if (date.getFullYear() === currentYear) {
+      const monthIndex = date.getMonth();
+      monthlyTotals[monthIndex] += income.totalAmount || 0;
+    }
+  });
+
+  // Prepare chart data
+  const dynamicData = monthlyTotals.map((amount, index) => ({
+    id: index,
+    label: monthNames[index],
     value: amount,
   }));
 
@@ -62,14 +82,21 @@ export default function YearlyIncomeChart() {
       <PieChart
         height={400}
         series={[
-          { data: dynamicData, outerRadius: radius },
-          {
-            data: dynamicData.slice(0, itemNb),
-            innerRadius: radius,
-            arcLabel: () => "",
-          },
+          { 
+            data: dynamicData, 
+            outerRadius: radius,
+            highlightScope: { faded: 'global', highlighted: 'item' },
+            faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' }
+          }
         ]}
         skipAnimation={skipAnimation}
+        slotProps={{
+          legend: {
+            direction: 'row',
+            position: { vertical: 'bottom', horizontal: 'middle' },
+            padding: 0,
+          },
+        }}
       />
     </Box>
   );

@@ -2,225 +2,198 @@
 /* eslint-disable no-unused-vars */
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  FaCarAlt,
+  useEffect,
+  useRef,
+  useState
+} from "react";
+import Cookies from "js-cookie";
+import {
+  Home,
+  Logout,
+  Receipt,
+  CurrencyExchange,
+  DirectionsCar,
+  RequestQuote,
+  AccountBalance,
+  MoneyOff,
+  CalendarToday,
+  Storage,
+  BackupTable,
+  PersonAdd,
+  Business,
+  Store,
+  Storefront,
+  Group,
+  LocalShipping,
+  Recycling,
+  DeleteForever,
+  RestorePage
+} from "@mui/icons-material";
+import {
   FaProjectDiagram,
-  FaProductHunt,
-  FaUserTie,
-  FaCriticalRole,
-  FaAlipay,
   FaUsers,
-  FaUsersCog,
-  FaDatabase,
-  FaHeadset,
-  FaRegListAlt,
-  FaHospitalUser,
+  FaCalendarAlt,
+  FaUserPlus,
+  FaUserFriends,
+  FaClipboardList,
+  FaFileInvoice,
+  FaFileInvoiceDollar,
+  FaMoneyBillWave,
+  FaMoneyBill,
+  FaRunning,
+  FaCheckCircle,
+  FaTrash,
+  FaTrashRestore,
+  FaHospitalUser
 } from "react-icons/fa";
-import { FaAnchorCircleCheck } from "react-icons/fa6";
-import { useEffect, useRef, useState } from "react";
-
-import { Home, Logout, Receipt, CurrencyExchange } from "@mui/icons-material";
-import { animateScroll as scroll } from "react-scroll";
+import {
+  HiOutlineOfficeBuilding,
+  HiOutlineUserGroup,
+  HiOutlineUserAdd,
+  HiOutlineDocumentText,
+  HiOutlineDocumentDuplicate,
+  HiOutlineTrash
+} from "react-icons/hi";
 
 const LeftHoberSidebar = () => {
-  const [expanded, setExpanded] = useState(false);
-  const navRef = useRef();
-  const [toggle, setToggle] = useState(false);
-  const toggleSideBar = () => {
-    setToggle((toggle) => !toggle);
-  };
-
-  const containerRef = useRef();
-  const handleToggleCloseBtn = () => {
-    setToggle(false);
-  };
-
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const button = document.getElementById("button");
-      if (window.scrollY > 50) {
-        button.classList.add("scrollToTopBtn");
-      } else {
-        button.classList.remove("scrollToTopBtn");
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  function scrollToTop() {
-    window.scrollTo(0, 0);
-    scroll.scrollToTop({ smooth: true });
-  }
-
   const navigate = useNavigate();
+  
   const handleLogout = () => {
     Cookies.remove("tas-auth");
     navigate("/");
   };
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   return (
     <div className="mt-14">
+      {/* Dashboard */}
       <div>
         <div className="toolTipWrap">
           <NavLink to="/dashboard">
             <Home className="tooltipIcon" />
           </NavLink>
-          <b className="toolTip">Dashboard </b>
+          <b className="toolTip">Dashboard</b>
         </div>
       </div>
 
+      {/* Client */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/add-customer">
+            <HiOutlineUserGroup className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Client</b>
+        </div>
+      </div>
+
+      {/* Vehicle Job Card */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/addjob">
-            {" "}
-            <FaCarAlt className="tooltipIcon" />
+            <DirectionsCar className="tooltipIcon" />
           </NavLink>
-
-          <b className="toolTip">Job Card</b>
+          <b className="toolTip">Vehicle Job Card</b>
         </div>
       </div>
+
+      {/* Quotation */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/qutation">
-            {" "}
-            <FaCarAlt className="tooltipIcon" />
+            <RequestQuote className="tooltipIcon" />
           </NavLink>
           <b className="toolTip">Quotation</b>
         </div>
       </div>
+
+      {/* Invoice Card */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/invoice">
-            {" "}
             <Receipt className="tooltipIcon" />
           </NavLink>
           <b className="toolTip">Invoice Card</b>
         </div>
       </div>
+
+      {/* Money Receipt */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/money-receive">
-            {" "}
             <CurrencyExchange className="tooltipIcon" />
           </NavLink>
-          <b className="toolTip text-sm">Money Receipt </b>
+          <b className="toolTip text-sm">Money Receipt</b>
         </div>
       </div>
+
+      {/* Projects */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/running-project">
-            {" "}
             <FaProjectDiagram className="tooltipIcon" />
           </NavLink>
+          <b className="toolTip">Projects</b>
+        </div>
+      </div>
 
-          <b className="toolTip">Project</b>
-        </div>
-      </div>
+      {/* Finance */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-product">
-            <FaProductHunt className="tooltipIcon" />
+          <NavLink to="/dashboard/add-income">
+            <AccountBalance className="tooltipIcon" />
           </NavLink>
+          <b className="toolTip">Finance</b>
+        </div>
+      </div>
 
-          <b className="toolTip">Product</b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-customer">
-            <FaUserTie className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Customer</b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-supplier">
-            <FaHospitalUser className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Suppliers </b>
-        </div>
-      </div>
+      {/* HRM */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
           <NavLink to="/dashboard/add-employee">
             <FaUsers className="tooltipIcon" />
           </NavLink>
-          <b className="toolTip">Employee </b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-attendance">
-            <FaRegListAlt className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Attendance </b>
+          <b className="toolTip">HRM</b>
         </div>
       </div>
 
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-expense">
-            <FaCriticalRole className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Income </b>
+      {/* Tenant & UI Management (Superadmin only) */}
+      {user.role === "superadmin" && (
+        <div className="mt-[14px]">
+          <div className="toolTipWrap">
+            <NavLink to="/dashboard/all-tenant-list">
+              <Business className="tooltipIcon" />
+            </NavLink>
+            <b className="toolTip">Tenant Management</b>
+          </div>
         </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-expense">
-            <FaCriticalRole className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Expense </b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/add-expense">
-            <FaAnchorCircleCheck className="tooltipIcon" />
-          </NavLink>
-          <b className="toolTip">Role </b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/bill-pay">
-            <FaAlipay className="tooltipIcon" />
-          </NavLink>
+      )}
 
-          <b className="toolTip">Bill Pay </b>
-        </div>
-      </div>
+      {/* Recycle Bin */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
-          <NavLink to="/dashboard/profile">
-            <FaUsersCog className="tooltipIcon" />
+          <NavLink to="/dashboard/recycle-bin-jobcard-list">
+            <Recycling className="tooltipIcon" />
           </NavLink>
-          <b className="toolTip">Profile </b>
+          <b className="toolTip">Recycle Bin</b>
         </div>
       </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <FaDatabase className="tooltipIcon" />
-          <b className="toolTip">Data Backup </b>
-        </div>
-      </div>
-      <div className="mt-[14px]">
-        <div className="toolTipWrap">
-          <NavLink to="/dashboard/support">
-            <FaHeadset className="tooltipIcon" />
-          </NavLink>
 
-          <b className="toolTip">Support </b>
+      {/* Database Backup */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/backup">
+            <Storage className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Data Backup</b>
         </div>
       </div>
+
+      {/* Log Out */}
       <div className="mt-[14px]">
         <div onClick={handleLogout} className="toolTipWrap">
           <Logout className="tooltipIcon" />
-          <b className="toolTip">Log Out </b>
+          <b className="toolTip">Log Out</b>
         </div>
       </div>
     </div>

@@ -1,11 +1,17 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
-import { FaTrashAlt, FaEdit, FaEye } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaEdit,
+  FaEye,
+  FaDownload,
+  FaFileInvoice,
+} from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import Loading from "../../../components/Loading/Loading";
 import { ArrowBack } from "@mui/icons-material";
-import { Button, Pagination } from "@mui/material";
+import { Button, Pagination, Tooltip } from "@mui/material";
 
 import {
   useGetAllQuotationsQuery,
@@ -14,10 +20,11 @@ import {
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { backBtnStyle } from "../../../utils/customStyle";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 const QuotationList = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const [filterType, setFilterType] = useState("");
 
@@ -69,6 +76,20 @@ const tenantDomain = useTenantDomain();
     }
   };
 
+  const { data: profileData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
+
   useEffect(() => {
     if (search) {
       setFilterType(search);
@@ -91,7 +112,6 @@ const tenantDomain = useTenantDomain();
             >
               Back
             </Button>
-            
           </div>
           <div className="productHome">
             <span>Dashboard / </span>
@@ -142,7 +162,7 @@ const tenantDomain = useTenantDomain();
                         <th>Car Number </th>
                         <th>Mobile Number</th>
                         <th>Date</th>
-                        <th colSpan={4}>Action</th>
+                        <th colSpan={5}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -202,42 +222,102 @@ const tenantDomain = useTenantDomain();
                             <td>{card.date}</td>
 
                             <td>
-                              <a
-                                className="bg-[#42A0D9] text-white px-3 py-2 text-[12px]  rounded-full "
-                                href={`${
-                                  import.meta.env.VITE_API_URL
-                                }/quotations/quotation/${card._id}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Tooltip
+                                title="View Invoice"
+                                arrow
+                                placement="top"
                               >
-                                Download
-                              </a>
-                            </td>
-                            <td>
-                              <div
-                                onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2"
-                              >
-                                <FaEye className="editIcon" />
-                              </div>
-                            </td>
-                            <td>
-                              <div className="editIconWrap edit">
-                                <Link
-                                  to={`/dashboard/update-quotation?id=${card._id}`}
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
+                                  rel="noreferrer"
                                 >
-                                  <FaEdit className="editIcon" />
-                                </Link>
-                              </div>
+                                  <FaFileInvoice className="editIcon" />
+                                </a>
+                              </Tooltip>
                             </td>
+
                             <td>
-                              <button
-                                disabled={deleteLoading}
-                                onClick={() => handleMoveToRecycled(card._id)}
-                                className="editIconWrap"
+                              <Tooltip
+                                title="Download Quotation"
+                                arrow
+                                placement="top"
                               >
-                                <FaTrashAlt className="deleteIcon" />
-                              </button>
+                                <a
+                                  className="editIconWrap edit2"
+                                  href={`${
+                                    import.meta.env.VITE_API_URL
+                                  }/quotations/quotation/${
+                                    card._id
+                                  }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                                    JSON.stringify(companyProfileData)
+                                  )}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <FaDownload className="editIcon" />
+                                </a>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip title="Preview" arrow placement="top">
+                                <div
+                                  onClick={() => handleIconPreview(card._id)}
+                                  className="editIconWrap edit2"
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEye className="editIcon" />
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title="Edit Quotation"
+                                arrow
+                                placement="top"
+                              >
+                                <div className="editIconWrap edit">
+                                  <Link
+                                    to={`/dashboard/update-quotation?id=${card._id}`}
+                                  >
+                                    <FaEdit className="editIcon" />
+                                  </Link>
+                                </div>
+                              </Tooltip>
+                            </td>
+
+                            <td>
+                              <Tooltip
+                                title={
+                                  deleteLoading
+                                    ? "Deleting..."
+                                    : "Move to Recycled"
+                                }
+                                arrow
+                                placement="top"
+                              >
+                                <span>
+                                  <button
+                                    disabled={deleteLoading}
+                                    onClick={() =>
+                                      handleMoveToRecycled(card._id)
+                                    }
+                                    className="editIconWrap"
+                                    style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "none",
+                                      border: "none",
+                                      padding: 0,
+                                    }}
+                                  >
+                                    <FaTrashAlt className="deleteIcon" />
+                                  </button>
+                                </span>
+                              </Tooltip>
                             </td>
                           </tr>
                         );

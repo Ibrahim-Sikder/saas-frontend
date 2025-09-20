@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { HiLocationMarker } from "react-icons/hi";
-import { HiEnvelope, HiMiniPhone } from "react-icons/hi2";
+import { HiMiniPhone } from "react-icons/hi2";
 import { ImUserTie } from "react-icons/im";
 import "../Customer.css";
 import CustomerJobCardList from "./CustomerJobCardList";
@@ -20,6 +19,7 @@ import { Person } from "@mui/icons-material";
 import { tabsStyles, tabStyles } from "../../../../utils/customStyle";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 import CustomerNote from "./CustomerNote";
+import { useGetCompanyProfileQuery } from "../../../../redux/api/companyProfile";
 
 const CustomerProfile = () => {
   const location = useLocation();
@@ -47,6 +47,19 @@ const CustomerProfile = () => {
     error: customerError,
   } = useGetSingleCustomerQuery({ id, tenantDomain });
 
+  const { data } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
+
+  const companyProfileData = {
+    companyName: data?.data?.companyName,
+    address: data?.data?.address,
+    website: data?.data?.website,
+    phone: data?.data?.phone,
+    email: data?.data?.email,
+    logo: data?.data?.logo[0],
+    companyNameBN: data?.data?.companyNameBN,
+  };
   if (isLoading) {
     return <Loading />;
   }
@@ -158,15 +171,23 @@ const CustomerProfile = () => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <CustomerAccount profileData={profileData} />
+          <CustomerAccount
+            tenantDomain={tenantDomain}
+            profileData={profileData}
+          />
         </TabPanel>
 
         <TabPanel value={value} index={1}>
-          <VehicleDetails id={id} user_type={profileData?.data?.user_type} />
+          <VehicleDetails
+            tenantDomain={tenantDomain}
+            id={id}
+            user_type={profileData?.data?.user_type}
+          />
         </TabPanel>
 
         <TabPanel value={value} index={2}>
           <CustomerJobCardList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             customerId={profileData?.data?.customerId}
             user_type={profileData?.data?.user_type}
@@ -175,6 +196,7 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <CustomerQoutationList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
@@ -182,6 +204,7 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={4}>
           <CustomerInvoiceList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
@@ -189,21 +212,22 @@ const CustomerProfile = () => {
         </TabPanel>
         <TabPanel value={value} index={5}>
           <CustomerMoneyList
+          companyProfileData={companyProfileData}
             tenantDomain={tenantDomain}
             id={id}
             user_type={profileData?.data?.user_type}
           />
         </TabPanel>
         <TabPanel value={value} index={6}>
-          <Message />
+          <Message data={profileData?.data} />
         </TabPanel>
         <TabPanel value={value} index={7}>
-          <CustomerNote  tenantDomain={tenantDomain}  id={id}/>
+          <CustomerNote tenantDomain={tenantDomain} id={id} />
         </TabPanel>
 
         <div>
           <p className="my-5 text-center">
-            © Copyright 2024 | Softypy Garage | All Rights Reserved
+            © Copyright 2024 | Garage Master | All Rights Reserved
           </p>
         </div>
       </div>

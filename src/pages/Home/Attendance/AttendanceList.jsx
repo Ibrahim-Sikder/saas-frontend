@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -26,7 +25,8 @@ import Loading from "../../../components/Loading/Loading";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import TodayAttendance from "./TodayAttendance";
 import dayjs from "dayjs";
-
+import swal from "sweetalert";
+import AllAttendanceList from "./AllAttendanceList";
 const AttendanceList = () => {
   const [filterType, setFilterType] = useState("");
   const [stats, setStats] = useState({
@@ -55,7 +55,6 @@ const AttendanceList = () => {
   const [deleteAttendance, { isLoading }] = useDeleteAttendanceMutation();
 
   useEffect(() => {
-    // Calculate statistics when data changes
     if (allAttendance?.data?.records) {
       const totalRecords = allAttendance.data.records.length;
       const totalPresent = allAttendance.data.records.reduce(
@@ -89,25 +88,46 @@ const AttendanceList = () => {
     setFilterType(date);
   };
 
-const handleDeleteFilter = async (date) => {
+  const handleDeleteFilter = async (date) => {
+    const formattedDate = dayjs(date, ["DD-MM-YYYY", "DD-MM-YY"]).format(
+      "DD-MM-YYYY"
+    );
 
-  const formattedDate = dayjs(date).format("DD-MM-YYYY");
+    // Show confirmation dialog
+    const willDelete = await swal({
+      title: "Are you sure?",
+      text: `You want to delete attendance for ${formattedDate}?`,
+      icon: "warning",
+      dangerMode: true,
+      buttons: ["Cancel", "Yes, Delete"],
+    });
 
-  try {
-    const response = await deleteAttendance({
-      tenantDomain,
-      attendanceInfo: { date: formattedDate },
-    }).unwrap();
+    if (willDelete) {
+      try {
+        const response = await deleteAttendance({
+          tenantDomain,
+          date: formattedDate, // send directly
+        }).unwrap();
 
-    if (response.success) {
-      toast.success(response.message);
-      refetch();
+        if (response.success) {
+          swal(
+            "Deleted!",
+            `Attendance for ${formattedDate} has been deleted.`,
+            "success"
+          );
+          refetch();
+        } else {
+          swal(
+            "Error",
+            response.message || "Failed to delete attendance",
+            "error"
+          );
+        }
+      } catch (error) {
+        swal("Error", error.message || "Failed to delete attendance", "error");
+      }
     }
-  } catch (error) {
-    toast.error(error.message || "Failed to delete attendance");
-  }
-};
-
+  };
 
   const handleAllAttendance = () => {
     setFilterType("");
@@ -119,12 +139,9 @@ const handleDeleteFilter = async (date) => {
 
   return (
     <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-md">
-      <div className="mt-12">
+      {/* <div className="mt-12">
         <TodayAttendance />
       </div>
-
-
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between my-10">
         <div className="flex items-center gap-3">
           <div className="bg-indigo-600 p-3 rounded-lg shadow-lg">
@@ -147,7 +164,7 @@ const handleDeleteFilter = async (date) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 flex items-center justify-between">
           <div>
@@ -186,7 +203,7 @@ const handleDeleteFilter = async (date) => {
         </div>
       </div>
 
-      {/* Filter Section */}
+
       <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
           <Search className="h-5 w-5 text-indigo-500" />
@@ -225,7 +242,7 @@ const handleDeleteFilter = async (date) => {
         </div>
       </div>
 
-      {/* Table Section */}
+
       {allAttendance?.data?.records?.length > 0 ? (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -339,7 +356,9 @@ const handleDeleteFilter = async (date) => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
+
+      <AllAttendanceList />
     </div>
   );
 };

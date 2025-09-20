@@ -26,7 +26,6 @@ import {
   Add,
   Delete,
   Payment,
-  AttachMoney,
   DateRange,
   BusinessCenter,
 } from "@mui/icons-material";
@@ -165,6 +164,7 @@ const ExpenseForm = ({ id }) => {
       note: data.note || "",
     };
 
+
     const toastId = toast.loading(
       id ? "Updating Expense..." : "Creating Expense..."
     );
@@ -195,9 +195,7 @@ const ExpenseForm = ({ id }) => {
       navigate("/dashboard/expense-list");
     } catch (error) {
       toast.update(toastId, {
-        render:
-          `Error ${id ? "updating" : "creating"} expense: ` +
-          (error?.data?.message || error?.message || "Something went wrong!"),
+        render:   (error?.data?.message || error?.message || "Something went wrong!"),
         type: "error",
         isLoading: false,
         autoClose: 3000,
@@ -318,7 +316,7 @@ const ExpenseForm = ({ id }) => {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <AttachMoney sx={{ color: "#10b981" }} />
+                            ৳
                             </InputAdornment>
                           ),
                         }}
@@ -380,7 +378,7 @@ const ExpenseForm = ({ id }) => {
                             <TASInput
                               fullWidth
                               name={`items[${index}].name`}
-                              label={`Item ${index + 1} Name`}
+                              label={`Expense Item Name`}
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
@@ -396,11 +394,11 @@ const ExpenseForm = ({ id }) => {
                               fullWidth
                               label="Amount"
                               name={`items[${index}].amount`}
-                              type="number"
+                              
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
-                                    <AttachMoney sx={{ color: "#10b981" }} />
+                                    ৳
                                   </InputAdornment>
                                 ),
                               }}
@@ -468,10 +466,14 @@ const ExpenseForm = ({ id }) => {
                         items={paymentMethods}
                       />
                     </Grid>
-                    {/* Conditional Payment Fields */}
-                    {["Bkash", "Nagad", "Rocket", "Other"].includes(
-                      methods.watch("payment_method")
-                    ) && (
+
+                    {[
+                      "Bkash",
+                      "Nagad",
+                      "Rocket",
+                      "Other",
+                      "Bank Transfer",
+                    ].includes(methods.watch("payment_method")) && (
                       <>
                         <Grid item xs={12} md={3}>
                           <TASInput
@@ -485,18 +487,32 @@ const ExpenseForm = ({ id }) => {
                           <TASInput
                             fullWidth
                             name="transactionNumber"
-                            label="Transaction Number"
+                            label="Transaction ID"
                             sx={expenseInputStyle}
                           />
                         </Grid>
                       </>
                     )}
+
+                    {["Cash"].includes(methods.watch("payment_method")) && (
+                      <>
+                        <Grid item xs={12} md={3}>
+                          <TASInput
+                            fullWidth
+                            name="referanceNo"
+                            label="Referance Number"
+                            sx={expenseInputStyle}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
                     <Grid item xs={12}>
                       <TASTextarea
                         fullWidth
                         name="note"
                         minRows={4}
-                        placeholder="Add any additional notes about this expense..."
+                        placeholder="Add any additional notes about this income..."
                         sx={expenseInputStyle}
                       />
                     </Grid>
