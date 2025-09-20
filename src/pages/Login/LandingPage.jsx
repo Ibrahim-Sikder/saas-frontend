@@ -15,12 +15,6 @@ import {
   Analytics,
 } from "@mui/icons-material"
 
-import logo from "../../../src/assets/logo/log.png";
-import logo2 from "../../../src/assets/logo/logo2.png";
-import logo3 from "../../../src/assets/logo/logo3.png";
-import logo4 from "../../../src/assets/logo/logo4.png";
-import logo5 from "../../../src/assets/logo/logo5.png";
-import logo6 from "../../../src/assets/logo/logo6.png";
 import { Navigation } from "../Landingpage/Navigation";
 import { HeroSection } from "../Landingpage/HeroSection";
 import { ClientLogos } from "../Landingpage/ClientLogo";
@@ -42,14 +36,7 @@ export default function GarageLandingPage() {
     }
   }
 
-  const clientLogos = [
-    { name: "AutoCare Pro", logo: logo },
-    { name: "Elite Motors", logo: logo2 },
-    { name: "Speed Garage", logo: logo3 },
-    { name: "Premium Auto", logo: logo4 },
-    { name: "Garage Master", logo: logo5 },
-    { name: "Auto Excellence", logo: logo6 },
-  ]
+
 
   const navItems = [
     { label: "Features", id: "features" },
@@ -378,7 +365,7 @@ export default function GarageLandingPage() {
     >
       <Navigation navItems={navItems} scrollToSection={scrollToSection} />
       <HeroSection />
-      <ClientLogos clientLogos={clientLogos} />
+      <ClientLogos />
       <StatsSection stats={stats} />
       <WorkflowSection workflowSteps={workflowSteps} />
       <FeaturesSection features={features} />

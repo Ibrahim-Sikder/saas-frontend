@@ -4,26 +4,16 @@
 import { useState } from "react";
 import {
   Box,
-  Typography,
-  Paper,
-  Tooltip,
-  Tabs,
-  Tab,
-  Card,
-  CardContent,
   CircularProgress,
   Fade,
   Alert,
   Grid,
   Button,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   useGetAllUserQuery,
   useUpdateUserMutation,
 } from "../../../redux/api/userApi";
-
-import { toast } from "react-toastify";
 
 // Import subcomponents
 import ProfileHeader from "./ProfileHeader";
@@ -95,7 +85,7 @@ const Profile = () => {
     >
       {/* Header Section */}
       <ProfileHeader
-      tenantDomain={tenantDomain}
+        tenantDomain={tenantDomain}
         userData={userData}
         tenantInfo={tenantInfo}
         subscription={subscription}

@@ -1,8 +1,25 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# SaaS Multi-Tenant Domain Setup Guide
 
-Currently, two official plugins are available:
+This project supports hosting multiple client domains on the same VPS using Nginx and automated SSL with Certbot.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+
+## Adding a New Client Domain
+
+Follow these steps to add and secure a new client domain (e.g., `garage.worldautosolution.com`):
+
+### 1. DNS Setup
+
+- Make sure the client domain points to your VPS IP via an A record.
+- If you want to use a `www` subdomain (e.g., `www.garage.worldautosolution.com`), add an A record for that too.
+
+### 2. Run the Setup Script
+
+Make the setup script executable (if not done yet) and run it with the domain as the argument:
+
+```bash
+cd /root
+sudo chmod +x /root/setup-client-domain.sh
+sudo /root/setup-client-domain.sh garage.worldautosolution.com

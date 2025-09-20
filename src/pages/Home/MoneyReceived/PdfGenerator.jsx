@@ -15,11 +15,20 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const PdfGenerator = () => {
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-  
+
   const tenantDomain = useTenantDomain();
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -31,6 +40,7 @@ const PdfGenerator = () => {
       id,
     }
   );
+
 
   if (isLoading) {
     return <Loading />;
@@ -51,13 +61,22 @@ const PdfGenerator = () => {
           <div ref={componentRef} className="moneyFormWrap">
             <div className="flex items-center justify-between  lg:flex-row gap-3">
               <div className="logoWrap logoWrap2">
-                <img className="" src={CompanyInfoData?.data?.logo} alt="logo" />
+                <img
+                  className=""
+                  src={CompanyInfoData?.data?.logo}
+                  alt="logo"
+                />
               </div>
 
               <div className="moneyHead moneyHead2">
-                <h2 className="receivedTitle receivedTitle2">
-                  {CompanyInfoData?.data?.companyName}
-                </h2>
+                <div className="flex-1 text-center">
+                  <h2 className="text-3xl">
+                    {CompanyInfoData?.data?.companyNameBN}
+                  </h2>
+                  <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold">
+                    ({CompanyInfoData?.data?.companyName})
+                  </h3>
+                </div>
                 <span className="mt-5 block">
                   It's trusted computerized Organization for all kinds of
                   vehicle Cheque up & maintenance such as computerized Engine
@@ -76,9 +95,7 @@ const PdfGenerator = () => {
                 </div>
                 <div className="flex items-center">
                   <Home className="hotlineIcon"> </Home>
-                  <small>
-                   {CompanyInfoData?.data?.address}
-                  </small>
+                  <small>{CompanyInfoData?.data?.address}</small>
                 </div>
                 <div className="flex items-center">
                   <WhatsApp className="hotlineIcon" />
@@ -124,7 +141,7 @@ const PdfGenerator = () => {
                     </label>
                   )}
                   <span className="text-sm">
-                    {singleMoneyReceipt?.data?.job_no}
+                    {singleMoneyReceipt?.data?.invoice?.invoice_no}
                   </span>
                 </div>
                 <div className="flex items-center justify-center receivedField">
@@ -332,9 +349,20 @@ const PdfGenerator = () => {
                 </span>
               </div>
             </div>
-            <div className="mt-5">
-              <small className="signature">Authorized Signature</small>
+
+             <div className="flex justify-between mt-16 mb-5 text-[12px] ">
+              <div className="text-center signature">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center signature">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
+              </div>
             </div>
+           
           </div>
         </div>
       </div>
@@ -345,7 +373,9 @@ const PdfGenerator = () => {
             className="bg-[#82017F] text-white px-3 py-2 text-[12px] rounded-full mr-2"
             href={`${import.meta.env.VITE_API_URL}/money-receipts/money/${
               singleMoneyReceipt.data._id
-            }?tenantDomain=${tenantDomain}`}
+            }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+              JSON.stringify(companyProfileData)
+            )}`}
             target="_blank"
             rel="noreferrer"
           >

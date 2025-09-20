@@ -53,7 +53,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import PrintIcon from "@mui/icons-material/Print"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney"
+
 import PeopleIcon from "@mui/icons-material/People"
 import HistoryIcon from "@mui/icons-material/History"
 import HomeIcon from "@mui/icons-material/Home"
@@ -462,7 +462,7 @@ const tenantDomain = useTenantDomain();
                   boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
                 }}
               >
-                <AttachMoneyIcon sx={{ fontSize: 30 }} />
+               ৳
               </Avatar>
               <Box sx={{ ml: 2 }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>

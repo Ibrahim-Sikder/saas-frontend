@@ -126,6 +126,7 @@ const AddCustomer = () => {
       customerOwnerPhone: data.customerOwnerPhone,
       customerOwnerName: data.customerOwnerName,
       customerOwnerCountryCode: customerOwnerCountryCode.code,
+      whatsappNumber: data.whatsappNumber,
 
       reference_name: data.reference_name,
     };
@@ -381,6 +382,15 @@ const AddCustomer = () => {
                         </Grid>
                       </Grid>
 
+                      <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <TextField
+                          fullWidth
+                          on
+                          label="Whatsapp Number (N)"
+                          {...register("whatsappNumber")}
+                          error={!!errors?.whatsappNumber}
+                        />
+                      </Grid>
                       <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TextField
                           fullWidth

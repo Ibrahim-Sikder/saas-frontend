@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 
-const TASAutocomplete = ({
+const GarageAutoCompleted = ({
   name,
   label = "Autocomplete",
   fullWidth = true,
@@ -84,4 +84,4 @@ const TASAutocomplete = ({
   );
 };
 
-export default TASAutocomplete;
+export default GarageAutoCompleted;

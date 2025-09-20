@@ -151,6 +151,7 @@ const AddCompany = () => {
       companyOwnerName: data.companyOwnerName,
       companyOwnerCountryCode: companyOwnerCountryCode.code,
       reference_name: data.reference_name,
+      whatsappNumber: data.whatsappNumber,
     };
 
     data.vehicle_model = Number(data.vehicle_model);
@@ -237,7 +238,19 @@ const AddCompany = () => {
                     <TextField
                       fullWidth
                       on
-                      label="Company Name (T)"
+                      label={
+                        <>
+                          Company Name (T)
+                          <span
+                            style={{
+                              color: "red",
+                              fontSize: "25px",
+                            }}
+                          >
+                            *
+                          </span>
+                        </>
+                      }
                       {...register("company_name", {
                         required: "Compnay name is required",
                       })}
@@ -251,7 +264,6 @@ const AddCompany = () => {
                       onC
                       label="Vehicle User Name (T)"
                       {...register("vehicle_username")}
-                   
                     />
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -259,12 +271,7 @@ const AddCompany = () => {
                       fullWidth
                       on
                       label="Company Address (T)"
-                      
-                      {...register("company_address", {
-                        required: "Company address is required!",
-                      })}
-                      error={!!errors.company_address}
-                      helperText={errors.company_address?.message}
+                      {...register("company_address")}
                     />
                   </Grid>
 
@@ -297,7 +304,19 @@ const AddCompany = () => {
                             required: "Company contact number is required! ",
                           })}
                           fullWidth
-                          label="Company Contact No (N)"
+                          label={
+                            <>
+                              Company Contact No (N)
+                              <span
+                                style={{
+                                  color: "red",
+                                  fontSize: "25px",
+                                }}
+                              >
+                                *
+                              </span>
+                            </>
+                          }
                           variant="outlined"
                           type="tel"
                           value={phoneNumber}
@@ -308,7 +327,14 @@ const AddCompany = () => {
                       </Grid>
                     </Grid>
                   </Grid>
-
+                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      on
+                      label="Whatsapp Number (N)"
+                      {...register("whatsappNumber")}
+                    />
+                  </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
                       fullWidth

@@ -2,14 +2,22 @@ import { baseApi } from "./baseApi";
 
 const vehicleApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createVehicle: builder.mutation({
-      query: (vehicleInfo) => ({
-        url: "/vehicles",
-        method: "POST",
-        body: vehicleInfo,
-      }),
-      invalidatesTags: ["vehicle"],
-    }),
+createVehicle: builder.mutation({
+  query: ({ tenantDomain, vehicleInfo }) => {
+    const request = {
+      url: "/vehicles",
+      method: "POST",
+      body: vehicleInfo,
+      params: { tenantDomain },
+    };
+
+
+
+    return request;
+  },
+  invalidatesTags: ["vehicle"],
+}),
+
 
     getAllVehicles: builder.query({
       query: ({ tenantDomain, id, limit, page, searchTerm, isRecycled }) => ({
@@ -41,6 +49,17 @@ const vehicleApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["vehicle"],
     }),
+    updateVehicle: builder.mutation({
+      query: ({ tenantDomain, id, vehicleInfo }) => ({
+        url: `/vehicles/${id}`,
+        method: "PATCH",
+        body: vehicleInfo,
+        params: {
+          tenantDomain,
+        },
+      }),
+      invalidatesTags: ["vehicle"],
+    }),
   }),
 });
 
@@ -49,4 +68,5 @@ export const {
   useGetAllVehiclesQuery,
   useGetSingleVehicleQuery,
   useDeleteVehicleMutation,
+  useUpdateVehicleMutation,
 } = vehicleApi;

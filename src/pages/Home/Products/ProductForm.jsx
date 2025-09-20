@@ -10,9 +10,7 @@ import {
   Typography,
   Paper,
   Button,
-  TextField,
   Grid,
-  Chip,
   Snackbar,
   Alert,
   Avatar,
@@ -42,7 +40,6 @@ import {
   Store,
   Speed,
   Help as HelpIcon,
-  Search,
   CheckCircle,
   WarningRounded,
   CalendarMonth,
@@ -69,7 +66,6 @@ import FormTextArea from "../../../components/form/FormTextArea";
 import ProductStatusSelector from "../../../components/form/Status";
 import { toast } from "react-toastify";
 import TASSelect from "../../../components/form/Select";
-import dayjs from "dayjs";
 import FormDatePicker from "../../../components/form/Datepicker";
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
 import { Tooltip } from "@mui/material";
@@ -82,7 +78,8 @@ import { CreateProductTypeModal } from "../ProductType/CreateProductTypeModal";
 import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
-
+import { useGetAllWarrantyQuery } from "../../../redux/api/warrantyApi";
+import CreateWarrantyModal from "../../Inventory/WarrandyModal";
 
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
@@ -98,9 +95,6 @@ export default function ProductForm({ id }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [expiryDateType, setExpiryDateType] = useState("fixed");
   const [unitOpen, setUnitOpen] = useState(false);
   const [brandOpen, setBrandOpen] = useState(false);
@@ -108,6 +102,10 @@ export default function ProductForm({ id }) {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
   const [productTypeOpen, setproductTypeOpen] = useState(false);
+  const [warrantyOpen, setWarrantyOpen] = useState(false);
+
+  const handleWarrantyOpen = () => setWarrantyOpen(true);
+  const handleWarrantyClose = () => setWarrantyOpen(false);
   const handleCategoryOpen = () => setCategoryOpen(true);
   const handleCategoryClose = () => setCategoryOpen(false);
   const handleBrandOpen = () => setBrandOpen(true);
@@ -124,7 +122,6 @@ export default function ProductForm({ id }) {
 
   const { data: singleProduct, isLoading: singleProductLoading } =
     useGetSingleProductQuery({ tenantDomain, id });
-
   const [updateProduct] = useUpdateProductMutation();
   const [createProduct] = useCreateProductMutation();
   const { data } = useGetAllICategoryQuery({
@@ -166,7 +163,21 @@ export default function ProductForm({ id }) {
       page: 1,
       searchTerm: "",
     });
+  const { data: warrantyData } = useGetAllWarrantyQuery({
+    tenantDomain,
+    limit: 1000000,
+    page: 1,
+    searchTerm: "",
+  });
 
+  // Options for dropdowns
+  const warrantyOptions = useMemo(() => {
+    if (!warrantyData?.data) return [];
+    return warrantyData.data.map((war) => ({
+      label: war.name,
+      value: war._id,
+    }));
+  }, [warrantyData?.data]);
   // Options for dropdowns
   const warehouseOptions = useMemo(() => {
     if (!wareHouseData?.data?.warehouses) return [];
@@ -255,7 +266,6 @@ export default function ProductForm({ id }) {
       product_quantity: singleProduct.data.product_quantity || "",
       stock_alert: singleProduct.data.stock_alert || "",
       shipping: singleProduct.data.shipping || "",
-      warranty: singleProduct.data.warranty || "",
       productDescription: singleProduct.data.productDescription || "",
       specifications: singleProduct.data.specifications || "",
       storageLocation: singleProduct.data.storageLocation || "",
@@ -311,6 +321,13 @@ export default function ProductForm({ id }) {
             )?.label || "",
           ]
         : [],
+      warranties: singleProduct.data.warranties
+        ? [
+            warrantyOptions.find(
+              (war) => war.value === singleProduct.data.warranties._id
+            )?.label || "",
+          ]
+        : [],
       initialStock: singleProduct.data.initialStock || 0,
       stock: singleProduct.data.stock || 0,
       reorderLevel: singleProduct.data.reorderLevel || 0,
@@ -326,6 +343,7 @@ export default function ProductForm({ id }) {
     productTypeOptions,
     suppliersOptions,
     warehouseOptions,
+    warrantyOptions,
   ]);
 
   useEffect(() => {
@@ -391,6 +409,14 @@ export default function ProductForm({ id }) {
           warehouseOptions.find((cat) => cat.label === data.warehouse[0])?.value
             ? [
                 warehouseOptions.find((cat) => cat.label === data.warehouse[0])
+                  .value,
+              ]
+            : [],
+        warranties:
+          data.warranties?.[0] &&
+          warrantyOptions.find((cat) => cat.label === data.warranties[0])?.value
+            ? [
+                warrantyOptions.find((cat) => cat.label === data.warranties[0])
                   .value,
               ]
             : [],
@@ -681,7 +707,32 @@ export default function ProductForm({ id }) {
               </Grid>
             </Grid>
           </Grid>
-
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={8.5} lg={11}>
+                <TASAutocomplete
+                  size="medium"
+                  name="warranties"
+                  label="Warranty"
+                  placeholder="Warranty"
+                  icon={Category}
+                  iconPosition="start"
+                  options={warrantyOptions}
+                />
+              </Grid>
+              <Grid item lg={1} display="flex" justifyContent="center">
+                <Tooltip title="Add Supplier" arrow>
+                  <Button
+                    onClick={handleWarrantyOpen}
+                    variant="contained"
+                    sx={addButtonStyle}
+                  >
+                    <AddCircleOutlineIcon fontSize="medium" />
+                  </Button>
+                </Tooltip>
+              </Grid>
+            </Grid>
+          </Grid>
           <Grid item xs={12}>
             <TagsInput name="tags" />
           </Grid>
@@ -755,9 +806,7 @@ export default function ProductForm({ id }) {
           <Grid item xs={12} md={4}>
             <TASInput
               name="expense"
-              
               placeholder="Expense"
-              required
               icon={MonetizationOn}
               iconPosition="start"
               type="number"
@@ -1153,15 +1202,7 @@ export default function ProductForm({ id }) {
               type="number"
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <TASInput
-              name="warranty"
-              label="Warranty Period"
-              icon={WarningRounded}
-              iconPosition="start"
-              type="number"
-            />
-          </Grid>
+         
           <Grid item xs={12}>
             <FormTextArea
               name="productDescription"
@@ -1179,27 +1220,6 @@ export default function ProductForm({ id }) {
               iconPosition="start"
               type="number"
             />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel id="is-deleted-label">Is Deleted</InputLabel>
-              <Select
-                labelId="is-deleted-label"
-                name="isDeleted"
-                defaultValue={false}
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Settings />
-                  </InputAdornment>
-                }
-              >
-                <MenuItem value={true}>Yes</MenuItem>
-                <MenuItem value={false}>No</MenuItem>
-              </Select>
-              <FormHelperText>
-                Mark as deleted without removing from database
-              </FormHelperText>
-            </FormControl>
           </Grid>
         </Grid>
       ),
@@ -1450,6 +1470,12 @@ export default function ProductForm({ id }) {
           </Alert>
         </Snackbar>
       </Box>
+
+      {warrantyOpen && (
+        <CreateWarrantyModal open={warrantyOpen} onClose={handleWarrantyClose} />
+      )}
+
+
       {categoryOpen && (
         <CreateCategoryModal
           open={categoryOpen}
@@ -1477,6 +1503,7 @@ export default function ProductForm({ id }) {
       {unitOpen && (
         <CreateUnitModal open={unitOpen} setOpen={handleUnitClose} />
       )}
+      
     </>
   );
 }

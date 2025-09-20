@@ -32,7 +32,6 @@ import {
   AddShoppingCart,
   PointOfSale,
   AccountBalance,
-  AttachMoney,
   MoneyOff,
   PersonAdd,
   Business,
@@ -48,6 +47,9 @@ import {
   Assignment,
   Add,
   List,
+  Savings,
+  Payments,
+  ReceiptLong,
 } from "@mui/icons-material";
 
 import {
@@ -477,8 +479,8 @@ const Sidebar = ({ toggle }) => {
               </Typography>
             ))}
           </AccordionDetails>
-        </Accordion>
-        <Accordion
+        </Accordion> 
+         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel18"}
@@ -538,7 +540,7 @@ const Sidebar = ({ toggle }) => {
           </AccordionDetails>
         </Accordion>
         {/* Inventory */}
-        <Accordion
+         <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel6"}
@@ -560,12 +562,7 @@ const Sidebar = ({ toggle }) => {
 
           <AccordionDetails>
             <div className="accordionTypoGrapy">
-              {/* <div className="flex items-center mb-2">
-                <Dashboard className="mr-2" />
-                <NavLink to="/dashboard/inventory-dashboard">
-                  Inventory Dashboard
-                </NavLink>
-              </div> */}
+              
               {[
                 {
                   icon: <Inventory2 />,
@@ -630,7 +627,7 @@ const Sidebar = ({ toggle }) => {
           <AccordionDetails>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
-                <AttachMoney className="mr-2" />
+                ৳
                 <NavLink to="/dashboard/add-income">Add Income</NavLink>
               </div>
             </Typography>
@@ -652,32 +649,27 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/expense-list">Expense List</NavLink>
               </div>
             </Typography>
-            {/* <Typography className="accordionTypoGrapy">
+            <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Category className="mr-2" />
                 <NavLink to="/dashboard/expense-categories">
                   Expense Categories{" "}
                 </NavLink>
               </div>
-            </Typography> */}
-            {/* <Typography className="accordionTypoGrapy">
+            </Typography>
+          
+            <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
-                <Payments className="mr-2" />
-                <NavLink to="/dashboard/add-paybill"> Pay Bill </NavLink>
+                <Savings className="mr-2" />
+                <NavLink to="/dashboard/donation">Donation Add</NavLink>
               </div>
             </Typography>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
-                <ReceiptLong className="mr-2" />
-                <NavLink to="/dashboard/paybill">Bill List</NavLink>
-              </div>
-            </Typography> */}
-            {/* <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
                 <Savings className="mr-2" />
-                <NavLink to="/dashboard/donation">Donation</NavLink>
+                <NavLink to="/dashboard/donation-list">Donation List</NavLink>
               </div>
-            </Typography> */}
+            </Typography>
           </AccordionDetails>
         </Accordion>
         {/* HRM */}
@@ -735,28 +727,17 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-leave">Leave</NavLink>
               </span>
             </Typography>
+          
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
-                <HolidayVillage className="mr-2" />
-                <NavLink to="/dashboard/holiday">Holiday</NavLink>
-              </span>
-            </Typography>
-            <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <AttachMoney className="mr-2" />
+                ৳
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
-            {/* <Typography className="accordionTypoGrapy">
-              <span className="flex items-center">
-                <AccessTime className="mr-2" />
-                <NavLink to="/dashboard/employee-overtime">Overtime</NavLink>
-              </span>
-            </Typography> */}
           </AccordionDetails>
         </Accordion>
 
-        {user.role !== "superadmin" && (
+        {user.role == "superadmin" && (
           <Accordion
             sx={{ paddingBottom: "10px" }}
             className="dashboardAccordion"

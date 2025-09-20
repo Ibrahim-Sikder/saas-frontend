@@ -2,11 +2,19 @@
 
 import { Box, Container, Typography, Grid, Paper } from "@mui/material"
 import { motion } from "framer-motion"
+import { useGetAllCompanyBrandsQuery } from "../../redux/api/companyBrandApi";
+import Loading from "../../components/Loading/Loading";
 
 
 
-export const ClientLogos = ({ clientLogos }) => {
+export const ClientLogos = () => {
+    const { data, isLoading } = useGetAllCompanyBrandsQuery({});
+    if(isLoading){
+      return <Loading/>
+    }
+  
   return (
+
     <Box
       id="clients"
       sx={{
@@ -21,7 +29,7 @@ export const ClientLogos = ({ clientLogos }) => {
           </Typography>
         </Box>
         <Grid container spacing={4} alignItems="center" justifyContent="center">
-          {clientLogos.map((client, index) => (
+          {data?.data?.data?.map((client, index) => (
             <Grid item xs={6} sm={4} md={2} key={index}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

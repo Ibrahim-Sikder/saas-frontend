@@ -33,7 +33,6 @@ import {
   Receipt as ReceiptIcon,
   LocalShipping as LocalShippingIcon,
   Discount as DiscountIcon,
-  AttachMoney as AttachMoneyIcon,
   ReceiptLong as ReceiptLongIcon,
   Store as StoreIcon,
   Person as PersonIcon,
@@ -74,8 +73,8 @@ import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const MotionCard = motion(Card);
 
-const Purchasform = () => {
-  const theme = useTheme();
+const PurchaseForm = () => {
+
   const navigate = useNavigate();
   const [params, setParams] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -277,7 +276,7 @@ const Purchasform = () => {
     shipping: singlePurchase?.data?.shipping || "",
 
     date: singlePurchase?.data?.date || "",
-    purchasStatus: singlePurchase?.data?.purchasStatus || "",
+    purchaseStatus: singlePurchase?.data?.purchaseStatus || "",
     paymentMethod: singlePurchase?.data?.paymentMethod || "",
     attachDocument: singlePurchase?.data?.attachDocument || "",
     suppliers: singlePurchase?.data?.suppliers
@@ -364,6 +363,7 @@ const Purchasform = () => {
       totalShipping,
       grandTotal,
     };
+    console.log('this is modify data ',modifyData)
 
     try {
       setShowSuccessAnimation(true);
@@ -712,7 +712,7 @@ const Purchasform = () => {
                             items={purchaseStatus}
                             size="medium"
                             fullWidth
-                            name="purchasStatus"
+                            name="purchaseStatus"
                             label="Purchase Status"
                             sx={outlinedInputWrapperSx}
                             InputProps={{
@@ -1441,7 +1441,7 @@ const Purchasform = () => {
                       onClick={() => setExpandedSummary(!expandedSummary)}
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <AttachMoneyIcon sx={{ color: "white", mr: 1.5 }} />
+                      ৳
                         <Typography variant="h6" fontWeight="700" color="white">
                           Order Summary
                         </Typography>
@@ -1646,7 +1646,7 @@ const Purchasform = () => {
                                         "0 3px 6px rgba(139, 92, 246, 0.3)",
                                     }}
                                   >
-                                    <AttachMoneyIcon fontSize="small" />
+                                   ৳
                                   </Avatar>
                                   <Typography
                                     variant="h6"
@@ -1718,4 +1718,4 @@ const Purchasform = () => {
   );
 };
 
-export default Purchasform;
+export default PurchaseForm;

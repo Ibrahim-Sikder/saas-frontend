@@ -12,23 +12,9 @@ import {
   IconButton,
   useTheme,
 } from "@mui/material";
-import {
-  Close as CloseIcon,
-  Person as PersonIcon,
-  Store as StoreIcon,
-  LocalShipping as LocalShippingIcon,
-  Receipt as ReceiptIcon,
-  Payment as PaymentIcon,
-  Add as AddIcon,
-  Remove as RemoveIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-  Inventory as InventoryIcon,
-  Save as SaveIcon,
-  EventNote as EventNoteIcon,
-  CreditCard as CreditCardIcon,
-} from "@mui/icons-material";
+
 import PurchaseOrderForm from "./PurchaseOrderForm";
+import { Close, Inventory } from "@mui/icons-material";
 
 const PurchaseOrderModal = ({tenantDomain, open, onClose, onSave }) => {
   const theme = useTheme();
@@ -59,7 +45,7 @@ const PurchaseOrderModal = ({tenantDomain, open, onClose, onSave }) => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <InventoryIcon sx={{ mr: 1.5 }} />
+          <Inventory sx={{ mr: 1.5 }} />
           <Typography variant="h6" fontWeight="bold">
             New Purchase Order
           </Typography>
@@ -70,7 +56,7 @@ const PurchaseOrderModal = ({tenantDomain, open, onClose, onSave }) => {
           onClick={onClose}
           aria-label="close"
         >
-          <CloseIcon />
+          <Close />
         </IconButton>
       </DialogTitle>
 

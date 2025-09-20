@@ -55,12 +55,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import Confetti from "react-confetti"
 import { useWindowSize } from "react-use"
-// import successAnimation from "../../assets/animations/success.json"
-// import businessAnimation from "../../assets/animations/business.json"
-// import securityAnimation from "../../assets/animations/security.json"
-// import paymentAnimation from "../../assets/animations/payment.json"
-
-// Custom styled step connector
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 22,
@@ -123,7 +117,6 @@ function ColorlibStepIcon(props) {
 
 // Credit card component
 const CreditCardDisplay = ({ cardNumber, cardName, expiryDate }) => {
-  const theme = useTheme()
 
   return (
     <Box

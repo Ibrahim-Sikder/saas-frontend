@@ -8,8 +8,6 @@ import {
   Table,
   Tooltip,
   Typography,
-
-  CircularProgress,
   Fade,
   useTheme,
   alpha,
@@ -31,8 +29,6 @@ import {
   Email as EmailIcon,
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
-  ErrorOutline as ErrorOutlineIcon,
-  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 
 import { Link } from "react-router-dom";
@@ -68,15 +64,12 @@ const WorldClassSupplierList = () => {
   const {
     data: allSuppliers,
     isLoading,
-    error,
-    refetch,
   } = useGetAllSuppliersQuery({
     tenantDomain,
     limit,
     page: currentPage,
     isRecycled: false,
   });
-
 
   useEffect(() => {
     if (allSuppliers?.success && allSuppliers?.data?.suppliers) {
@@ -172,65 +165,6 @@ const WorldClassSupplierList = () => {
     }
   };
 
-  // Show loading state while fetching initial data
-  if (isLoading && suppliers.length === 0) {
-    return (
-      <div className="w-full mt-8 px-0 md:px-2">
-        <GlassCard>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              py: 5,
-            }}
-          >
-            <CircularProgress />
-            <Typography sx={{ ml: 2 }}>Loading suppliers...</Typography>
-          </Box>
-        </GlassCard>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error && suppliers.length === 0) {
-    return (
-      <div className="w-full mt-8 px-0 md:px-2">
-        <GlassCard>
-          <Box sx={{ textAlign: "center", py: 5 }}>
-            <Box sx={{ mb: 3 }}>
-              <ErrorOutlineIcon
-                sx={{ fontSize: 64, color: "error.main", mb: 2 }}
-              />
-            </Box>
-
-            <Typography variant="h5" color="error" gutterBottom>
-              Error Loading Suppliers
-            </Typography>
-
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ mb: 3, maxWidth: 500, mx: "auto" }}
-            >
-              {error.message ||
-                "Something went wrong while loading the suppliers data."}
-            </Typography>
-
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={refetch}
-              disabled={isLoading}
-            >
-              {isLoading ? "Retrying..." : "Retry"}
-            </Button>
-          </Box>
-        </GlassCard>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full mt-8 px-0 md:px-2">
@@ -396,7 +330,7 @@ const WorldClassSupplierList = () => {
                         )}
                       </Box>
                     </th>
-                   
+
                     <th style={{ padding: "16px", textAlign: "center" }}>
                       Actions
                     </th>
@@ -509,7 +443,7 @@ const WorldClassSupplierList = () => {
                             status={supplier.supplier_status}
                           />
                         </td>
-                        
+
                         <td
                           style={{ padding: "16px", textAlign: "center" }}
                           onClick={(e) => e.stopPropagation()}

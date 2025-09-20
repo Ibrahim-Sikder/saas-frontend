@@ -3,44 +3,56 @@
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Typography } from "@mui/material";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import React from "react";
+import {
+  Typography,
+  Box,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Card,
+  useTheme,
+  alpha,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import swal from "sweetalert";
 
-import { useDeleteBillPayMutation } from "../../redux/api/bill-pay";
 import {
   useDeleteDonationMutation,
   useGetAllDonationQuery,
 } from "../../redux/api/donationApi";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
+import Loading from "../../components/Loading/Loading";
+import { useAccountSummaryQuery } from "../../redux/api/meta.api";
+import DonationStatisticCard from "./DonationStatisticCard";
 
-const DonatinList = () => {
-  const [deleteDonation, { isLoading }] = useDeleteDonationMutation();
+const DonationList = () => {
+  const theme = useTheme();
+  const tenantDomain = useTenantDomain();
+  const [deleteDonation, { isLoading: isDeleting }] =
+    useDeleteDonationMutation();
+
   const { data: donationData, isLoading: donationLoading } =
-    useGetAllDonationQuery();
+    useGetAllDonationQuery({ tenantDomain });
+  const { data: accountSummary } = useAccountSummaryQuery({ tenantDomain });
 
-  const deletePackage = async (id) => {
+  const handleDelete = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",
-      text: "Are you sure that you want to delete this card?",
+      text: "Are you sure that you want to delete this donation?",
       icon: "warning",
       dangerMode: true,
+      buttons: ["Cancel", "Delete"],
     });
 
     if (willDelete) {
       try {
-        await deleteDonation(id).unwrap;
-        swal("Deleted!", "Donation delete successful.", "success");
+        await deleteDonation({ id, tenantDomain }).unwrap();
+        swal("Deleted!", "Donation deleted successfully.", "success");
       } catch (error) {
         swal(
           "Error",
@@ -50,69 +62,163 @@ const DonatinList = () => {
       }
     }
   };
+
   if (donationLoading) {
-    return <p>Loading</p>;
+    return <Loading />;
   }
 
   return (
-    <Box bgcolor="white" padding={3}>
-      <Typography variant="h5" fontWeight="bold" marginBottom="15px">
-        Donatin List
-      </Typography>
+    <Box>
+      <DonationStatisticCard accountSummary={accountSummary} />
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Mobile</TableCell>
-              <TableCell align="center">Email</TableCell>
-              <TableCell align="center">Address </TableCell>
-              <TableCell align="center">Dopnation Purpose </TableCell>
-              <TableCell align="center">Donation Amount </TableCell>
-              <TableCell align="center">Country</TableCell>
-              <TableCell align="center">Payment Method </TableCell>
-              <TableCell align="center">Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {donationData?.data?.map((data, i) => (
+      <Card elevation={3} sx={{ borderRadius: 2, overflow: "hidden" }}>
+        <Box
+          sx={{
+            p: 2,
+            backgroundColor: alpha(theme.palette.primary.main, 0.05),
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography variant="h6" color="primary" fontWeight="600">
+            All Donations
+          </Typography>
+        </Box>
+
+        <TableContainer>
+          <Table sx={{ minWidth: 650 }} aria-label="donations table">
+            <TableHead>
               <TableRow
-                key={i}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                sx={{
+                  backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                }}
               >
-                <TableCell align="center">{data.name}</TableCell>
-                <TableCell align="center">{data.mobile_number}</TableCell>
-                <TableCell align="center">{data.email}</TableCell>
-                <TableCell align="center">{data.address}</TableCell>
-                <TableCell align="center">{data.donation_purpose}</TableCell>
-                <TableCell align="center">{data.donation_amount}</TableCell>
-                <TableCell align="center">{data.donation_country}</TableCell>
-                <TableCell align="center">{data.payment_method}</TableCell>
-                <TableCell align="center">
-                  <div className="flex justify-center">
-                    <IconButton title="See Profile">
-                      <VisibilityIcon className="text-green-600" />
-                    </IconButton>
-                    <IconButton title="Edit">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => deletePackage(data._id)}
-                      disabled={isLoading}
-                      title="Delete"
-                    >
-                      <DeleteIcon className="text-red-600" />
-                    </IconButton>
-                  </div>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }}>Donor</TableCell>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }} align="center">
+                  Contact
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }} align="center">
+                  Purpose
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }} align="center">
+                  Amount
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }} align="center">
+                  Payment Method
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", py: 2 }} align="center">
+                  Actions
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {donationData?.data?.map((data, i) => (
+                <TableRow
+                  key={i}
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.03),
+                    },
+                    transition: "background-color 0.2s",
+                  }}
+                >
+                  <TableCell component="th" scope="row" sx={{ py: 2 }}>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight="600">
+                        {data.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {data.donation_country}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 2 }}>
+                    <Box>
+                      <Typography variant="body2">
+                        {data.mobile_number}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {data.email}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 2 }}>
+                    <Chip
+                      label={data.donation_purpose}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 2 }}>
+                    <Typography
+                      variant="body1"
+                      fontWeight="600"
+                      color="primary"
+                    >
+                      ৳{data.donation_amount}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 2 }}>
+                    <Chip
+                      label={data.payment_method}
+                      size="small"
+                      color="secondary"
+                    />
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 0.5,
+                      }}
+                    >
+                      <IconButton
+                        title="Edit"
+                        size="small"
+                        component={Link}
+                        to={`/dashboard/update-donation?id=${data?._id}`}
+                        sx={{
+                          backgroundColor: alpha(theme.palette.info.main, 0.1),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.info.main,
+                              0.2
+                            ),
+                          },
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDelete(data._id)}
+                        disabled={isDeleting}
+                        title="Delete"
+                        size="small"
+                        sx={{
+                          backgroundColor: alpha(theme.palette.error.main, 0.1),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.error.main,
+                              0.2
+                            ),
+                          },
+                          "&:disabled": { opacity: 0.5 },
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" className="text-red-600" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
     </Box>
   );
 };
 
-export default DonatinList;
+export default DonationList;

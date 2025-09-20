@@ -47,7 +47,7 @@ import {
   Cancel,
   Timelapse,
   CalendarMonth,
-  AttachMoney,
+
   AccountBalance,
   Payments,
   Refresh,
@@ -268,7 +268,7 @@ const SupplierBillPay = ({ supplierWithBillPay }) => {
                   Total Amount
                 </Typography>
                 <Avatar sx={{ bgcolor: "rgba(76, 175, 80, 0.1)", color: "#4CAF50" }}>
-                  <AttachMoney />
+                 ৳
                 </Avatar>
               </Box>
               <Typography variant="h3" sx={{ my: 2, fontWeight: "bold" }}>

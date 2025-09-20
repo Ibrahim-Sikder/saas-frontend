@@ -90,7 +90,7 @@ const ShowRoomAccount = ({ profileData }) => {
                   <b>Company Phone</b>
                   <b>Driver Name</b>
                   <b>Driver Phone</b>
-                  <b>Show Room Address</b>
+                  <b> Address</b>
                   <b>Reference Name</b>
                   <b>Date</b>
                 </div>

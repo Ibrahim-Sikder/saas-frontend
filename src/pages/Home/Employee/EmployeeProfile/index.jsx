@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Grid,
   Avatar,
   Button,
@@ -14,16 +13,12 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-  Divider,
   IconButton,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -36,7 +31,6 @@ import EmployeeAccount from "./EmployeeAccount";
 import SingleEmployeeLeaveList from "./SingleEmployeeLeaveList";
 import EmployeeSalary from "./EmployeeSalary";
 import EmployeeOvertime from "./EmployeeOvertime";
-import EmployeeHoliday from "./EmployeeHoliday";
 import EmployeeAttendance from "./EmployeeAttendance";
 import "../Employee.css";
 import avatar from "../../../../../public/assets/chat3.jpg";
@@ -45,8 +39,10 @@ import {
   tabsStyles,
   tabStyles,
 } from "../../../../utils/customStyle";
-import { GlassmorphicBox, StyledPaper } from "../../../../utils";
+import { StyledPaper } from "../../../../utils";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import EmployeeProfileHeader from "./EmployeeProfileHeader";
+import EmployeeHeaderStyle from "./EmployeeHeaderStyle";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -67,14 +63,14 @@ const EmployeeProfile = () => {
   const [value, setValue] = useState(0);
   const location = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const { data, isLoading, error } = useGetSingleEmployeeQuery({
     tenantDomain,
     id,
   });
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -128,229 +124,70 @@ const tenantDomain = useTenantDomain();
   );
 
   return (
-    <Box sx={{ p: { xs: 2, md: 5 }, bgcolor: "#f0f4f8" }}>
-      <Typography variant="h4" fontWeight="bold" mb={3}>
-        Employee Profile
-      </Typography>
+    <Box
+      sx={{
+        p: { xs: 2, md: 5 },
+        minHeight: "50vh",
+      }}
+    >
+      <StyledPaper
+        elevation={24}
+        sx={{
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(20px)",
+          borderRadius: "24px",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          overflow: "hidden",
+        }}
+      >
+        <EmployeeHeaderStyle />
 
-      <StyledPaper elevation={5}>
-        <Box
-          sx={{
-            height: 200,
-            background: "linear-gradient(135deg, #42A1DA 0%, #F77F00 100%)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: -50,
-              left: -50,
-              width: 200,
-              height: 200,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.1)",
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -30,
-              right: -30,
-              width: 150,
-              height: 150,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.1)",
-            }}
-          />
-        </Box>
-
-        <Box sx={{ mt: -10, px: 4, pb: 4 }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <AnimatedAvatar
-                  src={data?.data?.image || avatar}
-                  alt={data?.data?.full_name}
-                  className="profile-image-pulse"
-                />
-                <Typography variant="h5" fontWeight="bold" mt={2}>
-                  {data?.data?.full_name}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {data?.data?.designation}
-                </Typography>
-                <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                  <Button
-                    variant="contained"
-                    startIcon={<SendIcon />}
-                    sx={{
-                      borderRadius: 20,
-                      textTransform: "none",
-                    }}
-                  >
-                    Message
-                  </Button>
-                  <IconButton
-                    sx={{
-                      bgcolor: "background.paper",
-                      "&:hover": { bgcolor: "action.hover" },
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={8}>
-              <GlassmorphicBox>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Chip
-                        icon={<CalendarTodayIcon />}
-                        label={`Joined: ${data?.data?.join_date}`}
-                        sx={{ borderRadius: 20, px: 1 }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <EmailIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography>{data?.data?.email}</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography>{data?.data?.phone}</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <LocationOnIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography>{data?.data?.address}</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </GlassmorphicBox>
-
-              <Box sx={{ mt: 4, display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <StyledPaper elevation={3} sx={{ flex: 1, minWidth: 200 }}>
-                  <Box sx={{ p: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="h6">Overtime</Typography>
-                      <Avatar
-                        sx={{
-                          bgcolor: "primary.light",
-                          width: 40,
-                          height: 40,
-                        }}
-                      >
-                        <AccessTimeIcon />
-                      </Avatar>
-                    </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      {totalOvertime || 0} hrs
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {monthName}, {currentYear}
-                    </Typography>
-                  </Box>
-                </StyledPaper>
-
-                <StyledPaper elevation={3} sx={{ flex: 1, minWidth: 200 }}>
-                  <Box sx={{ p: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="h6">Salary</Typography>
-                      <Avatar
-                        sx={{
-                          bgcolor: "secondary.light",
-                          width: 40,
-                          height: 40,
-                        }}
-                      >
-                        <AttachMoneyIcon />
-                      </Avatar>
-                    </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      ৳ {totalSalary || 0}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {monthName} Paid
-                    </Typography>
-                  </Box>
-                </StyledPaper>
-
-                <StyledPaper elevation={3} sx={{ flex: 1, minWidth: 200 }}>
-                  <Box sx={{ p: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="h6">Attendance</Typography>
-                      <CircularProgress
-                        variant="determinate"
-                        value={attendancePercentage}
-                        size={40}
-                      />
-                    </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      {attendancePercentage}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {attendanceCount} / {daysInMonth} days
-                    </Typography>
-                  </Box>
-                </StyledPaper>
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
-
-        <Divider sx={{ my: 4 }} />
+        <EmployeeProfileHeader
+          employee={data?.data}
+          totalOvertime={totalOvertime}
+          totalSalary={totalSalary}
+          attendancePercentage={attendancePercentage}
+          attendanceCount={attendanceCount}
+          daysInMonth={daysInMonth}
+          monthName={monthName}
+          currentYear={currentYear}
+        />
 
         <div className="text-black mt-14">
-          <Tabs
-            sx={tabsStyles}
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
+          <Box
+            sx={{
+              background: "rgba(102, 126, 234, 0.05)",
+              borderRadius: "20px",
+              p: 1,
+              mb: 3,
+            }}
           >
-            <Tab sx={tabStyles} label="Account" />
-            <Tab sx={tabStyles} label="Attendance" />
-            <Tab sx={tabStyles} label="Leave" />
-            <Tab sx={tabStyles} label="Holiday" />
-            <Tab sx={tabStyles} label="Shift & Schedule" />
-            <Tab sx={tabStyles} label="Salary" />
-            <Tab sx={tabStyles} label="Overtime" />
-          </Tabs>
+            <Tabs
+              sx={{
+                ...tabsStyles,
+                "& .MuiTab-root": {
+                  ...tabStyles,
+                  borderRadius: "15px",
+                  margin: "0 4px",
+                  transition: "all 0.3s ease",
+                  "&.Mui-selected": {
+                    background: "linear-gradient(45deg, #667eea, #764ba2)",
+                    color: "white",
+                    fontWeight: "bold",
+                  },
+                },
+              }}
+              value={value}
+              onChange={handleChange}
+              aria-label="employee tabs"
+            >
+              <Tab label="Account" />
+              <Tab label="Attendance" />
+              <Tab label="Leave" />
+              <Tab label="Salary" />
+              <Tab label="Overtime" />
+            </Tabs>
+          </Box>
 
           <TabPanel value={value} index={0}>
             <EmployeeAccount id={id} accountInfo={data?.data} />
@@ -365,23 +202,37 @@ const tenantDomain = useTenantDomain();
             <SingleEmployeeLeaveList tenantDomain={tenantDomain} id={id} />
           </TabPanel>
           <TabPanel value={value} index={3}>
-            <EmployeeHoliday id={id} />
-          </TabPanel>
-          <TabPanel value={value} index={4}>
-            <h3 className="text-3xl font-bold">Employee Holiday</h3>
-          </TabPanel>
-          <TabPanel value={value} index={5}>
             <EmployeeSalary tenantDomain={tenantDomain} id={id} />
           </TabPanel>
-          <TabPanel value={value} index={6}>
-            <EmployeeOvertime tenantDomain={tenantDomain} id={id} />
+          <TabPanel value={value} index={4}>
+            <EmployeeOvertime
+              accountInfo={data?.data}
+              tenantDomain={tenantDomain}
+              id={id}
+            />
           </TabPanel>
 
-          <div>
-            <p className="my-5 text-center">
-              © Copyright 2024 | Softypy Garage | All Rights Reserved
-            </p>
-          </div>
+          <Box
+            sx={{
+              textAlign: "center",
+              mt: 6,
+              p: 3,
+              background: "rgba(102, 126, 234, 0.05)",
+              borderRadius: "15px",
+            }}
+          >
+            <Typography
+              sx={{
+                background: "linear-gradient(45deg, #667eea, #764ba2)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: "bold",
+              }}
+            >
+              © Copyright 2024 | Garage Master | All Rights Reserved
+            </Typography>
+          </Box>
         </div>
       </StyledPaper>
     </Box>

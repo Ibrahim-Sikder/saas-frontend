@@ -1,17 +1,17 @@
-import { FaFileInvoice } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { FaTrashAlt, FaEdit, FaEye } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import swal from "sweetalert";
 import {
-  useDeleteMoneyReceiptMutation,
   useDueAllMoneyReceiptsQuery,
+  useMoveRecycledMoneyReceiptMutation,
 } from "../../../redux/api/money-receipt";
 import { Pagination } from "@mui/material";
 import Loading from "../../../components/Loading/Loading";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const DuemoneyReceiptList = () => {
   const location = useLocation();
@@ -22,6 +22,8 @@ const DuemoneyReceiptList = () => {
   const navigate = useNavigate();
   const textInputRef = useRef(null);
   const tenantDomain = useTenantDomain();
+  const [moveRecycledMoneyReceipt, { isLoading: deleteLoading }] =
+    useMoveRecycledMoneyReceiptMutation();
 
   useEffect(() => {
     if (search) {
@@ -38,27 +40,41 @@ const DuemoneyReceiptList = () => {
       isRecycled: false,
     });
 
-  const [deleteMoneyReceipt, { isLoading: deleteLoading, error: deleteError }] =
-    useDeleteMoneyReceiptMutation();
+  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+    tenantDomain,
+  });
 
+  const companyProfileData = {
+    companyName: CompanyInfoData?.data?.companyName,
+    address: CompanyInfoData?.data?.address,
+    website: CompanyInfoData?.data?.website,
+    phone: CompanyInfoData?.data?.phone,
+    email: CompanyInfoData?.data?.email,
+    logo: CompanyInfoData?.data?.logo[0],
+    companyNameBN: CompanyInfoData?.data?.companyNameBN,
+  };
   const handleIconPreview = async (e) => {
     navigate(`/dashboard/money-receipt-view?id=${e}`);
   };
 
-  const deletePackage = async (id) => {
+  const handleMoveRecycledbin = async (id) => {
     const willDelete = await swal({
       title: "Are you sure?",
-      text: "Are you sure that you want to delete this money receipt?",
+      text: " You want to move  this Money Receipt Recycle Bin?",
       icon: "warning",
       dangerMode: true,
     });
 
     if (willDelete) {
       try {
-        await deleteMoneyReceipt({tenantDomain, id}).unwrap();
-        swal("Deleted!", "Money receipt deleted successfully.", "success");
+        await moveRecycledMoneyReceipt({ tenantDomain, id }).unwrap();
+        swal(
+          "Move to Recycle bin!",
+          "Move to Recycle bin successful.",
+          "success"
+        );
       } catch (error) {
-        swal("Error", "Money receipt data not found.", "error");
+        swal("Error", "An error occurred while deleting the card.", "error");
       }
     }
   };
@@ -74,15 +90,10 @@ const DuemoneyReceiptList = () => {
     return <Loading />;
   }
 
-  if (deleteError) {
-    toast.error(deleteError?.message);
-  }
-
   return (
     <div className="mt-5 overflow-x-auto">
       <div className="flex items-center justify-between mt-5 mb-8">
         <div className="flex flex-wrap items-center justify-center">
-          <FaFileInvoice className="invoicIcon" />
           <div className="ml-2">
             <h3 className="text-sm font-bold md:text-2xl">Money Receipt</h3>
             <span>
@@ -174,14 +185,18 @@ const DuemoneyReceiptList = () => {
                     </td>
                     <td>
                       <a
-                        className="bg-[#42A0D9] text-white px-3 py-2 text-[12px] rounded-full mr-2"
+                        className="editIconWrap edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
-                        }/money-receipts/money/${card._id}`}
+                        }/money-receipts/money/${
+                          card._id
+                        }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                          JSON.stringify(companyProfileData)
+                        )}`}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Download
+                        <FaDownload className="editIcon" />
                       </a>
                     </td>
                     <td>
@@ -196,7 +211,7 @@ const DuemoneyReceiptList = () => {
                     <td>
                       <button
                         disabled={deleteLoading}
-                        onClick={() => deletePackage(card._id)}
+                        onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
                       >
                         <FaTrashAlt className="deleteIcon" />

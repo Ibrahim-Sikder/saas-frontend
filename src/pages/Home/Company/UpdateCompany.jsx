@@ -53,9 +53,8 @@ const UpdateCompany = () => {
     setFilteredVehicles(filtered);
   };
 
-
   const handleYearSelectInput = (event) => {
-    const value = event.target.value
+    const value = event.target.value;
     if (/^\d{0,4}$/.test(value)) {
       setYearSelectInput(value);
       const filtered = vehicleModels?.filter((option) =>
@@ -115,8 +114,7 @@ const UpdateCompany = () => {
     refetch,
   } = useGetSingleCompanyQuery({ tenantDomain, id });
 
-  const [updateCompany] =
-    useUpdateCompanyMutation();
+  const [updateCompany] = useUpdateCompanyMutation();
 
   const {
     register,
@@ -135,6 +133,7 @@ const UpdateCompany = () => {
         company_country_code: singleCard?.data?.company_country_code,
         company_email: singleCard?.data?.company_email,
         customer_address: singleCard?.data?.customer_address,
+        whatsappNumber: singleCard?.data?.whatsappNumber,
 
         driver_name: singleCard?.data?.driver_name,
         driver_country_code: singleCard?.data?.driver_country_code,
@@ -186,6 +185,7 @@ const UpdateCompany = () => {
       company_email: data.company_email,
       customer_address: data.customer_address,
       driver_name: data.driver_name,
+      whatsappNumber: data.whatsappNumber,
       driver_contact: data.driver_contact,
       driver_country_code: driverCountryCode.code,
       reference_name: data.reference_name,
@@ -280,7 +280,7 @@ const UpdateCompany = () => {
 
   return (
     <section>
-      <div className=" addProductWraps mt-8">
+      <div className=" addProductWraps my-8">
         <div className="productHeadWrap">
           <div className="flex flex-wrap items-center justify-center">
             <Button
@@ -352,7 +352,7 @@ const UpdateCompany = () => {
                           }
                           onChange={(event, newValue) => {
                             setCountryCode(newValue);
-                            setPhoneNumber(""); // Reset the phone number when changing country codes
+                            setPhoneNumber("");
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -386,7 +386,14 @@ const UpdateCompany = () => {
                       </Grid>
                     </Grid>
                   </Grid>
-
+                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      on
+                      label="Whatsapp Number (N)"
+                      {...register("whatsappNumber")}
+                    />
+                  </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
                     <TextField
                       fullWidth

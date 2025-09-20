@@ -2,11 +2,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useRef, useState } from "react";
-import logo from "../../../../public/assets/logo.png";
 import { useReactToPrint } from "react-to-print";
 import { usePDF } from "react-to-pdf";
 import { Link, useLocation } from "react-router-dom";
-
 import "../Invoice/Invoice.css";
 import "./Quotation.css";
 import { Divider } from "@mui/material";
@@ -17,20 +15,27 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const Detail = () => {
   const componentRef = useRef();
-  const { targetRef } = usePDF({ filename: "page.pdf" });
-
   const location = useLocation();
   const id = new URLSearchParams(location.search).get("id");
-const tenantDomain = useTenantDomain();
-
-  const { data: CompanyInfoData } = useGetCompanyProfileQuery({
+  const tenantDomain = useTenantDomain();
+  const { data: profileData } = useGetCompanyProfileQuery({
     tenantDomain,
   });
+
+  const companyProfileData = {
+    companyName: profileData?.data?.companyName,
+    address: profileData?.data?.address,
+    website: profileData?.data?.website,
+    phone: profileData?.data?.phone,
+    email: profileData?.data?.email,
+    logo: profileData?.data?.logo[0],
+    companyNameBN: profileData?.data?.companyNameBN,
+  };
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
-  const [quotationPreview, setQuotationPreview] = useState({})
+  const [quotationPreview, setQuotationPreview] = useState({});
   const [loading, setLoading] = useState(false);
   const { data } = useGetSingleQuotationQuery({
     tenantDomain,
@@ -48,32 +53,43 @@ const tenantDomain = useTenantDomain();
   }
 
   return (
-    <div ref={componentRef} className="h-screen">
-      <main ref={targetRef} className="invoicePrintWrap">
+    <div ref={componentRef}>
+      <main className="invoicePrintWrap">
         <div>
           <div className="pb-5 px-5 invoicePrint">
             <div>
               <div className=" mb-2 mx-auto text-center border-b-2 border-[#7493B8] pb-2">
                 <div className="flex items-center justify-between w-full mt-5 mb-2">
-                  <img className="w-[120px] " src={CompanyInfoData?.data?.logo} alt="logo" />
+                  <img
+                    className="w-[120px] "
+                    src={profileData?.data?.logo}
+                    alt="logo"
+                  />
                   <div>
-                    <h2 className="trustAutoTitle qoutationTitle">
-                     {CompanyInfoData?.data?.companyName}
-                    </h2>
+                    <div className="flex-1 text-center">
+                      <h2 className="trustAutoTitle">
+                        {profileData?.data?.companyNameBN}
+                      </h2>
+
+                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold ">
+                        ({profileData?.data?.companyName})
+                      </h3>
+                    </div>
                     <small className="block mt-2">
-                      Office: {CompanyInfoData?.data?.address}
+                      Office: {profileData?.data?.address}
                     </small>
                   </div>
                   <div className="text-left">
                     <small className="block">
-                      <small className="font-bold">Mobile:</small> {CompanyInfoData?.data?.phone}
+                      <small className="font-bold">Mobile:</small>{" "}
+                      {profileData?.data?.phone}
                     </small>
                     <small className="block">
                       <small className="font-bold">Email:</small>{" "}
-                      {CompanyInfoData?.data?.email}
+                      {profileData?.data?.email}
                     </small>
                     <small className="block font-bold ">
-                     {CompanyInfoData?.data?.website}
+                      {profileData?.data?.website}
                     </small>
                   </div>
                 </div>
@@ -199,8 +215,9 @@ const tenantDomain = useTenantDomain();
                     </div>
                     <div className="invoiceCustomerInfo">
                       <small>
-                        <span className="mr-1">:</span>{" "}
-                        {quotationPreview?.vehicle?.fullRegNum}
+                        <span className="mr-1">:</span>
+                        {quotationPreview?.vehicle?.carReg_no}
+                        <span> {quotationPreview?.vehicle?.fullRegNum}</span>
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}
@@ -216,10 +233,7 @@ const tenantDomain = useTenantDomain();
                       </small>
                       <small>
                         <span className="mr-1">:</span>{" "}
-                        {
-                          quotationPreview?.vehicle?.mileageHistory?.[0]
-                            ?.mileage
-                        }
+                        {quotationPreview?.mileage}
                       </small>
                     </div>
                   </div>
@@ -308,7 +322,9 @@ const tenantDomain = useTenantDomain();
                       <b>Sub Total </b>
                       {quotationPreview?.discount !== 0 && <b> Discount </b>}
                       {quotationPreview?.vat !== 0 && <b> VAT </b>}
-                      {quotationPreview?.tax !== 0 && <b> Tax </b>}
+                      {quotationPreview?.tax !== 0 && (
+                        <b> Tax included </b>
+                      )}
                       <b> Grand Total </b>
                     </div>
                     <div>
@@ -332,7 +348,21 @@ const tenantDomain = useTenantDomain();
                 {quotationPreview?.net_total_in_words}
               </div>
             </div>
+            {/* Signature Section */}
+            <div className="flex justify-between mt-16 mb-5 text-[12px]">
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Client Signature
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="border-t border-black pt-1 mx-auto w-48">
+                  Authorized Signature
+                </div>
+              </div>
+            </div>
           </div>
+          
         </div>
         <div>
           <div className="printInvoiceBtnGroup">
@@ -343,7 +373,11 @@ const tenantDomain = useTenantDomain();
             </Link>
             <a
               className="bg-[#42A0D9] text-white px-2 py-1  rounded-full "
-              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${quotationPreview?._id}?tenantDomain=${tenantDomain}`}
+              href={`${import.meta.env.VITE_API_URL}/quotations/quotation/${
+                quotationPreview?._id
+              }?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
+                JSON.stringify(companyProfileData)
+              )}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -352,7 +386,6 @@ const tenantDomain = useTenantDomain();
             <Link
               to={`/dashboard/invoice?order_no=${quotationPreview?.job_no}&id=${id}`}
             >
-        
               <button> Invoice </button>
             </Link>
           </div>
