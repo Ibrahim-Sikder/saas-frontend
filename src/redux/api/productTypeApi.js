@@ -3,10 +3,11 @@ import { baseApi } from "./baseApi";
 const productTypeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProductType: builder.mutation({
-      query: (incomeInfo) => ({
+      query: ({tenantDomain, data}) => ({
         url: "/product-type",
         method: "POST",
-        body: incomeInfo,
+        body:data,
+        params:{tenantDomain}
       }),
       invalidatesTags: ["productType"],
     }),

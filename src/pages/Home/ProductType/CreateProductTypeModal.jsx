@@ -23,20 +23,20 @@ import {
 import GarageForm from "../../../components/form/Form";
 import TASInput from "../../../components/form/Input";
 import { useCreateProductTypeMutation } from "../../../redux/api/productTypeApi";
-
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 export const CreateProductTypeModal = ({ open, setOpen }) => {
+  const tenantDomain = useTenantDomain();
   const [productType] = useCreateProductTypeMutation();
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (formData) => {
     try {
-      const res = await productType(data).unwrap();
-      toast.success("Product Type created successfully!");
-      setOpen(false)
+      const res = await productType({ tenantDomain, data: formData }).unwrap();
+      if (res.success) {
+        toast.success("Product Type created successfully!");
+        setOpen(false);
+      }
     } catch (error) {
-      toast.error(
-        "Error creating Product Type: " + error.message ||
-          "Something went wrong!"
-      );
+      toast.error(error.message || "Something went wrong!");
     }
   };
 
