@@ -42,7 +42,6 @@ import FormDatePicker from "../../components/form/Datepicker";
 import {
   ShoppingCart as ShoppingCartIcon,
   Discount as DiscountIcon,
-  AttachMoney as AttachMoneyIcon,
   ReceiptLong as ReceiptLongIcon,
   CalendarMonth as CalendarMonthIcon,
   Numbers as NumbersIcon,
@@ -80,9 +79,7 @@ const MotionCard = motion(Card);
 
 const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
   const theme = useTheme();
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [productFields, setProductFields] = useState([]);
-  const [fileList, setFileList] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [totalTax, setTotalTax] = useState(0);
@@ -91,7 +88,6 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedSummary, setExpandedSummary] = useState(true);
   const productSearchRef = useRef(null);
-  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [formData, setFormData] = useState({
     orderDate: new Date().toISOString().split("T")[0],
     expectedDeliveryDate: "",
@@ -212,7 +208,6 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
         autoClose: 2000,
       });
     } else {
-      // Add new product
       const productPrice = Number(product.product.purchasePrice) || 0;
       const newProduct = {
         productId: product.product._id,
@@ -224,7 +219,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
         discount: Number(product.product.discount) || 0,
         shipping: Number(product.product.shipping) || 0,
         product_quantity: product.product.product_quantity,
-        quantity: 1, // Default order quantity is 1
+        quantity: 1,
         subtotal: productPrice,
       };
 
@@ -1509,7 +1504,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                     onClick={() => setExpandedSummary(!expandedSummary)}
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <AttachMoneyIcon sx={{ color: "white", mr: 1.5 }} />
+                      ৳
                       <Typography variant="h6" fontWeight="700" color="white">
                         Order Summary
                       </Typography>
@@ -1670,9 +1665,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                   alignItems: "center",
                                 }}
                               >
-                                <Avatar sx={avatarStyle}>
-                                  <AttachMoneyIcon fontSize="small" />
-                                </Avatar>
+                                <Avatar sx={avatarStyle}>৳</Avatar>
                                 <Typography
                                   variant="h6"
                                   fontWeight="700"

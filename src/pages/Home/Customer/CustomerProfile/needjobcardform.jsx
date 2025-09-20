@@ -57,7 +57,7 @@
 //     id: vehicleId,
 //   })
 
-//   console.log("vehicle new", data)
+
 
 //   const isLoading = createLoading || updateLoading || vehicleLoading
 

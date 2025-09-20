@@ -47,7 +47,6 @@ const attendanceApi = baseApi.injectEndpoints({
         if (searchTerm) params.append("searchTerm", searchTerm);
         if (startDate) params.append("startDate", startDate.toString().trim());
         if (endDate) params.append("endDate", endDate.toString().trim());
-        console.log(params);
         if (month) params.append("month", month);
         if (year) params.append("year", year);
         if (status) params.append("status", status);

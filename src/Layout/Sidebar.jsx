@@ -32,7 +32,6 @@ import {
   AddShoppingCart,
   PointOfSale,
   AccountBalance,
-  AttachMoney,
   MoneyOff,
   PersonAdd,
   Business,
@@ -628,7 +627,7 @@ const Sidebar = ({ toggle }) => {
           <AccordionDetails>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
-                <AttachMoney className="mr-2" />
+                ৳
                 <NavLink to="/dashboard/add-income">Add Income</NavLink>
               </div>
             </Typography>
@@ -731,7 +730,7 @@ const Sidebar = ({ toggle }) => {
           
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
-                <AttachMoney className="mr-2" />
+                ৳
                 <NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>

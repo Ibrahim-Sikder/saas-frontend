@@ -3,10 +3,11 @@ import { baseApi } from "./baseApi";
 const warrantyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createWarranty: builder.mutation({
-      query: ({ tenantDomain, ...data }) => ({
-         url: `/warranties?tenantDomain=${tenantDomain}`,
+      query: ({ tenantDomain,data }) => ({
+         url: `/warranties`,
         method: "POST",
         body: data,
+        params:{tenantDomain}
       }),
       invalidatesTags: ["warranty"],
     }),

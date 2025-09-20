@@ -23,7 +23,7 @@ import {
   Event as EventIcon,
   Security as SecurityIcon,
   Store as StoreIcon,
-  AttachMoney as AttachMoneyIcon,
+
   CalendarToday as CalendarTodayIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
@@ -504,10 +504,7 @@ const BillPayInvoice = () => {
                       <Box
                         sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
                       >
-                        <AttachMoneyIcon
-                          fontSize="small"
-                          sx={{ color: "text.secondary", mr: 1 }}
-                        />
+                        ৳
                         <Typography variant="body2" color="text.secondary">
                           Payment Method
                         </Typography>

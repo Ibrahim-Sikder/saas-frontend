@@ -13,7 +13,7 @@ export const productCategory = [
   "Fleet Management",
 ];
 
-export const purchaseStatus = ["Incomplete", "Complete", "Draft"];
+export const purchaseStatus = ['Unpaid', 'Paid', 'Draft'];
 export const addjustment = ["Addition", "Subtraction"];
 export const productTag = [
   { title: "Oil Change" },

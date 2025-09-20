@@ -22,21 +22,16 @@ import GarageForm from "../../components/form/Form";
 import FormInput from "../../components/form/Input";
 import TASSelect from "../../components/form/Select";
 import Loading from "../../components/Loading/Loading";
+import { useTenantDomain } from "../../hooks/useTenantDomain";
 
-const WarrantyModal = ({
-  open,
-  onClose,
-  editingWarranty,
-  refetch,
-  tenantDomain,
-}) => {
+const CreateWarrantyModal = ({ open, onClose, editingWarranty }) => {
   const [createWarranty] = useCreateWarrantyMutation();
   const [updateWarranty] = useUpdateWarrantyMutation();
   const { data: singleWarranty, isLoading } = useGetSingleWarrantyQuery(
     editingWarranty?._id,
     { skip: !editingWarranty?._id }
   );
-
+  const tenantDomain = useTenantDomain();
   useEffect(() => {
     if (singleWarranty && editingWarranty) {
       // If you need to prefill form with fetched data
@@ -53,7 +48,6 @@ const WarrantyModal = ({
           ...data,
         }).unwrap();
       } else {
-
         res = await createWarranty({
           ...data,
           tenantDomain,
@@ -64,14 +58,10 @@ const WarrantyModal = ({
         toast.success(
           `Warranty ${editingWarranty ? "updated" : "created"} successfully!`
         );
-        refetch();
         onClose();
       }
     } catch (error) {
-      toast.error(
-        `Error ${editingWarranty ? "updating" : "creating"} warranty: ` +
-          (error.message || "Something went wrong")
-      );
+      toast.error(error.message || "Something went wrong");
     }
   };
 
@@ -118,23 +108,47 @@ const WarrantyModal = ({
           <GarageForm onSubmit={handleFormSubmit} defaultValues={defaultValues}>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12}>
-                <FormInput name="name" label="Warranty Name" fullWidth />
+                <FormInput
+                  name="name"
+                  label={
+                    <>
+                      Warranty Name
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={12}>
-                <FormInput name="description" label="Description" fullWidth    multiline    rows={3}/>
+                <FormInput
+                  name="description"
+                  label="Description"
+                  fullWidth
+                  multiline
+                  rows={3}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FormInput
                   name="duration"
-                  label="Duration"
+                  label={
+                    <>
+                      Duration
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   type="number"
                   fullWidth
-
                 />
               </Grid>
               <Grid item xs={12}>
                 <TASSelect
-                  label="Duration Type"
+                  label={
+                    <>
+                      Duration Type
+                      <span style={{ color: "red", fontSize: "25px" }}> *</span>
+                    </>
+                  }
                   name="durationType"
                   fullWidth
                   size="medium"
@@ -164,4 +178,4 @@ const WarrantyModal = ({
   );
 };
 
-export default WarrantyModal;
+export default CreateWarrantyModal;

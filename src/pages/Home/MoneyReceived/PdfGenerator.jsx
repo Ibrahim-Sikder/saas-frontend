@@ -41,7 +41,7 @@ const PdfGenerator = () => {
     }
   );
 
-  console.log("single money", singleMoneyReceipt);
+
   if (isLoading) {
     return <Loading />;
   }

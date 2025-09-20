@@ -165,7 +165,6 @@ const WorldClassSupplierList = () => {
     }
   };
 
-  console.log(allSuppliers);
 
   return (
     <div className="w-full mt-8 px-0 md:px-2">

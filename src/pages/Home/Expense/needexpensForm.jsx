@@ -30,7 +30,6 @@
 //   Add,
 //   Delete,
 //   Payment,
-//   AttachMoney,
 //   DateRange,
 //   BusinessCenter,
 // } from "@mui/icons-material";
@@ -348,7 +347,7 @@
 //                       InputProps={{
 //                         startAdornment: (
 //                           <InputAdornment position="start">
-//                             <AttachMoney sx={{ color: "#10b981" }} />
+//                            ৳
 //                           </InputAdornment>
 //                         ),
 //                       }}
@@ -446,7 +445,7 @@
 //                             InputProps={{
 //                               startAdornment: (
 //                                 <InputAdornment position="start">
-//                                   <AttachMoney sx={{ color: "#10b981" }} />
+//                                ৳
 //                                 </InputAdornment>
 //                               ),
 //                             }}

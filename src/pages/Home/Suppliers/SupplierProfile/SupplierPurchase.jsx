@@ -30,6 +30,7 @@ import {
   DialogActions,
   useTheme,
   alpha,
+  Grid,
 } from "@mui/material";
 import {
   LocalShipping,
@@ -47,12 +48,18 @@ import {
   Inventory,
   Timeline,
   ReceiptLong,
+  AttachMoney,
+  Numbers,
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
-import { GlassCard, StatusChip } from "./supplier";
-import { AnimatedIconButton, StyledTableContainer } from "../../../../utils/customStyle";
 
-const OrderTable = ({ orderData }) => {
+import { GlassCard, StatusChip } from "./supplier";
+import {
+  AnimatedIconButton,
+  StyledTableContainer,
+} from "../../../../utils/customStyle";
+import SupplierPurchaseModal from "./SupplierPurchaseModal";
+
+const SupplierPurchase = ({ purchaseData }) => {
   const theme = useTheme();
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
@@ -60,6 +67,10 @@ const OrderTable = ({ orderData }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [dialogAction, setDialogAction] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const handleFilterMenuOpen = (event) => {
     setFilterMenuAnchor(event.currentTarget);
@@ -94,15 +105,11 @@ const OrderTable = ({ orderData }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Delivered":
+      case "Paid":
         return theme.palette.success.main;
       case "Pending":
         return theme.palette.warning.main;
       case "Cancelled":
-        return theme.palette.error.main;
-      case "Paid":
-        return theme.palette.success.main;
-      case "Unpaid":
         return theme.palette.error.main;
       default:
         return theme.palette.info.main;
@@ -111,11 +118,9 @@ const OrderTable = ({ orderData }) => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "Delivered":
       case "Paid":
         return <CheckCircle fontSize="small" />;
       case "Pending":
-      case "Unpaid":
         return <Pending fontSize="small" />;
       case "Cancelled":
         return <Cancel fontSize="small" />;
@@ -134,15 +139,29 @@ const OrderTable = ({ orderData }) => {
     return products.reduce((total, product) => total + product.quantity, 0);
   };
 
+  // Calculate average product price in an order
+  const calculateAveragePrice = (products) => {
+    if (!products || products.length === 0) return 0;
+    const total = products.reduce(
+      (sum, product) => sum + product.productPrice,
+      0
+    );
+    return total / products.length;
+  };
+
   // Filter orders based on search term
-  const filteredOrders = orderData?.filter(
+  const filteredOrders = purchaseData?.filter(
     (order) =>
       order?.referenceNo
         ?.toString()
         ?.toLowerCase()
         ?.includes(searchTerm?.toLowerCase()) ||
-      order?.status?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-      order?.paymentStatus?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+      order?.purchaseStatus
+        ?.toLowerCase()
+        ?.includes(searchTerm?.toLowerCase()) ||
+      order?.products?.some((product) =>
+        product?.productName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+      )
   );
 
   return (
@@ -196,7 +215,7 @@ const OrderTable = ({ orderData }) => {
             <MenuItem>
               <FormControlLabel
                 control={<Checkbox defaultChecked />}
-                label="Delivered"
+                label="Paid"
               />
             </MenuItem>
             <MenuItem>
@@ -253,7 +272,7 @@ const OrderTable = ({ orderData }) => {
                 0.3
               )}`,
             }}
-            onClick={() => handleOpenDialog("create")}
+            onClick={handleOpen}
           >
             Create Order
           </Button>
@@ -267,10 +286,10 @@ const OrderTable = ({ orderData }) => {
               <TableCell>Reference No</TableCell>
               <TableCell>Order Date</TableCell>
               <TableCell>Items</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Delivery Date</TableCell>
+              <TableCell>Avg. Price</TableCell>
+              <TableCell>Total Amount</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Payment</TableCell>
+              <TableCell>Payment Method</TableCell>
               <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -290,7 +309,7 @@ const OrderTable = ({ orderData }) => {
                     <CalendarToday
                       sx={{ mr: 1, color: theme.palette.text.secondary }}
                     />
-                    {formatDate(order.orderDate)}
+                    {formatDate(order.date)}
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -301,34 +320,23 @@ const OrderTable = ({ orderData }) => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                   ৳
-                    {order.grandTotal.toLocaleString()}
+                    ৳{calculateAveragePrice(order.products).toFixed(2)}
                   </Box>
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Timeline
-                      sx={{ mr: 1, color: theme.palette.secondary.main }}
-                    />
-                    {formatDate(order.expectedDeliveryDate)}
+                    ৳{order.grandTotal.toLocaleString()}
                   </Box>
                 </TableCell>
                 <TableCell>
                   <StatusChip
-                    icon={getStatusIcon(order.status)}
-                    label={order.status}
+                    icon={getStatusIcon(order.purchaseStatus)}
+                    label={order.purchaseStatus}
                     size="small"
-                    statuscolor={getStatusColor(order.status)}
+                    statuscolor={getStatusColor(order.purchaseStatus)}
                   />
                 </TableCell>
-                <TableCell>
-                  <StatusChip
-                    icon={getStatusIcon(order.paymentStatus)}
-                    label={order.paymentStatus}
-                    size="small"
-                    statuscolor={getStatusColor(order.paymentStatus)}
-                  />
-                </TableCell>
+                <TableCell>{order.paymentMethod}</TableCell>
                 <TableCell align="right">
                   <Tooltip title="View Order">
                     <AnimatedIconButton
@@ -373,33 +381,107 @@ const OrderTable = ({ orderData }) => {
         <DialogContent>
           {selectedOrder && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant="body1">
-                Reference No: {selectedOrder.referenceNo}
-              </Typography>
-              <Typography variant="body1">
-                Order Date: {formatDate(selectedOrder.orderDate)}
-              </Typography>
-              <Typography variant="body1">
-                Items: {calculateTotalItems(selectedOrder.products)}
-              </Typography>
-              <Typography variant="body1">
-                Amount: ${selectedOrder.grandTotal.toLocaleString()}
-              </Typography>
-              <Typography variant="body1">
-                Delivery Date: {formatDate(selectedOrder.expectedDeliveryDate)}
-              </Typography>
-              <Typography variant="body1">
-                Status: {selectedOrder.status}
-              </Typography>
-              <Typography variant="body1">
-                Payment Status: {selectedOrder.paymentStatus}
-              </Typography>
-              <Typography variant="body1">
-                Payment Method: {selectedOrder.paymentMethod}
-              </Typography>
-              <Typography variant="body1">
-                Note: {selectedOrder.note}
-              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Reference No:
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedOrder.referenceNo}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Order Date:
+                  </Typography>
+                  <Typography variant="body1">
+                    {formatDate(selectedOrder.date)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Total Items:
+                  </Typography>
+                  <Typography variant="body1">
+                    {calculateTotalItems(selectedOrder.products)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Grand Total:
+                  </Typography>
+                  <Typography variant="body1">
+                    ৳{selectedOrder.grandTotal.toLocaleString()}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Status:
+                  </Typography>
+                  <StatusChip
+                    icon={getStatusIcon(selectedOrder.purchaseStatus)}
+                    label={selectedOrder.purchaseStatus}
+                    size="small"
+                    statuscolor={getStatusColor(selectedOrder.purchaseStatus)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Payment Method:
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedOrder.paymentMethod}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              {selectedOrder.note && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body1" fontWeight="bold">
+                    Note:
+                  </Typography>
+                  <Typography variant="body1">{selectedOrder.note}</Typography>
+                </Box>
+              )}
+
+              {selectedOrder.products && selectedOrder.products.length > 0 && (
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Products:
+                  </Typography>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Product Name</TableCell>
+                        <TableCell>Unit</TableCell>
+                        <TableCell align="right">Quantity</TableCell>
+                        <TableCell align="right">Price</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {selectedOrder.products.map((product, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{product.productName}</TableCell>
+                          <TableCell>{product.productUnit}</TableCell>
+                          <TableCell align="right">
+                            {product.quantity}
+                          </TableCell>
+                          <TableCell align="right">
+                            ৳{product.productPrice.toFixed(2)}
+                          </TableCell>
+                          <TableCell align="right">
+                            ৳
+                            {(product.productPrice * product.quantity).toFixed(
+                              2
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              )}
             </Box>
           )}
         </DialogContent>
@@ -416,8 +498,10 @@ const OrderTable = ({ orderData }) => {
           )}
         </DialogActions>
       </Dialog>
+
+      {open && <SupplierPurchaseModal open={handleOpen} setOpen={handleClose}/>}
     </GlassCard>
   );
 };
 
-export default OrderTable;
+export default SupplierPurchase;

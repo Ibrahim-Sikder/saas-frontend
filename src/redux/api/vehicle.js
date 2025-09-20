@@ -4,9 +4,6 @@ const vehicleApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 createVehicle: builder.mutation({
   query: ({ tenantDomain, vehicleInfo }) => {
-    // Debug logs
-    console.log("🔍 createVehicle called with:", { tenantDomain, vehicleInfo });
-
     const request = {
       url: "/vehicles",
       method: "POST",
@@ -14,7 +11,7 @@ createVehicle: builder.mutation({
       params: { tenantDomain },
     };
 
-    console.log("📤 Request payload:", request);
+
 
     return request;
   },

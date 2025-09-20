@@ -20,7 +20,7 @@ import {
   Avatar,
 } from "@mui/material";
 import {
-  AttachMoney,
+
   TrendingUp,
   TrendingDown,
   Receipt,
@@ -36,7 +36,7 @@ import {
 } from "@mui/icons-material";
 
 const DashboardSummary = ({ accountSummary }) => {
-  console.log(accountSummary);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [timeRange, setTimeRange] = useState("monthly");
@@ -356,7 +356,7 @@ const DashboardSummary = ({ accountSummary }) => {
           >
             <Box display="flex" alignItems="center" mb={3}>
               <Avatar sx={{ bgcolor: "success.main", mr: 2 }}>
-                <AttachMoney />
+               ৳
               </Avatar>
               <Box>
                 <Typography variant="h6" fontWeight="bold" color="success.dark">
@@ -372,7 +372,7 @@ const DashboardSummary = ({ accountSummary }) => {
                 <StatCard
                   title="Total Income"
                   value={totalIncome}
-                  icon={<AttachMoney color="success" />}
+                 
                   color="success"
                   progress={incomePercentage}
                 />

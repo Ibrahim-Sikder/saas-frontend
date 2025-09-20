@@ -26,7 +26,7 @@ import {
   Add,
   Delete,
   Payment,
-  AttachMoney,
+
   DateRange,
   BusinessCenter,
 } from "@mui/icons-material";
@@ -351,7 +351,7 @@ const ExpenseForm = ({ id }) => {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <AttachMoney sx={{ color: "#10b981" }} />
+                              ৳
                             </InputAdornment>
                           ),
                         }}
@@ -367,7 +367,7 @@ const ExpenseForm = ({ id }) => {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <AttachMoney sx={{ color: "#10b981" }} />
+                             ৳
                             </InputAdornment>
                           ),
                         }}
@@ -443,7 +443,7 @@ const ExpenseForm = ({ id }) => {
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
-                                    <AttachMoney sx={{ color: "#10b981" }} />
+                                   ৳
                                   </InputAdornment>
                                 ),
                               }}

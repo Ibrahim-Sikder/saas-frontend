@@ -15,7 +15,6 @@ import {
   DirectionsCar,
   RequestQuote,
   AccountBalance,
-  AttachMoney,
   MoneyOff,
   CalendarToday,
   Storage,

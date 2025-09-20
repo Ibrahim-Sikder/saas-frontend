@@ -24,7 +24,6 @@ import {
   Person,
   Payment,
   VolunteerActivism,
-  AttachMoney,
 } from "@mui/icons-material";
 import {
   useCreateDonationMutation,
@@ -260,7 +259,7 @@ export default function DonationForm({ id }) {
                         gutterBottom
                         sx={{ display: "flex", alignItems: "center" }}
                       >
-                        <AttachMoney sx={{ mr: 1, color: "primary.main" }} />{" "}
+                        ৳
                         Donation Details
                       </Typography>
                       <Divider sx={{ mb: 3 }} />

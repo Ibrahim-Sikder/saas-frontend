@@ -35,7 +35,7 @@ export default function WarrantiesPage() {
   const theme = useTheme();
   const [openModal, setOpenModal] = useState(false);
   const [editingWarranty, setEditingWarranty] = useState(null);
-  console.log('warranty id check',editingWarranty)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const tenantDomain = useTenantDomain();

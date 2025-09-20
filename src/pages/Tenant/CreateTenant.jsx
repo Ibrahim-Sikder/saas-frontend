@@ -39,7 +39,7 @@ import {
   ArrowBack,
   Build,
   Payment,
-  AttachMoney,
+  
   Person,
   Email,
   Lock,
@@ -576,7 +576,7 @@ const TenantRegisterPage = () => {
             </Typography>
             <Paper variant="outlined" sx={{ p: 3, mt: 2, bgcolor: "grey.50" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <AttachMoney color="primary" sx={{ mr: 1 }} />
+                ৳
                 <Typography variant="h6">Total Amount: ${tenantData.amount.toFixed(2)}</Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">

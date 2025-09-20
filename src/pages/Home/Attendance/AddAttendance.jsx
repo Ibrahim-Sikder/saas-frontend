@@ -179,8 +179,6 @@ const AddAttendance = () => {
         late_status: lateStatus[index],
       })
     );
-    
-    console.log("attendance data this ", attendanceData);
     try {
       const response = await createAttendance({
         tenantDomain,

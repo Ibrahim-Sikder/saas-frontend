@@ -32,7 +32,7 @@
 //   AddShoppingCart,
 //   PointOfSale,
 //   AccountBalance,
-//   AttachMoney,
+
 //   MoneyOff,
 //   PersonAdd,
 //   Business,

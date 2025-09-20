@@ -6,7 +6,6 @@ import {
   Payment,
   Receipt,
   AccountTree,
-  AttachMoney,
   CalendarMonth,
   ShowChart,
   MoneyOff

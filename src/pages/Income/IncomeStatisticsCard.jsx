@@ -7,7 +7,7 @@ import {
   PointOfSale,
   AccountTree,
   Receipt,
-  AttachMoney,
+
   CalendarMonth,
   ShowChart
 } from "@mui/icons-material";
@@ -456,7 +456,7 @@ const IncomeStatisticsCard = ({ accountSummary }) => {
                   mb: 2
                 }}
               >
-                <AttachMoney />
+                ৳
               </Avatar>
               <Typography variant="h6" sx={{ color: "#64748b", mb: 1 }}>
                 Other Income

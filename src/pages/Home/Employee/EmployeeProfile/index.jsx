@@ -19,7 +19,6 @@ import {
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -72,7 +71,7 @@ const EmployeeProfile = () => {
     id,
   });
 
-  console.log("employee profile", data);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

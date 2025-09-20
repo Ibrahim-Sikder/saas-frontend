@@ -116,7 +116,7 @@ const AttendanceListPage = () => {
 
   // FIXED: Handle delete attendance with date parameter
   const handleDeleteAttendance = async (id, date) => {
-    console.log(id, date);
+
     const formattedDate = dayjs(date, ["DD-MM-YYYY", "DD-MM-YY"]).format(
       "YYYY-MM-DD" // Changed to match backend expectation
     );

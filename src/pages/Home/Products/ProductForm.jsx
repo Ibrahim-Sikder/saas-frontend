@@ -66,7 +66,6 @@ import FormTextArea from "../../../components/form/FormTextArea";
 import ProductStatusSelector from "../../../components/form/Status";
 import { toast } from "react-toastify";
 import TASSelect from "../../../components/form/Select";
-import dayjs from "dayjs";
 import FormDatePicker from "../../../components/form/Datepicker";
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
 import { Tooltip } from "@mui/material";
@@ -80,6 +79,7 @@ import { AddSupplierModal } from "../Suppliers/AddSupplierModal";
 import { CreateUnitModal } from "../Unit/CreateUnitModal";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useGetAllWarrantyQuery } from "../../../redux/api/warrantyApi";
+import CreateWarrantyModal from "../../Inventory/WarrandyModal";
 
 export default function ProductForm({ id }) {
   const navigate = useNavigate();
@@ -95,9 +95,6 @@ export default function ProductForm({ id }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [expiryDateType, setExpiryDateType] = useState("fixed");
   const [unitOpen, setUnitOpen] = useState(false);
   const [brandOpen, setBrandOpen] = useState(false);
@@ -105,6 +102,10 @@ export default function ProductForm({ id }) {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
   const [productTypeOpen, setproductTypeOpen] = useState(false);
+  const [warrantyOpen, setWarrantyOpen] = useState(false);
+
+  const handleWarrantyOpen = () => setWarrantyOpen(true);
+  const handleWarrantyClose = () => setWarrantyOpen(false);
   const handleCategoryOpen = () => setCategoryOpen(true);
   const handleCategoryClose = () => setCategoryOpen(false);
   const handleBrandOpen = () => setBrandOpen(true);
@@ -168,7 +169,7 @@ export default function ProductForm({ id }) {
     page: 1,
     searchTerm: "",
   });
-  console.log(warrantyData);
+
   // Options for dropdowns
   const warrantyOptions = useMemo(() => {
     if (!warrantyData?.data) return [];
@@ -722,7 +723,7 @@ export default function ProductForm({ id }) {
               <Grid item lg={1} display="flex" justifyContent="center">
                 <Tooltip title="Add Supplier" arrow>
                   <Button
-                    onClick={handleSupplierOpen}
+                    onClick={handleWarrantyOpen}
                     variant="contained"
                     sx={addButtonStyle}
                   >
@@ -1201,15 +1202,7 @@ export default function ProductForm({ id }) {
               type="number"
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <TASInput
-              name="warranty"
-              label="Warranty Period"
-              icon={WarningRounded}
-              iconPosition="start"
-              type="number"
-            />
-          </Grid>
+         
           <Grid item xs={12}>
             <FormTextArea
               name="productDescription"
@@ -1477,6 +1470,12 @@ export default function ProductForm({ id }) {
           </Alert>
         </Snackbar>
       </Box>
+
+      {warrantyOpen && (
+        <CreateWarrantyModal open={warrantyOpen} onClose={handleWarrantyClose} />
+      )}
+
+
       {categoryOpen && (
         <CreateCategoryModal
           open={categoryOpen}
@@ -1504,6 +1503,7 @@ export default function ProductForm({ id }) {
       {unitOpen && (
         <CreateUnitModal open={unitOpen} setOpen={handleUnitClose} />
       )}
+      
     </>
   );
 }

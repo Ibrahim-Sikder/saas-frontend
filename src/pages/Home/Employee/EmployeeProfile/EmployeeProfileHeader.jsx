@@ -10,7 +10,6 @@ import {
   CircularProgress,
 } from "@mui/material"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import EmailIcon from "@mui/icons-material/Email"
 import PhoneIcon from "@mui/icons-material/Phone"
@@ -270,7 +269,7 @@ const EmployeeProfileHeader = ({
                   Total Salary
                 </Typography>
                 <Avatar sx={{ bgcolor: "rgba(255,255,255,0.2)", width: 50, height: 50 }}>
-                  <AttachMoneyIcon sx={{ fontSize: 28 }} />
+                 ৳
                 </Avatar>
               </Box>
               <Typography variant="h3" fontWeight="bold" sx={{ mb: 1 }}>
