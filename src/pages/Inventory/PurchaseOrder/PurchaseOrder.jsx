@@ -18,8 +18,7 @@ import ActionMenu from "./PurchaseActionMenu";
 import ReceiveDialog from "./PurchaseReceiveDialog";
 import { Home, NavigateNext, Receipt } from "@mui/icons-material";
 import { ShoppingCart } from "lucide-react";
-
-
+import Swal from "sweetalert2";
 export default function PurchaseOrder() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +40,9 @@ export default function PurchaseOrder() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10;
+
+
+  const [receivingOrderId, setReceivingOrderId] = useState(null);
   
   const [deletePurchase] = useDeletePurchaseOrderMutation();
   const { data: purchaseOrderData, refetch } = useGetAllPurchaseOrdersQuery({
@@ -82,42 +83,61 @@ export default function PurchaseOrder() {
     }
   };
 
-  const handleDeleteOrder = async () => {
-    if (selectedOrder) {
+ const handleDeleteOrder = async () => {
+  if (!selectedOrder) return;
+
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This action cannot be undone.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    reverseButtons: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
       try {
-        const res = await deletePurchase(selectedOrder._id).unwrap();
+        const res = await deletePurchase({
+          tenantDomain,
+          id: selectedOrder._id,
+        }).unwrap();
+
         if (res.success) {
           toast.success("Purchase order deleted successfully!");
           refetch();
+
+          Swal.fire("Deleted!", "The purchase order has been deleted.", "success");
         }
       } catch (error) {
-        toast.error("Failed to delete purchase order");
+        Swal.fire("Error", "Failed to delete purchase order", "error");
         console.error(error);
       }
     }
-    handleMenuClose();
-  };
+  });
+
+  handleMenuClose();
+};
 
   const handleAddOrder = () => {
     setOpenPurchaseModal(true);
   };
 
   const handleOpenReceiveDialog = () => {
-    setOpenReceiveDialog(true);
+    if (selectedOrder) {
+      setReceivingOrderId(selectedOrder._id);
+      setOpenReceiveDialog(true);
+    }
     handleMenuClose();
   };
 
   const handleCloseReceiveDialog = () => {
     setOpenReceiveDialog(false);
+    setReceivingOrderId(null);
   };
 
-  const handleReceiveOrder = () => {
-    // Handle receive order logic
-  };
 
-  const handleSavePurchaseOrder = (purchaseData) => {
-    // Handle save purchase order logic
-  };
 
   const handleDateRangeChange = (e) => {
     const { name, value } = e.target;
@@ -204,8 +224,8 @@ export default function PurchaseOrder() {
         receiveDate={receiveDate}
         receiveStatus={receiveStatus}
         receiveNote={receiveNote}
+        purchaseId={receivingOrderId}
         onClose={handleCloseReceiveDialog}
-        onReceiveOrder={handleReceiveOrder}
         onReceiveDateChange={setReceiveDate}
         onReceiveStatusChange={setReceiveStatus}
         onReceiveNoteChange={setReceiveNote}
@@ -214,7 +234,7 @@ export default function PurchaseOrder() {
       <PurchaseOrderModal
         open={openPurchaseModal}
         onClose={() => setOpenPurchaseModal(false)}
-        onSave={handleSavePurchaseOrder}
+      
         tenantDomain={tenantDomain}
       />
       

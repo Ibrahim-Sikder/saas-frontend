@@ -74,7 +74,6 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 const MotionCard = motion(Card);
 
 const PurchaseForm = () => {
-
   const navigate = useNavigate();
   const [params, setParams] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -363,7 +362,7 @@ const PurchaseForm = () => {
       totalShipping,
       grandTotal,
     };
-    console.log('this is modify data ',modifyData)
+    console.log("this is modify data ", modifyData);
 
     try {
       setShowSuccessAnimation(true);
@@ -621,7 +620,17 @@ const PurchaseForm = () => {
                         <Grid item xs={12} md={6}>
                           <TASDatepicker
                             name="date"
-                            label="Purchase Date"
+                            label={
+                              <>
+                                Purchase Date
+                                <span
+                                  style={{ color: "red", fontSize: "25px" }}
+                                >
+                                  {" "}
+                                  *
+                                </span>
+                              </>
+                            }
                             fullWidth
                             size="medium"
                             InputProps={{
@@ -657,7 +666,17 @@ const PurchaseForm = () => {
                             size="medium"
                             fullWidth
                             name="warehouse"
-                            label="Select Warehouse"
+                            label={
+                              <>
+                                Select Warehouse
+                                <span
+                                  style={{ color: "red", fontSize: "25px" }}
+                                >
+                                  {" "}
+                                  *
+                                </span>
+                              </>
+                            }
                             sx={outlinedInputWrapperSx}
                             InputProps={{
                               startAdornment: (
@@ -674,7 +693,17 @@ const PurchaseForm = () => {
                             size="medium"
                             fullWidth
                             name="suppliers"
-                            label="Supplier"
+                            label={
+                              <>
+                                Supplier
+                                <span
+                                  style={{ color: "red", fontSize: "25px" }}
+                                >
+                                  {" "}
+                                  *
+                                </span>
+                              </>
+                            }
                             sx={outlinedInputWrapperSx}
                             InputProps={{
                               startAdornment: (
@@ -700,7 +729,7 @@ const PurchaseForm = () => {
                                     color="action"
                                     sx={{ mr: 1 }}
                                   />
-                                  $
+                                  ৳
                                 </InputAdornment>
                               ),
                               sx: outlinedInputSx,
@@ -713,7 +742,17 @@ const PurchaseForm = () => {
                             size="medium"
                             fullWidth
                             name="purchaseStatus"
-                            label="Purchase Status"
+                            label={
+                              <>
+                                Purchase Status
+                                <span
+                                  style={{ color: "red", fontSize: "25px" }}
+                                >
+                                  {" "}
+                                  *
+                                </span>
+                              </>
+                            }
                             sx={outlinedInputWrapperSx}
                             InputProps={{
                               startAdornment: (
@@ -817,7 +856,7 @@ const PurchaseForm = () => {
                               {option.label}
                             </Typography>
                             <Typography variant="body2" color="#64748b">
-                              Price: ${option.product.purchasePrice} | Stock:{" "}
+                              Price: ৳ {option.product.purchasePrice} | Stock:{" "}
                               {option.product.stock || "N/A"}
                             </Typography>
                           </Box>
@@ -997,11 +1036,7 @@ const PurchaseForm = () => {
                       <tbody>
                         <AnimatePresence>
                           {productFields.length === 0 ? (
-                            <motion.tr
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                            >
+                            <tr>
                               <td
                                 colSpan={9}
                                 style={{
@@ -1018,15 +1053,7 @@ const PurchaseForm = () => {
                                     gap: 2,
                                   }}
                                 >
-                                  <motion.div
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{
-                                      type: "spring",
-                                      stiffness: 260,
-                                      damping: 20,
-                                    }}
-                                  >
+                                  <div>
                                     <Avatar
                                       sx={{
                                         width: 80,
@@ -1039,7 +1066,7 @@ const PurchaseForm = () => {
                                     >
                                       <ShoppingCartIcon sx={{ fontSize: 40 }} />
                                     </Avatar>
-                                  </motion.div>
+                                  </div>
                                   <Typography
                                     variant="h6"
                                     fontWeight="600"
@@ -1057,15 +1084,11 @@ const PurchaseForm = () => {
                                   </Typography>
                                 </Box>
                               </td>
-                            </motion.tr>
+                            </tr>
                           ) : (
                             productFields.map((field, index) => (
-                              <motion.tr
+                              <tr
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.2 }}
                                 style={{
                                   borderBottom: "1px solid #e2e8f0",
                                   backgroundColor:
@@ -1224,7 +1247,7 @@ const PurchaseForm = () => {
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
-                                          $
+                                          ৳
                                         </InputAdornment>
                                       ),
                                     }}
@@ -1273,7 +1296,7 @@ const PurchaseForm = () => {
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
-                                          $
+                                          ৳
                                         </InputAdornment>
                                       ),
                                       sx: {
@@ -1344,7 +1367,7 @@ const PurchaseForm = () => {
                                     </IconButton>
                                   </Tooltip>
                                 </td>
-                              </motion.tr>
+                              </tr>
                             ))
                           )}
                         </AnimatePresence>
@@ -1441,7 +1464,7 @@ const PurchaseForm = () => {
                       onClick={() => setExpandedSummary(!expandedSummary)}
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                      ৳
+                        ৳
                         <Typography variant="h6" fontWeight="700" color="white">
                           Order Summary
                         </Typography>
@@ -1646,7 +1669,7 @@ const PurchaseForm = () => {
                                         "0 3px 6px rgba(139, 92, 246, 0.3)",
                                     }}
                                   >
-                                   ৳
+                                    ৳
                                   </Avatar>
                                   <Typography
                                     variant="h6"

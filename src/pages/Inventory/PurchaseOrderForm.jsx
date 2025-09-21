@@ -61,7 +61,6 @@ import TASInput from "../../components/form/Input";
 import TASSelect from "../../components/form/Select";
 import TASAutocomplete from "../../components/form/Autocomplete";
 import { useGetAllIProductQuery } from "../../redux/api/productApi";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
@@ -75,7 +74,6 @@ import { formatCurrency } from "../../utils/formatter";
 import { useGetAllSuppliersQuery } from "../../redux/api/supplier";
 import ImageUpload from "../../components/form/ImageUpload";
 import { useGetAllWarehousesQuery } from "../../redux/api/warehouseApi";
-const MotionCard = motion(Card);
 
 const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
   const theme = useTheme();
@@ -455,7 +453,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
             <Grid container spacing={4}>
               {/* Left Column - Document Upload */}
               <Grid item xs={12} md={3}>
-                <MotionCard
+                <Card
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
@@ -523,12 +521,12 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                       />
                     </Box>
                   </CardContent>
-                </MotionCard>
+                </Card>
               </Grid>
 
               {/* Right Column - Purchase Details */}
               <Grid item xs={12} md={9}>
-                <MotionCard
+                <Card
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
@@ -567,7 +565,15 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                       <Grid item xs={12} md={6}>
                         <FormDatePicker
                           name="orderDate"
-                          label="Order Date"
+                          label={
+                            <>
+                              Order Date
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           fullWidth
                           size="medium"
                           InputProps={{
@@ -619,7 +625,15 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                           size="medium"
                           fullWidth
                           name="warehouse"
-                          label="Select Warehouse"
+                          label={
+                            <>
+                              Select Warehouse
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           sx={outlinedInputWrapperSx}
                           InputProps={{
                             startAdornment: (
@@ -636,7 +650,15 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                           size="medium"
                           fullWidth
                           name="suppliers"
-                          label="Supplier"
+                          label={
+                            <>
+                            Select Supplier
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           sx={outlinedInputWrapperSx}
                           InputProps={{
                             startAdornment: (
@@ -662,7 +684,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                   color="action"
                                   sx={{ mr: 1 }}
                                 />
-                                $
+                                ৳
                               </InputAdornment>
                             ),
                             sx: outlinedInputSx,
@@ -679,9 +701,18 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                             "Received",
                           ]}
                           size="medium"
+                          label={
+                            <>
+                            Purchase Status
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           fullWidth
                           name="status"
-                          label="Purchase Status"
+                         
                           sx={outlinedInputWrapperSx}
                           InputProps={{
                             startAdornment: (
@@ -715,7 +746,16 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                           size="medium"
                           fullWidth
                           name="paymentStatus"
-                          label="Payment Status"
+                          label={
+                            <>
+                             Payment Status 
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
+                         
                           sx={outlinedInputWrapperSx}
                           InputProps={{
                             startAdornment: (
@@ -728,7 +768,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                       </Grid>
                     </Grid>
                   </CardContent>
-                </MotionCard>
+                </Card>
               </Grid>
             </Grid>
 
@@ -815,7 +855,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                               {option.label}
                             </Typography>
                             <Typography variant="body2" color="#64748b">
-                              Price: ${option.product.purchasePrice} | Stock:{" "}
+                              Price: ৳{option.product.purchasePrice} | Stock:{" "}
                               {option.product.stock || "N/A"}
                             </Typography>
                           </Box>
@@ -1151,7 +1191,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
-                                          $
+                                          ৳
                                         </InputAdornment>
                                       ),
                                       sx: {
@@ -1259,7 +1299,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
-                                          $
+                                          ৳
                                         </InputAdornment>
                                       ),
                                       sx: {
@@ -1338,7 +1378,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
-                                          $
+                                          ৳
                                         </InputAdornment>
                                       ),
                                       sx: {
@@ -1424,7 +1464,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
 
             <Grid container spacing={4} sx={{ mt: 1 }}>
               <Grid item xs={12} md={7}>
-                <MotionCard
+                <Card
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.6 }}
@@ -1470,11 +1510,11 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                       sx={textInuptStyle}
                     />
                   </CardContent>
-                </MotionCard>
+                </Card>
               </Grid>
 
               <Grid item xs={12} md={5}>
-                <MotionCard
+                <Card
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.7 }}
@@ -1692,7 +1732,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                       </Box>
                     </CardContent>
                   </Collapse>
-                </MotionCard>
+                </Card>
               </Grid>
             </Grid>
           </Grid>

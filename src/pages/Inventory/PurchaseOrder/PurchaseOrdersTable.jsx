@@ -146,7 +146,7 @@ const PurchaseOrdersTable = ({
 
                 <TableCell align="right">
                   <Typography sx={{ fontWeight: "bold" }}>
-                    ৳{order.grandTotal?.toLocaleString() || 0}
+                    ৳ {order.grandTotal?.toLocaleString() || 0}
                   </Typography>
                 </TableCell>
                 <TableCell>
