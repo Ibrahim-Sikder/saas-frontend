@@ -17,7 +17,7 @@ import TechnicianSection from "./TechnicianSection";
 import VehicleReportSection from "./VehicleReportSection";
 import VehicleInfoSection from "./VehicleInfoSection";
 import JobCardCompanyForm from "./JobCardCompanyForm";
-import JobCardTable from "./JobCardTable";
+import JobCardTable from "./JobCardTable.jsx";
 
 const AddJobCard = () => {
   const tenantDomain = useTenantDomain();
