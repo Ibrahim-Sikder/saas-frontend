@@ -12,11 +12,12 @@ import HeaderSection from "./HeaderSection";
 import UserSelectionSection from "./UserSelectionSection";
 import JobCardCustomerForm from "./JobCardCustomerForm";
 import JobCardShowroomForm from "./JobCardShowroomForm";
-import JobCardCompanyForm from "./JobcardCompanyForm";
+
 import TechnicianSection from "./TechnicianSection";
 import VehicleReportSection from "./VehicleReportSection";
 import JobCardTable from "./JobCardTable";
 import VehicleInfoSection from "./VehicleInfoSection";
+import JobCardCompanyForm from "./JobCardCompanyForm";
 
 const AddJobCard = () => {
   const tenantDomain = useTenantDomain();
