@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import {
   Box,
   Table,
@@ -23,11 +24,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Grid,
   useTheme,
   alpha,
 } from "@mui/material";
 import {
   Visibility,
+  Edit, // Added for edit action
+  Delete, // Added delete icon
   Search,
   FilterList,
   Sort,
@@ -44,18 +48,49 @@ import {
   StyledTableContainer,
 } from "../../../../utils/customStyle";
 import ProductForm from "../../Products/ProductForm";
+import { useDeleteProductMutation } from "../../../../redux/api/productApi";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import Swal from "sweetalert2";
 
 const SupplierProduct = ({ productData }) => {
   const theme = useTheme();
+  const navigate = useNavigate(); // Added navigation hook
   const [searchTerm, setSearchTerm] = useState("");
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [sortAnchorEl, setSortAnchorEl] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState("");
+  const [deleteProduct] = useDeleteProductMutation();
+  const tenantDomain = useTenantDomain();
 
   const handleFilterClick = (event) => {
     setFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteProduct({ tenantDomain, id }).unwrap();
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "The product has been deleted successfully.",
+        showConfirmButton: false,
+        timer: 2000,
+        background: "#fff",
+        customClass: {
+          title: "text-purple-800 font-medium",
+          content: "text-gray-600",
+        },
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while deleting the product.",
+        confirmButtonColor: "#6a1b9a",
+      });
+    } 
   };
 
   const handleFilterClose = () => {
@@ -75,9 +110,36 @@ const SupplierProduct = ({ productData }) => {
   };
 
   const handleProductAction = (action, product) => {
-    setSelectedProduct(product);
-    setDialogAction(action);
-    setOpenDialog(true);
+    if (action === "edit") {
+      // Navigate to update-product page with product ID
+      navigate(`/dashboard/update-product/?id=${product._id}`);
+    } else if (action === "view") {
+      // Log product details to console
+      console.log("Product Details:", product);
+      setSelectedProduct(product);
+      setDialogAction(action);
+      setOpenDialog(true);
+    } else if (action === "delete") {
+      // Show confirmation dialog before deleting
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleDelete(product._id); 
+        }
+      });
+    } else {
+      // For "add" action
+      setSelectedProduct(product);
+      setDialogAction(action);
+      setOpenDialog(true);
+    }
   };
 
   const handleCloseDialog = () => {
@@ -278,6 +340,21 @@ const SupplierProduct = ({ productData }) => {
                       <Visibility />
                     </StyledIconButton>
                   </Tooltip>
+                  <Tooltip title="Edit Product">
+                    <StyledIconButton
+                      onClick={() => handleProductAction("edit", product)}
+                    >
+                      <Edit />
+                    </StyledIconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Product">
+                    <StyledIconButton
+                      onClick={() => handleProductAction("delete", product)}
+                      color="error"
+                    >
+                      <Delete />
+                    </StyledIconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
@@ -294,25 +371,68 @@ const SupplierProduct = ({ productData }) => {
       >
         <DialogTitle>
           {dialogAction === "add" && "Add New Product"}
-          {dialogAction === "edit" && "Edit Product"}
           {dialogAction === "view" && "Product Details"}
-          {dialogAction === "delete" && "Delete Product"}
         </DialogTitle>
         <DialogContent>
-         <ProductForm/>
-          
+          {dialogAction === "view" && selectedProduct && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Product Information
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Product Code:</strong> {selectedProduct.product_code}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Product Name:</strong> {selectedProduct.product_name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Batch Number:</strong> {selectedProduct.batchNumber || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Price:</strong> ৳{selectedProduct.sellingPrice.toFixed(2)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Stock:</strong> {selectedProduct.product_quantity} pcs
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Expiry Date:</strong> {formatDate(selectedProduct.expiryDate)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Status:</strong> {selectedProduct.productStatus}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Stock Alert:</strong> {selectedProduct.stock_alert}
+                  </Typography>
+                </Grid>
+                {/* Add more fields as needed */}
+              </Grid>
+            </Box>
+          )}
+          {dialogAction === "add" && (
+            <ProductForm />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          {dialogAction !== "view" && (
-            <Button
-              variant="contained"
-              color={dialogAction === "delete" ? "error" : "primary"}
-              onClick={handleCloseDialog}
-            >
-              {dialogAction === "add" && "Add"}
-              {dialogAction === "edit" && "Save"}
-              {dialogAction === "delete" && "Delete"}
+          {dialogAction === "add" && (
+            <Button variant="contained" onClick={handleCloseDialog}>
+              Add
             </Button>
           )}
         </DialogActions>

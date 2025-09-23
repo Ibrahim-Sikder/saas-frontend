@@ -349,7 +349,7 @@ const ProductCard = ({ product, onEdit, onDelete, onFavorite, isFavorite }) => {
   );
 };
 
-// Product list row component for list view
+
 const ProductListItem = ({
   product,
   onEdit,
@@ -557,10 +557,8 @@ export default function ProductList() {
   const [sortDirection, setSortDirection] = useState("desc");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [sortAnchorEl, setSortAnchorEl] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

@@ -3,6 +3,8 @@
 "use client";
 
 import { useState } from "react";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import {
   Box,
   Typography,
@@ -48,18 +50,41 @@ import {
   Timeline,
   ReceiptLong,
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
 import { GlassCard, StatusChip } from "./supplier";
-import { AnimatedIconButton, StyledTableContainer } from "../../../../utils/customStyle";
+import {
+  AnimatedIconButton,
+  StyledTableContainer,
+} from "../../../../utils/customStyle";
+import { useDeletePurchaseOrderMutation } from "../../../../redux/api/purchaseOrderApi";
+import ActionMenu from "../../../Inventory/PurchaseOrder/ActionMenu";
+import ReceiveDialog from "../../../Inventory/PurchaseOrder/ReceiveDialog";
+import UpdatePurchaseOrderModal from "../../../Inventory/UpdatePurchaseOrderModal";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
-const OrderTable = ({ orderData }) => {
+const OrderTable = ({ orderData, refetch }) => {
   const theme = useTheme();
+  const tenantDomain = useTenantDomain();
+
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [dialogAction, setDialogAction] = useState("");
+
+  // State for action menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
+
+  // State for receive dialog
+  const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
+  const [receivingOrderId, setReceivingOrderId] = useState(null);
+
+  // State for update modal
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  // Delete mutation
+  const [deletePurchase] = useDeletePurchaseOrderMutation();
 
   const handleFilterMenuOpen = (event) => {
     setFilterMenuAnchor(event.currentTarget);
@@ -90,6 +115,78 @@ const OrderTable = ({ orderData }) => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedOrder(null);
+  };
+
+  // Action menu handlers
+  const handleMenuOpen = (event, order) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedOrderForAction(order);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleViewOrder = () => {
+    handleOpenDialog("view", selectedOrderForAction);
+    handleMenuClose();
+  };
+
+  const handleEditOrder = () => {
+    setSelectedOrder(selectedOrderForAction);
+    setOpenUpdateModal(true);
+    handleMenuClose();
+  };
+
+  const handleOpenReceiveDialog = () => {
+    setReceivingOrderId(selectedOrderForAction._id);
+    setOpenReceiveDialog(true);
+    handleMenuClose();
+  };
+
+  const handleCloseReceiveDialog = () => {
+    setOpenReceiveDialog(false);
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!selectedOrderForAction) return;
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await deletePurchase({
+            tenantDomain,
+            id: selectedOrderForAction._id,
+          }).unwrap();
+
+          if (res.success) {
+            toast.success("Purchase order deleted successfully!");
+            refetch();
+
+            Swal.fire(
+              "Deleted!",
+              "The purchase order has been deleted.",
+              "success"
+            );
+          }
+        } catch (error) {
+          Swal.fire("Error", "Failed to delete purchase order", "error");
+          console.error(error);
+        }
+      }
+    });
+
+    handleMenuClose();
   };
 
   const getStatusColor = (status) => {
@@ -301,8 +398,7 @@ const OrderTable = ({ orderData }) => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                   ৳
-                    {order.grandTotal.toLocaleString()}
+                    ৳{order.grandTotal.toLocaleString()}
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -330,24 +426,11 @@ const OrderTable = ({ orderData }) => {
                   />
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title="View Order">
-                    <AnimatedIconButton
-                      size="small"
-                      onClick={() => handleOpenDialog("view", order)}
-                    >
-                      <Visibility fontSize="small" />
-                    </AnimatedIconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit Order">
-                    <AnimatedIconButton
-                      size="small"
-                      onClick={() => handleOpenDialog("edit", order)}
-                    >
-                      <Edit fontSize="small" />
-                    </AnimatedIconButton>
-                  </Tooltip>
                   <Tooltip title="More Options">
-                    <AnimatedIconButton size="small">
+                    <AnimatedIconButton
+                      size="small"
+                      onClick={(e) => handleMenuOpen(e, order)}
+                    >
                       <MoreVert fontSize="small" />
                     </AnimatedIconButton>
                   </Tooltip>
@@ -358,7 +441,35 @@ const OrderTable = ({ orderData }) => {
         </Table>
       </StyledTableContainer>
 
-      {/* Order Action Dialog */}
+      {/* Action Menu */}
+      <ActionMenu
+        anchorEl={anchorEl}
+        selectedOrder={selectedOrderForAction}
+        onMenuClose={handleMenuClose}
+        onViewOrder={handleViewOrder}
+        onEditOrder={handleEditOrder}
+        onOpenReceiveDialog={handleOpenReceiveDialog}
+        onDeleteOrder={handleDeleteOrder}
+      />
+
+      {/* Receive Dialog */}
+      <ReceiveDialog
+        open={openReceiveDialog}
+        purchaseId={receivingOrderId}
+        onClose={handleCloseReceiveDialog}
+      />
+
+      {/* Update Purchase Order Modal */}
+      {openUpdateModal && selectedOrder && (
+        <UpdatePurchaseOrderModal
+          tenantDomain={tenantDomain}
+          onClose={() => setOpenUpdateModal(false)}
+          open={openUpdateModal}
+          orderId={selectedOrder._id}
+        />
+      )}
+
+      {/* Order View Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -367,7 +478,6 @@ const OrderTable = ({ orderData }) => {
       >
         <DialogTitle>
           {dialogAction === "create" && "Create New Order"}
-          {dialogAction === "edit" && "Edit Order"}
           {dialogAction === "view" && "Order Details"}
         </DialogTitle>
         <DialogContent>
@@ -404,16 +514,7 @@ const OrderTable = ({ orderData }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          {dialogAction !== "view" && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCloseDialog}
-            >
-              {dialogAction === "create" ? "Create" : "Save"}
-            </Button>
-          )}
+          <Button onClick={handleCloseDialog}>Close</Button>
         </DialogActions>
       </Dialog>
     </GlassCard>

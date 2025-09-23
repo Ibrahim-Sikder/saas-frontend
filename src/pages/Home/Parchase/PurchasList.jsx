@@ -89,12 +89,6 @@ const statusColors = {
   Paid: { bg: "#10b981", color: "#fff" },
 };
 
-// Payment status chip colors
-const paymentColors = {
-  Paid: { bg: "#10b981", color: "#fff" },
-  Unpaid: { bg: "#ef4444", color: "#fff" },
-  Partial: { bg: "#f59e0b", color: "#fff" },
-};
 
 // Row component for expandable rows
 function Row({ purchase, onDelete, onEdit, onView }) {
@@ -573,133 +567,6 @@ export default function PurchaseList() {
     navigate(`/dashboard/update-purchase?id=${purchase._id}`);
   };
 
-  const handleViewPurchase = (purchase) => {
-
-  };
-
-  // Empty state component
-  const EmptyState = () => (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        py: 8,
-        px: 3,
-        textAlign: "center",
-      }}
-    >
-      <Box
-        sx={{ 
-          mb: 3, 
-          width: 200, 
-          height: 200, 
-          backgroundColor: alpha(theme.palette.primary.main, 0.1),
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <ShoppingCartIcon sx={{ fontSize: 80, color: alpha(theme.palette.primary.main, 0.5) }} />
-      </Box>
-      <Typography variant="h5" fontWeight="700" color="#1e293b" gutterBottom>
-        {search || filterStatus || filterPayment
-          ? "No matching purchases found"
-          : "No purchases yet"}
-      </Typography>
-      <Typography variant="body1" color="#64748b" sx={{ maxWidth: 500, mb: 4 }}>
-        {search || filterStatus || filterPayment
-          ? "We couldn't find any purchases matching your criteria. Try different filters or clear the search."
-          : "Get started by creating your first purchase. Purchases help you track your inventory and expenses."}
-      </Typography>
-      <Button
-        variant="contained"
-        component={Link}
-        to="/dashboard/add-purchase"
-        startIcon={<AddIcon />}
-        sx={{
-          borderRadius: "8px",
-          backgroundColor: "#6366f1",
-          px: 4,
-          py: 1.5,
-          boxShadow: "0 4px 6px -1px rgba(99, 102, 241, 0.2)",
-          "&:hover": {
-            backgroundColor: "#4f46e5",
-            boxShadow: "0 4px 12px -1px rgba(99, 102, 241, 0.3)",
-          },
-        }}
-      >
-        Create Your First Purchase
-      </Button>
-    </Box>
-  );
-
-  // Loading skeleton
-  const LoadingSkeleton = () => (
-    <Box>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell width="5%"></TableCell>
-              <TableCell>Reference</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Supplier</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Total</TableCell>
-              <TableCell align="right">Paid</TableCell>
-              <TableCell align="right">Due</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array(5)
-              .fill(0)
-              .map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton variant="circular" width={24} height={24} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="text" width={120} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="text" width={100} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="text" width={150} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rounded" width={80} height={24} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Skeleton variant="text" width={80} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Skeleton variant="text" width={80} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Skeleton variant="text" width={80} />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box
-                      sx={{ display: "flex", justifyContent: "center", gap: 1 }}
-                    >
-                      <Skeleton variant="circular" width={32} height={32} />
-                      <Skeleton variant="circular" width={32} height={32} />
-                      <Skeleton variant="circular" width={32} height={32} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
-  );
-
   // Stats Cards
   const StatsCards = () => {
     const totalPurchases = purchases.length;
@@ -1127,12 +994,7 @@ export default function PurchaseList() {
 
           {/* Content */}
           <Box>
-            {isLoading ? (
-              <LoadingSkeleton />
-            ) : purchases.length === 0 ? (
-              <EmptyState />
-            ) : (
-              <TableContainer>
+            <TableContainer>
                 <Table sx={{ minWidth: 800 }}>
                   <TableHead>
                     <TableRow>
@@ -1230,14 +1092,11 @@ export default function PurchaseList() {
                         purchase={purchase}
                         onDelete={handleDeleteConfirm}
                         onEdit={handleEditPurchase}
-                        onView={handleViewPurchase}
                       />
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-            )}
-
             {/* Pagination */}
             {purchases.length > 0 && (
               <TablePagination

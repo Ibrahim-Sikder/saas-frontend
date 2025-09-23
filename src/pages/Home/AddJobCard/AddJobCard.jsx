@@ -8,7 +8,6 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import useUserDetails from "../../../hooks/useUserDetails";
 import useJobCardNumber from "../../../hooks/useJobCardNumber";
 import { useCreateJobCardMutation } from "../../../redux/api/jobCard";
-import JobCardCompanyForm from "./JobcardCompanyForm";
 import TechnicianSection from "./TechnicianSection";
 import VehicleReportSection from "./VehicleReportSection";
 import VehicleInfoSection from "./VehicleInfoSection";
@@ -17,6 +16,7 @@ import JobCardShowroomForm from "./JobCardShowroomForm";
 import UserSelectionSection from "./UserSelectionSection";
 import HeaderSection from "./HeaderSection";
 import JobCardTable from "./JobcardTable";
+import JobCardCompanyForm from "./JobcardCompanyForm";
 
 const AddJobCard = () => {
   const tenantDomain = useTenantDomain();

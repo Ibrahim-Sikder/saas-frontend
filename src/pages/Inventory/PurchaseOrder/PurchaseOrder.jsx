@@ -14,11 +14,13 @@ import PageHeader from "./PurchaseHeader";
 import SummaryCards from "./PurchaseSummaryCards";
 import FiltersSection from "./PurchaseFilter";
 import PurchaseOrdersTable from "./PurchaseOrdersTable";
-import ActionMenu from "./PurchaseActionMenu";
-import ReceiveDialog from "./PurchaseReceiveDialog";
+import ActionMenu from "./ActionMenu";
+
 import { Home, NavigateNext, Receipt } from "@mui/icons-material";
 import { ShoppingCart } from "lucide-react";
 import Swal from "sweetalert2";
+import ReceiveDialog from "./ReceiveDialog";
+
 export default function PurchaseOrder() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");

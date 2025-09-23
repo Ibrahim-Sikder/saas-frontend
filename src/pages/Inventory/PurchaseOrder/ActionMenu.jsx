@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { CheckCircle, Delete, Edit } from "@mui/icons-material";
+import { CheckCircle, Delete, Edit, Visibility } from "@mui/icons-material";
 import { Menu, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -7,7 +7,7 @@ const ActionMenu = ({
   anchorEl,
   selectedOrder,
   onMenuClose,
-
+  onViewOrder,
   onEditOrder,
   onOpenReceiveDialog,
   onDeleteOrder,
@@ -25,7 +25,13 @@ const ActionMenu = ({
         },
       }}
     >
-      
+      <MenuItem onClick={onViewOrder} sx={{ py: 1.5 }}>
+        <Visibility
+          fontSize="small"
+          sx={{ mr: 1, color: theme.palette.info.main }}
+        />
+        View
+      </MenuItem>
       <MenuItem onClick={onEditOrder} sx={{ py: 1.5 }}>
         <Edit
           fontSize="small"

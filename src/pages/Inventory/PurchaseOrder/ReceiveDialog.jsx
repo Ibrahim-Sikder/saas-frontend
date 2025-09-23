@@ -33,7 +33,6 @@ const ReceiveDialog = ({ open, purchaseId, onClose }) => {
   const [updatePurchaseOrder, { isLoading }] = useUpdatePurchaseOrderMutation();
 
   const handleReceiveOrder = async (data) => {
-
     try {
       const res = await updatePurchaseOrder({
         tenantDomain,
@@ -108,12 +107,7 @@ const ReceiveDialog = ({ open, purchaseId, onClose }) => {
               <TASSelect
                 size="normal"
                 name="status"
-                items={[
-                  "Pending",
-                  "Cancelled",
-                  "Shipped",
-                  "Received",
-                ]}
+                items={["Pending", "Cancelled", "Shipped", "Received"]}
                 label="Receive Status"
                 sx={{ borderRadius: 2 }}
               />
@@ -140,7 +134,7 @@ const ReceiveDialog = ({ open, purchaseId, onClose }) => {
             Cancel
           </Button>
           <Button
-            type="submit" 
+            type="submit"
             variant="contained"
             color="primary"
             disabled={isLoading}

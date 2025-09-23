@@ -26,6 +26,7 @@ const SupplierTabsContent = ({ tabValue, supplier, }) => {
         <SupplierBillPay supplier={supplier} />
       </Box>
     </>
+    
   );
 };
 
