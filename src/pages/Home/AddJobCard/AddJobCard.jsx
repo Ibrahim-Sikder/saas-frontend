@@ -8,15 +8,15 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import useUserDetails from "../../../hooks/useUserDetails";
 import useJobCardNumber from "../../../hooks/useJobCardNumber";
 import { useCreateJobCardMutation } from "../../../redux/api/jobCard";
+import HeaderSection from "./HeaderSection";
+import UserSelectionSection from "./UserSelectionSection";
+import JobCardCustomerForm from "./JobCardCustomerForm";
+import JobCardShowroomForm from "./JobCardShowroomForm";
+import JobCardCompanyForm from "./JobcardCompanyForm";
 import TechnicianSection from "./TechnicianSection";
 import VehicleReportSection from "./VehicleReportSection";
+import JobCardTable from "./JobCardTable";
 import VehicleInfoSection from "./VehicleInfoSection";
-import JobCardCustomerForm from "./JobcardCustomerForm";
-import JobCardShowroomForm from "./JobCardShowroomForm";
-import UserSelectionSection from "./UserSelectionSection";
-import HeaderSection from "./HeaderSection";
-import JobCardTable from "./JobcardTable";
-import JobCardCompanyForm from "./JobcardCompanyForm";
 
 const AddJobCard = () => {
   const tenantDomain = useTenantDomain();
