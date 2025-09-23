@@ -15,7 +15,7 @@ import { HiOutlineSearch } from "react-icons/hi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
-const JobcardTable = () => {
+const JobCardTable = () => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
@@ -278,4 +278,4 @@ const JobcardTable = () => {
   );
 };
 
-export default JobcardTable;
+export default JobCardTable;

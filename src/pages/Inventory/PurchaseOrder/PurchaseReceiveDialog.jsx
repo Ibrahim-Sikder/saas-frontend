@@ -33,6 +33,7 @@ const ReceiveDialog = ({ open, purchaseId, onClose }) => {
   const [updatePurchaseOrder, { isLoading }] = useUpdatePurchaseOrderMutation();
 
   const handleReceiveOrder = async (data) => {
+
     try {
       const res = await updatePurchaseOrder({
         tenantDomain,

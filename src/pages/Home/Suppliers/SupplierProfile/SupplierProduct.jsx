@@ -8,12 +8,9 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
-  IconButton,
-  Chip,
   Typography,
   TextField,
   InputAdornment,
@@ -30,8 +27,6 @@ import {
   alpha,
 } from "@mui/material";
 import {
-  Edit,
-  Delete,
   Visibility,
   Search,
   FilterList,
@@ -39,7 +34,6 @@ import {
   AddCircle,
   Category,
   Inventory,
-  AttachMoney,
   CalendarToday,
   Star,
 } from "@mui/icons-material";
@@ -240,7 +234,7 @@ const SupplierProduct = ({ productData }) => {
                       justifyContent: "flex-end",
                     }}
                   >
-                    <AttachMoney sx={{ color: theme.palette.success.main }} />
+                    ৳
                     {product.sellingPrice.toFixed(2)}
                   </Box>
                 </TableCell>

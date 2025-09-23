@@ -32,7 +32,6 @@ import {
 } from "react-icons/fa";
 import {
   MdBusiness,
-  MdCategory,
   MdPayment,
   MdVerified,
   MdOutlineWarning,
@@ -50,7 +49,6 @@ import { countries } from "../../../constant/Vehicle.constant";
 import TASInput from "../../../components/form/Input";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextArea from "../../../components/form/FormTextArea";
-import { vendorOption } from "../../../utils/options";
 import GarageForm from "../../../components/form/Form";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
@@ -118,7 +116,7 @@ const SupplierForm = ({ id }) => {
       singleSupplier?.data?.country_code ||
       (countries[0] ? countries[0].code : ""),
     email: singleSupplier?.data?.email || "",
-    vendor: singleSupplier?.data?.vendor || "",
+ 
     tax_id: singleSupplier?.data?.tax_id || "",
     street_address: singleSupplier?.data?.street_address || "",
     country: singleSupplier?.data?.country || "",
@@ -322,14 +320,7 @@ const SupplierForm = ({ id }) => {
                       Business & Address Information
                     </h3>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <FormSelect
-                          name="vendor"
-                          label="Vendor"
-                          options={vendorOption}
-                          icon={MdCategory}
-                        />
-                      </Grid>
+                     
                       <Grid item xs={12} md={6}>
                         <TASInput
                           name="tax_id"

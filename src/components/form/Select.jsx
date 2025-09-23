@@ -2,7 +2,7 @@
 import { MenuItem, TextField, InputAdornment } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
 
-const TASSelect = ({
+const FormSelect = ({
   items,
   name,
   label,
@@ -64,4 +64,4 @@ const TASSelect = ({
   );
 };
 
-export default TASSelect;
+export default FormSelect;

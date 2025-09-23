@@ -51,6 +51,12 @@ const PurchaseOrdersTable = ({
     );
   };
 
+
+  const formatCurrency = (value) => {
+    if (value === undefined || value === null) return "৳0";
+    return `৳${Number(value).toLocaleString()}`;
+  };
+
   return (
     <Paper
       sx={{
@@ -74,11 +80,10 @@ const PurchaseOrdersTable = ({
                 Total Quantity
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Product Price{" "}
+                Product Price (৳)
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                {" "}
-                Total Amount{" "}
+                Total Amount (৳)
               </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Order Date</TableCell>
@@ -117,13 +122,13 @@ const PurchaseOrdersTable = ({
                         mr: 1,
                         fontSize: "0.875rem",
                         bgcolor: getAvatarColor(
-                          order.suppliers?.full_name?.charAt(0) || "U"
+                          order.suppliers?.[0]?.full_name?.charAt(0) || "U"
                         ),
                       }}
                     >
-                      {order.suppliers?.full_name?.charAt(0) || "U"}
+                      {order.suppliers?.[0]?.full_name?.charAt(0) || "U"}
                     </Avatar>
-                    {order.suppliers?.full_name || "Unknown Supplier"}
+                    {order.suppliers?.[0]?.full_name || "Unknown Supplier"}
                   </Box>
                 </TableCell>
                 <TableCell align="right">
@@ -140,13 +145,13 @@ const PurchaseOrdersTable = ({
                 </TableCell>
                 <TableCell align="right">
                   {order.products?.[0]?.unit_price
-                    ? `৳${order.products[0].unit_price}`
+                    ? formatCurrency(order.products[0].unit_price)
                     : "-"}
                 </TableCell>
 
                 <TableCell align="right">
                   <Typography sx={{ fontWeight: "bold" }}>
-                    ৳ {order.grandTotal?.toLocaleString() || 0}
+                    {formatCurrency(order.grandTotal)}
                   </Typography>
                 </TableCell>
                 <TableCell>

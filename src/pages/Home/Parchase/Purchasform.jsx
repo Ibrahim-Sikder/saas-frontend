@@ -155,8 +155,8 @@ const PurchaseForm = () => {
       0
     );
 
-    const newTotalDiscount = productFields.reduce(
-      (acc, item) => acc + item.discount * item.quantity,
+  const newTotalDiscount = productFields.reduce(
+      (acc, item) => acc + (item.discount),
       0
     );
 
@@ -362,7 +362,6 @@ const PurchaseForm = () => {
       totalShipping,
       grandTotal,
     };
-    console.log("this is modify data ", modifyData);
 
     try {
       setShowSuccessAnimation(true);

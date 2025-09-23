@@ -85,19 +85,8 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
   const [grandTotal, setGrandTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedSummary, setExpandedSummary] = useState(true);
+  const [shippingCost, setShippingCost] = useState(0);
   const productSearchRef = useRef(null);
-  const [formData, setFormData] = useState({
-    orderDate: new Date().toISOString().split("T")[0],
-    expectedDeliveryDate: "",
-    referenceNo: "",
-    warehouse: "",
-    supplier: null,
-    shipping: 0,
-    status: "Pending",
-    paymentMethod: "",
-    paymentStatus: "Unpaid",
-    note: "",
-  });
 
   const [createPurchaseOrder, { isLoading: isSubmitting }] =
     useCreatePurchaseOrderMutation();
@@ -155,33 +144,49 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
       product,
     }));
   }, [productsData?.data?.products]);
+  
   useEffect(() => {
     const newTotalAmount = productFields.reduce(
-      (acc, item) => acc + item.unit_price * item.product_quantity,
+      (acc, item) => acc + (item.unit_price || 0) * (item.product_quantity || 0),
       0
     );
 
     const newTotalDiscount = productFields.reduce(
-      (acc, item) => acc + item.discount * item.product_quantity,
+      (acc, item) => acc + (item.discount),
       0
     );
 
     const newTotalTax = productFields.reduce(
       (acc, item) =>
-        acc + ((item.unit_price * item.tax) / 100) * item.product_quantity,
+        acc + (((item.unit_price || 0) * (item.tax || 0)) / 100) * (item.product_quantity || 0),
       0
     );
 
-    const newTotalShipping = Number.parseFloat(formData.shipping) || 0;
+      // Calculate total shipping from products
+  const totalProductShipping = productFields.reduce(
+    (acc, item) => acc + (item.shipping || 0),
+    0
+  );
+
+  // Total shipping is product shipping plus additional shipping cost
+  const totalShippingAmount = totalProductShipping + shippingCost;
+
+   setTotalShipping(totalShippingAmount); 
 
     setTotalAmount(newTotalAmount);
     setTotalDiscount(newTotalDiscount);
     setTotalTax(newTotalTax);
-    setTotalShipping(newTotalShipping);
     setGrandTotal(
-      newTotalAmount + newTotalTax + newTotalShipping - newTotalDiscount
+      newTotalAmount + newTotalTax + totalShipping - newTotalDiscount
     );
-  }, [productFields, formData.shipping]);
+  }, [productFields, shippingCost, totalShipping]);
+
+  useEffect(() => {
+    if (singlePurchase?.data) {
+      setShippingCost(singlePurchase.data.shipping || 0);
+      setTotalShipping(singlePurchase.data.shipping || 0);
+    }
+  }, [singlePurchase]);
 
   const handleProductSearch = (value) => {
     setSearchTerm(value);
@@ -207,6 +212,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
       });
     } else {
       const productPrice = Number(product.product.purchasePrice) || 0;
+         const subTotal = productPrice * Number(product.product.product_quantity)
       const newProduct = {
         productId: product.product._id,
         productName: product.product.product_name,
@@ -216,9 +222,9 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
         tax: Number(product.product.product_tax) || 0,
         discount: Number(product.product.discount) || 0,
         shipping: Number(product.product.shipping) || 0,
-        product_quantity: product.product.product_quantity,
+           product_quantity: product.product.product_quantity,
         quantity: 1,
-        subtotal: productPrice,
+        subtotal: subTotal,
       };
 
       setProductFields([...productFields, newProduct]);
@@ -265,7 +271,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
     updatedFields[index].productPrice = newPrice;
     updatedFields[index].unit_price = newPrice;
     // Update subtotal
-    updatedFields[index].subtotal = newPrice * updatedFields[index].quantity;
+    updatedFields[index].subtotal = newPrice * updatedFields[index].product_quantity;
     setProductFields(updatedFields);
   };
 
@@ -277,7 +283,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
     updatedFields[index].productPrice = newUnitPrice;
     // Update subtotal
     updatedFields[index].subtotal =
-      newUnitPrice * updatedFields[index].quantity;
+      newUnitPrice * updatedFields[index].product_quantity;
     setProductFields(updatedFields);
   };
 
@@ -295,12 +301,17 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
     setProductFields(updatedFields);
   };
 
+  const handleShippingChange = (value) => {
+    const shippingValue = Number(value) || 0;
+    setShippingCost(shippingValue);
+    setTotalShipping(shippingValue);
+  };
+
   const defaultValues = {
     expectedDeliveryDate: singlePurchase?.data?.expectedDeliveryDate || "",
     discount: singlePurchase?.data?.discount || "",
     referenceNo: singlePurchase?.data?.referenceNo || "",
     shipping: singlePurchase?.data?.shipping || "",
-
     orderDate: singlePurchase?.data?.orderDate || "",
     status: singlePurchase?.data?.status || "Pending",
     paymentMethod: singlePurchase?.data?.paymentMethod || "",
@@ -369,7 +380,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
       attachDocument: Array.isArray(data.attachDocument)
         ? data.attachDocument[0]
         : data.attachDocument,
-      shipping: Number(data.shipping),
+      shipping: shippingCost,
       products: productFields.map((product) => ({
         ...product,
         productPrice: Number(product.productPrice),
@@ -404,9 +415,10 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
       totalAmount,
       totalDiscount,
       totalTax,
-      totalShipping,
+     
       grandTotal,
       paymentStatus: data.paymentStatus || "Unpaid",
+      totalShipping
     };
 
     try {
@@ -426,7 +438,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
           ...modifyData,
         }).unwrap();
         if (res.success) {
-          toast.success("Purchase order successfully!");
+          toast.success("Purchase order created successfully!");
           onClose();
         }
       }
@@ -669,28 +681,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TASInput
-                          type="number"
-                          size="medium"
-                          fullWidth
-                          name="shipping"
-                          label="Shipping"
-                          placeholder="0.00"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <LocalShippingIcon
-                                  color="action"
-                                  sx={{ mr: 1 }}
-                                />
-                                ৳
-                              </InputAdornment>
-                            ),
-                            sx: outlinedInputSx,
-                          }}
-                        />
-                      </Grid>
+                     
                       <Grid item xs={12} md={6}>
                         <TASSelect
                           items={[
@@ -1098,6 +1089,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                             </tr>
                           ) : (
                             productFields.map((field, index) => (
+
                               <tr
                                 key={index}
                                 style={{
@@ -1421,7 +1413,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                                     {formatCurrency(
                                       field.subtotal ||
                                         (field.unit_price ||
-                                          field.productPrice) * field.quantity
+                                          field.productPrice) * field.product_quantity
                                     )}
                                   </Box>
                                 </td>
@@ -1544,7 +1536,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
                     onClick={() => setExpandedSummary(!expandedSummary)}
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      ৳
+                    
                       <Typography variant="h6" fontWeight="700" color="white">
                         Order Summary
                       </Typography>

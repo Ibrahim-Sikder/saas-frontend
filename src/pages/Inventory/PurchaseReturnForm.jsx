@@ -69,7 +69,7 @@ export default function PurchaseReturnForm({ id }) {
   const [activeStep, setActiveStep] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
 
   const {
     control,

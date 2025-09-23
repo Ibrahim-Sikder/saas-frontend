@@ -113,8 +113,8 @@ export default function EnhancedSupplierProfile() {
               label="Orders"
             />
             <StyledTab icon={<Inventory sx={{ mb: 0.5 }} />} label="Products" />
-            <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Bill Pay" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Purchase" />
+            <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Bill Pay" />
           </StyledTabs>
         </Box>
 
@@ -122,7 +122,6 @@ export default function EnhancedSupplierProfile() {
         <SupplierTabsContent
           tabValue={tabValue}
           supplier={singleSupplier}
-          supplierWithBillPay={supplierWithBillPay?.data}
         />
       </Box>
     </Box>

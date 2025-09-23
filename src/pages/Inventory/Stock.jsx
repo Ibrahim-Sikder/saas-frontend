@@ -123,19 +123,26 @@ const tenantDomain = useTenantDomain();
         } else if (currentStock <= reorderLevel) {
           status = "low-stock";
         }
+        
         const totalPurchaseValue = stock.totalPurchaseValue || 0;
         const totalSellingValue = stock.totalSellingValue || 0;
+        const purchasePrice = product.purchasePrice || 0;
+        const sellingPrice = product.sellingPrice || 0;
+        const minimumSalePrice = product.minimumSalePrice || 0;
 
         return {
           id: stock._id?.product || stock._id || Math.random().toString(),
           code: product.product_code || "N/A",
           name: product.product_name || "Unnamed Product",
           category: product.category?.main_category || "Uncategorized",
-          brand: product.brand?.brand || "N/A",
+         
           unit: product.unit?.unit || "pcs",
           inQuantity: stock.inQuantity || 0,
           outQuantity: stock.outQuantity || 0,
           currentStock: stock.stock || 0,
+          purchasePrice: purchasePrice,
+          sellingPrice: sellingPrice,
+          minimumSalePrice: minimumSalePrice,
           avgPurchasePrice: stock.avgPurchasePrice || 0,
           avgSellingPrice: stock.avgSellingPrice || 0,
           lastPurchasePrice: stock.lastPurchasePrice || 0,
@@ -150,7 +157,16 @@ const tenantDomain = useTenantDomain();
           image: product.image || "/placeholder.svg?height=60&width=60",
           productDescription: product.productDescription || "",
 
-          originalData: stock,
+          // Store all original data for details view
+          originalData: {
+            ...stock,
+            product: {
+              ...product,
+              purchasePrice,
+              sellingPrice,
+              minimumSalePrice
+            }
+          },
         };
       });
       const uniqueCategories = new Set(["All"]);
@@ -164,11 +180,13 @@ const tenantDomain = useTenantDomain();
       setCategories(Array.from(uniqueCategories));
     }
   }, [stockData]);
+  
   const selectedProduct = useMemo(() => {
     return processedProducts.find(
       (product) => product.id === selectedProductId
     );
   }, [selectedProductId, processedProducts]);
+  
   const filteredProducts = useMemo(() => {
     if (!processedProducts) return [];
 
@@ -177,7 +195,7 @@ const tenantDomain = useTenantDomain();
         searchTerm === "" ||
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       
         item.warehouse.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory =
         categoryFilter === "All" || item.category === categoryFilter;
@@ -187,6 +205,7 @@ const tenantDomain = useTenantDomain();
       return matchesSearch && matchesCategory && matchesStatus;
     });
   }, [processedProducts, statusFilter, searchTerm, categoryFilter]);
+  
   const summaryStats = useMemo(() => {
     if (!processedProducts || processedProducts.length === 0) {
       return {
@@ -223,10 +242,12 @@ const tenantDomain = useTenantDomain();
       ).length,
     };
   }, [processedProducts]);
+  
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     return filteredProducts.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredProducts, currentPage, rowsPerPage]);
+  
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage + 1);
   };
@@ -296,9 +317,9 @@ const tenantDomain = useTenantDomain();
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("bn-BD", {
       style: "currency",
-      currency: "USD",
+      currency: "BDT",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -638,9 +659,6 @@ const tenantDomain = useTenantDomain();
         </Tabs>
       </Paper>
 
-      {/* Summary Cards */}
-
-
       {/* Stock Movement Chart */}
       {tabValue === 0 && (
         <Paper
@@ -836,13 +854,15 @@ const tenantDomain = useTenantDomain();
                     >
                       <TableCell sx={{ fontWeight: "bold" }}>Picture</TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
+                     
                       <TableCell sx={{ fontWeight: "bold" }}>
-                        AVG P.P.
+                        Purchase Price
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>L.P.P.</TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>
                         Selling Price
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Min Sale Price
                       </TableCell>
                       <TableCell align="right" sx={{ fontWeight: "bold" }}>
                         In Quantity
@@ -899,15 +919,15 @@ const tenantDomain = useTenantDomain();
                             </Typography>
                           </Box>
                         </TableCell>
-                        <TableCell>{item.brand}</TableCell>
+                     
                         <TableCell>
-                          {formatCurrency(item.avgPurchasePrice)}
+                          {formatCurrency(item.purchasePrice)}
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(item.lastPurchasePrice)}
+                          {formatCurrency(item.sellingPrice)}
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(item.avgSellingPrice)}
+                          {formatCurrency(item.minimumSalePrice)}
                         </TableCell>
                         <TableCell align="right">
                           <Chip
@@ -926,13 +946,7 @@ const tenantDomain = useTenantDomain();
                           />
                         </TableCell>
                         <TableCell align="right">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "flex-end",
-                            }}
-                          >
+                         
                             <Typography
                               variant="body2"
                               sx={{
@@ -941,24 +955,12 @@ const tenantDomain = useTenantDomain();
                                   item.currentStock,
                                   item.minimumStock
                                 ),
-                                mr: 1,
+                           
                               }}
                             >
                               {item.currentStock} {item.unit}
                             </Typography>
-                            <Box
-                              sx={{
-                                width: 40,
-                                height: 4,
-                                borderRadius: 2,
-                                backgroundColor: getStockLevelColor(
-                                  item.currentStock,
-                                  item.minimumStock
-                                ),
-                                opacity: 0.3,
-                              }}
-                            />
-                          </Box>
+                            
                         </TableCell>
                         <TableCell align="right" sx={{ fontWeight: "medium" }}>
                           {formatCurrency(item.totalPurchaseValue)}
@@ -980,7 +982,10 @@ const tenantDomain = useTenantDomain();
                             >
                               <IconButton
                                 size="small"
-                                onClick={() => handleOpenStockDetails()}
+                                onClick={() => {
+                                  setSelectedProductId(item.id);
+                                  handleOpenStockDetails();
+                                }}
                                 sx={{
                                   color: theme.palette.primary.main,
                                   backgroundColor: alpha(
@@ -998,26 +1003,7 @@ const tenantDomain = useTenantDomain();
                                 <VisibilityIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title="Edit" TransitionComponent={Zoom}>
-                              <IconButton
-                                size="small"
-                                sx={{
-                                  color: theme.palette.success.main,
-                                  backgroundColor: alpha(
-                                    theme.palette.success.main,
-                                    0.1
-                                  ),
-                                  "&:hover": {
-                                    backgroundColor: alpha(
-                                      theme.palette.success.main,
-                                      0.2
-                                    ),
-                                  },
-                                }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                           
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -1087,7 +1073,6 @@ const tenantDomain = useTenantDomain();
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit Product</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleOpenStockHistory}>
           <ListItemIcon>

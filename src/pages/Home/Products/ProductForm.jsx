@@ -1202,7 +1202,7 @@ export default function ProductForm({ id }) {
               type="number"
             />
           </Grid>
-         
+
           <Grid item xs={12}>
             <FormTextArea
               name="productDescription"
@@ -1472,9 +1472,11 @@ export default function ProductForm({ id }) {
       </Box>
 
       {warrantyOpen && (
-        <CreateWarrantyModal open={warrantyOpen} onClose={handleWarrantyClose} />
+        <CreateWarrantyModal
+          open={warrantyOpen}
+          onClose={handleWarrantyClose}
+        />
       )}
-
 
       {categoryOpen && (
         <CreateCategoryModal
@@ -1503,7 +1505,6 @@ export default function ProductForm({ id }) {
       {unitOpen && (
         <CreateUnitModal open={unitOpen} setOpen={handleUnitClose} />
       )}
-      
     </>
   );
 }

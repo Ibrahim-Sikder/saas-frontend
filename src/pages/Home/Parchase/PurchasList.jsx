@@ -574,8 +574,7 @@ export default function PurchaseList() {
   };
 
   const handleViewPurchase = (purchase) => {
-    // Logic to view purchase details
-    console.log("View purchase:", purchase);
+
   };
 
   // Empty state component

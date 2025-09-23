@@ -234,7 +234,6 @@ export default function PurchaseOrder() {
       <PurchaseOrderModal
         open={openPurchaseModal}
         onClose={() => setOpenPurchaseModal(false)}
-      
         tenantDomain={tenantDomain}
       />
       
