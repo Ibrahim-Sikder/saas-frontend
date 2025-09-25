@@ -20,5 +20,13 @@ export const tagTypesList = [
   "productType",
   "barcode",
   'stocks',
+  'stock-transactions',
+  'purchaseReturn',
+  'purchaseOrder',
+  'warranty',
+  'warehouse',
+  'tenant',
+  
+
   
 ];

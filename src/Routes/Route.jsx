@@ -138,6 +138,7 @@ import UpdateDonation from "../pages/Donation/UpdateDonation";
 import PurchaseOrder from "../pages/Inventory/PurchaseOrder/PurchaseOrder";
 import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturnList";
 import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
+import StockTransaction from "../pages/Inventory/StockTransaction/StockTransaction";
 
 export const router = createBrowserRouter([
   {
@@ -593,6 +594,10 @@ export const router = createBrowserRouter([
       {
         path: "variants",
         element: <Variants />,
+      },
+      {
+        path: "stock-transaction",
+        element: <StockTransaction />,
       },
 
       {
