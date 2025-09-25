@@ -6,7 +6,7 @@ import { Box, Typography, Breadcrumbs, Link, Grid, Paper } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import PurchaseOrderModal from "../PurchaseModal";
+import PurchaseOrderModal from "../PurchaseOrderModal";
 import UpdatePurchaseOrderModal from "../UpdatePurchaseOrderModal";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useDeletePurchaseOrderMutation, useGetAllPurchaseOrdersQuery } from "../../../redux/api/purchaseOrderApi";

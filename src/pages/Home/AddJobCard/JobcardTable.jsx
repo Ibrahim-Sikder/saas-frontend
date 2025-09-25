@@ -16,7 +16,7 @@ import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
 const JobCardTable = () => {
-    const location = useLocation();
+      const location = useLocation();
     const search = new URLSearchParams(location.search).get("search");
     const [filterType, setFilterType] = useState("");
   
@@ -82,8 +82,8 @@ const JobCardTable = () => {
         setFilterType(search);
       }
     }, [search]);
-  return (
-     <div>
+    return (
+         <div>
           <div className="mt-5 overflow-x-auto">
             <div className="w-full mb-24">
               <div className="flex flex-wrap items-center justify-between mb-5">
@@ -275,7 +275,7 @@ const JobCardTable = () => {
             </div>
           </div>
         </div>
-  );
+    );
 };
 
 export default JobCardTable;

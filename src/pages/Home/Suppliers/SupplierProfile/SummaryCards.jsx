@@ -11,9 +11,9 @@ const SummaryCards = ({ supplier }) => {
   const theme = useTheme();
   
   // Using the single supplier object instead of an array
-  const totalDue = supplier?.totalDue || 0;
-  const totalPaid = supplier?.totalPaid || 0;
-  const totalBalance = supplier?.balance || 0;
+  const totalDue = supplier?.purchasesSummary?.dueAmount || 0;
+  const totalPaid = supplier?.purchasesSummary?.paidAmount || 0;
+  const totalBalance = supplier?.purchasesSummary?.totalAmount || 0;
   const pendingSuppliers = supplier?.balance > 0 ? 1 : 0;
 
   const cards = [

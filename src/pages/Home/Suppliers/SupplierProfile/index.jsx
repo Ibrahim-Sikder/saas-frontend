@@ -16,7 +16,7 @@ import {
   useGetSupplierWithBillPayQuery,
 } from "../../../../redux/api/supplier";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
-import PurchaseOrderModal from "../../../Inventory/PurchaseModal";
+import PurchaseOrderModal from "../../../Inventory/PurchaseOrderModal";
 import SupplierHeaderActions from "./SupplierHeaderActions";
 import SupplierMetrics from "./SupplierMetrics";
 import SupplierProfileHeader from "./SupplierProfileHeader";
@@ -114,6 +114,7 @@ export default function EnhancedSupplierProfile() {
             />
             <StyledTab icon={<Inventory sx={{ mb: 0.5 }} />} label="Products" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Purchase" />
+            <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Purchase Return" />
             <StyledTab icon={<Payments sx={{ mb: 0.5 }} />} label="Bill Pay" />
           </StyledTabs>
         </Box>

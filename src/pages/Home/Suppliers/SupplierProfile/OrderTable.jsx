@@ -59,6 +59,7 @@ import { useDeletePurchaseOrderMutation } from "../../../../redux/api/purchaseOr
 import ActionMenu from "../../../Inventory/PurchaseOrder/ActionMenu";
 import ReceiveDialog from "../../../Inventory/PurchaseOrder/ReceiveDialog";
 import UpdatePurchaseOrderModal from "../../../Inventory/UpdatePurchaseOrderModal";
+import PurchaseOrderModal from "../../../Inventory/PurchaseOrderModal";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
 const OrderTable = ({ orderData, refetch }) => {
@@ -71,7 +72,9 @@ const OrderTable = ({ orderData, refetch }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [dialogAction, setDialogAction] = useState("");
-
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   // State for action menu
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
@@ -106,12 +109,6 @@ const OrderTable = ({ orderData, refetch }) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleOpenDialog = (action, order = null) => {
-    setDialogAction(action);
-    setSelectedOrder(order);
-    setOpenDialog(true);
-  };
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedOrder(null);
@@ -128,7 +125,6 @@ const OrderTable = ({ orderData, refetch }) => {
   };
 
   const handleViewOrder = () => {
-    handleOpenDialog("view", selectedOrderForAction);
     handleMenuClose();
   };
 
@@ -311,34 +307,8 @@ const OrderTable = ({ orderData, refetch }) => {
             <Divider />
             <MenuItem onClick={handleFilterMenuClose}>Apply Filters</MenuItem>
           </Menu>
-          <Tooltip title="Sort orders">
-            <Button
-              variant="outlined"
-              startIcon={<Sort />}
-              sx={{ mr: 1, borderRadius: 20 }}
-              onClick={handleSortMenuOpen}
-            >
-              Sort
-            </Button>
-          </Tooltip>
-          <Menu
-            anchorEl={sortMenuAnchor}
-            open={Boolean(sortMenuAnchor)}
-            onClose={handleSortMenuClose}
-          >
-            <MenuItem onClick={handleSortMenuClose}>
-              Date (Newest First)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Date (Oldest First)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Amount (High to Low)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Amount (Low to High)
-            </MenuItem>
-          </Menu>
+                     
+       
           <Button
             variant="contained"
             startIcon={<Add />}
@@ -350,7 +320,7 @@ const OrderTable = ({ orderData, refetch }) => {
                 0.3
               )}`,
             }}
-            onClick={() => handleOpenDialog("create")}
+            onClick={handleOpen}
           >
             Create Order
           </Button>
@@ -468,55 +438,15 @@ const OrderTable = ({ orderData, refetch }) => {
           orderId={selectedOrder._id}
         />
       )}
+      {open && (
+        <PurchaseOrderModal
+          tenantDomain={tenantDomain}
+          onClose={handleClose}
+          open={handleOpen}
+        />
+      )}
 
-      {/* Order View Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          {dialogAction === "create" && "Create New Order"}
-          {dialogAction === "view" && "Order Details"}
-        </DialogTitle>
-        <DialogContent>
-          {selectedOrder && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1">
-                Reference No: {selectedOrder.referenceNo}
-              </Typography>
-              <Typography variant="body1">
-                Order Date: {formatDate(selectedOrder.orderDate)}
-              </Typography>
-              <Typography variant="body1">
-                Items: {calculateTotalItems(selectedOrder.products)}
-              </Typography>
-              <Typography variant="body1">
-                Amount: ${selectedOrder.grandTotal.toLocaleString()}
-              </Typography>
-              <Typography variant="body1">
-                Delivery Date: {formatDate(selectedOrder.expectedDeliveryDate)}
-              </Typography>
-              <Typography variant="body1">
-                Status: {selectedOrder.status}
-              </Typography>
-              <Typography variant="body1">
-                Payment Status: {selectedOrder.paymentStatus}
-              </Typography>
-              <Typography variant="body1">
-                Payment Method: {selectedOrder.paymentMethod}
-              </Typography>
-              <Typography variant="body1">
-                Note: {selectedOrder.note}
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
+    
     </GlassCard>
   );
 };

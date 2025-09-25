@@ -136,6 +136,7 @@ const PurchaseOrderForm = ({ tenantDomain, onClose, orderId }) => {
       value: war._id,
     }));
   }, [warehouseData?.data?.warehouses]);
+  
   const productOptions = useMemo(() => {
     if (!productsData?.data?.products) return [];
     return productsData.data.products.map((product) => ({

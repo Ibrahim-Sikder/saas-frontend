@@ -79,7 +79,7 @@ const SupplierPurchase = ({ purchaseData }) => {
     useDeletePurchaseMutation();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
-  
+  console.log(selectedOrderForAction)
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -114,25 +114,12 @@ const SupplierPurchase = ({ purchaseData }) => {
     setSelectedOrder(null);
   };
 
-  // Action menu handlers
-  const handleMenuOpen = (event, order) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedOrderForAction(order);
-  };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
-  const handleViewOrder = () => {
-    handleOpenDialog("view", selectedOrderForAction);
-    handleMenuClose();
-  };
 
-  const handleEditOrder = () => {
-    navigate(`/dashboard/update-purchase?id=${selectedOrderForAction._id}`);
-    handleMenuClose();
-  };
+
 
   const handleDeleteOrder = () => {
     Swal.fire({
@@ -391,7 +378,7 @@ const SupplierPurchase = ({ purchaseData }) => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    ৳{order.grandTotal.toLocaleString()}
+                    ৳{order.grandTotal?.toLocaleString()}
                   </Box>
                 </TableCell>
                 <TableCell>

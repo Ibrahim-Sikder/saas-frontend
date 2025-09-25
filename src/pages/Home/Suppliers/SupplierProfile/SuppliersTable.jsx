@@ -24,6 +24,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 
+
 const SuppliersTable = ({
   supplierPaymentData,
   onRecordPayment,

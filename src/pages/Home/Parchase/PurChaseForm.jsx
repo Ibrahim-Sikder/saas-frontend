@@ -71,9 +71,10 @@ import {
 import { formatCurrency } from "../../../utils/formatter";
 import { useGetAllWarehousesQuery } from "../../../redux/api/warehouseApi";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
+
 const MotionCard = motion(Card);
 
-const PurchaseForm = () => {
+const PurChaseForm = () => {
   const navigate = useNavigate();
   const [params, setParams] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -121,7 +122,7 @@ const PurchaseForm = () => {
   });
   const [createPurchase, { isLoading: isSubmitting }] =
     useCreatePurchaseMutation();
-
+  
   // Prepare supplier options
   const suppliersOptions = useMemo(() => {
     if (!supplierData?.data?.suppliers) return [];
@@ -130,6 +131,7 @@ const PurchaseForm = () => {
       value: supplier._id,
     }));
   }, [supplierData?.data?.suppliers]);
+  
   const wareHouseOptions = useMemo(() => {
     if (!warehouseData?.data?.warehouses) return [];
     return warehouseData.data.warehouses.map((warehouse) => ({
@@ -155,8 +157,8 @@ const PurchaseForm = () => {
       0
     );
 
-  const newTotalDiscount = productFields.reduce(
-      (acc, item) => acc + (item.discount),
+    const newTotalDiscount = productFields.reduce(
+      (acc, item) => acc + item.discount,
       0
     );
 
@@ -270,20 +272,18 @@ const PurchaseForm = () => {
     setProductFields(updatedFields);
   };
 
+  // FIXED: Correctly map supplier and warehouse data for default values
   const defaultValues = {
     referenceNo: singlePurchase?.data?.referenceNo || "",
     shipping: singlePurchase?.data?.shipping || "",
-
     date: singlePurchase?.data?.date || "",
     purchaseStatus: singlePurchase?.data?.purchaseStatus || "",
     paymentMethod: singlePurchase?.data?.paymentMethod || "",
     attachDocument: singlePurchase?.data?.attachDocument || "",
-    suppliers: singlePurchase?.data?.suppliers
-      ? [singlePurchase.data.suppliers.full_name]
-      : [],
-    warehouse: singlePurchase?.data?.warehouse
-      ? [singlePurchase.data.warehouse.name]
-      : [],
+    // FIXED: Map supplier array to array of names
+    suppliers: singlePurchase?.data?.suppliers?.map(supplier => supplier.full_name) || [],
+    // FIXED: Map warehouse object to array with name
+    warehouse: singlePurchase?.data?.warehouse ? [singlePurchase.data.warehouse.name] : [],
     note: singlePurchase?.data?.note || "",
     products:
       singlePurchase?.data?.products?.map((product) => ({
@@ -297,6 +297,7 @@ const PurchaseForm = () => {
         shipping: product.shipping,
       })) || [],
   };
+
   useEffect(() => {
     if (singlePurchase?.data?.products) {
       setProductFields(
@@ -387,7 +388,6 @@ const PurchaseForm = () => {
         }
       }
     } catch (error) {
-      setShowSuccessAnimation(false);
       setShowSuccessAnimation(false);
 
       // Extract the main error message
@@ -1740,4 +1740,4 @@ const PurchaseForm = () => {
   );
 };
 
-export default PurchaseForm;
+export default PurChaseForm;

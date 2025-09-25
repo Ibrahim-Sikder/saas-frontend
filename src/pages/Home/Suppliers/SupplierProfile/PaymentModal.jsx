@@ -95,6 +95,8 @@ const PaymentModal = ({ open, onClose, onSave, supplier }) => {
         : undefined,
     };
 
+
+
     try {
       const res = await recordPayment({
         data: paymentData,
@@ -112,12 +114,13 @@ const PaymentModal = ({ open, onClose, onSave, supplier }) => {
         const errorData = error.data;
         if (errorData.message) {
           errorMessage = errorData.message;
-        }
-        else if (errorData.errorSources && errorData.errorSources.length > 0) {
+        } else if (
+          errorData.errorSources &&
+          errorData.errorSources.length > 0
+        ) {
           errorMessage = errorData.errorSources[0].message;
         }
-      }
-      else if (error && error.message) {
+      } else if (error && error.message) {
         errorMessage = error.message;
       }
 

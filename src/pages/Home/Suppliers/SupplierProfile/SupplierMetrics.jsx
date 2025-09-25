@@ -10,9 +10,6 @@ import {
   Cancel as CancelledIcon,
   LocalShipping as ShippedIcon,
   Schedule as PendingIcon,
-  Money as MoneyIcon,
-  Payment as PaymentIcon,
-  AccountBalanceWallet as WalletIcon,
 } from "@mui/icons-material";
 import { GradientBox } from "./supplier";
 
@@ -60,12 +57,7 @@ const SupplierMetrics = ({ supplier, paymentStats }) => {
     },
   };
 
-  // Get balance text
-  const getBalanceText = (balance) => {
-    if (balance > 0) return "Due";
-    if (balance < 0) return "Overpayment";
-    return "Settled";
-  };
+
 
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -232,112 +224,6 @@ const SupplierMetrics = ({ supplier, paymentStats }) => {
         </GradientBox>
       </Grid>
 
-      {/* Total Due Card */}
-      <Grid item xs={12} md={4}>
-        <GradientBox gradientColors="#F44336 0%, #E91E63 100%">
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: "white" }}
-            >
-              Total Due
-            </Typography>
-            <MoneyIcon sx={{ fontSize: 40, opacity: 0.8 }} />
-          </Box>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", color: "white", my: 1 }}
-          >
-            {formatCurrency(supplier?.totalDue || 0)}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-              Amount owed to supplier
-            </Typography>
-          </Box>
-        </GradientBox>
-      </Grid>
-
-      {/* Total Paid Card */}
-      <Grid item xs={12} md={4}>
-        <GradientBox gradientColors="#4CAF50 0%, #8BC34A 100%">
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: "white" }}
-            >
-              Total Paid
-            </Typography>
-            <PaymentIcon sx={{ fontSize: 40, opacity: 0.8 }} />
-          </Box>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", color: "white", my: 1 }}
-          >
-            {formatCurrency(supplier?.totalPaid || 0)}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-              Amount paid to supplier
-            </Typography>
-          </Box>
-        </GradientBox>
-      </Grid>
-
-      {/* Remaining Balance Card */}
-      <Grid item xs={12} md={4}>
-        <GradientBox 
-          gradientColors={
-            supplier?.balance > 0 
-              ? "#F44336 0%, #E91E63 100%" 
-              : supplier?.balance < 0 
-                ? "#4CAF50 0%, #8BC34A 100%" 
-                : "#9E9E9E 0%, #607D8B 100%"
-          }
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: "white" }}
-            >
-              Remaining
-            </Typography>
-            <WalletIcon sx={{ fontSize: 40, opacity: 0.8 }} />
-          </Box>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "white", my: 1 }}
-          >
-            {formatCurrency(Math.abs(supplier?.balance || 0))}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ArrowUpward sx={{ color: "white", fontSize: 16, mr: 0.5 }} />
-            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-              {getBalanceText(supplier?.balance || 0)}
-            </Typography>
-          </Box>
-        </GradientBox>
-      </Grid>
     </Grid>
   );
 };

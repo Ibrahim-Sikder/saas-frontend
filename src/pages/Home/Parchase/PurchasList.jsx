@@ -40,7 +40,6 @@ import {
   Link as MuiLink,
   Grid,
   Paper,
-  Collapse,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -66,8 +65,7 @@ import {
   LocalShipping as ShippingIcon,
   Discount as DiscountIcon,
   AccountBalance as PaymentIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -89,12 +87,10 @@ const statusColors = {
   Paid: { bg: "#10b981", color: "#fff" },
 };
 
-
-// Row component for expandable rows
-function Row({ purchase, onDelete, onEdit, onView }) {
-  const [open, setOpen] = useState(false);
+// Purchase Details Modal Component
+function PurchaseDetailsModal({ open, onClose, purchase }) {
   const theme = useTheme();
-  
+
   const getSupplierName = (supplier) => {
     if (!supplier) return "N/A";
     if (typeof supplier === "string") return supplier;
@@ -121,329 +117,334 @@ function Row({ purchase, onDelete, onEdit, onView }) {
     return "N/A";
   };
 
-  const calculatePurchaseDetails = (purchase) => {
-    const totalAmount = purchase.totalAmount || 0;
-    const totalDiscount = purchase.totalDiscount || 0;
-    const totalTax = purchase.totalTax || 0;
-    const shipping = purchase.shipping || 0;
-    const grandTotal = purchase.grandTotal || totalAmount - totalDiscount + totalTax + shipping;
-    const paid = purchase.paid || 0;
-    const due = grandTotal - paid;
-
-    return { totalAmount, totalDiscount, totalTax, shipping, grandTotal, paid, due };
+  const supplierName = getSupplierName(purchase?.suppliers);
+  const statusColor = statusColors[purchase?.purchaseStatus] || {
+    bg: "#64748b",
+    color: "#fff",
   };
 
-  const supplierName = getSupplierName(purchase.suppliers);
-  const { grandTotal, paid, due } = calculatePurchaseDetails(purchase);
-  const statusColor = statusColors[purchase.purchaseStatus] || { bg: "#64748b", color: "#fff" };
+  if (!purchase) return null;
 
   return (
-    <>
-      <TableRow
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: "12px",
+          overflow: "hidden",
+        },
+      }}
+    >
+      <DialogTitle
         sx={{
-          "& > *": { borderBottom: "unset" },
-          "&:hover": {
-            backgroundColor: alpha(theme.palette.primary.main, 0.02),
-          },
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 2,
+          pt: 3,
+          px: 3,
         }}
       >
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>
-          <Typography variant="subtitle2" fontWeight="600">
-            {purchase.referenceNo}
+        <Box>
+          <Typography variant="h5" fontWeight="700">
+            Purchase Details
           </Typography>
-        </TableCell>
-        <TableCell>
-          <Typography variant="body2">
-            {purchase.date ? formatDate(purchase.date) : "No date"}
+          <Typography variant="body2" color="#64748b">
+            Reference: {purchase.referenceNo}
           </Typography>
-        </TableCell>
-        <TableCell>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Avatar
-              sx={{
-                width: 32,
-                height: 32,
-                mr: 1.5,
-                backgroundColor: alpha("#6366f1", 0.1),
-                color: "#6366f1",
-                fontSize: "0.875rem",
-              }}
-            >
-              {supplierName.charAt(0).toUpperCase()}
-            </Avatar>
-            <Typography variant="body2" fontWeight="500">
-              {supplierName}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell>
-          <Chip
-            label={purchase.purchaseStatus || "Pending"}
-            size="small"
-            sx={{
-              backgroundColor: statusColor.bg,
-              color: statusColor.color,
-              fontWeight: 600,
-              borderRadius: "6px",
-              fontSize: "0.75rem",
-            }}
-          />
-        </TableCell>
-        <TableCell align="right">
-          <Typography variant="body2" fontWeight="600">
-            {formatCurrency(grandTotal)}
-          </Typography>
-        </TableCell>
-        <TableCell align="right">
-          <Typography variant="body2" fontWeight="600" color="#10b981">
-            {formatCurrency(paid)}
-          </Typography>
-        </TableCell>
-        <TableCell align="right">
-          <Typography
-            variant="body2"
-            fontWeight="600"
-            color={due > 0 ? "#ef4444" : "#10b981"}
-          >
-            {formatCurrency(due)}
-          </Typography>
-        </TableCell>
-        <TableCell align="center">
-          <Stack direction="row" spacing={1} justifyContent="center">
-            <Tooltip title="View Details">
-              <IconButton
-                size="small"
-                onClick={() => onView(purchase)}
-                sx={{
-                  backgroundColor: alpha("#3b82f6", 0.1),
-                  color: "#3b82f6",
-                  "&:hover": {
-                    backgroundColor: alpha("#3b82f6", 0.2),
-                  },
-                }}
-              >
-                <VisibilityIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Edit">
-              <IconButton
-                size="small"
-                onClick={() => onEdit(purchase)}
-                sx={{
-                  backgroundColor: alpha("#6366f1", 0.1),
-                  color: "#6366f1",
-                  "&:hover": {
-                    backgroundColor: alpha("#6366f1", 0.2),
-                  },
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                onClick={() => onDelete(purchase._id)}
-                sx={{
-                  backgroundColor: alpha("#ef4444", 0.1),
-                  color: "#ef4444",
-                  "&:hover": {
-                    backgroundColor: alpha("#ef4444", 0.2),
-                  },
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1, py: 2 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Purchase Details
+        </Box>
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        {/* Header Info */}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={6}>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+              <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+                Purchase Information
               </Typography>
-              
-              {/* Product Details Table */}
-              <Table size="small" sx={{ mb: 3 }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Product</TableCell>
-                    <TableCell align="right">Quantity</TableCell>
-                    <TableCell align="right">Unit Price</TableCell>
-                    <TableCell align="right">Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {purchase.products?.map((product, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              mr: 1.5,
-                              backgroundColor: alpha("#6366f1", 0.1),
-                              color: "#6366f1",
-                              fontSize: "0.875rem",
-                            }}
-                          >
-                            {product.productName?.charAt(0).toUpperCase() || "P"}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="body2" fontWeight="500">
-                              {product.productName || "Unknown Product"}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Unit: {product.productUnit || "N/A"}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">{product.quantity || 0}</TableCell>
-                      <TableCell align="right">
-                        {formatCurrency(product.productPrice || 0)}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography fontWeight="600">
-                          {formatCurrency(
-                            ((product.productPrice || 0) * (product.quantity || 0)) -
-                              (product.discount || 0) +
-                              (product.tax || 0)
-                          )}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Date:
+                </Typography>
+                <Typography variant="body2" fontWeight="500">
+                  {purchase.date ? formatDate(purchase.date) : "No date"}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Status:
+                </Typography>
+                <Chip
+                  label={purchase.purchaseStatus || "N/A"}
+                  size="small"
+                  sx={{
+                    backgroundColor: statusColor.bg,
+                    color: statusColor.color,
+                    fontWeight: 600,
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Supplier:
+                </Typography>
+                <Typography variant="body2" fontWeight="500">
+                  {supplierName}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+              <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+                Payment Information
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Payment Method:
+                </Typography>
+                <Typography variant="body2" fontWeight="500">
+                  {purchase.paymentMethod || "N/A"}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Paid Amount:
+                </Typography>
+                <Typography variant="body2" fontWeight="500" color="#10b981">
+                  {formatCurrency(purchase.paidAmount || 0)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Due Amount:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight="500"
+                  color={purchase.dueAmount > 0 ? "#ef4444" : "#10b981"}
+                >
+                  {formatCurrency(purchase.dueAmount || 0)}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
 
-              {/* Summary Section */}
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                    <Typography variant="subtitle2" fontWeight="600" gutterBottom>
-                      Payment Information
-                    </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Payment Method:
-                      </Typography>
-                      <Typography variant="body2" fontWeight="500">
-                        {purchase.paymentMethod || "N/A"}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Status:
-                      </Typography>
-                      <Chip
-                        label={purchase.purchaseStatus || "N/A"}
-                        size="small"
+        {/* Product Details Table */}
+        <Typography variant="h6" gutterBottom>
+          Products
+        </Typography>
+        <TableContainer sx={{ mb: 3 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Product</TableCell>
+                <TableCell align="right">Quantity</TableCell>
+                <TableCell align="right">Unit Price</TableCell>
+                <TableCell align="right">Total</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {purchase.products?.map((product, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Avatar
                         sx={{
-                          backgroundColor: statusColors[purchase.purchaseStatus]?.bg || "#64748b",
-                          color: statusColors[purchase.purchaseStatus]?.color || "#fff",
-                          fontWeight: 600,
+                          width: 32,
+                          height: 32,
+                          mr: 1.5,
+                          backgroundColor: alpha("#6366f1", 0.1),
+                          color: "#6366f1",
+                          fontSize: "0.875rem",
                         }}
-                      />
-                    </Box>
-                    {purchase.note && (
-                      <Box sx={{ mt: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          Notes:
+                      >
+                        {product.productName?.charAt(0).toUpperCase() || "P"}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" fontWeight="500">
+                          {product.productName || "Unknown Product"}
                         </Typography>
-                        <Typography variant="body2">{purchase.note}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Unit: {product.productUnit || "N/A"}
+                        </Typography>
                       </Box>
-                    )}
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                    <Typography variant="subtitle2" fontWeight="600" gutterBottom>
-                      Order Summary
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">{product.quantity || 0}</TableCell>
+                  <TableCell align="right">
+                    {formatCurrency(product.productPrice || 0)}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography fontWeight="600">
+                      {formatCurrency(
+                        (product.productPrice || 0) * (product.quantity || 0)
+                      )}
                     </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Subtotal:
-                      </Typography>
-                      <Typography variant="body2">
-                        {formatCurrency(purchase.totalAmount || 0)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Discount:
-                      </Typography>
-                      <Typography variant="body2" color="#ef4444">
-                        -{formatCurrency(purchase.totalDiscount || 0)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Tax:
-                      </Typography>
-                      <Typography variant="body2">
-                        +{formatCurrency(purchase.totalTax || 0)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Shipping:
-                      </Typography>
-                      <Typography variant="body2">
-                        +{formatCurrency(purchase.shipping || 0)}
-                      </Typography>
-                    </Box>
-                    <Divider sx={{ my: 1 }} />
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                      <Typography variant="body2" fontWeight="600">
-                        Grand Total:
-                      </Typography>
-                      <Typography variant="body2" fontWeight="600">
-                        {formatCurrency(grandTotal)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Paid Amount:
-                      </Typography>
-                      <Typography variant="body2" color="#10b981">
-                        {formatCurrency(paid)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Due Amount:
-                      </Typography>
-                      <Typography variant="body2" color={due > 0 ? "#ef4444" : "#10b981"}>
-                        {formatCurrency(due)}
-                      </Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Summary Section */}
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+              <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+                Order Summary
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Subtotal:
+                </Typography>
+                <Typography variant="body2">
+                  {formatCurrency(purchase.totalAmount || 0)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Discount:
+                </Typography>
+                <Typography variant="body2" color="#ef4444">
+                  -{formatCurrency(purchase.totalDiscount || 0)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Tax:
+                </Typography>
+                <Typography variant="body2">
+                  +{formatCurrency(purchase.totalTax || 0)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Shipping:
+                </Typography>
+                <Typography variant="body2">
+                  +{formatCurrency(purchase.shipping || 0)}
+                </Typography>
+              </Box>
+              <Divider sx={{ my: 1 }} />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="body2" fontWeight="600">
+                  Grand Total:
+                </Typography>
+                <Typography variant="body2" fontWeight="600">
+                  {formatCurrency(purchase.grandTotal || 0)}
+                </Typography>
+              </Box>
+              {purchase.note && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Notes:
+                  </Typography>
+                  <Typography variant="body2">{purchase.note}</Typography>
+                </Box>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          sx={{
+            borderRadius: "8px",
+            color: "#64748b",
+            borderColor: "#cbd5e1",
+            "&:hover": {
+              borderColor: "#94a3b8",
+              backgroundColor: "#f8fafc",
+            },
+            px: 3,
+            py: 1,
+          }}
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 
 export default function PurchaseList() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [sortField, setSortField] = useState("date");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -455,6 +456,8 @@ export default function PurchaseList() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedPurchase, setSelectedPurchase] = useState(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const tenantDomain = useTenantDomain();
 
   const { data, isLoading, refetch } = useGetAllPurchasesQuery({
@@ -468,8 +471,9 @@ export default function PurchaseList() {
   const [deletePurchase, { isLoading: isDeleting }] =
     useDeletePurchaseMutation();
 
-  // Safely extract purchases and meta data with fallbacks
+  // Safely extract purchases, purchaseSummary and meta data with fallbacks
   const purchases = data?.data?.purchases || [];
+  const purchaseSummary = data?.data?.purchaseSummary || {};
   const meta = data?.data?.meta || {};
   const total = meta.total || 0;
 
@@ -567,12 +571,48 @@ export default function PurchaseList() {
     navigate(`/dashboard/update-purchase?id=${purchase._id}`);
   };
 
+  const handleViewPurchase = (purchase) => {
+    setSelectedPurchase(purchase);
+    setDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setDetailsModalOpen(false);
+    setSelectedPurchase(null);
+  };
+
+  const getSupplierName = (supplier) => {
+    if (!supplier) return "N/A";
+    if (typeof supplier === "string") return supplier;
+    if (Array.isArray(supplier)) {
+      if (supplier.length === 0) return "N/A";
+      const firstSupplier = supplier[0];
+      if (typeof firstSupplier === "string") return firstSupplier;
+      if (typeof firstSupplier === "object" && firstSupplier !== null) {
+        return (
+          firstSupplier.full_name ||
+          firstSupplier.name ||
+          `Supplier ${firstSupplier._id?.substring(0, 6) || "Unknown"}`
+        );
+      }
+      return "N/A";
+    }
+    if (typeof supplier === "object" && supplier !== null) {
+      return (
+        supplier.full_name ||
+        supplier.name ||
+        `Supplier ${supplier._id?.substring(0, 6) || "Unknown"}`
+      );
+    }
+    return "N/A";
+  };
+
   // Stats Cards
   const StatsCards = () => {
-    const totalPurchases = purchases.length;
-    const totalAmount = purchases.reduce((sum, p) => sum + (p.grandTotal || 0), 0);
-    const totalPaid = purchases.reduce((sum, p) => sum + (p.paid || 0), 0);
-    const totalDue = totalAmount - totalPaid;
+    const totalPurchases = meta.total || 0;
+    const totalAmount = purchaseSummary.grandTotal || 0;
+    const totalPaid = purchaseSummary.paidAmount || 0;
+    const totalDue = purchaseSummary.dueAmount || 0;
 
     return (
       <Box
@@ -679,11 +719,7 @@ export default function PurchaseList() {
               </Avatar>
             </Box>
             <Typography variant="h5" fontWeight="700" color="#1e293b">
-              {isLoading ? (
-                <Skeleton width={60} />
-              ) : (
-                formatCurrency(totalPaid)
-              )}
+              {isLoading ? <Skeleton width={60} /> : formatCurrency(totalPaid)}
             </Typography>
             <Typography variant="body2" color="#64748b">
               Total Paid
@@ -715,11 +751,7 @@ export default function PurchaseList() {
               </Avatar>
             </Box>
             <Typography variant="h5" fontWeight="700" color="#1e293b">
-              {isLoading ? (
-                <Skeleton width={60} />
-              ) : (
-                formatCurrency(totalDue)
-              )}
+              {isLoading ? <Skeleton width={60} /> : formatCurrency(totalDue)}
             </Typography>
             <Typography variant="body2" color="#64748b">
               Total Due
@@ -995,108 +1027,230 @@ export default function PurchaseList() {
           {/* Content */}
           <Box>
             <TableContainer>
-                <Table sx={{ minWidth: 800 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell width="5%"></TableCell>
-                      <TableCell
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Reference
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Date
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Supplier
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Status
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Total
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Paid
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Due
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{
-                          backgroundColor: "#f8fafc",
-                          fontWeight: 600,
-                          color: "#475569",
-                          borderBottom: "2px solid #e2e8f0",
-                        }}
-                      >
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {purchases.map((purchase) => (
-                      <Row
+              <Table sx={{ minWidth: 800 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Reference
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Date
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Supplier
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Status
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Total
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Paid
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Due
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        backgroundColor: "#f8fafc",
+                        fontWeight: 600,
+                        color: "#475569",
+                        borderBottom: "2px solid #e2e8f0",
+                      }}
+                    >
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {purchases.map((purchase) => {
+                    const supplierName = getSupplierName(purchase.suppliers);
+                    const statusColor = statusColors[purchase.purchaseStatus] || {
+                      bg: "#64748b",
+                      color: "#fff",
+                    };
+
+                    return (
+                      <TableRow
                         key={purchase._id}
-                        purchase={purchase}
-                        onDelete={handleDeleteConfirm}
-                        onEdit={handleEditPurchase}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: alpha("#6366f1", 0.02),
+                          },
+                        }}
+                      >
+                        <TableCell>
+                          <Typography variant="subtitle2" fontWeight="600">
+                            {purchase.referenceNo}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {purchase.date
+                              ? formatDate(purchase.date)
+                              : "No date"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Avatar
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                mr: 1.5,
+                                backgroundColor: alpha("#6366f1", 0.1),
+                                color: "#6366f1",
+                                fontSize: "0.875rem",
+                              }}
+                            >
+                              {supplierName.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Typography variant="body2" fontWeight="500">
+                              {supplierName}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={purchase.purchaseStatus || "Pending"}
+                            size="small"
+                            sx={{
+                              backgroundColor: statusColor.bg,
+                              color: statusColor.color,
+                              fontWeight: 600,
+                              borderRadius: "6px",
+                              fontSize: "0.75rem",
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight="600">
+                            {formatCurrency(purchase.grandTotal || 0)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight="600" color="#10b981">
+                            {formatCurrency(purchase.paidAmount || 0)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography
+                            variant="body2"
+                            fontWeight="600"
+                            color={purchase.dueAmount > 0 ? "#ef4444" : "#10b981"}
+                          >
+                            {formatCurrency(purchase.dueAmount || 0)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Stack direction="row" spacing={1} justifyContent="center">
+                            <Tooltip title="View Details">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleViewPurchase(purchase)}
+                                sx={{
+                                  backgroundColor: alpha("#3b82f6", 0.1),
+                                  color: "#3b82f6",
+                                  "&:hover": {
+                                    backgroundColor: alpha("#3b82f6", 0.2),
+                                  },
+                                }}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Edit">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEditPurchase(purchase)}
+                                sx={{
+                                  backgroundColor: alpha("#6366f1", 0.1),
+                                  color: "#6366f1",
+                                  "&:hover": {
+                                    backgroundColor: alpha("#6366f1", 0.2),
+                                  },
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteConfirm(purchase._id)}
+                                sx={{
+                                  backgroundColor: alpha("#ef4444", 0.1),
+                                  color: "#ef4444",
+                                  "&:hover": {
+                                    backgroundColor: alpha("#ef4444", 0.2),
+                                  },
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
             {/* Pagination */}
             {purchases.length > 0 && (
               <TablePagination
@@ -1384,6 +1538,13 @@ export default function PurchaseList() {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Purchase Details Modal */}
+        <PurchaseDetailsModal
+          open={detailsModalOpen}
+          onClose={handleCloseDetailsModal}
+          purchase={selectedPurchase}
+        />
       </Box>
     </Fade>
   );

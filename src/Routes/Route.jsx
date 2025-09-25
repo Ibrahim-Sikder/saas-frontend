@@ -106,7 +106,6 @@ import InventoryDashboard from "../pages/Inventory/InventoryDashboard";
 import ExpiredProduct from "../pages/Inventory/ExpiredProduct";
 import LowStock from "../pages/Inventory/LowStock";
 import Variants from "../pages/Inventory/Variants";
-import Warranties from "../pages/Inventory/Warranties";
 import StockPage from "../pages/Inventory/Stock";
 import RemoveStock from "../pages/Inventory/RemoveStock";
 import PurchaseReturn from "../pages/Inventory/PurchaseReturn";
@@ -117,7 +116,6 @@ import LowStockReportPage from "../pages/Reports/LowStockReport";
 import ProductStockReportPage from "../pages/Reports/ProductStockReport";
 import DailyStockMovementReportPage from "../pages/Reports/DailyStockReport";
 import ReportsPage from "../pages/Reports/Report";
-import PurchaseReturnList from "../pages/Inventory/PurchaseReturnList";
 import PurchaseReturnUpdate from "../pages/Inventory/PurchaseReturnUpdate";
 import WarehouseManagement from "../pages/Inventory/WarehouseManagement";
 import StockAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
@@ -138,6 +136,8 @@ import Review from "../pages/Review/Review";
 import DonationList from "../pages/Donation/DonationList";
 import UpdateDonation from "../pages/Donation/UpdateDonation";
 import PurchaseOrder from "../pages/Inventory/PurchaseOrder/PurchaseOrder";
+import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturnList";
+import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
 
 export const router = createBrowserRouter([
   {
@@ -348,7 +348,7 @@ export const router = createBrowserRouter([
         element: <UpdatePurchase />,
       },
       {
-        path: "purchase-return-update",
+        path: "update-purchase-return",
         element: <PurchaseReturnUpdate />,
       },
       {
@@ -597,7 +597,7 @@ export const router = createBrowserRouter([
 
       {
         path: "warranties",
-        element: <Warranties />,
+        element: <WarrantiesPage />,
       },
       {
         path: "stock-transfer",
@@ -631,7 +631,7 @@ export const router = createBrowserRouter([
 
       {
         path: "purchase-return",
-        element: <PurchaseReturnList />,
+        element: <PurchaseReturnList/>,
       },
       {
         path: "purchase-order",

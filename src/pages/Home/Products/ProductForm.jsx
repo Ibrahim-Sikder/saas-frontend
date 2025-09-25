@@ -172,8 +172,8 @@ export default function ProductForm({ id }) {
 
   // Options for dropdowns
   const warrantyOptions = useMemo(() => {
-    if (!warrantyData?.data) return [];
-    return warrantyData.data.map((war) => ({
+    if (!warrantyData?.data?.data) return [];
+    return warrantyData.data?.data.map((war) => ({
       label: war.name,
       value: war._id,
     }));

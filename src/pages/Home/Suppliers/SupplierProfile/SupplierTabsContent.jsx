@@ -5,6 +5,7 @@ import OrderTable from "./OrderTable";
 import SupplierProduct from "./SupplierProduct";
 import SupplierBillPay from "./SupplierBillPay";
 import SupplierPurchase from "./SupplierPurchase";
+import SupplierPurchaseReturn from "./SupplierPurchaseReturn";
 
 const SupplierTabsContent = ({ tabValue, supplier, }) => {
   return (
@@ -23,6 +24,9 @@ const SupplierTabsContent = ({ tabValue, supplier, }) => {
         <SupplierPurchase purchaseData={supplier?.purchases} />
       </Box>
       <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
+        <SupplierPurchaseReturn supplier={supplier} />
+      </Box>
+      <Box sx={{ display: tabValue === 5 ? "block" : "none" }}>
         <SupplierBillPay supplier={supplier} />
       </Box>
     </>
