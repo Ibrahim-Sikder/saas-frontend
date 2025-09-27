@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+// hooks/useStockTransfer.js
 import { useState, useEffect, useCallback } from "react";
-
 import toast from "react-hot-toast";
 import { useCreateStockTransferMutation } from "../redux/api/stocktransferApi";
 
-export default function useStockTransfer({ stockData, warehouseResponse }) {
+export default function useStockTransfer({ stockData, warehouseResponse, tenantDomain }) {
   // Form state
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,21 +15,22 @@ export default function useStockTransfer({ stockData, warehouseResponse }) {
     toLocation: "",
     transferredBy: "",
   });
-  
+
   // Transfer items state
   const [transferItems, setTransferItems] = useState([
     { id: 1, product: null, quantity: 1, note: "" },
   ]);
-  
+
   // Error state
   const [errors, setErrors] = useState({});
-  
+
   // Data processing state
   const [warehouseStocks, setWarehouseStocks] = useState({});
   const [availableProducts, setAvailableProducts] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
 
-  // Process warehouse data when it's loaded
+  const [createStockTransfer] = useCreateStockTransferMutation();
+
   useEffect(() => {
     if (
       warehouseResponse &&
@@ -50,7 +50,6 @@ export default function useStockTransfer({ stockData, warehouseResponse }) {
     }
   }, [warehouseResponse]);
 
-  // Process stock data when it's loaded
   useEffect(() => {
     if (stockData && stockData.data) {
       // Group stocks by warehouse
@@ -89,12 +88,11 @@ export default function useStockTransfer({ stockData, warehouseResponse }) {
     }
   }, [stockData]);
 
-  // Update available products when fromLocation changes
   useEffect(() => {
     if (formData.fromLocation && warehouseStocks[formData.fromLocation]) {
       const products = [];
       const warehouseProducts = warehouseStocks[formData.fromLocation].products;
-      
+
       Object.keys(warehouseProducts).forEach((productId) => {
         const product = warehouseProducts[productId];
         if (product.currentStock > 0) {
@@ -118,7 +116,7 @@ export default function useStockTransfer({ stockData, warehouseResponse }) {
           });
         }
       });
-      
+
       setAvailableProducts(products);
 
       // Reset transfer items when location changes
@@ -312,48 +310,19 @@ export default function useStockTransfer({ stockData, warehouseResponse }) {
           items,
         };
 
-        console.log("Transfer data:", transferData);
-
-        // Call API
-        const [createStockTransfer] = useCreateStockTransferMutation();
         const result = await createStockTransfer({
           transferData,
-          tenantDomain: "your-tenant-domain", // This should be passed as a prop
+          tenantDomain,
         }).unwrap();
 
         if (result.success) {
-          // Show success message
+
           toast.success("Stock transfer completed successfully!");
 
-          // Call success callback
+          // Call success callback with the result
           if (onSuccess && typeof onSuccess === "function") {
-            onSuccess({
-              success: true,
-              message: "Stock transfer completed successfully",
-              data: {
-                fromWarehouse: formData.fromLocation,
-                toWarehouse: formData.toLocation,
-                transferredBy: formData.transferredBy,
-                referenceNo: formData.referenceNo,
-                date: formData.date,
-                items: transferItems
-                  .filter((item) => item && item.product)
-                  .map((item) => ({
-                    product: item.product._id,
-                    productName: item.product.name,
-                    quantity: item.quantity,
-                    note: item.note || "",
-                  })),
-                totalItems: transferItems.filter((item) => item && item.product)
-                  .length,
-                totalQuantity: transferItems
-                  .filter((item) => item && item.product)
-                  .reduce((sum, item) => sum + item.quantity, 0),
-              },
-            });
+            onSuccess(result);
           }
-
-          // Reset form
           resetForm();
         } else {
           setErrors({

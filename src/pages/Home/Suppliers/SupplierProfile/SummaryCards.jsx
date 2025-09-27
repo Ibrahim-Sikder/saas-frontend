@@ -7,6 +7,7 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 
+
 const SummaryCards = ({ supplier }) => {
   const theme = useTheme();
   

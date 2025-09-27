@@ -1,8 +1,9 @@
+// StockManagement/StockTransfer/StockTransferModal.js
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react/prop-types */
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import {  useCallback } from "react";
 import {
   Dialog,
   DialogActions,
@@ -17,13 +18,11 @@ import { alpha, useTheme } from "@mui/material/styles";
 import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 import { useGetAllStocksQuery } from "../../../../redux/api/stocksApi";
 import { useGetAllWarehousesQuery } from "../../../../redux/api/warehouseApi";
-import { useCreateStockTransferMutation } from "../../../../redux/api/stocktransferApi";
 
 import StockTransferForm from "./StockTransferForm";
 import useStockTransfer from "../../../../hooks/useStockTransfer";
 
-
- function StockTransferModal({
+function StockTransferModal({
   open,
   onClose,
   onSubmit,
@@ -32,7 +31,6 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
   const theme = useTheme();
   const tenantDomain = useTenantDomain();
 
-  // API hooks
   const { data: stockData, isLoading: stockLoading } =
     useGetAllStocksQuery({
       tenantDomain,
@@ -47,10 +45,6 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
       limit: 100,
       searchTerm: "",
     });
-  const [createStockTransfer, { isLoading: isTransferring }] =
-    useCreateStockTransferMutation();
-
-  // Custom hook for state and logic
   const {
     formData,
     transferItems,
@@ -68,7 +62,7 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
     handleSubmit,
     getWarehouseName,
     resetForm,
-  } = useStockTransfer({ employees, stockData, warehouseResponse });
+  } = useStockTransfer({ employees, stockData, warehouseResponse, tenantDomain });
 
   // Safe close function to prevent errors
   const handleSafeClose = useCallback(() => {
@@ -80,7 +74,24 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
     }
   }, [onClose, resetForm]);
 
-  const isLoading = stockLoading || warehouseLoading || isTransferring;
+
+  const handleFormSubmit = async () => {
+    try {
+
+      await handleSubmit((result) => {
+        if (result.success) {
+          handleSafeClose();
+          if (onSubmit && typeof onSubmit === "function") {
+            onSubmit(result.data);
+          }
+        }
+      });
+    } catch (error) {
+      // Error is already handled in the hook
+    }
+  };
+
+  const isLoading = stockLoading || warehouseLoading || formSubmitting;
 
   return (
     <Dialog
@@ -143,7 +154,7 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
           Cancel
         </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={handleFormSubmit} 
           variant="contained"
           disabled={
             isLoading ||
@@ -174,4 +185,4 @@ import useStockTransfer from "../../../../hooks/useStockTransfer";
   );
 }
 
-export default StockTransferModal
+export default StockTransferModal;

@@ -3,7 +3,6 @@ import Main from "../Layout/Main";
 import Home from "../pages/Home/Home";
 import JobCardList from "../pages/Home/AddJobCard/JobCardList";
 import AddEmployee from "../pages/Home/Employee/AddEmployee";
-import ViewInvoice from "../pages/Home/Invoice/ViewInvoice";
 import Detail from "../pages/Home/Invoice/Detail";
 import UpdateInvoice from "../pages/Home/Invoice/UpdateInvoice";
 import Invoice from "../pages/Home/Invoice/Invoice";
@@ -109,7 +108,6 @@ import Variants from "../pages/Inventory/Variants";
 import StockPage from "../pages/Inventory/Stock";
 import RemoveStock from "../pages/Inventory/RemoveStock";
 import PurchaseReturn from "../pages/Inventory/PurchaseReturn";
-import PurchaseHistory from "../pages/Inventory/PurchaseHistory";
 import StockTransferPage from "../pages/Inventory/StockTransper";
 import ExpiredProductsReportPage from "../pages/Reports/ExpiredProductReport";
 import LowStockReportPage from "../pages/Reports/LowStockReport";
@@ -139,6 +137,7 @@ import PurchaseOrder from "../pages/Inventory/PurchaseOrder/PurchaseOrder";
 import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturnList";
 import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
 import StockTransaction from "../pages/Inventory/StockTransaction/StockTransaction";
+import InvoiceList from "../pages/Home/Invoice/ViewInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -393,8 +392,8 @@ export const router = createBrowserRouter([
         element: <Detail />,
       },
       {
-        path: "invoice-view",
-        element: <ViewInvoice />,
+        path: "invoice-list",
+        element: <InvoiceList />,
       },
 
       {
@@ -636,20 +635,17 @@ export const router = createBrowserRouter([
 
       {
         path: "purchase-return",
-        element: <PurchaseReturnList/>,
+        element: <PurchaseReturnList />,
       },
       {
         path: "purchase-order",
-        element: <PurchaseOrder/>,
+        element: <PurchaseOrder />,
       },
       {
         path: "purchase-return-add",
         element: <PurchaseReturn />,
       },
-      {
-        path: "purchase-history",
-        element: <PurchaseHistory />,
-      },
+
       {
         path: "stock",
         element: <StockPage />,

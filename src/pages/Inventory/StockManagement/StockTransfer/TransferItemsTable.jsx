@@ -32,6 +32,7 @@ export default function TransferItemsTable({
   formData,
   theme,
 }) {
+  console.log(transferItems)
   return (
     <TableContainer
       component={Paper}

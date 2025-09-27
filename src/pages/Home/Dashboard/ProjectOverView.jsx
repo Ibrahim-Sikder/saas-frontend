@@ -73,7 +73,7 @@ const ProjectOverView = () => {
                     : i == 4
                     ? `${`/dashboard/quotation-list`}`
                     : i == 5
-                    ? `${`/dashboard/invoice-view`}`
+                    ? `${`/dashboard/invoice-list`}`
                     : i == 2
                     ? `${`/dashboard/company-list`}`
                     : null

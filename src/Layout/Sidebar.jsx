@@ -284,7 +284,7 @@ const Sidebar = ({ toggle }) => {
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <FaFileInvoiceDollar className="mr-2" />
-                <NavLink to="/dashboard/invoice-view">Invoice List</NavLink>
+                <NavLink to="/dashboard/invoice-list">Invoice List</NavLink>
               </span>
             </Typography>
           </AccordionDetails>
@@ -529,14 +529,7 @@ const Sidebar = ({ toggle }) => {
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <HiOutlineClipboardList className="mr-2" />
-                <NavLink to="/dashboard/purchase-history">
-                  Purchase History{" "}
-                </NavLink>
-              </div>
-            </Typography>
+          
           </AccordionDetails>
         </Accordion>
         {/* Inventory */}

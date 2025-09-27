@@ -229,6 +229,7 @@ const SupplierBillPay = ({ supplier }) => {
         />
       </Grid>
 
+
       <PaymentModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

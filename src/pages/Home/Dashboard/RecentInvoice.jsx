@@ -25,7 +25,7 @@ const RecentInvoice = () => {
       <div className="recentCard overflow-x-auto ">
         <div className="flex items-center justify-between">
           <h3 className="m-3 text-xl block font-semibold">Recent Invoice </h3>
-          <Link to="/dashboard/invoice-view">
+          <Link to="/dashboard/invoice-list">
             <button className=" flex items-center mr-2  rounded-full px-3 py-1 bg-[#DDDDDD]">
               <small className="">See More</small>
               <HiOutlineArrowNarrowRight size={15} className="ml-1" />

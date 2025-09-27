@@ -97,15 +97,15 @@ const SuppliersTable = ({
             </TableHead>
             <TableBody>
               <TableRow key={supplier._id} hover>
-                <TableCell>{formatCurrency(supplier.totalDue)}</TableCell>
-                <TableCell>{formatCurrency(supplier.totalPaid)}</TableCell>
+                <TableCell>{formatCurrency(supplier?.purchasesSummary?.dueAmount)}</TableCell>
+                <TableCell>{formatCurrency(supplier?.purchasesSummary?.totalPaid)}</TableCell>
                 <TableCell>
                   <Typography
                     fontWeight="bold"
-                    color={getBalanceColor(supplier.balance)}
+                    color={getBalanceColor(supplier?.purchasesSummary?.balance)}
                   >
-                    {formatCurrency(Math.abs(supplier.balance))}
-                    {supplier.balance < 0 ? " (Overpayment)" : supplier.balance > 0 ? " (Due)" : ""}
+                    {formatCurrency(supplier?.purchasesSummary?.balance)}
+                    {supplier?.purchasesSummary?.balance < 0 ? " (Overpayment)" : supplier?.purchasesSummary?.balance > 0 ? " (Due)" : ""}
                   </Typography>
                 </TableCell>
                 <TableCell>
