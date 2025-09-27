@@ -79,7 +79,7 @@ const SupplierPurchase = ({ purchaseData }) => {
     useDeletePurchaseMutation();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
-  console.log(selectedOrderForAction)
+  console.log(selectedOrderForAction);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -118,9 +118,6 @@ const SupplierPurchase = ({ purchaseData }) => {
     setAnchorEl(null);
   };
 
-
-
-
   const handleDeleteOrder = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -135,7 +132,10 @@ const SupplierPurchase = ({ purchaseData }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deletePurchase({ tenantDomain, id: selectedOrderForAction._id }).unwrap();
+          await deletePurchase({
+            tenantDomain,
+            id: selectedOrderForAction._id,
+          }).unwrap();
           Swal.fire({
             title: "Deleted!",
             text: "The purchase has been deleted successfully.",
@@ -327,7 +327,7 @@ const SupplierPurchase = ({ purchaseData }) => {
             }}
             onClick={handleOpen}
           >
-            Create Order
+            Create New Purchase
           </Button>
         </Box>
       </Box>
@@ -402,7 +402,9 @@ const SupplierPurchase = ({ purchaseData }) => {
                   <Tooltip title="Edit Order">
                     <AnimatedIconButton
                       size="small"
-                      onClick={() => navigate(`/dashboard/update-purchase?id=${order._id}`)}
+                      onClick={() =>
+                        navigate(`/dashboard/update-purchase?id=${order._id}`)
+                      }
                     >
                       <Edit fontSize="small" />
                     </AnimatedIconButton>
@@ -432,9 +434,7 @@ const SupplierPurchase = ({ purchaseData }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>
-          {dialogAction === "view" && "Order Details"}
-        </DialogTitle>
+        <DialogTitle>{dialogAction === "view" && "Order Details"}</DialogTitle>
         <DialogContent>
           {selectedOrder && (
             <Box sx={{ mt: 2 }}>
@@ -553,5 +553,6 @@ const SupplierPurchase = ({ purchaseData }) => {
     </GlassCard>
   );
 };
+
 
 export default SupplierPurchase;

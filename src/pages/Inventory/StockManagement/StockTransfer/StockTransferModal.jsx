@@ -18,9 +18,10 @@ import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 import { useGetAllStocksQuery } from "../../../../redux/api/stocksApi";
 import { useGetAllWarehousesQuery } from "../../../../redux/api/warehouseApi";
 import { useCreateStockTransferMutation } from "../../../../redux/api/stocktransferApi";
-import toast from "react-hot-toast";
+
 import StockTransferForm from "./StockTransferForm";
-import useStockTransfer from "./useStockTransfer";
+import useStockTransfer from "../../../../hooks/useStockTransfer";
+
 
  function StockTransferModal({
   open,
