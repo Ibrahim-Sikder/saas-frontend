@@ -47,13 +47,14 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { alpha } from "@mui/material/styles";
-import StockTransferModal from "./StockManagement/StockTransferModal";
+
 import {
   useDeleteStockTransferMutation,
   useGetAllStockTransfersQuery,
 } from "../../redux/api/stocktransferApi";
 import Swal from "sweetalert2";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
+import StockTransferModal from "./StockManagement/StockTransfer/StockTransferModal";
 
 const employees = [
   "John Smith",
@@ -804,3 +805,4 @@ const tenantDomain = useTenantDomain();
     </Box>
   );
 }
+
