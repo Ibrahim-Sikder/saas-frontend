@@ -18,6 +18,7 @@ import VehicleInfoSection from "./VehicleInfoSection";
 import JobCardCompanyForm from "./JobCardCompanyForm";
 import JobCardTable from "./JobCardTable";
 
+
 const AddJobCard = () => {
   const tenantDomain = useTenantDomain();
   const location = useLocation();
