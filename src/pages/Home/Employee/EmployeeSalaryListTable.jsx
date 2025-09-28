@@ -86,7 +86,6 @@ const EnhancedEmployeeSalaryListTable = ({ tenantDomain }) => {
   const currentYear = currentDate.getFullYear();
   const [deleteSalary] = useDeleteSalaryMutation();
 
-  // Build filter parameters for API call
   const buildFilterParams = () => {
     const params = {};
 
@@ -94,7 +93,6 @@ const EnhancedEmployeeSalaryListTable = ({ tenantDomain }) => {
     if (filterYear) params.year = filterYear;
     if (filterDay) {
       params.day = filterDay.getDate();
-      // Also include month and year if day is selected to ensure accurate filtering
       if (!filterMonth)
         params.month = filterDay.toLocaleString("default", { month: "long" });
       if (!filterYear) params.year = filterDay.getFullYear().toString();
@@ -239,7 +237,7 @@ const EnhancedEmployeeSalaryListTable = ({ tenantDomain }) => {
 
     if (result.isConfirmed) {
       try {
-        await deleteSalary(id).unwrap();
+        await deleteSalary({ id, tenantDomain }).unwrap();
         await Swal.fire(
           "Deleted!",
           "Salary record has been deleted.",
