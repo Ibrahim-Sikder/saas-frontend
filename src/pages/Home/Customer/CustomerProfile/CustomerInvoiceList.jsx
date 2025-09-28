@@ -198,7 +198,7 @@ const CustomerInvoiceList = ({
                             >
                               <div
                                 onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2 cursor-pointer"
+                                className="flex flex-col items-center edit2 cursor-pointer"
                                 role="button"
                                 tabIndex={0}
                                 onKeyDown={(e) => {
@@ -218,7 +218,7 @@ const CustomerInvoiceList = ({
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/invoices/invoice/${
@@ -236,7 +236,7 @@ const CustomerInvoiceList = ({
 
                           <td>
                             <Tooltip title="Edit Invoice" arrow placement="top">
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center edit">
                                 <Link
                                   to={{
                                     pathname: `/dashboard/update-invoice`,

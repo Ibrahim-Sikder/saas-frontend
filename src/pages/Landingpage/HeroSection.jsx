@@ -73,7 +73,7 @@ export const HeroSection = () => {
         />
       </motion.div>
 
-      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2, mt: {lg:10} }}>
         <Grid container spacing={8} alignItems="center">
           <Grid item xs={12} md={6}>
             <motion.div
@@ -96,7 +96,7 @@ export const HeroSection = () => {
                         "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
                       color: "#ffffff",
                       fontWeight: 700,
-                      px: 3,
+                      px: {lg:3},
                       py: 1,
                       fontSize: "0.9rem",
                       boxShadow: `0 8px 25px rgba(6, 182, 212, 0.3)`,
@@ -107,10 +107,12 @@ export const HeroSection = () => {
 
               <Typography
                 variant="h1"
+                className="text-center lg:text-left"
                 sx={{
                   fontWeight: 900,
                   fontSize: { xs: "3rem", md: "5rem" },
                   lineHeight: 0.9,
+
                   mb: 4,
                   background:
                     "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
@@ -175,11 +177,13 @@ export const HeroSection = () => {
                     size="large"
                     startIcon={<Rocket />}
                     sx={{
+                      width: {lg:380},
+                      borderWidth: 3,
                       background:
                         "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
-                      px: 6,
-                      py: 3,
-                      fontSize: "1.2rem",
+                      px: {lg:5},
+                      py: {lg:3},
+                      fontSize: {lg:"1.2rem"},
                       fontWeight: 700,
                       borderRadius: 4,
                       boxShadow: `0 15px 50px rgba(6, 182, 212, 0.4)`,
@@ -192,7 +196,7 @@ export const HeroSection = () => {
                       },
                     }}
                   >
-                    🚀 START FREE 30-DAY TRIAL
+                    START FREE 30-DAY TRIAL
                   </Button>
                 </motion.div>
 
@@ -204,12 +208,15 @@ export const HeroSection = () => {
                     variant="outlined"
                     size="large"
                     startIcon={<PlayArrow />}
+                    // className="flex"
                     sx={{
+                      width: 250,
+                      display: "flex",
                       borderWidth: 3,
                       borderColor: "#06b6d4",
                       color: "#06b6d4",
-                      px: 6,
-                      py: 3,
+                      px: 5,
+                      py: 2.8,
                       fontSize: "1.2rem",
                       fontWeight: 700,
                       borderRadius: 4,
@@ -220,7 +227,7 @@ export const HeroSection = () => {
                       },
                     }}
                   >
-                    🎬 Watch Demo
+                    Watch Demo
                   </Button>
                 </motion.div>
               </Stack>
@@ -230,6 +237,7 @@ export const HeroSection = () => {
                 spacing={6}
                 alignItems="center"
                 flexWrap="wrap"
+             
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Stack direction="row" spacing={0.5}>
@@ -266,7 +274,7 @@ export const HeroSection = () => {
             </motion.div>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} style={{marginTop:80}}>
             <motion.div
               initial={{ opacity: 0, scale: 0.8, rotateY: 20 }}
               animate={{ opacity: 1, scale: 1, rotateY: 0 }}
@@ -299,17 +307,20 @@ export const HeroSection = () => {
                     }}
                   >
                     <Box
-                      component="img"
-                      src="/placeholder.svg?height=600&width=800"
-                      alt="Garage Master Dashboard"
+                      // component="img"
+                      // src="/placeholder.svg?height=600&width=800"
+                      // alt="Garage Master Dashboard"
                       sx={{
                         width: "100%",
                         height: "auto",
                         display: "block",
                         filter: "brightness(1.1) contrast(1.1)",
                         color: "#fff",
+                        textAlign: "center",
                       }}
-                    />
+                    >
+                      Garage Master Dashboard
+                    </Box>
                   </Paper>
                 </motion.div>
 
@@ -326,7 +337,7 @@ export const HeroSection = () => {
                   }}
                   style={{
                     position: "absolute",
-                    top: "10%",
+                    top: "180%",
                     right: "-15%",
                     zIndex: 3,
                   }}
@@ -389,8 +400,8 @@ export const HeroSection = () => {
                   }}
                   style={{
                     position: "absolute",
-                    bottom: "15%",
-                    left: "-20%",
+                    bottom: "180%",
+                    left: {sm:"-80%", lg:"-20%"},
                     zIndex: 3,
                   }}
                 >

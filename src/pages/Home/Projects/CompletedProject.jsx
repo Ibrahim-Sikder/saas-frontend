@@ -208,7 +208,7 @@ const InvoiceTable = () => {
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/invoices/invoice/${
@@ -223,20 +223,22 @@ const InvoiceTable = () => {
                           </td>
 
                           <td>
+                            
                             <Tooltip title="Preview" arrow placement="top">
-                              <div
+                              <a
                                 onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2"
+                                // className="editIconWrap edit2"
+                                className="flex flex-col items-center"
                                 style={{ cursor: "pointer" }}
                               >
                                 <FaEye className="editIcon" />
-                              </div>
+                              </a>
                             </Tooltip>
                           </td>
 
                           <td>
                             <Tooltip title="Edit Invoice" arrow placement="top">
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center" >
                                 <Link
                                   to={`/dashboard/update-invoice?id=${card._id}`}
                                 >

@@ -178,14 +178,14 @@ const DuemoneyReceiptList = () => {
                     <td>
                       <div
                         onClick={() => handleIconPreview(card._id)}
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                       >
                         <FaEye className="editIcon" />
                       </div>
                     </td>
                     <td>
                       <a
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
                         }/money-receipts/money/${
@@ -200,7 +200,7 @@ const DuemoneyReceiptList = () => {
                       </a>
                     </td>
                     <td>
-                      <div className="editIconWrap edit">
+                      <div className="flex flex-col items-center edit">
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}`}
                         >

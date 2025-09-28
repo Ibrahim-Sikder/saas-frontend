@@ -1,17 +1,30 @@
 /* eslint-disable react/prop-types */
-"use client"
-import { Container, Typography, Box, Grid, Card, CardContent, alpha } from "@mui/material"
-import { ArrowForward } from "@mui/icons-material"
-import { motion } from "framer-motion"
+"use client";
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  alpha,
+} from "@mui/material";
+import { ArrowForward, TaskAlt } from "@mui/icons-material";
+import { motion } from "framer-motion";
 
 const WorkflowSection = ({ workflowSteps }) => {
   return (
     <Box id="workflow" sx={{ py: 15 }}>
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 12 }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             <Typography
               variant="h2"
+              // className="flex items-center justify-center"
               sx={{
                 fontWeight: 900,
                 mb: 4,
@@ -22,7 +35,31 @@ const WorkflowSection = ({ workflowSteps }) => {
                 fontSize: { xs: "2.5rem", md: "4rem" },
               }}
             >
-              🔄 Complete Workflow
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:"center",
+                  gap:2
+                }}
+              >
+                <Box
+                  sx={{
+                    background: `linear-gradient(135deg, #06b6d4, ${alpha(
+                      "#06b6d4",
+                      0.7
+                    )})`,
+                    borderRadius: 3,
+                    p: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <TaskAlt sx={{ fontSize: 32 }} />
+                </Box>
+                Complete Workflow
+              </Box>
               <Box component="span" sx={{ display: "block" }}>
                 From Customer to Payment
               </Box>
@@ -37,12 +74,13 @@ const WorkflowSection = ({ workflowSteps }) => {
                 fontWeight: 500,
               }}
             >
-              Our streamlined 9-step process ensures nothing falls through the cracks. Every step is automated, tracked,
-              and optimized for maximum efficiency.
+              Our streamlined 9-step process ensures nothing falls through the
+              cracks. Every step is automated, tracked, and optimized for
+              maximum efficiency.
             </Typography>
           </motion.div>
         </Box>
-        <Grid container spacing={4}>
+        <Grid container spacing={2}>
           {workflowSteps.map((step, index) => (
             <Grid item xs={12} md={6} lg={4} key={index}>
               <motion.div
@@ -81,7 +119,10 @@ const WorkflowSection = ({ workflowSteps }) => {
                       left: 0,
                       right: 0,
                       height: 4,
-                      background: `linear-gradient(90deg, #06b6d4, ${alpha("#06b6d4", 0.5)})`,
+                      background: `linear-gradient(90deg, #06b6d4, ${alpha(
+                        "#06b6d4",
+                        0.5
+                      )})`,
                       opacity: 0.7,
                       transition: "opacity 0.3s ease",
                     },
@@ -94,7 +135,10 @@ const WorkflowSection = ({ workflowSteps }) => {
                           width: 60,
                           height: 60,
                           borderRadius: "50%",
-                          background: `linear-gradient(135deg, #06b6d4, ${alpha("#06b6d4", 0.7)})`,
+                          background: `linear-gradient(135deg, #06b6d4, ${alpha(
+                            "#06b6d4",
+                            0.7
+                          )})`,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -102,7 +146,11 @@ const WorkflowSection = ({ workflowSteps }) => {
                           boxShadow: `0 8px 25px ${alpha("#06b6d4", 0.3)}`,
                         }}
                       >
-                        <Typography variant="h5" fontWeight="bold" sx={{ color: "#ffffff" }}>
+                        <Typography
+                          variant="h5"
+                          fontWeight="bold"
+                          sx={{ color: "#ffffff" }}
+                        >
                           {step.step}
                         </Typography>
                       </Box>
@@ -119,7 +167,10 @@ const WorkflowSection = ({ workflowSteps }) => {
                       >
                         <Box
                           sx={{
-                            background: `linear-gradient(135deg, #06b6d4, ${alpha("#06b6d4", 0.7)})`,
+                            background: `linear-gradient(135deg, #06b6d4, ${alpha(
+                              "#06b6d4",
+                              0.7
+                            )})`,
                             borderRadius: 3,
                             p: 1.5,
                             display: "flex",
@@ -136,7 +187,10 @@ const WorkflowSection = ({ workflowSteps }) => {
                       fontWeight="bold"
                       gutterBottom
                       sx={{
-                        background: `linear-gradient(135deg, #06b6d4, ${alpha("#06b6d4", 0.7)})`,
+                        background: `linear-gradient(135deg, #06b6d4, ${alpha(
+                          "#06b6d4",
+                          0.7
+                        )})`,
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
@@ -194,7 +248,7 @@ const WorkflowSection = ({ workflowSteps }) => {
         </Grid>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default WorkflowSection
+export default WorkflowSection;

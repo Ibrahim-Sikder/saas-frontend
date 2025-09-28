@@ -16,18 +16,16 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <Providers>
-          <PrintProvider>
-            <ToastContainer />
-            <RouterProvider router={router} />
-           
-          </PrintProvider>
-        </Providers>
-        
-      </ThemeProvider>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <Providers>
+            <PrintProvider>
+              <ToastContainer />
+              <RouterProvider router={router} />
+            </PrintProvider>
+          </Providers>
+        </ThemeProvider>
+      </QueryClientProvider>
     </Provider>
   </React.StrictMode>
 );

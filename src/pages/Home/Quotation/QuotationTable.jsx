@@ -246,7 +246,7 @@ const QuotationTable = () => {
                                 placement="top"
                               >
                                 <a
-                                  className="editIconWrap edit2"
+                                  className="flex flex-col items-center edit2"
                                   href={`${
                                     import.meta.env.VITE_API_URL
                                   }/quotations/quotation/${
@@ -266,7 +266,7 @@ const QuotationTable = () => {
                               <Tooltip title="Preview" arrow placement="top">
                                 <div
                                   onClick={() => handleIconPreview(card._id)}
-                                  className="editIconWrap edit2"
+                                  className="flex flex-col items-center edit2"
                                   style={{ cursor: "pointer" }}
                                 >
                                   <FaEye className="editIcon" />
@@ -280,7 +280,7 @@ const QuotationTable = () => {
                                 arrow
                                 placement="top"
                               >
-                                <div className="editIconWrap edit">
+                                <div className="flex flex-col items-center edit">
                                   <Link
                                     to={`/dashboard/update-quotation?id=${card._id}`}
                                   >

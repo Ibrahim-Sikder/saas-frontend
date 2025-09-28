@@ -218,7 +218,7 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                           <td>
                             <Tooltip title="Create Invoice" arrow placement="top">
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
                                 rel="noreferrer"
                               >
@@ -234,7 +234,7 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
@@ -254,7 +254,7 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                               arrow
                               placement="top"
                             >
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center edit">
                                 <Link
                                   to={`/dashboard/update-quotation?id=${card._id}&user_type=${user_type}&user=${id}`}
                                 >

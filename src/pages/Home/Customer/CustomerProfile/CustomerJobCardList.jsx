@@ -198,7 +198,7 @@ const CustomerJobCardList = ({
 
                           <td>
                             <a
-                              className="editIconWrap edit2 group relative"
+                              className="flex flex-col items-center edit2 group relative"
                               href={`${
                                 import.meta.env.VITE_API_URL
                               }/jobCards/jobcard/${
@@ -217,7 +217,7 @@ const CustomerJobCardList = ({
                           </td>
 
                           <td>
-                            <div className="editIconWrap edit group relative">
+                            <div className="flex flex-col items-center edit group relative">
                               <Link
                                 to={`/dashboard/update-jobcard?id=${card._id}&user_type=${user_type}&user=${id}`}
                               >

@@ -215,7 +215,7 @@ const JobCardTable = () => {
     
                                 <td>
                                   <a
-                                    className="editIconWrap edit2"
+                                    className="flex flex-col items-center"
                                     href={`${
                                       import.meta.env.VITE_API_URL
                                     }/jobCards/jobcard/${
@@ -232,13 +232,13 @@ const JobCardTable = () => {
                                 <td>
                                   <div
                                     onClick={() => handleIconPreview(card._id)}
-                                    className="flex items-center justify-center cursor-pointer"
+                                    className="flex flex-col items-center justify-center cursor-pointer"
                                   >
                                     <FaEye className="h-[22px] w-[22px]" />
                                   </div>
                                 </td>
                                 <td>
-                                  <div className="editIconWrap edit">
+                                  <div className="flex flex-col items-center edit">
                                     <Link
                                       to={`/dashboard/update-jobcard?id=${card._id}`}
                                     >

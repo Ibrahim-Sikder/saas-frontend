@@ -168,14 +168,14 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                     <td>
                       <div
                         onClick={() => handleIconPreview(card._id)}
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                       >
                         <FaEye className="editIcon" />
                       </div>
                     </td>
                     <td>
                       <a
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
                         }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
@@ -189,7 +189,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                     </td>
 
                     <td>
-                      <div className="editIconWrap edit">
+                      <div className="flex flex-col items-center edit">
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}&user_type=${user_type}&user=${id}`}
                         >
