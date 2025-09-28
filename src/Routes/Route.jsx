@@ -96,11 +96,7 @@ import AddPaybill from "../pages/BillPay/AddPaybill";
 import BillPayList from "../pages/BillPay/BillPayList";
 import BillPayHistory from "../pages/BillPay/BillPayHistory";
 import UpdateEmployeeSalary from "../pages/Home/Employee/UpdateEmployeeSalary";
-import Signup from "../pages/Signup/Signup";
-import RegisterPage from "../pages/Login/Register";
-import TenantRegistrationPage from "../pages/Login/TenantRegister";
-import SubscriptionPage from "../pages/Login/Subscription";
-import PricingPage from "../pages/Login/PricingPage";
+
 import InventoryDashboard from "../pages/Inventory/InventoryDashboard";
 import ExpiredProduct from "../pages/Inventory/ExpiredProduct";
 import LowStock from "../pages/Inventory/LowStock";
@@ -121,7 +117,6 @@ import AddAdjustment from "../pages/Inventory/Adjustment/AddAdjustment";
 import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import CreateTenant from "../pages/Tenant/CreateTenant";
 import LandingPage from "../pages/Login/LandingPage";
-import SubscriptionManagement from "../pages/Subscription/Subscription";
 import Login from "../pages/Login/Login";
 import AdminUserListPage from "../pages/Home/Profile/AllUserList";
 import UserProfilePage from "../pages/Home/Profile/Profile";
@@ -148,10 +143,7 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
-      {
-        path: "signup",
-        element: <Signup />,
-      },
+
       {
         path: "login",
         element: <Login />,
@@ -160,27 +152,10 @@ export const router = createBrowserRouter([
         path: "create-tenant",
         element: <CreateTenant />,
       },
-      {
-        path: "register",
-        element: <RegisterPage />,
-      },
-      {
-        path: "tenant",
-        element: <TenantRegistrationPage />,
-      },
 
-      {
-        path: "subscription",
-        element: <SubscriptionManagement />,
-      },
-      {
-        path: "subscription",
-        element: <SubscriptionPage />,
-      },
-      {
-        path: "pricing",
-        element: <PricingPage />,
-      },
+
+  
+
     ],
   },
   {
