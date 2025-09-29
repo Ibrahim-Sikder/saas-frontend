@@ -117,10 +117,10 @@ const InvoiceTable = () => {
                   <thead>
                     <tr>
                       <th>SL No</th>
-                      <th>Order Number</th>
+                      <th>Order No.</th>
                       <th>Customer Name</th>
                       <th>Car Reg No</th>
-                      <th>Mobile Number</th>
+                      <th>Mobile No.</th>
                       <th>Vehicle Brand</th>
                       <th>Vehicle Name</th>
                       <th>Date</th>
@@ -212,7 +212,7 @@ const InvoiceTable = () => {
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <FaDownload className="editIcon" />
+                                <FaDownload className="editIcon text-green-500" />
                               </a>
                             </Tooltip>
                           </td>
@@ -235,7 +235,7 @@ const InvoiceTable = () => {
                                 <Link
                                   to={`/dashboard/update-invoice?id=${card._id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </Tooltip>

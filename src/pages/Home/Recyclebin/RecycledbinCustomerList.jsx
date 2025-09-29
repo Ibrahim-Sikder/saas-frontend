@@ -195,8 +195,8 @@ const tenantDomain = useTenantDomain();
                         <th>Customer ID </th>
                         <th>Customer Name</th>
                         <th>Veichle User Name</th>
-                        <th>Car Number </th>
-                        <th>Mobile Number</th>
+                        <th>Car No. </th>
+                        <th>Mobile No.</th>
                         <th>Vehicle Name </th>
                         <th colSpan={3}>Action</th>
                       </tr>
@@ -214,7 +214,7 @@ const tenantDomain = useTenantDomain();
                           (customerData?.data?.meta?.currentPage - 1) * limit +
                           (index + 1);
                         return (
-                          <tr key={card?._id}>
+                          <tr key={card?._id} >
                             <td>{globalIndex}</td>
                             <td>{card?.customerId}</td>
                             <td>{card?.customer_name}</td>
@@ -238,7 +238,7 @@ const tenantDomain = useTenantDomain();
                                 <Link
                                   to={`/dashboard/update-customer?id=${card?._id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </td>
@@ -247,7 +247,7 @@ const tenantDomain = useTenantDomain();
                                 onClick={() => handleDeleteOrRestore(card?._id)}
                                 className="editIconWrap"
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </div>
                             </td>
                           </tr>

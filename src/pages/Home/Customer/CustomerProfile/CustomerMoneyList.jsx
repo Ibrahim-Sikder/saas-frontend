@@ -184,7 +184,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <FaDownload className="editIcon" />
+                        <FaDownload className="editIcon text-green-500" />
                       </a>
                     </td>
 
@@ -193,7 +193,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}&user_type=${user_type}&user=${id}`}
                         >
-                          <FaEdit className="editIcon" />
+                          <FaEdit className="editIcon text-blue-500" /> 
                         </Link>
                       </div>
                     </td>
@@ -203,7 +203,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
                       >
-                        <FaTrashAlt className="deleteIcon" />
+                        <FaTrashAlt className="deleteIcon text-red-500" />
                       </button>
                     </td>
                   </tr>

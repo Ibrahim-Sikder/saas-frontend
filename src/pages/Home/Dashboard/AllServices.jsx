@@ -28,6 +28,10 @@ const AllServices = ({ showSensitiveData }) => {
 
   if (isLoading) return <Loading />;
 
+
+const card ="flex flex-col md:flex-row items-center justify-center content-center gap-x-2 mt-3 md:mt-8 space-y-2 "
+  const amount = "text-center text-[32px] font-bold " 
+
   return (
     <div className="dashBoardRight mt-5 lg:mt-0 ">
       {/* Always visible cards */}
@@ -35,12 +39,12 @@ const AllServices = ({ showSensitiveData }) => {
         {/* Completed Services */}
         <div className="invoice-card">
           <Link to="/dashboard/complete-project">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap">
                 <HiOutlineBriefcase className="dashboardCardIcon" />
               </div>
-              <div className="invoice-info">
-                <h2 className="amount">
+              <div className="invoice-info ">
+                <h2 className={amount}>
                   {allMetaData?.data?.statusSummary?.completed}
                 </h2>
                 <p className="label">Completed Services</p>
@@ -52,12 +56,12 @@ const AllServices = ({ showSensitiveData }) => {
         {/* Running Services */}
         <div className="invoice-card">
           <Link to="/dashboard/running-project">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap2 ">
                 <FaWrench className="dashboardCardIcon" />
               </div>
               <div className="invoice-info">
-                <h2 className="amount">
+                <h2 className={amount}>
                   {allMetaData?.data?.statusSummary?.running}
                 </h2>
                 <p className="label">Running Services</p>
@@ -68,12 +72,12 @@ const AllServices = ({ showSensitiveData }) => {
 
         {/* Total Product (always visible) */}
         <div className="invoice-card">
-          <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+          <div className={card}>
             <div className="dashboardCardIconWrap4">
               <FaCarSide className="dashboardCardIcon" />
             </div>
             <div className="invoice-info">
-              <h2 className="amount">000</h2>
+              <h2 className={amount}>000</h2>
               <p className="label">Total Product</p>
             </div>
           </div>
@@ -82,12 +86,12 @@ const AllServices = ({ showSensitiveData }) => {
         {/* All Customers (always visible) */}
         <div className="invoice-card invoice-card2">
           <Link to="/dashboard/all-customer">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap7">
                 <FaUsers className="dashboardCardIcon" />
               </div>
               <div className="invoice-info">
-                <h2 className="amount">
+                <h2 className={amount}>
                   {allMetaData?.data?.totalCustomers +
                     allMetaData?.data?.totalShowRooms +
                     allMetaData?.data?.totalCompanies}
@@ -104,12 +108,12 @@ const AllServices = ({ showSensitiveData }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 place-content-center gap-3 lg:gap-3 xl:gap-7 mb-5">
           {/* Total Sale */}
           <div className="invoice-card">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap3">
                 <FaPercent className="dashboardCardIcon" />
               </div>
               <div className="invoice-info">
-                <h2 className="amount">000</h2>
+                <h2 className={amount}>000</h2>
                 <p className="label">Total Sale</p>
               </div>
             </div>
@@ -117,12 +121,12 @@ const AllServices = ({ showSensitiveData }) => {
 
           {/* Total Amount */}
           <div className="invoice-card invoice-card2">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap">
                 <AssuredWorkload className="dashboardCardIcon" />
               </div>
               <div className="invoice-info">
-                <h2 className="amount">{allMetaData?.data?.totalAmount} ৳</h2>
+                <h2 className={amount}>{allMetaData?.data?.totalAmount} ৳</h2>
                 <p className="label">Total Amount</p>
               </div>
             </div>
@@ -130,12 +134,12 @@ const AllServices = ({ showSensitiveData }) => {
 
           {/* Paid Services Bill */}
           <div className="invoice-card invoice-card2">
-            <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+            <div className={card}>
               <div className="dashboardCardIconWrap5">
                 <FaFileInvoice className="dashboardCardIcon" />
               </div>
               <div className="invoice-info">
-                <h2 className="amount">{allMetaData?.data?.totalAdvance} ৳</h2>
+                <h2 className={amount}>{allMetaData?.data?.totalAdvance} ৳</h2>
                 <p className="label">Paid Services Bill</p>
               </div>
             </div>
@@ -144,12 +148,12 @@ const AllServices = ({ showSensitiveData }) => {
           {/* Due Service Bill */}
           <div className="invoice-card invoice-card2">
             <Link to="/dashboard/money-receipt-due">
-              <div className="flex gap-x-3 mt-8 ietms-center justify-center ">
+              <div className={card}>
                 <div className="dashboardCardIconWrap6">
                   <FaFileInvoiceDollar className="dashboardCardIcon" />
                 </div>
                 <div className="invoice-info">
-                  <h2 className="amount">
+                  <h2 className={amount}>
                     {allMetaData?.data?.totalRemaining} ৳
                   </h2>
                   <p className="label">Due Service Bill</p>

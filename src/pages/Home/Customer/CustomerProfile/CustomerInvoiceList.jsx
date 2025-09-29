@@ -125,10 +125,10 @@ const CustomerInvoiceList = ({
                   <thead>
                     <tr>
                       <th>SL No </th>
-                      <th>Order Number </th>
+                      <th>Order No. </th>
                       <th>Customer Name</th>
-                      <th>Car Number </th>
-                      <th>Mobile Number</th>
+                      <th>Car No. </th>
+                      <th>Mobile No.</th>
                       <th>Date</th>
                       <th colSpan={5}>Action</th>
                     </tr>
@@ -229,7 +229,7 @@ const CustomerInvoiceList = ({
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <FaDownload className="editIcon" />
+                                <FaDownload className="editIcon text-green-500" />
                               </a>
                             </Tooltip>
                           </td>
@@ -244,7 +244,7 @@ const CustomerInvoiceList = ({
                                     state: { redirectTo: "customer-profile" },
                                   }}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </Tooltip>
@@ -272,7 +272,7 @@ const CustomerInvoiceList = ({
                                 }}
                                 aria-label="Move to Recycle Bin"
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </button>
                             </Tooltip>
                           </td>

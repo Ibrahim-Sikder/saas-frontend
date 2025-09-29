@@ -196,7 +196,7 @@ const DuemoneyReceiptList = () => {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <FaDownload className="editIcon" />
+                        <FaDownload className="editIcon text-green-500" />
                       </a>
                     </td>
                     <td>
@@ -204,7 +204,7 @@ const DuemoneyReceiptList = () => {
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}`}
                         >
-                          <FaEdit className="editIcon" />
+                          <FaEdit className="editIcon text-blue-500" /> 
                         </Link>
                       </div>
                     </td>
@@ -214,7 +214,7 @@ const DuemoneyReceiptList = () => {
                         onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
                       >
-                        <FaTrashAlt className="deleteIcon" />
+                        <FaTrashAlt className="deleteIcon text-red-500" />
                       </button>
                     </td>
                   </tr>

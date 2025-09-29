@@ -35,7 +35,7 @@ const Home = () => {
   }
 
   return (
-    <div className="xl:mt-10 ">
+    <div className="mt-5 xl:mt-10 ">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="md:text-3xl font-bold">Welcome Admin !</h3>

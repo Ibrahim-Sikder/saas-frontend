@@ -181,7 +181,7 @@ const MoneyReceiptTable = () => {
                       rel="noreferrer"
                     >
                       
-                      <FaDownload className="editIcon" />
+                      <FaDownload className="editIcon text-green-500" />
                     </a>
                   </td>
                   <td>
@@ -189,7 +189,7 @@ const MoneyReceiptTable = () => {
                       <Link
                         to={`/dashboard/money-receipt-update?id=${card._id}`}
                       >
-                        <FaEdit className="editIcon" />
+                        <FaEdit className="editIcon text-blue-500" /> 
                       </Link>
                     </div>
                   </td>
@@ -199,7 +199,7 @@ const MoneyReceiptTable = () => {
                       onClick={() => handleMoveRecycledbin(card._id)}
                       className="editIconWrap"
                     >
-                      <FaTrashAlt className="deleteIcon" />
+                      <FaTrashAlt className="deleteIcon text-red-500" />
                     </button>
                   </td>
                 </tr>

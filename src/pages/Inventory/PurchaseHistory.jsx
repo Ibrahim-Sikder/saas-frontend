@@ -466,7 +466,7 @@ const tenantDomain = useTenantDomain();
               </Avatar>
               <Box sx={{ ml: 2 }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                  $ {totalAmount.toLocaleString()}
+                  ৳ {totalAmount.toLocaleString()}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "medium" }}>
                   Total Amount
@@ -684,13 +684,13 @@ const tenantDomain = useTenantDomain();
                         </Avatar>
                         <span>{purchase.suppliers?.full_name || "Unknown Supplier"}</span>
                       </TableCell>
-                      <TableCell>$ {purchase.grandTotal?.toLocaleString() || 0}</TableCell>
+                      <TableCell>৳ {purchase.grandTotal?.toLocaleString() || 0}</TableCell>
                       <TableCell>
-                        <span className="print-status">{purchase.purchasStatus || "Unknown"}</span>
+                        {/* <span className="print-status">{purchase.purchasStatus || "Unknown"}</span> */}
                         <span className="no-print">{getStatusChip(purchase.purchasStatus)}</span>
                       </TableCell>
                       <TableCell>
-                        <span className="print-payment">{purchase.paymentMethod || "Unknown"}</span>
+                        {/* <span className="print-payment">{purchase.paymentMethod || "Unknown"}</span> */}
                         <span className="no-print">
                           <Chip
                             label={purchase.paymentMethod || "Unknown"}
