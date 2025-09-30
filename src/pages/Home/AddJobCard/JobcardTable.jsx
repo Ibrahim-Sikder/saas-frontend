@@ -192,7 +192,7 @@ const JobCardTable = () => {
                                 <td className="text-center">
                                   <Link
                                     to={`/dashboard/qutation?order_no=${card?.job_no}`}
-                                    className="inline-flex flex justify-center items-center space-x-2 text-purple-600 hover:text-purple-800 transition-colors group"
+                                    className="flex justify-center items-center space-x-2 text-purple-600 hover:text-purple-800 transition-colors group"
                                   >
                                     <span className="relative inline-block">
                                       <svg
