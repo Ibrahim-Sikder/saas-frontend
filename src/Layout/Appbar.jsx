@@ -38,7 +38,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
       <div className="w-full h-16 xl:h-16 bg-[#42A1DA] fixed z-10 ">
         <div className="flex items-center justify-between lg:pr-8 pl-10 lg:pl-20 mt-3 md:mt-2 lg:mt-3">
           <div
-            className={`${toggle ? `activeToggle` : `navActive`}`}
+            className={`${toggle ? `activeToggle ` : `navActive`}`}
             ref={navRef}
             onClick={toggleSideBar}
           >
