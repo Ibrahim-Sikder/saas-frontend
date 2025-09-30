@@ -125,16 +125,16 @@ const JobCardTable = () => {
                     <section className="tableContainer">
                       <table className="customTable">
                         <thead>
-                          <tr>
-                            <th>SL No</th>
+                          <tr className="text-[15px]">
+                            <th>SL. N.</th>
                             <th>User Id</th>
-                            <th>Order Number </th>
-                            <th>Chassis No </th>
+                            <th>Order No. </th>
+                            <th>Chassis No. </th>
                             <th>User type</th>
                             <th>Vehicle Name</th>
-                            <th>Car Reg Num </th>
-                            <th>Vehicle Brand</th>
-                            <th>Mobile Number</th>
+                            <th>Car Reg No. </th>
+                            <th>V. Brand</th>
+                            <th>Mobile No.</th>
                             <th>Date</th>
                             <th colSpan={5}>Action</th>
                           </tr>
@@ -149,50 +149,50 @@ const JobCardTable = () => {
                                 key={card?._id}
                                 className="transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-100 hover:text-black"
                               >
-                                <td>{globalIndex}</td>
-                                <td>{card?.Id}</td>
-                                <td>{card?.job_no}</td>
-                                <td>
+                                <td style={{fontSize:15}}>{globalIndex}</td>
+                                <td style={{fontSize:15}}>{card?.Id}</td>
+                                <td style={{fontSize:15}}>{card?.job_no}</td>
+                                <td style={{fontSize:15}}>
                                   {card?.vehicle?.map((vehicle, idx) => (
                                     <span key={idx}>{vehicle?.chassis_no}</span>
                                   ))}
                                 </td>
-                                <td>{card?.user_type}</td>
-                                <td>
+                                <td style={{fontSize:15}}>{card?.user_type}</td>
+                                <td style={{fontSize:15}}>
                                   {card?.vehicle?.map((vehicle, idx) => (
                                     <span key={idx}>{vehicle?.vehicle_name}</span>
                                   ))}
                                 </td>
     
-                                <td>
+                                <td style={{fontSize:15}}>
                                   {card?.vehicle?.map((vehicle, idx) => (
                                     <span
                                       key={idx}
                                     >{`${vehicle?.carReg_no} ${vehicle?.car_registration_no}`}</span>
                                   ))}
                                 </td>
-                                <td>
+                                <td style={{fontSize:15}}>
                                   {card?.vehicle?.map((vehicle, idx) => (
                                     <span key={idx}>{vehicle?.vehicle_brand}</span>
                                   ))}
                                 </td>
     
                                 {card?.customer && (
-                                  <td>{card?.customer?.fullCustomerNum}</td>
+                                  <td style={{fontSize:15}}>{card?.customer?.fullCustomerNum}</td>
                                 )}
                                 {card?.company && (
-                                  <td>{card?.company?.fullCompanyNum}</td>
+                                  <td style={{fontSize:15}}>{card?.company?.fullCompanyNum}</td>
                                 )}
                                 {card?.showRoom && (
-                                  <td>{card?.showRoom?.fullCompanyNum}</td>
+                                  <td style={{fontSize:15}}>{card?.showRoom?.fullCompanyNum}</td>
                                 )}
     
-                                <td>{card?.date}</td>
+                                <td style={{fontSize:15}}>{card?.date}</td>
     
                                 <td className="text-center">
                                   <Link
                                     to={`/dashboard/qutation?order_no=${card?.job_no}`}
-                                    className="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-800 transition-colors group"
+                                    className="inline-flex flex justify-center items-center space-x-2 text-purple-600 hover:text-purple-800 transition-colors group"
                                   >
                                     <span className="relative inline-block">
                                       <svg
@@ -215,7 +215,7 @@ const JobCardTable = () => {
     
                                 <td>
                                   <a
-                                    className="editIconWrap edit2"
+                                    className="flex flex-col items-center"
                                     href={`${
                                       import.meta.env.VITE_API_URL
                                     }/jobCards/jobcard/${
@@ -226,23 +226,23 @@ const JobCardTable = () => {
                                     target="_blank"
                                     rel="noreferrer"
                                   >
-                                    <FaDownload className="editIcon" />
+                                    <FaDownload className="editIcon text-green-500" />
                                   </a>
                                 </td>
                                 <td>
                                   <div
                                     onClick={() => handleIconPreview(card._id)}
-                                    className="flex items-center justify-center cursor-pointer"
+                                    className="flex flex-col items-center justify-center cursor-pointer"
                                   >
                                     <FaEye className="h-[22px] w-[22px]" />
                                   </div>
                                 </td>
                                 <td>
-                                  <div className="editIconWrap edit">
+                                  <div className="flex flex-col items-center edit">
                                     <Link
                                       to={`/dashboard/update-jobcard?id=${card._id}`}
                                     >
-                                      <FaEdit className="editIcon" />
+                                      <FaEdit className="editIcon text-blue-500" />
                                     </Link>
                                   </div>
                                 </td>
@@ -252,7 +252,7 @@ const JobCardTable = () => {
                                     onClick={() => handleMoveToRecycled(card?._id)}
                                     className="editIconWrap"
                                   >
-                                    <FaTrashAlt className="deleteIcon" />
+                                    <FaTrashAlt className="deleteIcon text-red-500" />
                                   </button>
                                 </td>
                               </tr>

@@ -161,7 +161,7 @@ export const router = createBrowserRouter([
       // <PrivateRoute>
       //   <DashboardLayout />
       // </PrivateRoute>
-      <DashboardLayout />
+      <DashboardLayout /> 
     ),
     children: [
       {

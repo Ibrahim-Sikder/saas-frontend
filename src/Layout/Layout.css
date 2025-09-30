@@ -112,7 +112,7 @@
 .dashboardAccordion {
 	background: #2c3136 !important;
 	color: #fff !important;
-	transition: all 500s ease-in-out;
+	transition: all 500s ease-in-out; 
 }
 
 .dashboardAccordion:hover {
@@ -442,9 +442,7 @@
 
 	.activeToggle {
 		left: 11px;
-
 	}
-
 
 	.activeDrawer {
 		width: 100%;

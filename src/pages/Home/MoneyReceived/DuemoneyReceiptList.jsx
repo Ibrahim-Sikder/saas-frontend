@@ -178,14 +178,14 @@ const DuemoneyReceiptList = () => {
                     <td>
                       <div
                         onClick={() => handleIconPreview(card._id)}
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                       >
                         <FaEye className="editIcon" />
                       </div>
                     </td>
                     <td>
                       <a
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
                         }/money-receipts/money/${
@@ -196,15 +196,15 @@ const DuemoneyReceiptList = () => {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <FaDownload className="editIcon" />
+                        <FaDownload className="editIcon text-green-500" />
                       </a>
                     </td>
                     <td>
-                      <div className="editIconWrap edit">
+                      <div className="flex flex-col items-center edit">
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}`}
                         >
-                          <FaEdit className="editIcon" />
+                          <FaEdit className="editIcon text-blue-500" /> 
                         </Link>
                       </div>
                     </td>
@@ -214,7 +214,7 @@ const DuemoneyReceiptList = () => {
                         onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
                       >
-                        <FaTrashAlt className="deleteIcon" />
+                        <FaTrashAlt className="deleteIcon text-red-500" />
                       </button>
                     </td>
                   </tr>

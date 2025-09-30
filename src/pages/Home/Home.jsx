@@ -18,8 +18,9 @@ import {
 } from "../../redux/api/meta.api";
 import DashboardSummary from "./Dashboard/IncomeCard";
 import Loading from "../../components/Loading/Loading";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Home = () => {
+const Home = () => { 
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const tenantDomain = useTenantDomain();
   const {
@@ -34,7 +35,7 @@ const Home = () => {
   }
 
   return (
-    <div className="mt-10 ">
+    <div className="mt-5 xl:mt-10 ">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="md:text-3xl font-bold">Welcome Admin !</h3>
@@ -45,17 +46,26 @@ const Home = () => {
           onClick={() => setShowSensitiveData(!showSensitiveData)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          {showSensitiveData ? "Hide Sensitive Data" : "Show Sensitive Data"}
+          {showSensitiveData ? <><VisibilityOff/> Hide</>  : <><Visibility/> Show</>}
         </button>
       </div>
 
       {/* Conditionally render sensitive sections */}
+      <AllServices showSensitiveData={showSensitiveData} />
+
       {showSensitiveData && (
+        <DashboardSummary
+          data={allMetaData?.data}
+          accountSummary={accountSummary}
+        />
+      )}
+
+      {/* {showSensitiveData && (
         <>
           <AllServices />
           <DashboardSummary data={allMetaData?.data} accountSummary={accountSummary}/>
         </>
-      )}
+      )} */}
 
       <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />
