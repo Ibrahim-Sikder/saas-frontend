@@ -1,3 +1,4 @@
+// StockTransferPage.js
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 "use client";
@@ -35,7 +36,6 @@ import {
   TextField,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import SearchIcon from "@mui/icons-material/Search";
@@ -47,13 +47,14 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { alpha } from "@mui/material/styles";
-import StockTransferModal from "./StockManagement/StockTransferModal";
+
 import {
   useDeleteStockTransferMutation,
   useGetAllStockTransfersQuery,
 } from "../../redux/api/stocktransferApi";
 import Swal from "sweetalert2";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
+import StockTransferModal from "./StockManagement/StockTransfer/StockTransferModal";
 
 const employees = [
   "John Smith",
@@ -72,16 +73,19 @@ export default function StockTransferPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-const tenantDomain = useTenantDomain();
+  const tenantDomain = useTenantDomain();
+
   const queryParams = {
     tenantDomain,
     page: currentPage,
     limit: 100,
     searchTerm: searchTerm,
   };
+  
   const { data: stockTransferData, refetch } =
     useGetAllStockTransfersQuery(queryParams);
   const [deleteStockTransfer] = useDeleteStockTransferMutation();
+  
   // Get transfers from API data
   const transfers = stockTransferData?.data || [];
 
@@ -120,8 +124,10 @@ const tenantDomain = useTenantDomain();
     }
   };
 
-  const handleSubmit = (formData, transferItems) => {
-    handleClose();
+  // Update the handleSubmit function to properly handle the result
+  const handleSubmit = (data) => {
+    // The modal is already closed by the modal component
+    // Just refresh the data
     refetch(); // Refresh data after adding new transfer
   };
 

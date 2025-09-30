@@ -1,4 +1,4 @@
-import Purchasform from "./Purchasform";
+import PurChaseForm from "./PurChaseForm";
 
 const UpdatePurchase = () => {
   return (
@@ -9,7 +9,7 @@ const UpdatePurchase = () => {
       </div>
       <div className="  bg-[#F7F7F7] p-8 mt-5 ">
         <div className=" gap-x-8 bg-[#FFFFFF] p-8 rounded-md ">
-          <Purchasform />
+          <PurChaseForm />
         </div>
       </div>
     </div>

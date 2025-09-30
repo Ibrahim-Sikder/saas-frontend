@@ -654,7 +654,7 @@ const Invoice = () => {
           );
           setGoOtherButton("");
         } else {
-          navigate("/dashboard/invoice-view");
+          navigate("/dashboard/invoice-list");
           setGoOtherButton("");
         }
       }

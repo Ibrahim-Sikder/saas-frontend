@@ -50,7 +50,10 @@ export const paymentMethods = [
   "Rocket",
   "Cash",
   "Bank Transfer",
+  'Check',
+  'Card',
   "Other",
+
 ];
 export const bankNames = [
   "Bangladesh Bank",

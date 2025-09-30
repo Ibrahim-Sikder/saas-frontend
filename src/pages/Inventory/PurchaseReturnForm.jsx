@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -35,15 +35,23 @@ import {
   alpha,
   Alert,
   CircularProgress,
+  Divider,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveIcon from "@mui/icons-material/Save";
 import HomeIcon from "@mui/icons-material/Home";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
 import CalendarMonth from "@mui/icons-material/CalendarMonth";
 import EditNote from "@mui/icons-material/EditNote";
+
 import { useNavigate } from "react-router-dom";
 import {
   useCreatePurchaseReturnMutation,
@@ -54,13 +62,9 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useGetAllStocksQuery } from "../../redux/api/stocksApi";
 import { useTenantDomain } from "../../hooks/useTenantDomain";
-
-const warehouseOptions = [
-  { value: "main", label: "Main Warehouse" },
-  { value: "secondary", label: "Secondary Warehouse" },
-  { value: "workshop", label: "Workshop Storage" },
-  { value: "Vehicle Services", label: "Vehicle Services" },
-];
+import { useGetAllWarehousesQuery } from "../../redux/api/warehouseApi";
+import { useGetAllSuppliersQuery } from "../../redux/api/supplier";
+import { returnStatuses } from "../../constant/constant";
 
 export default function PurchaseReturnForm({ id }) {
   const theme = useTheme();
@@ -69,32 +73,74 @@ export default function PurchaseReturnForm({ id }) {
   const [activeStep, setActiveStep] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-const tenantDomain = useTenantDomain();
+  const [selectedPurchase, setSelectedPurchase] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const tenantDomain = useTenantDomain();
+
+  const { data: warehouseData } = useGetAllWarehousesQuery({
+    tenantDomain,
+    limit: 1000000,
+    page: 1,
+    searchTerm: "",
+  });
+
+  const { data: supplierData } = useGetAllSuppliersQuery({
+    tenantDomain,
+    limit: 1000000,
+    page: 1,
+    searchTerm: "",
+  });
+
+  const warehouseOptions = useMemo(() => {
+    if (!warehouseData?.data?.warehouses) return [];
+    return warehouseData.data.warehouses.map((war) => ({
+      label: war.name,
+      value: war._id,
+    }));
+  }, [warehouseData?.data?.warehouses]);
+
+  const supplierOptions = useMemo(() => {
+    if (!supplierData?.data?.suppliers) return [];
+    return supplierData.data.suppliers.map((sup) => ({
+      label: sup.full_name,
+      value: sup._id,
+    }));
+  }, [supplierData?.data?.suppliers]);
 
   const {
     control,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors },
     watch,
   } = useForm({
     defaultValues: {
       returnDate: new Date().toISOString().split("T")[0],
       referenceNo: "",
+      suppliers: [],
       warehouse: "",
       returnReason: "",
       returnNote: "",
+      status: "pending",
     },
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const watchedWarehouse = watch("warehouse");
+  const watchedSuppliers = watch("suppliers");
+  const watchedPurchase = watch("purchase");
 
   const queryParams = {
     tenantDomain,
     page: currentPage,
     limit: 100,
     searchTerm: searchTerm,
+    warehouse: watchedWarehouse,
+    supplier: watchedSuppliers?.[0] || "",
+    purchase: watchedPurchase,
   };
 
   const { data: stockData, isLoading } = useGetAllStocksQuery(queryParams);
@@ -102,29 +148,26 @@ const tenantDomain = useTenantDomain();
     useCreatePurchaseReturnMutation();
   const [updatePurchaseReturn, { isLoading: isUpdating }] =
     useUpdatePurchaseReturnMutation();
-  const { data: singlePurchaseReturn } = useGetSinglePurchaseReturnQuery({
+  const { data: singlePurchaseReturn, isLoading: singlePurchaseReturnLoading } = useGetSinglePurchaseReturnQuery({
     tenantDomain,
     id,
   });
 
   useEffect(() => {
     if (stockData && stockData.data && stockData.data.length > 0) {
-      const selectedItemsMap = {};
-      if (returnItems.length > 0) {
-        returnItems.forEach((item) => {
-          if (item.selected) {
-            selectedItemsMap[item.productId] = {
-              selected: item.selected,
-              returnQuantity: item.returnQuantity,
-              total: item.total,
-            };
-          }
-        });
-      }
-
       const initialReturnItems = stockData.data.map((item, index) => {
         const productId = item.product?._id;
-        const isSelected = selectedItemsMap[productId];
+        
+        // Check if this product is in the return items (for edit mode)
+        const existingItem = singlePurchaseReturn?.data?.items?.find(
+          (returnItem) => returnItem.productId?._id === productId
+        );
+
+        // Fixed supplier name extraction
+        const supplierName =
+          item.product?.suppliers && item.product.suppliers[0]
+            ? item.product.suppliers[0].full_name
+            : "Unknown";
 
         return {
           id: index,
@@ -133,81 +176,116 @@ const tenantDomain = useTenantDomain();
             name: item.product?.product_name || "Unknown Product",
             unit: item.product?.unit?.unit || "Unit",
           },
-          maxQuantity: item.product?.product_quantity || 0,
-          returnQuantity: isSelected ? isSelected.returnQuantity : 0,
-          price: item.purchasePrice || item.product?.purchasePrice || 0,
-          total: isSelected ? isSelected.total : 0,
-          selected: isSelected ? true : false,
+          maxQuantity: item.stock || 0, // Use actual stock quantity
+          returnQuantity: existingItem ? existingItem.quantity : 0,
+          price: item.productPurchasePrice || item.product?.purchasePrice || 0, // Use stock purchase price
+          total: existingItem ? existingItem.totalAmount : 0,
+          selected: !!existingItem, // Select if it exists in the return
           productId: productId,
           tax: item.product?.product_tax || 0,
           discount: item.product?.discount || 0,
           shipping: item.product?.shipping || 0,
           purchaseId: item._id,
           purchaseReferenceNo: item.referenceType || "N/A",
-          supplierName: item.product?.suppliers?.full_name || "Unknown",
+          supplierName: supplierName, // Fixed supplier name
+          warehouse: item.warehouse?._id,
+          warehouseName: item.warehouse?.name || "Unknown",
         };
       });
 
       setReturnItems(initialReturnItems);
 
       if (stockData.data[0]?.warehouse && !watchedWarehouse) {
-        setValue("warehouse", stockData.data[0].warehouse);
+        setValue("warehouse", stockData.data[0].warehouse._id);
       }
     }
-  }, [stockData, setValue]);
+  }, [stockData, setValue, singlePurchaseReturn]);
 
   useEffect(() => {
     if (singlePurchaseReturn?.data) {
       // Set form values from singlePurchaseReturn data
       setValue(
         "returnDate",
-        singlePurchaseReturn.data.returnDate ||
-          new Date().toISOString().split("T")[0]
+        singlePurchaseReturn.data.returnDate
+          ? new Date(singlePurchaseReturn.data.returnDate)
+              .toISOString()
+              .split("T")[0]
+          : new Date().toISOString().split("T")[0]
       );
       setValue("referenceNo", singlePurchaseReturn.data.referenceNo || "");
+
+      // Handle supplier for both create and update
+      if (
+        singlePurchaseReturn.data.suppliers &&
+        singlePurchaseReturn.data.suppliers.length > 0
+      ) {
+        // If we have suppliers array, use it
+        setValue("suppliers", singlePurchaseReturn.data.suppliers.map(s => s._id));
+      } else if (singlePurchaseReturn.data.supplier) {
+        // If we have a single supplier, convert to array
+        setValue("suppliers", [singlePurchaseReturn.data.supplier]);
+      } else {
+        setValue("suppliers", []);
+      }
+
       setValue("warehouse", singlePurchaseReturn.data.warehouse || "");
       setValue("returnReason", singlePurchaseReturn.data.returnReason || "");
       setValue("returnNote", singlePurchaseReturn.data.returnNote || "");
-
-      // If there are items in the return, update the returnItems state
-      if (
-        singlePurchaseReturn.data.items &&
-        singlePurchaseReturn.data.items.length > 0
-      ) {
-        setReturnItems((prevItems) => {
-          return prevItems.map((item) => {
-            // Find if this item exists in the singlePurchaseReturn items
-            const existingItem = singlePurchaseReturn.data.items.find(
-              (returnItem) => returnItem.productId?._id === item.productId
-            );
-
-            if (existingItem) {
-              return {
-                ...item,
-                selected: true,
-                returnQuantity: existingItem.quantity,
-                total: existingItem.totalAmount,
-              };
-            }
-            return item;
-          });
-        });
-      }
+      setValue("status", singlePurchaseReturn.data.status || "pending");
     }
   }, [singlePurchaseReturn, setValue]);
 
+  useEffect(() => {
+    // Filter stocks based on selected warehouse
+    if (watchedWarehouse) {
+      setSearchTerm("");
+      setCurrentPage(1);
+    }
+  }, [watchedWarehouse]);
+
+  useEffect(() => {
+    // Filter stocks based on selected supplier
+    if (watchedSuppliers && watchedSuppliers.length > 0) {
+      setSearchTerm("");
+      setCurrentPage(1);
+    }
+  }, [watchedSuppliers]);
+
+  useEffect(() => {
+    // Filter stocks based on selected purchase
+    if (watchedPurchase) {
+      setSearchTerm("");
+      setCurrentPage(1);
+    }
+  }, [watchedPurchase]);
+
   const handleItemSelection = (id) => {
     setReturnItems(
-      returnItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              selected: !item.selected,
-              returnQuantity: !item.selected ? 1 : 0,
-              total: !item.selected ? item.price : 0,
-            }
-          : item
-      )
+      returnItems.map((item) => {
+        if (item.id === id) {
+          const newSelected = !item.selected;
+          let newReturnQuantity = item.returnQuantity;
+
+          // When selecting an item, preserve the existing quantity
+          // Only set to 1 if it's the first time selecting (quantity is 0)
+          if (newSelected && item.returnQuantity === 0) {
+            newReturnQuantity = 1;
+          }
+
+          // When deselecting, set quantity to 0
+          if (!newSelected) {
+            newReturnQuantity = 0;
+          }
+
+          return {
+            ...item,
+            selected: newSelected,
+            returnQuantity: newReturnQuantity,
+            total: newReturnQuantity * item.price,
+          };
+        }
+        return item;
+      })
     );
   };
 
@@ -234,6 +312,10 @@ const tenantDomain = useTenantDomain();
     );
   };
 
+  const calculateTotalItems = () => {
+    return returnItems.filter((item) => item.selected).length;
+  };
+
   const onSubmit = async (formData) => {
     try {
       const selectedItems = returnItems.filter(
@@ -241,48 +323,72 @@ const tenantDomain = useTenantDomain();
       );
 
       if (selectedItems.length === 0) {
-        toast.error("Please select at least one item to return");
+        toast.error(
+          "Please select at least one item to return with quantity greater than 0"
+        );
         return;
       }
 
-      // Check if we're updating an existing return or creating a new one
+      // Check if any selected item has invalid quantity
+      const invalidItems = selectedItems.filter(
+        (item) =>
+          item.returnQuantity <= 0 || item.returnQuantity > item.maxQuantity
+      );
+
+      if (invalidItems.length > 0) {
+        toast.error(
+          "Please ensure all return quantities are valid (greater than 0 and not exceeding available quantity)"
+        );
+        return;
+      }
+
+      // Check if suppliers array is not empty
+      if (!formData.suppliers || formData.suppliers.length === 0) {
+        toast.error("Please select at least one supplier");
+        return;
+      }
+
+      // Prepare items data
+      const items = selectedItems.map((item) => ({
+        productId: item.productId,
+        productCode: item.product.code,
+        productName: item.product.name,
+        quantity: item.returnQuantity,
+        maxQuantity: item.maxQuantity,
+        unitPrice: item.price,
+        unit: item.product.unit,
+        totalAmount: item.total,
+      }));
+
+      const totalReturnAmount = selectedItems.reduce(
+        (sum, item) => sum + item.total,
+        0
+      );
+
       if (id && singlePurchaseReturn?.data?._id) {
         // Update existing purchase return
         const loadingToast = toast.loading("Updating purchase return...");
 
-        const items = selectedItems.map((item) => ({
-          productId: item.productId,
-          productCode: item.product.code,
-          productName: item.product.name,
-          quantity: item.returnQuantity,
-          maxQuantity: item.maxQuantity,
-          unitPrice: item.price,
-          unit: item.product.unit,
-          totalAmount: item.total,
-        }));
-
-        const totalReturnAmount = selectedItems.reduce(
-          (sum, item) => sum + item.total,
-          0
-        );
-
+        // For update, use 'suppliers' as an array of IDs
         const updateData = {
-          data: {
-            returnDate: formData.returnDate,
-            referenceNo: Number(formData.referenceNo) || 0,
-            warehouse: formData.warehouse,
-            returnNote: formData.returnNote,
-            returnReason: formData.returnReason,
-            items: items,
-            totalReturnAmount,
-            status: singlePurchaseReturn.data.status || "pending",
-          },
+          returnDate: formData.returnDate,
+          referenceNo: formData.referenceNo,
+          suppliers: Array.isArray(formData.suppliers)
+            ? formData.suppliers
+            : [formData.suppliers],
+          purchase: formData.purchase,
+          warehouse: formData.warehouse,
+          returnNote: formData.returnNote,
+          returnReason: formData.returnReason,
+          status: formData.status,
+          items: items,
+          totalReturnAmount,
         };
 
         const res = await updatePurchaseReturn({
           id,
           tenantDomain,
-          data: updateData.data,
+          data: updateData,
         }).unwrap();
 
         toast.dismiss(loadingToast);
@@ -291,45 +397,30 @@ const tenantDomain = useTenantDomain();
           navigate("/dashboard/purchase-return");
         }, 1500);
       } else {
-        // Create new purchase return - directly use the stock data
+        // Create new purchase return
         const loadingToast = toast.loading("Creating purchase return...");
 
-        // Format items for the API
-        const formattedItems = selectedItems.map((item) => ({
-          productId: item.productId,
-          productCode: item.product.code,
-          productName: item.product.name,
-          quantity: item.returnQuantity,
-          maxQuantity: item.maxQuantity,
-          unitPrice: item.price,
-          unit: item.product.unit,
-          totalAmount: item.total,
-        }));
-
-        const totalReturnAmount = selectedItems.reduce(
-          (sum, item) => sum + item.total,
-          0
-        );
-
-        // Create a single purchase return with all selected items
+        // For create, use 'suppliers' (plural) as an array
         const returnData = {
           returnDate: formData.returnDate,
-          referenceNo: Number(formData.referenceNo) || 0,
+          referenceNo: formData.referenceNo,
+          suppliers: Array.isArray(formData.suppliers)
+            ? formData.suppliers
+            : [formData.suppliers],
+          purchase: formData.purchase,
           warehouse: formData.warehouse,
           returnNote: formData.returnNote,
           returnReason: formData.returnReason,
-          items: formattedItems,
+          status: formData.status,
+          items: items,
           totalReturnAmount,
-          status: "pending",
-          // Use the first selected item's supplier info if available
-          supplier: selectedItems[0]?.product?.suppliers?._id,
-          supplierName: selectedItems[0]?.supplierName,
         };
-
+        console.log("return data", returnData);
         const result = await createPurchaseReturn({
           tenantDomain,
           ...returnData,
         }).unwrap();
+        console.log("result", result);
 
         toast.dismiss(loadingToast);
         toast.success("Purchase return created successfully");
@@ -344,12 +435,30 @@ const tenantDomain = useTenantDomain();
   };
 
   const handleCancel = () => {
-    navigate("/dashboard/purchase");
+    navigate("/dashboard/purchase-return");
   };
 
-  const steps = ["Purchase Details", "Select Return Items", "Confirm Return"];
+  const handleConfirmSubmit = () => {
+    setOpenConfirmDialog(true);
+  };
 
-  if (isLoading || !stockData) {
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  const handleFormSubmit = (formData) => {
+    handleConfirmSubmit();
+  };
+
+  const handleDialogConfirm = async () => {
+    const formData = getValues();
+    await onSubmit(formData);
+    setOpenConfirmDialog(false);
+  };
+
+  const steps = ["Select Filters", "Select Return Items", "Review & Submit"];
+
+  if (isLoading || !stockData || singlePurchaseReturnLoading) {
     return (
       <Box
         sx={{
@@ -417,7 +526,7 @@ const tenantDomain = useTenantDomain();
         </Link>
         <Link
           color="inherit"
-          href="/purchase"
+          href="/dashboard/purchase"
           sx={{ display: "flex", alignItems: "center" }}
         >
           <ShoppingCartIcon sx={{ mr: 0.5, fontSize: 18 }} />
@@ -453,7 +562,7 @@ const tenantDomain = useTenantDomain();
             WebkitTextFillColor: "transparent",
           }}
         >
-          Purchase Return
+          {id ? "Update Purchase Return" : "Create Purchase Return"}
         </Typography>
         <Button
           variant="outlined"
@@ -483,7 +592,7 @@ const tenantDomain = useTenantDomain();
         </Stepper>
       </Paper>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
             <Paper
@@ -509,6 +618,118 @@ const tenantDomain = useTenantDomain();
                 <Avatar
                   sx={{
                     bgcolor: theme.palette.warning.main,
+                    mr: 2,
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                  }}
+                >
+                  <EditNote />
+                </Avatar>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Select Filters
+                </Typography>
+              </Box>
+
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name="warehouse"
+                    control={control}
+                    rules={{ required: "Warehouse is required" }}
+                    render={({ field }) => (
+                      <FormControl
+                        fullWidth
+                        error={!!errors.warehouse}
+                        required
+                      >
+                        <InputLabel>Warehouse</InputLabel>
+                        <Select
+                          {...field}
+                          label="Warehouse"
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setActiveStep(1);
+                          }}
+                        >
+                          {warehouseOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.warehouse && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ mt: 0.5, ml: 1.5 }}
+                          >
+                            {errors.warehouse.message}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name="suppliers"
+                    control={control}
+                    rules={{ required: "Supplier is required" }}
+                    render={({ field }) => (
+                      <FormControl
+                        fullWidth
+                        error={!!errors.suppliers}
+                        required
+                      >
+                        <InputLabel>Supplier</InputLabel>
+                        <Select
+                          {...field}
+                          label="Supplier"
+                          value={field.value || []}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setSelectedSupplier(e.target.value);
+                            setActiveStep(1);
+                          }}
+                        >
+                          {supplierOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.suppliers && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ mt: 0.5, ml: 1.5 }}
+                          >
+                            {errors.suppliers.message}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 2,
+                  pb: 2,
+                  borderBottom: `1px solid ${alpha(
+                    theme.palette.divider,
+                    0.5
+                  )}`,
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: theme.palette.info.main,
                     mr: 2,
                     boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
                   }}
@@ -548,6 +769,9 @@ const tenantDomain = useTenantDomain();
                           Product
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold" }}>
+                          Warehouse
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
                           Purchase Ref
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold" }}>
@@ -555,7 +779,7 @@ const tenantDomain = useTenantDomain();
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold" }}>Unit</TableCell>
                         <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                          Purchase Qty
+                          Available Qty
                         </TableCell>
                         <TableCell align="right" sx={{ fontWeight: "bold" }}>
                           Return Qty
@@ -607,6 +831,21 @@ const tenantDomain = useTenantDomain();
                             </Typography>
                           </TableCell>
                           <TableCell>
+                            <Chip
+                              label={item.warehouseName}
+                              size="small"
+                              sx={{
+                                backgroundColor: alpha(
+                                  theme.palette.secondary.main,
+                                  0.1
+                                ),
+                                color: theme.palette.secondary.main,
+                                fontWeight: "medium",
+                                borderRadius: "6px",
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
                             <Typography variant="body2">
                               #{item.purchaseReferenceNo || "N/A"}
                             </Typography>
@@ -650,7 +889,7 @@ const tenantDomain = useTenantDomain();
                             <TextField
                               type="number"
                               size="small"
-                              value={item.returnQuantity}
+                              value={item.returnQuantity || 0}
                               onChange={(e) =>
                                 handleQuantityChange(item.id, e.target.value)
                               }
@@ -662,9 +901,9 @@ const tenantDomain = useTenantDomain();
                               sx={{ width: 80 }}
                             />
                           </TableCell>
-                          <TableCell align="right">$ {item.price}</TableCell>
+                          <TableCell align="right">৳ {item.price}</TableCell>
                           <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            $ {item.total}
+                            ৳ {item.total}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -712,7 +951,7 @@ const tenantDomain = useTenantDomain();
                     <EditNote />
                   </Avatar>
                   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    Return Summary
+                    Return Details
                   </Typography>
                 </Box>
 
@@ -726,7 +965,15 @@ const tenantDomain = useTenantDomain();
                         <TextField
                           {...field}
                           fullWidth
-                          label="Return Date"
+                          label={
+                            <>
+                              Return Date
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           type="date"
                           InputLabelProps={{ shrink: true }}
                           InputProps={{
@@ -753,7 +1000,6 @@ const tenantDomain = useTenantDomain();
                     <Controller
                       name="referenceNo"
                       control={control}
-                      rules={{ required: "Reference number is required" }}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -764,48 +1010,7 @@ const tenantDomain = useTenantDomain();
                             sx: { borderRadius: 2 },
                           }}
                           sx={{ mb: 2 }}
-                          error={!!errors.referenceNo}
-                          helperText={errors.referenceNo?.message}
-                          required
                         />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Controller
-                      name="warehouse"
-                      control={control}
-                      rules={{ required: "Warehouse is required" }}
-                      render={({ field }) => (
-                        <FormControl
-                          fullWidth
-                          sx={{ mb: 2 }}
-                          error={!!errors.warehouse}
-                          required
-                        >
-                          <InputLabel>Warehouse</InputLabel>
-                          <Select
-                            {...field}
-                            label="Warehouse"
-                            sx={{ borderRadius: 2 }}
-                          >
-                            {warehouseOptions.map((option) => (
-                              <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                          {errors.warehouse && (
-                            <Typography
-                              variant="caption"
-                              color="error"
-                              sx={{ mt: 0.5, ml: 1.5 }}
-                            >
-                              {errors.warehouse.message}
-                            </Typography>
-                          )}
-                        </FormControl>
                       )}
                     />
                   </Grid>
@@ -819,18 +1024,60 @@ const tenantDomain = useTenantDomain();
                         <TextField
                           {...field}
                           fullWidth
-                          label="Return Reason"
+                          label={
+                            <>
+                              Return Reason
+                              <span style={{ color: "red", fontSize: "25px" }}>
+                                {" "}
+                                *
+                              </span>
+                            </>
+                          }
                           multiline
                           rows={3}
                           InputProps={{ sx: { borderRadius: 2 } }}
                           sx={{ mb: 2 }}
-                          error={!!errors.returnReason}
-                          helperText={errors.returnReason?.message}
                           required
                         />
                       )}
                     />
                   </Grid>
+
+                  <Grid item xs={12}>
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <RadioGroup {...field} row sx={{ borderRadius: 2 }}>
+                            {returnStatuses.map((status) => (
+                              <FormControlLabel
+                                key={status.value}
+                                value={status.value}
+                                control={<Radio />}
+                                label={
+                                  <Chip
+                                    label={status.label}
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: alpha(
+                                        theme.palette[status.color].main,
+                                        0.1
+                                      ),
+                                      color: theme.palette[status.color].main,
+                                      fontWeight: "medium",
+                                      borderRadius: "6px",
+                                    }}
+                                  />
+                                }
+                              />
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                      )}
+                    />
+                  </Grid>
+
                   <Grid item xs={12}>
                     <Controller
                       name="returnNote"
@@ -868,6 +1115,26 @@ const tenantDomain = useTenantDomain();
                         variant="subtitle1"
                         sx={{ fontWeight: "medium" }}
                       >
+                        Total Items:
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="subtitle1"
+                        align="right"
+                        sx={{
+                          fontWeight: "bold",
+                          color: theme.palette.primary.main,
+                        }}
+                      >
+                        {calculateTotalItems()}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ fontWeight: "medium" }}
+                      >
                         Total Return Value:
                       </Typography>
                     </Grid>
@@ -880,7 +1147,7 @@ const tenantDomain = useTenantDomain();
                           color: theme.palette.primary.main,
                         }}
                       >
-                        $ {calculateTotalReturn()}
+                        ৳{calculateTotalReturn()}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -922,7 +1189,9 @@ const tenantDomain = useTenantDomain();
                   >
                     {isSubmitting || isUpdating
                       ? "Processing..."
-                      : "Confirm Return"}
+                      : id
+                      ? "Update Return"
+                      : "Submit Return"}
                   </Button>
                   <Button
                     fullWidth
@@ -943,6 +1212,60 @@ const tenantDomain = useTenantDomain();
           </Grid>
         </Grid>
       </form>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        aria-labelledby="confirm-dialog-title"
+      >
+        <DialogTitle id="confirm-dialog-title">
+          Confirm Purchase Return
+        </DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom>
+            Are you sure you want to {id ? "update" : "submit"} this purchase return?
+          </Typography>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: alpha(theme.palette.primary.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            }}
+          >
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
+                <Typography variant="body2">Total Items:</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" align="right" fontWeight="bold">
+                  {calculateTotalItems()}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Total Return Value:</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" align="right" fontWeight="bold">
+                  ৳{calculateTotalReturn()}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
+          <Button
+            onClick={handleDialogConfirm}
+            color="primary"
+            variant="contained"
+            disabled={isSubmitting || isUpdating}
+          >
+            {isSubmitting || isUpdating ? "Processing..." : "Confirm"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

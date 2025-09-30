@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 "use client";
 
 /* eslint-disable no-unused-vars */
@@ -27,7 +28,7 @@ import { Search } from "lucide-react";
 import { useTenantDomain } from "../../../hooks/useTenantDomain";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
-const QuotationTable = () => {
+const QuotationTable = ({title}) => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
 
@@ -105,7 +106,7 @@ const QuotationTable = () => {
         <div className="w-full mt-3 md:mt-5 ">
           <div className="mb-6 block md:flex justify-between items-center gap-0 md:gap-1">
             <h2 className="text-xl md:text-2xl font-semibold text-center mb-2">
-              Quotation List
+            {title}
             </h2>
             <div className="flex items-center">
               <TextField

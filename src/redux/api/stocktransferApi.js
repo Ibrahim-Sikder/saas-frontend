@@ -3,10 +3,11 @@ import { baseApi } from "./baseApi";
 const stockTransferApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createStockTransfer: builder.mutation({
-      query: (transferData) => ({
+      query: ({transferData, tenantDomain}) => ({
         url: "/stock-transfer",
         method: "POST",
         body: transferData,
+        params: {tenantDomain}
       }),
       invalidatesTags: ["stockTransfers"],
     }),

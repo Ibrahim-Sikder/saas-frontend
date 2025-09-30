@@ -105,11 +105,7 @@ const Login = () => {
           iconPosition="start"
         />
 
-        <Box sx={{ textAlign: "right", mt: 1 }}>
-          <Link component={RouterLink} to="/forgot-password" variant="body2">
-            Forgot password?
-          </Link>
-        </Box>
+      
 
         <Button
           type="submit"
@@ -122,48 +118,9 @@ const Login = () => {
           {loading ? "Signing in..." : "Sign In"}
         </Button>
 
-        <Divider sx={{ my: 3 }}>
-          <Typography variant="body2" color="text.secondary">
-            OR
-          </Typography>
-        </Divider>
+       
 
-        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<Google />}
-            sx={{ py: 1 }}
-          >
-            Google
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<Facebook />}
-            sx={{ py: 1 }}
-          >
-            Facebook
-          </Button>
-        </Box>
-
-        <Box sx={{ textAlign: "center", mt: 2 }}>
-          <Typography variant="body2">
-            Don't have an account?{" "}
-            <Link component={RouterLink} to="/create-tenant" variant="body2">
-              Sign up
-            </Link>
-          </Typography>
-        </Box>
-
-        <Box sx={{ textAlign: "center", mt: 3 }}>
-          <Typography variant="body2" color="text.secondary">
-            Want to create a new tenant?{" "}
-            <Link component={RouterLink} to="/create-tenant" variant="body2">
-              Register your business
-            </Link>
-          </Typography>
-        </Box>
+       
       </GarageForm>
     </AuthLayout>
   );

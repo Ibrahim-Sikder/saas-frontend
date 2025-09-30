@@ -25,14 +25,6 @@ const stockApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["stocks"],
     }),
-    stockTransper: builder.mutation({
-      query: (stockData) => ({
-        url: "/stocks/transfer",
-        method: "POST",
-        body: stockData,
-      }),
-      invalidatesTags: ["stocks"],
-    }),
     updateStock: builder.mutation({
       query: ({ id, data }) => ({
         url: `/stocks/${id}`,
@@ -57,5 +49,4 @@ export const {
   useCreateStockMutation,
   useUpdateStockMutation,
   useDeleteStockMutation,
-  useStockTransperMutation,
 } = stockApi;

@@ -53,7 +53,7 @@ const QuotationList = () => {
         
         </div>
       </div>
-      <QuotationTable />
+      <QuotationTable title='Quotation List ' />
     </div>
   );
 };

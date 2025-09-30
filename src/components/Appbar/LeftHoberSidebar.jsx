@@ -27,7 +27,25 @@ import {
   LocalShipping,
   Recycling,
   DeleteForever,
-  RestorePage
+  RestorePage,
+  Inventory,
+  ShoppingCart,
+  ShoppingBag,
+  Inventory2,
+  Category,
+  LocalOffer,
+  Widgets,
+  Difference,
+  PointOfSale,
+  AddShoppingCart,
+  MonetizationOn,
+  Savings,
+  Payments,
+  ReceiptLong,
+  Assignment,
+  EventNote,
+  HolidayVillage,
+  ExpandLess
 } from "@mui/icons-material";
 import {
   FaProjectDiagram,
@@ -44,7 +62,12 @@ import {
   FaCheckCircle,
   FaTrash,
   FaTrashRestore,
-  FaHospitalUser
+  FaHospitalUser,
+  FaTruck,
+  FaTags,
+  FaBarcode,
+  FaExclamationTriangle,
+  FaMoneyBillAlt
 } from "react-icons/fa";
 import {
   HiOutlineOfficeBuilding,
@@ -52,7 +75,12 @@ import {
   HiOutlineUserAdd,
   HiOutlineDocumentText,
   HiOutlineDocumentDuplicate,
-  HiOutlineTrash
+  HiOutlineTrash,
+  HiOutlineReceiptRefund,
+  HiOutlineClipboardList,
+  HiOutlineExclamation,
+  HiOutlineSwitchHorizontal,
+  HiOutlineShieldCheck
 } from "react-icons/hi";
 
 const LeftHoberSidebar = () => {
@@ -137,6 +165,46 @@ const LeftHoberSidebar = () => {
         </div>
       </div>
 
+      {/* Suppliers */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/add-supplier">
+            <LocalShipping className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Suppliers</b>
+        </div>
+      </div>
+
+      {/* Product */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/add-product">
+            <Inventory className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Product</b>
+        </div>
+      </div>
+
+      {/* Purchase */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/purchase-order">
+            <ShoppingCart className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Purchase</b>
+        </div>
+      </div>
+
+      {/* Inventory */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/stock">
+            <ShoppingBag className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">Inventory</b>
+        </div>
+      </div>
+
       {/* Finance */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
@@ -169,6 +237,16 @@ const LeftHoberSidebar = () => {
         </div>
       )}
 
+      {/* All User List */}
+      <div className="mt-[14px]">
+        <div className="toolTipWrap">
+          <NavLink to="/dashboard/all-user-list">
+            <Group className="tooltipIcon" />
+          </NavLink>
+          <b className="toolTip">All User List</b>
+        </div>
+      </div>
+
       {/* Recycle Bin */}
       <div className="mt-[14px]">
         <div className="toolTipWrap">
@@ -191,7 +269,7 @@ const LeftHoberSidebar = () => {
 
       {/* Log Out */}
       <div className="mt-[14px]">
-        <div onClick={handleLogout} className="toolTipWrap">
+        <div onClick={handleLogout} className="toolTipWrap cursor-pointer">
           <Logout className="tooltipIcon" />
           <b className="toolTip">Log Out</b>
         </div>

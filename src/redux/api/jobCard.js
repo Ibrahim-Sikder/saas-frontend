@@ -44,17 +44,16 @@ const jobCardApi = baseApi.injectEndpoints({
       }),
       providesTags: ["jobCard"],
     }),
-  updateJobCard: builder.mutation({
-  query: ({ id, data, tenantDomain }) => {
-    return {
-      url: `/jobCards/${id}`,
-      method: "PUT",
-      body: { ...data, tenantDomain }, 
-    };
-  },
-  invalidatesTags: ["jobCard"],
-}),
-
+    updateJobCard: builder.mutation({
+      query: ({ id, data, tenantDomain }) => {
+        return {
+          url: `/jobCards/${id}`,
+          method: "PUT",
+          body: { ...data, tenantDomain },
+        };
+      },
+      invalidatesTags: ["jobCard"],
+    }),
 
     deleteJobCard: builder.mutation({
       query: (id) => ({

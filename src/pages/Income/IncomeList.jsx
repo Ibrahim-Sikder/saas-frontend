@@ -271,7 +271,7 @@ const IncomeList = () => {
                           color: "#2980b9",
                         }}
                       >
-                        $
+                     ৳
                         {Number(row.totalAmount).toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -279,18 +279,10 @@ const IncomeList = () => {
                       </Typography>
 
                       <Box sx={{ mt: 0.5, fontSize: "0.75rem" }}>
+                       
+                      
                         <Box fontWeight="bold">
-                          Service Income : ${row.serviceIncomeAmount}
-                        </Box>
-                        <Box fontWeight="bold">
-                          Parts Income : ${row.partsIncomeAmount}
-                        </Box>
-                        <Box fontWeight="bold">
-                          {" "}
-                          Total Invoice Income: ${row.totalInvoiceIncome}
-                        </Box>
-                        <Box fontWeight="bold">
-                          Other Income: ${row.totalOtherIncome}
+                          Total Income: ${row.totalOtherIncome}
                         </Box>
                       </Box>
                     </Box>

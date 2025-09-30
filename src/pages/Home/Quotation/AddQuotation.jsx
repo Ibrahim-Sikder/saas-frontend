@@ -1,54 +1,61 @@
-"use client"
+"use client";
 /* eslint-disable no-unused-vars */
-import { useLocation, useNavigate } from "react-router-dom"
-import logo from "../../../../public/assets/logo.png"
-import { useEffect, useRef, useState } from "react"
-import { toast } from "react-toastify"
-import InputMask from "react-input-mask"
-import { Autocomplete, Box, Chip, Grid, TextField } from "@mui/material"
-import { useForm } from "react-hook-form"
-import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress"
-import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard"
-import { cmDmOptions, countries } from "../../../constant"
-import { useCreateQuotationMutation } from "../../../redux/api/quotation"
-import QuotationTable from "./QuotationTable"
-import { unitOptions } from "../../../utils/options"
-import { useGetAllStocksQuery } from "../../../redux/api/stocksApi"
-import { suggestionStyles } from "../../../utils/customStyle"
-import { formatNumber } from "../../../utils/formateSemicolon"
-import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile"
-import { useTenantDomain } from "../../../hooks/useTenantDomain"
+import { useLocation, useNavigate } from "react-router-dom";
+import logo from "../../../../public/assets/logo.png";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import InputMask from "react-input-mask";
+import { Autocomplete, Box, Chip, Grid, TextField } from "@mui/material";
+import { useForm } from "react-hook-form";
+import TrustAutoAddress from "../../../components/TrustAutoAddress/TrustAutoAddress";
+import { useGetSingleJobCardWithJobNoQuery } from "../../../redux/api/jobCard";
+import { cmDmOptions, countries } from "../../../constant";
+import { useCreateQuotationMutation } from "../../../redux/api/quotation";
+import QuotationTable from "./QuotationTable";
+import { unitOptions } from "../../../utils/options";
+import { useGetAllStocksQuery } from "../../../redux/api/stocksApi";
+import { suggestionStyles } from "../../../utils/customStyle";
+import { formatNumber } from "../../../utils/formateSemicolon";
+import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
+import { useTenantDomain } from "../../../hooks/useTenantDomain";
 
 const AddQuotation = () => {
-  const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({})
-  const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no)
-  const parsedDate = new Date()
-  const day = parsedDate.getDate().toString().padStart(2, "0")
-  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0")
-  const year = parsedDate.getFullYear()
-  const formattedDate = `${day}-${month}-${year}`
-  const location = useLocation()
-  const job_no = new URLSearchParams(location.search).get("order_no")
-  const [orderNumber, setOrderNumber] = useState(job_no)
-  const navigate = useNavigate()
-  const textInputRef = useRef(null)
-  const [filterType, setFilterType] = useState("")
-  const [goOtherButton, setGoOtherButton] = useState("")
-  const [selectedDate, setSelectedDate] = useState("")
-  const [countryCode, setCountryCode] = useState(countries[0])
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [grandTotal, setGrandTotal] = useState(0)
-  const [discount, setDiscount] = useState(0)
-  const [vat, setVAT] = useState(0)
-  const [tax, setTax] = useState(0)
-  const [partsTotal, setPartsTotal] = useState(0)
-  const [serviceTotal, setServiceTotal] = useState(0)
-  const [currentMileage, setCurrentMileage] = useState("")
-  const [mileageChanged, setMileageChanged] = useState(false)
+  const [getDataWithChassisNo, setGetDataWithChassisNo] = useState({});
+  const [value, setValue] = useState(getDataWithChassisNo?.vehicle?.carReg_no);
+  const parsedDate = new Date();
+  const day = parsedDate.getDate().toString().padStart(2, "0");
+  const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
+  const year = parsedDate.getFullYear();
+  const formattedDate = `${day}-${month}-${year}`;
+  const location = useLocation();
+  const job_no = new URLSearchParams(location.search).get("order_no");
+  const [orderNumber, setOrderNumber] = useState(job_no);
+  const navigate = useNavigate();
+  const textInputRef = useRef(null);
+  const [filterType, setFilterType] = useState("");
+  const [goOtherButton, setGoOtherButton] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [countryCode, setCountryCode] = useState(countries[0]);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [vat, setVAT] = useState(0);
+  const [tax, setTax] = useState(0);
+  const [partsTotal, setPartsTotal] = useState(0);
+  const [serviceTotal, setServiceTotal] = useState(0);
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [mileageChanged, setMileageChanged] = useState(false);
   const [items, setItems] = useState([
-    { description: "", unit: "", quantity: "", rate: "", rateDisplay: "", total: "" },
-  ])
+    {
+      description: "",
+      unit: "",
+      quantity: "",
+      rate: "",
+      rateDisplay: "",
+      total: "",
+    },
+  ]);
   const [serviceItems, setServiceItems] = useState([
     {
       description: "",
@@ -58,36 +65,37 @@ const AddQuotation = () => {
       rateDisplay: "",
       total: "",
     },
-  ])
-  const [productSuggestions, setProductSuggestions] = useState([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
-  const [activeInputType, setActiveInputType] = useState(null)
-  const [activeInputIndex, setActiveInputIndex] = useState(null)
-  const limit = 10
-  const tenantDomain = useTenantDomain()
+  ]);
+  const [productSuggestions, setProductSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+  const [activeInputType, setActiveInputType] = useState(null);
+  const [activeInputIndex, setActiveInputIndex] = useState(null);
+  const limit = 10;
+  const tenantDomain = useTenantDomain();
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
   const queryParams = {
     tenantDomain,
     page: currentPage,
     searchTerm: filterType,
     isRecycled: false,
-  }
+  };
 
-  const { data: stockData } = useGetAllStocksQuery(queryParams)
-
+  const { data: stockData } = useGetAllStocksQuery(queryParams);
+  console.log("stock data this  ", stockData);
   const { data: CompanyInfoData } = useGetCompanyProfileQuery({
     tenantDomain,
-  })
+  });
 
-  const [createQuotation, { isLoading: createLoading }] = useCreateQuotationMutation()
+  const [createQuotation, { isLoading: createLoading }] =
+    useCreateQuotationMutation();
 
   const {
     data: jobCardData,
@@ -96,15 +104,15 @@ const AddQuotation = () => {
   } = useGetSingleJobCardWithJobNoQuery({
     tenantDomain,
     jobNo: orderNumber,
-  })
+  });
 
   useEffect(() => {
     if (jobCardData?.data?.date) {
-      setSelectedDate(jobCardData?.data?.date)
+      setSelectedDate(jobCardData?.data?.date);
     } else {
-      setSelectedDate(formattedDate)
+      setSelectedDate(formattedDate);
     }
-  }, [formattedDate, jobCardData?.data?.date])
+  }, [formattedDate, jobCardData?.data?.date]);
 
   useEffect(() => {
     if (jobCardData?.data?.user_type === "customer") {
@@ -113,7 +121,8 @@ const AddQuotation = () => {
         Id: jobCardData?.data?.Id,
         company_name: jobCardData?.data?.customer?.company_name,
         customer_name: jobCardData?.data?.customer?.customer_name,
-        customer_country_code: jobCardData?.data?.customer?.customer_country_code,
+        customer_country_code:
+          jobCardData?.data?.customer?.customer_country_code,
         customer_contact: jobCardData?.data?.customer?.customer_contact,
         customer_address: jobCardData?.data?.customer?.customer_address,
         chassis_no: getDataWithChassisNo?.chassis_no,
@@ -123,7 +132,7 @@ const AddQuotation = () => {
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
         mileage: getDataWithChassisNo?.mileage,
-      })
+      });
     }
     if (jobCardData?.data?.user_type === "company") {
       reset({
@@ -143,7 +152,7 @@ const AddQuotation = () => {
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
         mileage: getDataWithChassisNo?.mileage,
-      })
+      });
     }
     if (jobCardData?.data?.user_type === "showRoom") {
       reset({
@@ -153,7 +162,8 @@ const AddQuotation = () => {
         vehicle_username: jobCardData?.data?.showRoom?.vehicle_username,
         showRoom_address: jobCardData?.data?.showRoom?.showRoom_address,
         company_name: jobCardData?.data?.showRoom?.company_name,
-        company_contact: phoneNumber || jobCardData?.data?.showRoom?.company_contact,
+        company_contact:
+          phoneNumber || jobCardData?.data?.showRoom?.company_contact,
         company_country_code: jobCardData?.data?.showRoom?.company_country_code,
         chassis_no: getDataWithChassisNo?.chassis_no,
         carReg_no: getDataWithChassisNo?.carReg_no,
@@ -162,7 +172,7 @@ const AddQuotation = () => {
         vehicle_brand: getDataWithChassisNo?.vehicle_brand,
         vehicle_name: getDataWithChassisNo?.vehicle_name,
         mileage: getDataWithChassisNo?.mileage,
-      })
+      });
     }
   }, [
     getDataWithChassisNo?.carReg_no,
@@ -195,230 +205,276 @@ const AddQuotation = () => {
     jobCardData?.data?.user_type,
     phoneNumber,
     reset,
-  ])
+  ]);
 
   const handleAddClick = () => {
-    setItems([...items, { description: "", unit: "", quantity: "", rate: "", rateDisplay: "", total: "" }])
-  }
+    setItems([
+      ...items,
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
+    ]);
+  };
 
   const handleServiceAdd = () => {
     setServiceItems([
       ...serviceItems,
-      { description: "", unit: "", quantity: "", rate: "", rateDisplay: "", total: "" },
-    ])
-  }
+      {
+        description: "",
+        unit: "",
+        quantity: "",
+        rate: "",
+        rateDisplay: "",
+        total: "",
+      },
+    ]);
+  };
 
   const handleRemove = (index) => {
     if (typeof index === "number" && index >= 0 && index < items.length) {
-      const list = [...items]
-      list.splice(index, 1)
-      setItems(list)
+      const list = [...items];
+      list.splice(index, 1);
+      setItems(list);
     } else {
-      console.error("Invalid index")
+      console.error("Invalid index");
     }
-  }
+  };
 
   const handleServiceRemove = (index) => {
     if (!index) {
-      const list = [...serviceItems]
-      setServiceItems(list)
+      const list = [...serviceItems];
+      setServiceItems(list);
     } else {
-      const list = [...serviceItems]
-      list.splice(index, 1)
-      setServiceItems(list)
+      const list = [...serviceItems];
+      list.splice(index, 1);
+      setServiceItems(list);
     }
-  }
+  };
 
   useEffect(() => {
-    const totalSum = items.reduce((sum, item) => sum + Number(item.total), 0)
-    const serviceTotalSum = serviceItems.reduce((sum, item) => sum + Number(item.total), 0)
-    const roundedTotalSum = Number.parseFloat(totalSum + serviceTotalSum).toFixed(2)
-    setPartsTotal(Number(totalSum))
-    setServiceTotal(Number(serviceTotalSum))
-    setGrandTotal(Number(roundedTotalSum))
-  }, [items, serviceItems])
+    const totalSum = items.reduce((sum, item) => sum + Number(item.total), 0);
+    const serviceTotalSum = serviceItems.reduce(
+      (sum, item) => sum + Number(item.total),
+      0
+    );
+    const roundedTotalSum = Number.parseFloat(
+      totalSum + serviceTotalSum
+    ).toFixed(2);
+    setPartsTotal(Number(totalSum));
+    setServiceTotal(Number(serviceTotalSum));
+    setGrandTotal(Number(roundedTotalSum));
+  }, [items, serviceItems]);
 
   const filterProductSuggestions = (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2 || !stockData?.data) {
-      setProductSuggestions([])
-      setShowSuggestions(false)
-      return
+      setProductSuggestions([]);
+      setShowSuggestions(false);
+      return;
     }
     const filteredProducts = stockData.data.filter((stock) =>
-      stock.product.product_name.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    setProductSuggestions(filteredProducts)
-    setShowSuggestions(filteredProducts.length > 0)
-    setActiveSuggestionIndex(0)
-  }
+      stock.product.product_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+    setProductSuggestions(filteredProducts);
+    setShowSuggestions(filteredProducts.length > 0);
+    setActiveSuggestionIndex(0);
+  };
 
   const handleServiceDescriptionChange = (index, value) => {
-    const newItems = [...serviceItems]
-    newItems[index].description = value
+    const newItems = [...serviceItems];
+    newItems[index].description = value;
     if (newItems[index].product) {
-      delete newItems[index].product
-      delete newItems[index].warehouse
-      delete newItems[index].product_name
-      delete newItems[index].sellingPrice
-      delete newItems[index].batchNumber
+      delete newItems[index].product;
+      delete newItems[index].warehouse;
+      delete newItems[index].product_name;
+      delete newItems[index].sellingPrice;
+      delete newItems[index].batchNumber;
     }
-    setServiceItems(newItems)
-    setActiveInputType("service")
-    setActiveInputIndex(index)
-    filterProductSuggestions(value)
-  }
+    setServiceItems(newItems);
+    setActiveInputType("service");
+    setActiveInputIndex(index);
+    filterProductSuggestions(value);
+  };
 
   const handleDescriptionChange = (index, value) => {
-    const newItems = [...items]
-    newItems[index].description = value
+    const newItems = [...items];
+    newItems[index].description = value;
     if (newItems[index].product) {
-      delete newItems[index].product
-      delete newItems[index].warehouse
-      delete newItems[index].product_name
-      delete newItems[index].sellingPrice
-      delete newItems[index].batchNumber
+      delete newItems[index].product;
+      delete newItems[index].warehouse;
+      delete newItems[index].product_name;
+      delete newItems[index].sellingPrice;
+      delete newItems[index].batchNumber;
     }
-    setItems(newItems)
-    setActiveInputType("parts")
-    setActiveInputIndex(index)
-    filterProductSuggestions(value)
-  }
+    setItems(newItems);
+    setActiveInputType("parts");
+    setActiveInputIndex(index);
+    filterProductSuggestions(value);
+  };
 
   const handleUnitChange = (index, value) => {
-    const newItems = [...items]
-    newItems[index].unit = value
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    newItems[index].unit = value;
+    setItems(newItems);
+  };
 
   const handleServiceUnitChange = (index, value) => {
-    const newItems = [...serviceItems]
-    newItems[index].unit = value
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    newItems[index].unit = value;
+    setServiceItems(newItems);
+  };
 
   // Fixed quantity change handlers to allow decimals
   const handleQuantityChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
+    const numericValue = value.replace(/[^0-9.]/g, "");
 
     // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...items]
-    const parsedValue = Number.parseFloat(cleanValue) || 0
-    newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-    newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    const parsedValue = Number.parseFloat(cleanValue) || 0;
+    newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+    newItems[index].total =
+      parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+    setItems(newItems);
+  };
 
   const handleServiceQuantityChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
+    const numericValue = value.replace(/[^0-9.]/g, "");
 
     // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...serviceItems]
-    const parsedValue = Number.parseFloat(cleanValue) || 0
-    newItems[index].quantity = cleanValue // Store as string to preserve decimal input
-    newItems[index].total = parsedValue * (Number.parseFloat(newItems[index].rate) || 0)
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    const parsedValue = Number.parseFloat(cleanValue) || 0;
+    newItems[index].quantity = cleanValue; // Store as string to preserve decimal input
+    newItems[index].total =
+      parsedValue * (Number.parseFloat(newItems[index].rate) || 0);
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+    setServiceItems(newItems);
+  };
 
   // Fixed rate change handlers to properly handle decimals without formatNumber interference
   const handleRateChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
+    const numericValue = value.replace(/[^0-9.]/g, "");
 
     // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...items]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setItems(newItems)
-  }
+    const newItems = [...items];
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    newItems[index].rate = parsedRate;
+    newItems[index].rateDisplay = cleanValue; // Store raw input for display
+    newItems[index].total =
+      (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+    setItems(newItems);
+  };
 
   const handleServiceRateChange = (index, value) => {
     // Allow decimal numbers by removing non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, "")
+    const numericValue = value.replace(/[^0-9.]/g, "");
 
     // Prevent multiple decimal points
-    const parts = numericValue.split(".")
-    const cleanValue = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numericValue
+    const parts = numericValue.split(".");
+    const cleanValue =
+      parts.length > 2
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
 
-    const newItems = [...serviceItems]
-    const parsedRate = Number.parseFloat(cleanValue) || 0
-    newItems[index].rate = parsedRate
-    newItems[index].rateDisplay = cleanValue // Store raw input for display
-    newItems[index].total = (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate
-    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2))
-    setServiceItems(newItems)
-  }
+    const newItems = [...serviceItems];
+    const parsedRate = Number.parseFloat(cleanValue) || 0;
+    newItems[index].rate = parsedRate;
+    newItems[index].rateDisplay = cleanValue; // Store raw input for display
+    newItems[index].total =
+      (Number.parseFloat(newItems[index].quantity) || 0) * parsedRate;
+    newItems[index].total = Number.parseFloat(newItems[index].total.toFixed(2));
+    setServiceItems(newItems);
+  };
 
   const handleDiscountChange = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
     if (!isNaN(parsedValue)) {
-      setDiscount(parsedValue)
+      setDiscount(parsedValue);
     }
-  }
+  };
 
   const handleVATChange = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
     if (!isNaN(parsedValue)) {
-      setVAT(parsedValue)
+      setVAT(parsedValue);
     }
-  }
+  };
 
   const handleTaxChange = (value) => {
-    const parsedValue = value === "" ? 0 : Number.parseFloat(value)
+    const parsedValue = value === "" ? 0 : Number.parseFloat(value);
     if (!isNaN(parsedValue)) {
-      setTax(parsedValue)
+      setTax(parsedValue);
     }
-  }
+  };
 
   const calculateFinalTotal = () => {
-    const discountAsPercentage = discount
-    const totalAfterDiscount = grandTotal - discountAsPercentage
-    const vatAsPercentage = vat / 100
-    const totalAfterVat = totalAfterDiscount + totalAfterDiscount * vatAsPercentage
-    const taxAsPercentage = tax / 100 
-    let finalTotal = totalAfterVat + totalAfterVat * taxAsPercentage
-    finalTotal = Number.parseFloat(finalTotal).toFixed(2)
-    return finalTotal
-  }
+    const discountAsPercentage = discount;
+    const totalAfterDiscount = grandTotal - discountAsPercentage;
+    const vatAsPercentage = vat / 100;
+    const totalAfterVat =
+      totalAfterDiscount + totalAfterDiscount * vatAsPercentage;
+    const taxAsPercentage = tax / 100;
+    let finalTotal = totalAfterVat + totalAfterVat * taxAsPercentage;
+    finalTotal = Number.parseFloat(finalTotal).toFixed(2);
+    return finalTotal;
+  };
 
   const handlePhoneNumberChange = (e) => {
-    const newPhoneNumber = e.target.value
+    const newPhoneNumber = e.target.value;
     if (
       /^\d*$/.test(newPhoneNumber) &&
       newPhoneNumber.length <= 10 &&
-      (newPhoneNumber === "" || !newPhoneNumber.startsWith("0") || newPhoneNumber.length > 1)
+      (newPhoneNumber === "" ||
+        !newPhoneNumber.startsWith("0") ||
+        newPhoneNumber.length > 1)
     ) {
-      setPhoneNumber(newPhoneNumber)
+      setPhoneNumber(newPhoneNumber);
     }
-  }
+  };
 
   const findMatchingUnit = (productUnit) => {
-    if (!productUnit) return "Pcs"
-    const unitValue = typeof productUnit === "object" ? productUnit.unit : productUnit
-    const shortName = typeof productUnit === "object" ? productUnit.short_name : null
+    if (!productUnit) return "Pcs";
+    const unitValue =
+      typeof productUnit === "object" ? productUnit.unit : productUnit;
+    const shortName =
+      typeof productUnit === "object" ? productUnit.short_name : null;
     const exactMatch = unitOptions.find(
       (option) =>
         option.value === unitValue ||
         option.label === unitValue ||
-        (shortName && (option.value === shortName || option.label === shortName)),
-    )
+        (shortName &&
+          (option.value === shortName || option.label === shortName))
+    );
     if (exactMatch) {
-      return exactMatch.value
+      return exactMatch.value;
     }
     const caseInsensitiveMatch = unitOptions.find(
       (option) =>
@@ -426,80 +482,93 @@ const AddQuotation = () => {
         option.label.toLowerCase() === unitValue?.toLowerCase() ||
         (shortName &&
           (option.value.toLowerCase() === shortName.toLowerCase() ||
-            option.label.toLowerCase() === shortName.toLowerCase())),
-    )
+            option.label.toLowerCase() === shortName.toLowerCase()))
+    );
     if (caseInsensitiveMatch) {
-      return caseInsensitiveMatch.value
+      return caseInsensitiveMatch.value;
     }
-    return "Pcs"
+    return "Pcs";
+  };
+
+const handleSelectSuggestion = (product) => {
+  console.log(product);
+  if (activeInputType === "service") {
+    const newItems = [...serviceItems];
+    const matchingUnit = findMatchingUnit(product.product.unit);
+    newItems[activeInputIndex].description = product.product.product_name;
+    newItems[activeInputIndex].unit = matchingUnit;
+    newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+    newItems[activeInputIndex].rateDisplay = (
+      product.product.sellingPrice || 0
+    ).toString();
+    // Use available stock quantity instead of product quantity
+    newItems[activeInputIndex].quantity = (product.stock || 0).toString();
+    newItems[activeInputIndex].product = product.product._id;
+    newItems[activeInputIndex].warehouse = product.warehouse;
+    newItems[activeInputIndex].product_name = product.product.product_name;
+    newItems[activeInputIndex].sellingPrice =
+      product.product.sellingPrice || 0;
+    newItems[activeInputIndex].batchNumber = product.batchNumber || "";
+
+    // Calculate total based on quantity and rate
+    newItems[activeInputIndex].total =
+      (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
+      (Number.parseFloat(newItems[activeInputIndex].rate) || 0);
+    newItems[activeInputIndex].total = Number.parseFloat(
+      newItems[activeInputIndex].total.toFixed(2)
+    );
+    setServiceItems(newItems);
+  } else if (activeInputType === "parts") {
+    const newItems = [...items];
+    const matchingUnit = findMatchingUnit(product.product.unit);
+    newItems[activeInputIndex].description = product.product.product_name;
+    newItems[activeInputIndex].unit = matchingUnit;
+    newItems[activeInputIndex].rate = product.product.sellingPrice || 0;
+    newItems[activeInputIndex].rateDisplay = (
+      product.product.sellingPrice || 0
+    ).toString();
+    // Use available stock quantity instead of product quantity
+    newItems[activeInputIndex].quantity = (product.stock || 0).toString();
+    newItems[activeInputIndex].product = product.product._id;
+    newItems[activeInputIndex].warehouse = product.warehouse;
+    newItems[activeInputIndex].product_name = product.product.product_name;
+    newItems[activeInputIndex].sellingPrice =
+      product.product.sellingPrice || 0;
+    newItems[activeInputIndex].batchNumber = product.batchNumber || "";
+
+    // Calculate total based on quantity and rate
+    newItems[activeInputIndex].total =
+      (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
+      (Number.parseFloat(newItems[activeInputIndex].rate) || 0);
+    newItems[activeInputIndex].total = Number.parseFloat(
+      newItems[activeInputIndex].total.toFixed(2)
+    );
+    setItems(newItems);
   }
-
-  const handleSelectSuggestion = (product) => {
-    if (activeInputType === "service") {
-      const newItems = [...serviceItems]
-      const matchingUnit = findMatchingUnit(product.product.unit)
-      newItems[activeInputIndex].description = product.product.product_name
-      newItems[activeInputIndex].unit = matchingUnit
-      newItems[activeInputIndex].rate = product.product.sellingPrice || 0
-      newItems[activeInputIndex].rateDisplay = (product.product.sellingPrice || 0).toString()
-      newItems[activeInputIndex].quantity = product.product.product_quantity || 0
-      newItems[activeInputIndex].product = product.product._id
-      newItems[activeInputIndex].warehouse = product.warehouse
-      newItems[activeInputIndex].product_name = product.product.product_name
-      newItems[activeInputIndex].sellingPrice = product.product.sellingPrice || 0
-      newItems[activeInputIndex].batchNumber = product.batchNumber || ""
-
-      // Calculate total based on quantity and rate
-      newItems[activeInputIndex].total =
-        (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
-        (Number.parseFloat(newItems[activeInputIndex].rate) || 0)
-      newItems[activeInputIndex].total = Number.parseFloat(newItems[activeInputIndex].total.toFixed(2))
-      setServiceItems(newItems)
-    } else if (activeInputType === "parts") {
-      const newItems = [...items]
-      const matchingUnit = findMatchingUnit(product.product.unit)
-      newItems[activeInputIndex].description = product.product.product_name
-      newItems[activeInputIndex].unit = matchingUnit
-      newItems[activeInputIndex].rate = product.product.sellingPrice || 0
-      newItems[activeInputIndex].rateDisplay = (product.product.sellingPrice || 0).toString()
-      newItems[activeInputIndex].quantity = product.product.product_quantity || 0
-      newItems[activeInputIndex].product = product.product._id
-      newItems[activeInputIndex].warehouse = product.warehouse
-      newItems[activeInputIndex].product_name = product.product.product_name
-      newItems[activeInputIndex].sellingPrice = product.product.sellingPrice || 0
-      newItems[activeInputIndex].batchNumber = product.batchNumber || ""
-
-      // Calculate total based on quantity and rate
-      newItems[activeInputIndex].total =
-        (Number.parseFloat(newItems[activeInputIndex].quantity) || 0) *
-        (Number.parseFloat(newItems[activeInputIndex].rate) || 0)
-      newItems[activeInputIndex].total = Number.parseFloat(newItems[activeInputIndex].total.toFixed(2))
-      setItems(newItems)
-    }
-    setShowSuggestions(false)
-  }
+  setShowSuggestions(false);
+};
 
   const prepareItemsForSubmission = (itemsArray) => {
     return itemsArray.map((item) => {
       if (item.product && item.warehouse) {
-        return item
+        return item;
       } else {
         return {
           ...item,
-        }
+        };
       }
-    })
-  }
+    });
+  };
 
   const onSubmit = async (data) => {
-    const toastId = toast.loading("Creating Quotation...")
+    const toastId = toast.loading("Creating Quotation...");
     const customer = {
       company_name: data.company_name,
       customer_name: data.customer_name,
       customer_contact: data.customer_contact,
       customer_country_code: data.company_country_code,
       customer_address: data.customer_address,
-    }
+    };
 
     const company = {
       company_name: data.company_name,
@@ -507,7 +576,7 @@ const AddQuotation = () => {
       company_address: data.company_address,
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
-    }
+    };
 
     const showRoom = {
       showRoom_name: data.showRoom_name,
@@ -516,7 +585,7 @@ const AddQuotation = () => {
       company_contact: data.company_contact,
       company_country_code: data.company_country_code,
       company_address: data.company_address,
-    }
+    };
 
     data.mileage = Number(data.mileage);
     const newMileageValue = Number(data.mileage);
@@ -563,11 +632,11 @@ const AddQuotation = () => {
       vehicle_brand: data.vehicle_brand,
       vehicle_name: data.vehicle_name,
       mileageHistory: updatedMileageHistory,
-    }
+    };
 
     // Prepare items for submission
-    const preparedItems = prepareItemsForSubmission(items)
-    const preparedServiceItems = prepareItemsForSubmission(serviceItems)
+    const preparedItems = prepareItemsForSubmission(items);
+    const preparedServiceItems = prepareItemsForSubmission(serviceItems);
 
     const quotation = {
       user_type: jobCardData?.data?.user_type,
@@ -585,7 +654,7 @@ const AddQuotation = () => {
       service_input_data: preparedServiceItems,
       logo,
       mileage: data.mileage,
-    }
+    };
 
     const values = {
       tenantDomain,
@@ -594,64 +663,73 @@ const AddQuotation = () => {
       showRoom,
       vehicle,
       quotation,
-    }
+    };
 
     try {
-      const res = await createQuotation(values).unwrap()
+      const res = await createQuotation(values).unwrap();
       if (res.success) {
-        toast.success(res.message)
+        toast.success(res.message);
         if (goOtherButton === "preview") {
-          navigate(`/dashboard/quotation-view?id=${res?.data?._id}`)
-          setGoOtherButton("")
+          navigate(`/dashboard/quotation-view?id=${res?.data?._id}`);
+          setGoOtherButton("");
         } else if (goOtherButton === "invoice") {
-          navigate(`/dashboard/invoice?order_no=${jobCardData?.data?.job_no}&id=${res?.data?._id}`)
-          setGoOtherButton("")
+          navigate(
+            `/dashboard/invoice?order_no=${jobCardData?.data?.job_no}&id=${res?.data?._id}`
+          );
+          setGoOtherButton("");
         } else {
-          navigate("/dashboard/quotation-list")
-          setGoOtherButton("")
+          navigate("/dashboard/quotation-list");
+          setGoOtherButton("");
         }
-        refetch()
+        refetch();
       }
     } catch (err) {
-      const errorMessage = err?.data?.message || err?.message || "Failed to create quotation"
-      toast.error(errorMessage)
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to create quotation";
+      toast.error(errorMessage);
     } finally {
-      toast.dismiss(toastId)
+      toast.dismiss(toastId);
     }
-  }
+  };
 
   useEffect(() => {
-    setGetDataWithChassisNo(jobCardData?.data?.vehicle)
-  }, [jobCardData?.data?.vehicle])
+    setGetDataWithChassisNo(jobCardData?.data?.vehicle);
+  }, [jobCardData?.data?.vehicle]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showSuggestions) {
-        setShowSuggestions(false)
+        setShowSuggestions(false);
       }
-    }
-    document.addEventListener("click", handleClickOutside)
+    };
+    document.addEventListener("click", handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside)
-    }
-  }, [showSuggestions])
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showSuggestions]);
 
   return (
     <div className="md:px-5 md:py-10">
       <div className=" mb-5 pb-5 mx-auto text-center border-b-2 border-[#42A1DA]">
         <div className=" addJobCardHeads">
-          <img src={CompanyInfoData?.data?.logo || "/placeholder.svg"} alt="logo" className=" addJobLogoImg" />
+          <img
+            src={CompanyInfoData?.data?.logo || "/placeholder.svg"}
+            alt="logo"
+            className=" addJobLogoImg"
+          />
           <div>
             <div className="flex-1 text-center">
-                      <h2 className="trustAutoTitle">
-                        {CompanyInfoData?.data?.companyNameBN}
-                      </h2>
+              <h2 className="trustAutoTitle">
+                {CompanyInfoData?.data?.companyNameBN}
+              </h2>
 
-                      <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold ">
-                        ({CompanyInfoData?.data?.companyName})
-                      </h3>
-                    </div>
-            <span className="text-[12px] lg:text-xl mt-5 block">Office: {CompanyInfoData?.data?.address}</span>
+              <h3 className="text-lg md:text-xl english-font mt-1 text-[#4671A1] font-bold ">
+                ({CompanyInfoData?.data?.companyName})
+              </h3>
+            </div>
+            <span className="text-[12px] lg:text-xl mt-5 block">
+              Office: {CompanyInfoData?.data?.address}
+            </span>
           </div>
           <TrustAutoAddress />
         </div>
@@ -674,7 +752,9 @@ const AddQuotation = () => {
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 my-10">
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-5">Customer Info</h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-5">
+                Customer Info
+              </h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -724,12 +804,14 @@ const AddQuotation = () => {
                       {...register("customer_name")}
                     />
                   )}
-                  {(jobCardData?.data?.user_type === "company" || jobCardData?.data?.user_type === "showRoom") && (
+                  {(jobCardData?.data?.user_type === "company" ||
+                    jobCardData?.data?.user_type === "showRoom") && (
                     <TextField
                       fullWidth
                       label="Customer"
                       focused={
-                        jobCardData?.data?.company?.vehicle_username || jobCardData?.data?.showRoom?.vehicle_username
+                        jobCardData?.data?.company?.vehicle_username ||
+                        jobCardData?.data?.showRoom?.vehicle_username
                       }
                       {...register("vehicle_username")}
                     />
@@ -745,8 +827,8 @@ const AddQuotation = () => {
                         getOptionLabel={(option) => option.label}
                         value={countryCode}
                         onChange={(event, newValue) => {
-                          setCountryCode(newValue)
-                          setPhoneNumber("")
+                          setCountryCode(newValue);
+                          setPhoneNumber("");
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -754,7 +836,9 @@ const AddQuotation = () => {
                             {...register("customer_country_code")}
                             label="Select Country Code"
                             variant="outlined"
-                            focused={jobCardData?.data?.customer?.customer_country_code}
+                            focused={
+                              jobCardData?.data?.customer?.customer_country_code
+                            }
                           />
                         )}
                       />
@@ -766,7 +850,11 @@ const AddQuotation = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
                         />
@@ -777,23 +865,35 @@ const AddQuotation = () => {
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Customer Contact No (N)"
-                          focused={jobCardData?.data?.customer?.customer_contact || ""}
+                          focused={
+                            jobCardData?.data?.customer?.customer_contact || ""
+                          }
                         />
                       )}
-                      {(jobCardData?.data?.user_type === "company" || jobCardData?.data?.user_type === "showRoom") && (
+                      {(jobCardData?.data?.user_type === "company" ||
+                        jobCardData?.data?.user_type === "showRoom") && (
                         <TextField
                           {...register("company_contact")}
                           variant="outlined"
                           fullWidth
                           type="tel"
-                          value={phoneNumber ? phoneNumber : jobCardData?.data?.customer?.customer_contact}
+                          value={
+                            phoneNumber
+                              ? phoneNumber
+                              : jobCardData?.data?.customer?.customer_contact
+                          }
                           onChange={handlePhoneNumberChange}
                           placeholder="Company Contact No (N)"
                           focused={
-                            jobCardData?.data?.company?.company_contact || jobCardData?.data?.showRoom?.company_contact
+                            jobCardData?.data?.company?.company_contact ||
+                            jobCardData?.data?.showRoom?.company_contact
                           }
                         />
                       )}
@@ -801,7 +901,13 @@ const AddQuotation = () => {
                   </Grid>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                  {!jobCardData?.data && <TextField fullWidth label="Address" {...register("customer_address")} />}
+                  {!jobCardData?.data && (
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      {...register("customer_address")}
+                    />
+                  )}
                   {jobCardData?.data?.user_type === "customer" && (
                     <TextField
                       fullWidth
@@ -815,7 +921,9 @@ const AddQuotation = () => {
                       fullWidth
                       label="Address"
                       {...register("company_address")}
-                      focused={jobCardData?.data?.company?.company_address || ""}
+                      focused={
+                        jobCardData?.data?.company?.company_address || ""
+                      }
                     />
                   )}
                   {jobCardData?.data?.user_type === "showRoom" && (
@@ -823,14 +931,18 @@ const AddQuotation = () => {
                       fullWidth
                       label="Address"
                       {...register("showRoom_address")}
-                      focused={jobCardData?.data?.showRoom?.showRoom_address || ""}
+                      focused={
+                        jobCardData?.data?.showRoom?.showRoom_address || ""
+                      }
                     />
                   )}
                 </Grid>
               </Grid>
             </Box>
             <Box>
-              <h3 className="text-xl lg:text-3xl font-bold mb-5 ">Vehicle Info</h3>
+              <h3 className="text-xl lg:text-3xl font-bold mb-5 ">
+                Vehicle Info
+              </h3>
               <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                   <TextField
@@ -852,7 +964,7 @@ const AddQuotation = () => {
                         options={cmDmOptions.map((option) => option.label)}
                         value={jobCardData?.data?.vehicle?.carReg_no || ""}
                         onChange={(event, newValue) => {
-                          setValue("carReg_no", newValue)
+                          setValue("carReg_no", newValue);
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -877,7 +989,9 @@ const AddQuotation = () => {
                             {...inputProps}
                             {...register("car_registration_no")}
                             label="Car R (N)"
-                            focused={getDataWithChassisNo?.car_registration_no || ""}
+                            focused={
+                              getDataWithChassisNo?.car_registration_no || ""
+                            }
                           />
                         )}
                       </InputMask>
@@ -911,19 +1025,23 @@ const AddQuotation = () => {
                     value={
                       currentMileage ||
                       (getDataWithChassisNo?.mileageHistory?.length > 0
-                        ? getDataWithChassisNo.mileageHistory[getDataWithChassisNo.mileageHistory.length - 1].mileage
+                        ? getDataWithChassisNo.mileageHistory[
+                            getDataWithChassisNo.mileageHistory.length - 1
+                          ].mileage
                         : getDataWithChassisNo?.mileage || "")
                     }
                     onChange={(e) => {
-                      const newMileage = e.target.value
-                      setCurrentMileage(newMileage)
-                      const lastMileage = getDataWithChassisNo?.mileageHistory?.slice(-1)[0]?.mileage
+                      const newMileage = e.target.value;
+                      setCurrentMileage(newMileage);
+                      const lastMileage =
+                        getDataWithChassisNo?.mileageHistory?.slice(-1)[0]
+                          ?.mileage;
                       if (lastMileage && Number(newMileage) !== lastMileage) {
-                        setMileageChanged(true)
+                        setMileageChanged(true);
                       } else if (!lastMileage && newMileage) {
-                        setMileageChanged(true)
+                        setMileageChanged(true);
                       } else {
-                        setMileageChanged(false)
+                        setMileageChanged(false);
                       }
                     }}
                     error={!!errors.mileage}
@@ -935,27 +1053,38 @@ const AddQuotation = () => {
                     <strong>Mileage History:</strong>
                     {getDataWithChassisNo?.mileageHistory?.length > 0 ? (
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {getDataWithChassisNo.mileageHistory.map((entry, index) => (
-                          <Chip
-                            key={index}
-                            label={`${entry.mileage} km (${new Date(entry.date).toLocaleDateString()})`}
-                            variant="outlined"
-                            className="bg-gray-100 border-gray-300 text-gray-800"
-                            onDelete={() => {
-                              const updatedHistory = getDataWithChassisNo.mileageHistory.filter((_, i) => i !== index)
-                              setGetDataWithChassisNo((prevState) => ({
-                                ...prevState,
-                                mileageHistory: updatedHistory,
-                              }))
-                            }}
-                            deleteIcon={
-                              <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">×</span>
-                            }
-                          />
-                        ))}
+                        {getDataWithChassisNo.mileageHistory.map(
+                          (entry, index) => (
+                            <Chip
+                              key={index}
+                              label={`${entry.mileage} km (${new Date(
+                                entry.date
+                              ).toLocaleDateString()})`}
+                              variant="outlined"
+                              className="bg-gray-100 border-gray-300 text-gray-800"
+                              onDelete={() => {
+                                const updatedHistory =
+                                  getDataWithChassisNo.mileageHistory.filter(
+                                    (_, i) => i !== index
+                                  );
+                                setGetDataWithChassisNo((prevState) => ({
+                                  ...prevState,
+                                  mileageHistory: updatedHistory,
+                                }));
+                              }}
+                              deleteIcon={
+                                <span className="text-red-500 hover:text-red-700 cursor-pointer text-lg">
+                                  ×
+                                </span>
+                              }
+                            />
+                          )
+                        )}
                       </div>
                     ) : (
-                      <p className="text-gray-500 mt-1">No previous mileage records</p>
+                      <p className="text-gray-500 mt-1">
+                        No previous mileage records
+                      </p>
                     )}
                   </div>
                 </Grid>
@@ -964,12 +1093,24 @@ const AddQuotation = () => {
           </div>
           <Box sx={{ marginTop: "50px" }}>
             <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 ">
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
-              <label className="col-span-12 md:col-span-6 text-center">Services Description</label>
-              <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-              <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
-              <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">hidden items for responsive</label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+                SL No
+              </label>
+              <label className="col-span-12 md:col-span-6 text-center">
+                Services Description
+              </label>
+              <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+                Qty
+              </label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+                Rate
+              </label>
+              <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+                Amount
+              </label>
+              <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
+                hidden items for responsive
+              </label>
             </div>
             {serviceItems.map((item, i) => {
               return (
@@ -992,39 +1133,67 @@ const AddQuotation = () => {
                           autoComplete="off"
                           type="text"
                           placeholder="Description"
-                          onChange={(e) => handleServiceDescriptionChange(i, e.target.value)}
+                          onChange={(e) =>
+                            handleServiceDescriptionChange(i, e.target.value)
+                          }
                           value={item.description}
                           required
                         />
-                        {showSuggestions && activeInputType === "service" && activeInputIndex === i && (
-                          <div style={suggestionStyles.suggestionsList}>
-                            {productSuggestions.map((product, index) => (
-                              <div
-                                key={product._id}
-                                style={{
-                                  ...suggestionStyles.suggestionItem,
-                                  ...(index === activeSuggestionIndex ? suggestionStyles.suggestionItemActive : {}),
-                                }}
-                                onClick={() => handleSelectSuggestion(product)}
-                              >
-                                <div style={suggestionStyles.suggestionItemContent}>
-                                  <span style={suggestionStyles.suggestionItemName}>
-                                    {product.product.product_name}
-                                  </span>
-                                  <span style={suggestionStyles.suggestionItemPrice}>
-                                    {product.product.product_quantity}
-                                  </span>
-                                  <span style={suggestionStyles.suggestionItemPrice}>
-                                    {product.product.unit?.short_name}
-                                  </span>
-                                  <span style={suggestionStyles.suggestionItemPrice}>
-                                    {product.product?.sellingPrice}
-                                  </span>
+                        {showSuggestions &&
+                          activeInputType === "service" &&
+                          activeInputIndex === i && (
+                            <div style={suggestionStyles.suggestionsList}>
+                              {productSuggestions.map((product, index) => (
+                                <div
+                                  key={product._id}
+                                  style={{
+                                    ...suggestionStyles.suggestionItem,
+                                    ...(index === activeSuggestionIndex
+                                      ? suggestionStyles.suggestionItemActive
+                                      : {}),
+                                  }}
+                                  onClick={() =>
+                                    handleSelectSuggestion(product)
+                                  }
+                                >
+                                  <div
+                                    style={
+                                      suggestionStyles.suggestionItemContent
+                                    }
+                                  >
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemName
+                                      }
+                                    >
+                                      {product.product.product_name}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      {product.stock}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      {product.product.unit?.short_name}
+                                    </span>
+                                    <span
+                                      style={
+                                        suggestionStyles.suggestionItemPrice
+                                      }
+                                    >
+                                      {product.product?.sellingPrice}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                              ))}
+                            </div>
+                          )}
                       </div>
                     </div>
                     <div className="col-span-12 md:col-span-2 flex gap-2">
@@ -1034,13 +1203,17 @@ const AddQuotation = () => {
                           autoComplete="off"
                           type="text"
                           placeholder="Qty"
-                          onChange={(e) => handleServiceQuantityChange(i, e.target.value)}
+                          onChange={(e) =>
+                            handleServiceQuantityChange(i, e.target.value)
+                          }
                           value={item.quantity}
                           required
                         />
                         <select
                           className="inputField col-span-9"
-                          onChange={(e) => handleServiceUnitChange(i, e.target.value)}
+                          onChange={(e) =>
+                            handleServiceUnitChange(i, e.target.value)
+                          }
                           value={item.unit || ""}
                           required
                         >
@@ -1060,7 +1233,9 @@ const AddQuotation = () => {
                         className="inputField"
                         autoComplete="off"
                         placeholder="Rate"
-                        onChange={(e) => handleServiceRateChange(i, e.target.value)}
+                        onChange={(e) =>
+                          handleServiceRateChange(i, e.target.value)
+                        }
                         value={item.rateDisplay || ""}
                         required
                       />
@@ -1097,16 +1272,28 @@ const AddQuotation = () => {
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </Box>
           <div className="grid grid-cols-12 gap-2 items-center font-bold mb-5 md:mb-1 mt-5 ">
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">SL No</label>
-            <label className="col-span-12 md:col-span-6 text-center ">Parts Description</label>
-            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">Qty</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">Rate</label>
-            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">Amount</label>
-            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">hidden items for responsive</label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              SL No
+            </label>
+            <label className="col-span-12 md:col-span-6 text-center ">
+              Parts Description
+            </label>
+            <label className="col-span-6 md:col-span-2 text-center hidden md:block  ">
+              Qty
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block ">
+              Rate
+            </label>
+            <label className="col-span-6 md:col-span-1 text-center hidden md:block  ">
+              Amount
+            </label>
+            <label className="opacity-0 col-span-6 md:col-span-1 hidden md:block ">
+              hidden items for responsive
+            </label>
           </div>
           {items.map((item, i) => {
             return (
@@ -1129,37 +1316,55 @@ const AddQuotation = () => {
                         autoComplete="off"
                         type="text"
                         placeholder="Description"
-                        onChange={(e) => handleDescriptionChange(i, e.target.value)}
+                        onChange={(e) =>
+                          handleDescriptionChange(i, e.target.value)
+                        }
                         value={item.description}
                         required
                       />
-                      {showSuggestions && activeInputType === "parts" && activeInputIndex === i && (
-                        <div style={suggestionStyles.suggestionsList}>
-                          {productSuggestions.map((product, index) => (
-                            <div
-                              key={product._id}
-                              style={{
-                                ...suggestionStyles.suggestionItem,
-                                ...(index === activeSuggestionIndex ? suggestionStyles.suggestionItemActive : {}),
-                              }}
-                              onClick={() => handleSelectSuggestion(product)}
-                            >
-                              <div style={suggestionStyles.suggestionItemContent}>
-                                <span style={suggestionStyles.suggestionItemName}>{product.product.product_name}</span>
-                                <span style={suggestionStyles.suggestionItemPrice}>
-                                  {product.product.product_quantity}
-                                </span>
-                                <span style={suggestionStyles.suggestionItemPrice}>
-                                  {product.product.unit?.short_name}
-                                </span>
-                                <span style={suggestionStyles.suggestionItemPrice}>
-                                  {product.product?.sellingPrice}
-                                </span>
+                      {showSuggestions &&
+                        activeInputType === "parts" &&
+                        activeInputIndex === i && (
+                          <div style={suggestionStyles.suggestionsList}>
+                            {productSuggestions.map((product, index) => (
+                              <div
+                                key={product._id}
+                                style={{
+                                  ...suggestionStyles.suggestionItem,
+                                  ...(index === activeSuggestionIndex
+                                    ? suggestionStyles.suggestionItemActive
+                                    : {}),
+                                }}
+                                onClick={() => handleSelectSuggestion(product)}
+                              >
+                                <div
+                                  style={suggestionStyles.suggestionItemContent}
+                                >
+                                  <span
+                                    style={suggestionStyles.suggestionItemName}
+                                  >
+                                    {product.product.product_name}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    {product.stock}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    {product.product.unit?.short_name}
+                                  </span>
+                                  <span
+                                    style={suggestionStyles.suggestionItemPrice}
+                                  >
+                                    {product.product?.sellingPrice}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                   <div className="col-span-12 md:col-span-2 flex gap-2">
@@ -1169,7 +1374,9 @@ const AddQuotation = () => {
                         autoComplete="off"
                         type="text"
                         placeholder="Qty"
-                        onChange={(e) => handleQuantityChange(i, e.target.value)}
+                        onChange={(e) =>
+                          handleQuantityChange(i, e.target.value)
+                        }
                         value={item.quantity}
                         required
                       />
@@ -1233,7 +1440,7 @@ const AddQuotation = () => {
                   )}
                 </div>
               </div>
-            )
+            );
           })}
           <div className="discountFieldWrap mt-5 ">
             <div className="flex items-center ">
@@ -1245,8 +1452,8 @@ const AddQuotation = () => {
               <input
                 className="py-1 text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "")
-                  handleDiscountChange(rawValue)
+                  const rawValue = e.target.value.replace(/,/g, "");
+                  handleDiscountChange(rawValue);
                 }}
                 value={formatNumber(discount)}
                 autoComplete="off"
@@ -1259,8 +1466,8 @@ const AddQuotation = () => {
               <input
                 className="text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "")
-                  handleVATChange(rawValue)
+                  const rawValue = e.target.value.replace(/,/g, "");
+                  handleVATChange(rawValue);
                 }}
                 value={formatNumber(vat)}
                 autoComplete="off"
@@ -1273,8 +1480,8 @@ const AddQuotation = () => {
               <input
                 className="text-center"
                 onChange={(e) => {
-                  const rawValue = e.target.value.replace(/,/g, "")
-                  handleTaxChange(rawValue)
+                  const rawValue = e.target.value.replace(/,/g, "");
+                  handleTaxChange(rawValue);
                 }}
                 value={formatNumber(tax)}
                 autoComplete="off"
@@ -1296,9 +1503,13 @@ const AddQuotation = () => {
               </button>
             </div>
             <div className="flex">
-              <button onClick={() => setGoOtherButton("preview")}>Preview</button>
+              <button onClick={() => setGoOtherButton("preview")}>
+                Preview
+              </button>
               <button>Print </button>
-              <button onClick={() => setGoOtherButton("invoice")}>Invoice </button>
+              <button onClick={() => setGoOtherButton("invoice")}>
+                Invoice{" "}
+              </button>
             </div>
             <div className="hidden  md:flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
@@ -1310,7 +1521,7 @@ const AddQuotation = () => {
       </div>
       <QuotationTable />
     </div>
-  )
-}
+  );
+};
 
-export default AddQuotation
+export default AddQuotation;

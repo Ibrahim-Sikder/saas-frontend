@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
 import { FaTrashAlt, FaEdit, FaEye, FaDownload } from "react-icons/fa";
@@ -14,7 +15,7 @@ import { Money } from "@mui/icons-material";
 import { getRowClass } from "../../../utils/getRowClass";
 import { useGetCompanyProfileQuery } from "../../../redux/api/companyProfile";
 
-const InvoiceTable = () => {
+const InvoiceTable = ({ title }) => {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search");
   const [filterType, setFilterType] = useState("");
@@ -82,7 +83,7 @@ const InvoiceTable = () => {
       <div className="overflow-x-auto">
         <div className="flex flex-wrap items-center justify-between mb-5">
           <h3 className="mb-3 text-xl md:text-3xl font-bold">
-            Invoice List: {allInvoices?.data?.invoices?.length}
+            {title}: {allInvoices?.data?.invoices?.length}
           </h3>
           <div className="flex items-center searcList">
             <div className="searchGroup">

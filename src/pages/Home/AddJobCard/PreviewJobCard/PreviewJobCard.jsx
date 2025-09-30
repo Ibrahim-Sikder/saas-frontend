@@ -92,7 +92,7 @@ const PreviewJobCard = () => {
   return (
     <main className="jobCardViewWrap">
       <div ref={componentRef}>
-        <div ref={targetRef} className=" jobCardPrint">
+        <div  className="jobCardPrint flex flex-col justify-between">
           <div className="headerContainer">
             <div className="mx-auto text-center border-b-[2px] ">
               <div className="mx-auto text-center border-b-[2px] border-[#110255] py-2">
@@ -451,7 +451,7 @@ const PreviewJobCard = () => {
             </div>
           </div>
 
-          <div className="">
+          <div >
             <div className="px-[8px]">
               <hr className=" border border-[#4671A1]" />
             </div>

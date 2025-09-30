@@ -28,18 +28,17 @@ const purchaseReturnApi = baseApi.injectEndpoints({
       providesTags: ["purchaseReturn"],
     }),
 
-   updatePurchaseReturn: builder.mutation({
-  query: ({ id, tenantDomain, data }) => ({
-    url: `/purchase-return/${id}`,
-    method: "PUT",
-    body: {
-      ...data,
-      tenantDomain, 
-    },
-  }),
-  invalidatesTags: ["purchaseReturn"],
-}),
-
+    updatePurchaseReturn: builder.mutation({
+      query: ({ id, tenantDomain, data }) => ({
+        url: `/purchase-return/${id}`,
+        method: "PUT",
+        body: {
+          ...data,
+          tenantDomain,
+        },
+      }),
+      invalidatesTags: ["purchaseReturn"],
+    }),
 
     removePurchaseReturn: builder.mutation({
       query: ({ id, data }) => ({

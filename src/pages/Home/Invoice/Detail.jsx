@@ -88,7 +88,7 @@ const handlePrint = useReactToPrint({
 
   return (
     <div ref={componentRef} className="h-screen">
-      <main ref={targetRef} className="invoicePrintWrap">
+      <main ref={targetRef} className="invoicePrintWrap ">
         <div>
           <div className="pb-5 px-5 invoicePrint">
             <div>
@@ -372,7 +372,7 @@ const handlePrint = useReactToPrint({
 
               <div className="flex justify-between items-end mt-3 border-b-[1px] pb-3 border-[#ddd]">
                 <div className="mt-5 text-[12px] invisible">
-                  <b className="">In words:</b>
+                
                 </div>
                 <div className="flex netTotalAmounts">
                   <div>
