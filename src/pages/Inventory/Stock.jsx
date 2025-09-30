@@ -316,14 +316,10 @@ const tenantDomain = useTenantDomain();
     return theme.palette.success.main;
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("bn-BD", {
-      style: "currency",
-      currency: "BDT",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+ const formatCurrency = (amount) => {
+  return amount.toLocaleString("en-US") + " ৳";
+};
+
 
   const isLoading = productLoading || isFetching;
 
@@ -514,7 +510,13 @@ const tenantDomain = useTenantDomain();
                 {isLoading ? (
                   <LinearProgress sx={{ my: 2 }} />
                 ) : (
+                  
+                  
+                  
+                   
                   formatCurrency(summaryStats.totalPurchaseValue)
+                  
+                  
                 )}
               </Typography>
               <Typography variant="body2" color="text.secondary">

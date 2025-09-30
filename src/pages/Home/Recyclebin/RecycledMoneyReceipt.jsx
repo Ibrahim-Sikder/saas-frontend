@@ -236,7 +236,7 @@ const tenantDomain = useTenantDomain();
                       <Link
                         to={`/dashboard/money-receipt-update?id=${card._id}`}
                       >
-                        <FaEdit className="editIcon" />
+                        <FaEdit className="editIcon text-blue-500" /> 
                       </Link>
                     </div>
                   </td>
@@ -246,7 +246,7 @@ const tenantDomain = useTenantDomain();
                       onClick={() => handleDeleteOrRestore(card._id)}
                       className="editIconWrap"
                     >
-                      <FaTrashAlt className="deleteIcon" />
+                      <FaTrashAlt className="deleteIcon text-red-500" />
                     </button>
                   </td>
                 </tr>

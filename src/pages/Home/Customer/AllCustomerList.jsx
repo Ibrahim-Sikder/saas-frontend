@@ -151,8 +151,8 @@ const AllCustomerList = () => {
                   <th>Customer ID</th>
                   <th>Customer Name</th>
                   <th>Vehicle User Name</th>
-                  <th>Car Number</th>
-                  <th>Mobile Number</th>
+                  <th>Car No.</th>
+                  <th>Mobile No.</th>
                   <th>User Type</th>
                   <th colSpan={2}>Action</th>
                 </tr>
@@ -198,7 +198,7 @@ const AllCustomerList = () => {
                                 : "update-show-room"
                             }?id=${customer?._id}`}
                           >
-                            <FaEdit className="editIcon" />
+                            <FaEdit className="editIcon text-blue-500" /> 
                           </Link>
                         </div>
                       </td>
