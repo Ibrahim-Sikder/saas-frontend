@@ -879,7 +879,7 @@ const UpdateInvoice = () => {
   const handleOnSubmit = () => {
     handleSubmit(onSubmit)();
     if (!userTypeFromProfile) {
-      navigate("/dashboard/invoice-view");
+      navigate("/dashboard/invoice-list");
     }
     if (userTypeFromProfile === "company") {
       navigate(`/dashboard/company-profile?id=${userFromProfile}`);

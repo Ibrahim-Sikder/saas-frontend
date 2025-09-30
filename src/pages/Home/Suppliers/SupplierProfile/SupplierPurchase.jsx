@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -50,6 +51,7 @@ import {
   ReceiptLong,
   AttachMoney,
   Numbers,
+  Delete,
 } from "@mui/icons-material";
 
 import { GlassCard, StatusChip } from "./supplier";
@@ -58,9 +60,13 @@ import {
   StyledTableContainer,
 } from "../../../../utils/customStyle";
 import SupplierPurchaseModal from "./SupplierPurchaseModal";
+import { useDeletePurchaseMutation } from "../../../../redux/api/purchaseApi";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
+import Swal from "sweetalert2";
 
 const SupplierPurchase = ({ purchaseData }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,8 +74,19 @@ const SupplierPurchase = ({ purchaseData }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [dialogAction, setDialogAction] = useState("");
   const [open, setOpen] = useState(false);
-
-  const handleOpen = () => setOpen(true);
+  const tenantDomain = useTenantDomain();
+  const [deletePurchase, { isLoading: isDeleting }] =
+    useDeletePurchaseMutation();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
+  console.log(selectedOrderForAction);
+ const handleOpen = () => {
+  const url = new URL(window.location);
+  url.searchParams.delete('id');
+  window.history.pushState({}, '', url);
+  
+  setOpen(true);
+};
   const handleClose = () => setOpen(false);
 
   const handleFilterMenuOpen = (event) => {
@@ -101,6 +118,48 @@ const SupplierPurchase = ({ purchaseData }) => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedOrder(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDeleteOrder = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deletePurchase({
+            tenantDomain,
+            id: selectedOrderForAction._id,
+          }).unwrap();
+          Swal.fire({
+            title: "Deleted!",
+            text: "The purchase has been deleted successfully.",
+            icon: "success",
+            confirmButtonColor: "#6366f1",
+            iconColor: "#6366f1",
+          });
+        } catch (error) {
+          Swal.fire({
+            title: "Error!",
+            text: "An error occurred while deleting the purchase.",
+            icon: "error",
+            confirmButtonColor: "#ef4444",
+          });
+        }
+      }
+    });
+    handleMenuClose();
   };
 
   const getStatusColor = (status) => {
@@ -274,7 +333,7 @@ const SupplierPurchase = ({ purchaseData }) => {
             }}
             onClick={handleOpen}
           >
-            Create Order
+            Create New Purchase
           </Button>
         </Box>
       </Box>
@@ -325,7 +384,7 @@ const SupplierPurchase = ({ purchaseData }) => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    ৳{order.grandTotal.toLocaleString()}
+                    ৳{order.grandTotal?.toLocaleString()}
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -349,14 +408,22 @@ const SupplierPurchase = ({ purchaseData }) => {
                   <Tooltip title="Edit Order">
                     <AnimatedIconButton
                       size="small"
-                      onClick={() => handleOpenDialog("edit", order)}
+                      onClick={() =>
+                        navigate(`/dashboard/update-purchase?id=${order._id}`)
+                      }
                     >
                       <Edit fontSize="small" />
                     </AnimatedIconButton>
                   </Tooltip>
-                  <Tooltip title="More Options">
-                    <AnimatedIconButton size="small">
-                      <MoreVert fontSize="small" />
+                  <Tooltip title="Delete Order">
+                    <AnimatedIconButton
+                      size="small"
+                      onClick={(e) => {
+                        setSelectedOrderForAction(order);
+                        handleDeleteOrder();
+                      }}
+                    >
+                      <Delete fontSize="small" />
                     </AnimatedIconButton>
                   </Tooltip>
                 </TableCell>
@@ -373,11 +440,7 @@ const SupplierPurchase = ({ purchaseData }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>
-          {dialogAction === "create" && "Create New Order"}
-          {dialogAction === "edit" && "Edit Order"}
-          {dialogAction === "view" && "Order Details"}
-        </DialogTitle>
+        <DialogTitle>{dialogAction === "view" && "Order Details"}</DialogTitle>
         <DialogContent>
           {selectedOrder && (
             <Box sx={{ mt: 2 }}>
@@ -486,22 +549,16 @@ const SupplierPurchase = ({ purchaseData }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          {dialogAction !== "view" && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCloseDialog}
-            >
-              {dialogAction === "create" ? "Create" : "Save"}
-            </Button>
-          )}
+          <Button onClick={handleCloseDialog}>Close</Button>
         </DialogActions>
       </Dialog>
 
-      {open && <SupplierPurchaseModal open={handleOpen} setOpen={handleClose}/>}
+      {open && (
+        <SupplierPurchaseModal open={handleOpen} setOpen={handleClose} />
+      )}
     </GlassCard>
   );
 };
+
 
 export default SupplierPurchase;

@@ -10,6 +10,15 @@ const supplierApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["supplier"],
     }),
+    recordPayment: builder.mutation({
+      query: ({data, tenantDomain }) => ({
+        url: "/suppliers/payments",
+        method: "POST",
+        body: data,
+        params: {tenantDomain, }
+      }),
+      invalidatesTags: ["supplier"],
+    }),
     getAllSuppliers: builder.query({
       query: ({ tenantDomain, limit, page, searchTerm, isRecycled }) => ({
         url: `/suppliers`,
@@ -104,4 +113,5 @@ export const {
   useMoveRecycledSupplierMutation,
   usePermenantlyDeleteSupplierMutation,
   useGetSupplierWithBillPayQuery,
+  useRecordPaymentMutation
 } = supplierApi;

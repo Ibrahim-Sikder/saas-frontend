@@ -92,6 +92,7 @@ const EmployeeSalaryForm = ({ id }) => {
       page: currentPage,
       searchTerm: searchTerm,
     });
+  console.log("employee ", getAllEmployee);
 
   const { data: singleSalary, isLoading: singleSalaryLoading } =
     useGetSalaryByMonthQuery({ tenantDomain, month });
@@ -148,11 +149,20 @@ const EmployeeSalaryForm = ({ id }) => {
   ]);
 
   const initializeWithDefaults = (employeeCount) => {
+    const newOvertimeHours = [];
+    
+    getAllEmployee.data.employees.forEach((employee) => {
+      const summary = employee.overtimeSummary?.find(
+        item => item.month === initialSelectedOption && item.year === parseInt(currentYear)
+      );
+      newOvertimeHours.push(summary ? parseFloat(summary.totalOvertime) : 0);
+    });
+
     setSelectedOption(new Array(employeeCount).fill(initialSelectedOption));
     setSelectedYear(new Array(employeeCount).fill(currentYear));
     setBonus(new Array(employeeCount).fill(0));
     setOvertimeAmount(new Array(employeeCount).fill(0));
-    setOvertimeHours(new Array(employeeCount).fill(0));
+    setOvertimeHours(newOvertimeHours);
     setSalaryAmount(new Array(employeeCount).fill(0));
     setPreviousDue(new Array(employeeCount).fill(0));
     setSalaryCut(new Array(employeeCount).fill(0));
@@ -183,7 +193,7 @@ const EmployeeSalaryForm = ({ id }) => {
       const yearArray = new Array(employeeCount).fill(currentYear);
       const bonusArray = new Array(employeeCount).fill(0);
       const overtimeAmountArray = new Array(employeeCount).fill(0);
-      const overtimeHoursArray = new Array(employeeCount).fill(0);
+      const overtimeHoursArray = [];
       const salaryAmountArray = new Array(employeeCount).fill(0);
       const previousDueArray = new Array(employeeCount).fill(0);
       const salaryCutArray = new Array(employeeCount).fill(0);
@@ -228,7 +238,7 @@ const EmployeeSalaryForm = ({ id }) => {
             salaryData.month_of_salary || initialSelectedOption;
           yearArray[index] = salaryData.year_of_salary || currentYear;
           bonusArray[index] = salaryData.bonus || 0;
-          overtimeAmountArray[index] = salaryData.overtime_rate || 0; // Change to overtime_rate
+          overtimeAmountArray[index] = salaryData.overtime_rate || 0;
           overtimeHoursArray[index] = salaryData.total_overtime || 0;
           salaryAmountArray[index] = salaryData.salary_amount || 0;
           previousDueArray[index] = salaryData.previous_due || 0;
@@ -238,6 +248,12 @@ const EmployeeSalaryForm = ({ id }) => {
           payArray[index] = salaryData.pay || 0;
           dueArray[index] = salaryData.due_amount || salaryData.due || 0;
           paidArray[index] = salaryData.payment_status === "completed";
+        } else {
+          // If no salary data, try to get from overtimeSummary
+          const summary = employee.overtimeSummary?.find(
+            item => item.month === initialSelectedOption && item.year === parseInt(currentYear)
+          );
+          overtimeHoursArray[index] = summary ? parseFloat(summary.totalOvertime) : 0;
         }
       });
 
@@ -451,65 +467,124 @@ const EmployeeSalaryForm = ({ id }) => {
   };
 
   const getOvertimeHours = (employee, index) => {
+    // First check if we have a user-modified value in state
     if (overtimeHours[index] !== undefined && overtimeHours[index] !== null) {
       return overtimeHours[index];
     }
+
+    // Then check for overtimeSummary data
+    const selectedMonth = selectedOption[index];
+    const selectedYearValue = parseInt(selectedYear[index]);
+    
+    // Find matching overtime summary
+    const summary = employee.overtimeSummary?.find(
+      item => item.month === selectedMonth && item.year === selectedYearValue
+    );
+
+    // Return value from summary if found, otherwise calculate from attendance
+    if (summary) {
+      return parseFloat(summary.totalOvertime);
+    }
+    
     return calculateOvertimeHours(employee);
   };
 
-const handleCreateSalary = async () => {
-  const newSalaryData =
-    filteredEmployees?.map((employee, index) => {
-      const originalIndex = getOriginalEmployeeIndex(employee);
-      const overtimeHoursVal = getOvertimeHours(employee, originalIndex);
-      const overtimeRate = overtimeAmount[originalIndex] || 0;
-      const overtimePayment = calculateOvertimePayment(overtimeHoursVal, overtimeRate);
-      const totalPaymentAmount = totalPayment[originalIndex] || 0;
-      const paidAmount =
-        (advance[originalIndex] || 0) + (pay[originalIndex] || 0);
-      const dueAmount = totalPaymentAmount - paidAmount;
-      const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
-
-      return {
-        employee: employee._id,
-        full_name: employee.full_name,
-        employeeId: employee.employeeId,
-        month_of_salary:
-          selectedOption[originalIndex] || initialSelectedOption,
-        year_of_salary: selectedYear[originalIndex] || currentYear,
-        bonus: bonus[originalIndex] || 0,
-        total_overtime: overtimeHoursVal,
-        overtime_rate: overtimeRate, // Add this field
-        overtime_amount: overtimePayment,
-        salary_amount: salaryAmount[originalIndex] || 0,
-        previous_due: previousDue[originalIndex] || 0,
-        cut_salary: salaryCut[originalIndex] || 0,
-        total_payment: totalPaymentAmount,
-        advance: advance[originalIndex] || 0,
-        pay: pay[originalIndex] || 0,
-        due: dueAmount,
-        paid: paidAmount,
-        paid_amount: paidAmount,
-        due_amount: dueAmount,
-        payment_status: paymentStatus,
-      };
-    }) || [];
-
-  try {
-    const response = await createSalary({
-      tenantDomain,
-      salaries: newSalaryData,
-    }).unwrap();
-
-    if (response.success) {
-      toast.success(response.message);
-      navigate("/dashboard/employee-salary");
+  const calculateOvertimeHours = (employee) => {
+    let totalOvertime = 0;
+    if (employee && employee.attendance && Array.isArray(employee.attendance)) {
+      employee.attendance.forEach((attendanceRecord) => {
+        if (
+          attendanceRecord.overtime &&
+          typeof attendanceRecord.overtime === "number"
+        ) {
+          totalOvertime += attendanceRecord.overtime;
+        }
+      });
     }
-  } catch (error) {
-    handleApiError(error);
-  }
-};
+    return totalOvertime;
+  };
 
+  const getEmployeesWithSalaryData = () => {
+    if (!isEditMode || !singleSalary?.data) return [];
+    const salariesArray = singleSalary.data;
+    const employees = getAllEmployee?.data?.employees || [];
+    return salariesArray
+      .map((salaryData) => {
+        let targetEmployeeId = null;
+        if (
+          salaryData.employee &&
+          typeof salaryData.employee === "object" &&
+          salaryData.employee._id
+        ) {
+          targetEmployeeId = salaryData.employee._id;
+        } else if (typeof salaryData.employee === "string") {
+          targetEmployeeId = salaryData.employee;
+        } else if (salaryData.employeeId) {
+          const foundEmployee = employees.find(
+            (emp) => emp.employeeId === salaryData.employeeId
+          );
+          targetEmployeeId = foundEmployee?._id;
+        }
+        return targetEmployeeId;
+      })
+      .filter(Boolean);
+  };
+
+  const handleCreateSalary = async () => {
+    const newSalaryData =
+      filteredEmployees?.map((employee, index) => {
+        const originalIndex = getOriginalEmployeeIndex(employee);
+        const overtimeHoursVal = getOvertimeHours(employee, originalIndex);
+        const overtimeRate = overtimeAmount[originalIndex] || 0;
+        const overtimePayment = calculateOvertimePayment(
+          overtimeHoursVal,
+          overtimeRate
+        );
+        const totalPaymentAmount = totalPayment[originalIndex] || 0;
+        const paidAmount =
+          (advance[originalIndex] || 0) + (pay[originalIndex] || 0);
+        const dueAmount = totalPaymentAmount - paidAmount;
+        const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
+
+        return {
+          employee: employee._id,
+          full_name: employee.full_name,
+          employeeId: employee.employeeId,
+          month_of_salary:
+            selectedOption[originalIndex] || initialSelectedOption,
+          year_of_salary: selectedYear[originalIndex] || currentYear,
+          bonus: bonus[originalIndex] || 0,
+          total_overtime: overtimeHoursVal,
+          overtime_rate: overtimeRate,
+          overtime_amount: overtimePayment,
+          salary_amount: salaryAmount[originalIndex] || 0,
+          previous_due: previousDue[originalIndex] || 0,
+          cut_salary: salaryCut[originalIndex] || 0,
+          total_payment: totalPaymentAmount,
+          advance: advance[originalIndex] || 0,
+          pay: pay[originalIndex] || 0,
+          due: dueAmount,
+          paid: paidAmount,
+          paid_amount: paidAmount,
+          due_amount: dueAmount,
+          payment_status: paymentStatus,
+        };
+      }) || [];
+
+    try {
+      const response = await createSalary({
+        tenantDomain,
+        salaries: newSalaryData,
+      }).unwrap();
+
+      if (response.success) {
+        toast.success(response.message);
+        navigate("/dashboard/employee-salary");
+      }
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
 
   const handleUpdateAllSalaries = async () => {
     try {
@@ -563,36 +638,35 @@ const handleCreateSalary = async () => {
         const dueAmount = totalPaymentAmount - paidAmount;
         const paymentStatus = getPaymentStatus(totalPaymentAmount, paidAmount);
 
-       const updateData = {
-        month_of_salary:
-          selectedOption[targetEmployeeIndex] || initialSelectedOption,
-        year_of_salary: selectedYear[targetEmployeeIndex] || currentYear,
-        bonus: bonus[targetEmployeeIndex] || 0,
-        total_overtime: getOvertimeHours(
-          employees[targetEmployeeIndex],
-          targetEmployeeIndex
-        ),
-        overtime_rate: overtimeAmount[targetEmployeeIndex] || 0, // Add this field
-        overtime_amount: calculateOvertimePayment(
-          getOvertimeHours(
+        const updateData = {
+          month_of_salary:
+            selectedOption[targetEmployeeIndex] || initialSelectedOption,
+          year_of_salary: selectedYear[targetEmployeeIndex] || currentYear,
+          bonus: bonus[targetEmployeeIndex] || 0,
+          total_overtime: getOvertimeHours(
             employees[targetEmployeeIndex],
             targetEmployeeIndex
           ),
-          overtimeAmount[targetEmployeeIndex] || 0
-        ),
-        salary_amount: salaryAmount[targetEmployeeIndex] || 0,
-        previous_due: previousDue[targetEmployeeIndex] || 0,
-        cut_salary: salaryCut[targetEmployeeIndex] || 0,
-        total_payment: totalPaymentAmount,
-        advance: advance[targetEmployeeIndex] || 0,
-        pay: pay[targetEmployeeIndex] || 0,
-        due: dueAmount,
-        paid: paidAmount,
-        paid_amount: paidAmount,
-        due_amount: dueAmount,
-        payment_status: paymentStatus,
-      };
-
+          overtime_rate: overtimeAmount[targetEmployeeIndex] || 0,
+          overtime_amount: calculateOvertimePayment(
+            getOvertimeHours(
+              employees[targetEmployeeIndex],
+              targetEmployeeIndex
+            ),
+            overtimeAmount[targetEmployeeIndex] || 0
+          ),
+          salary_amount: salaryAmount[targetEmployeeIndex] || 0,
+          previous_due: previousDue[targetEmployeeIndex] || 0,
+          cut_salary: salaryCut[targetEmployeeIndex] || 0,
+          total_payment: totalPaymentAmount,
+          advance: advance[targetEmployeeIndex] || 0,
+          pay: pay[targetEmployeeIndex] || 0,
+          due: dueAmount,
+          paid: paidAmount,
+          paid_amount: paidAmount,
+          due_amount: dueAmount,
+          payment_status: paymentStatus,
+        };
 
         return updateSalary({
           tenantDomain,
@@ -644,47 +718,6 @@ const handleCreateSalary = async () => {
         }
       });
     }
-  };
-
-  const calculateOvertimeHours = (employee) => {
-    let totalOvertime = 0;
-    if (employee && employee.attendance && Array.isArray(employee.attendance)) {
-      employee.attendance.forEach((attendanceRecord) => {
-        if (
-          attendanceRecord.overtime &&
-          typeof attendanceRecord.overtime === "number"
-        ) {
-          totalOvertime += attendanceRecord.overtime;
-        }
-      });
-    }
-    return totalOvertime;
-  };
-
-  const getEmployeesWithSalaryData = () => {
-    if (!isEditMode || !singleSalary?.data) return [];
-    const salariesArray = singleSalary.data;
-    const employees = getAllEmployee?.data?.employees || [];
-    return salariesArray
-      .map((salaryData) => {
-        let targetEmployeeId = null;
-        if (
-          salaryData.employee &&
-          typeof salaryData.employee === "object" &&
-          salaryData.employee._id
-        ) {
-          targetEmployeeId = salaryData.employee._id;
-        } else if (typeof salaryData.employee === "string") {
-          targetEmployeeId = salaryData.employee;
-        } else if (salaryData.employeeId) {
-          const foundEmployee = employees.find(
-            (emp) => emp.employeeId === salaryData.employeeId
-          );
-          targetEmployeeId = foundEmployee?._id;
-        }
-        return targetEmployeeId;
-      })
-      .filter(Boolean);
   };
 
   if (employeesLoading || (isEditMode && singleSalaryLoading)) {
@@ -909,7 +942,6 @@ const handleCreateSalary = async () => {
                     <TableCell sx={tableCellStyle}>
                       Total Overtime Payment
                     </TableCell>
-                    {/* <TableCell sx={tableCellStyle}>Previous Due</TableCell> */}
                     <TableCell sx={tableCellStyle}>Cut Salary</TableCell>
                     <TableCell sx={tableCellStyle}>Total Payment</TableCell>
                     <TableCell sx={tableCellStyle}>Advance</TableCell>
@@ -1084,7 +1116,7 @@ const handleCreateSalary = async () => {
                               type="number"
                               placeholder="0"
                               label="Hours"
-                              value={overtimeHours[originalIndex] || ""}
+                              value={overtimeHoursValue}
                               onChange={(e) =>
                                 handleOvertimeHours(employee, e.target.value)
                               }

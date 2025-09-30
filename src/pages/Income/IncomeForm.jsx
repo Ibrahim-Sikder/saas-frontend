@@ -305,79 +305,7 @@ const ExpenseForm = ({ id }) => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Grid container spacing={4}>
-            {/* Invoice & Date Section */}
-            <Grid item xs={12}>
-              <Card
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid #e2e8f0",
-                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                  backgroundColor: "white",
-                }}
-              >
-                <CardContent sx={{ p: 4 }}>
-                  <Stack direction="row" spacing={2} alignItems="center" mb={3}>
-                    <DateRange sx={{ color: "#3b82f6", fontSize: 24 }} />
-                    <Typography variant="h6" fontWeight="600" color="#1e293b">
-                      Invoice & Date Information
-                    </Typography>
-                  </Stack>
-                  <Divider sx={{ mb: 3 }} />
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={3}>
-                      <ExpenseAutoComplete
-                        label="Select Invoice"
-                        name="invoice_id"
-                        options={invoiceOption}
-                        size="normal"
-                        multiple={false}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <FormDatePicker
-                        size="medium"
-                        fullWidth
-                        name="date"
-                        label="Date"
-                        sx={expenseInputStyle}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TASInput
-                        fullWidth
-                        name="serviceIncomeAmount"
-                        label="Service Income"
-                        type="number"
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              ৳
-                            </InputAdornment>
-                          ),
-                        }}
-                        sx={expenseInputStyle}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TASInput
-                        fullWidth
-                        name="partsIncomeAmount"
-                        label="Parts Income"
-                        type="number"
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                             ৳
-                            </InputAdornment>
-                          ),
-                        }}
-                        sx={expenseInputStyle}
-                      />
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
+            
 
             {/* Income Items Section */}
             <Grid item xs={12}>
@@ -400,7 +328,7 @@ const ExpenseForm = ({ id }) => {
                     <Stack direction="row" spacing={2} alignItems="center">
                       <BusinessCenter sx={{ color: "#8b5cf6", fontSize: 24 }} />
                       <Typography variant="h6" fontWeight="600" color="#1e293b">
-                        Other Income
+                         Income Source
                       </Typography>
                     </Stack>
                   </Stack>

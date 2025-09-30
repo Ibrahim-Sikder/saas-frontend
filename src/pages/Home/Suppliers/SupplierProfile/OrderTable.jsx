@@ -3,6 +3,8 @@
 "use client";
 
 import { useState } from "react";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import {
   Box,
   Typography,
@@ -48,18 +50,44 @@ import {
   Timeline,
   ReceiptLong,
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
 import { GlassCard, StatusChip } from "./supplier";
-import { AnimatedIconButton, StyledTableContainer } from "../../../../utils/customStyle";
+import {
+  AnimatedIconButton,
+  StyledTableContainer,
+} from "../../../../utils/customStyle";
+import { useDeletePurchaseOrderMutation } from "../../../../redux/api/purchaseOrderApi";
+import ActionMenu from "../../../Inventory/PurchaseOrder/ActionMenu";
+import ReceiveDialog from "../../../Inventory/PurchaseOrder/ReceiveDialog";
+import UpdatePurchaseOrderModal from "../../../Inventory/UpdatePurchaseOrderModal";
+import PurchaseOrderModal from "../../../Inventory/PurchaseOrderModal";
+import { useTenantDomain } from "../../../../hooks/useTenantDomain";
 
-const OrderTable = ({ orderData }) => {
+const OrderTable = ({ orderData, refetch }) => {
   const theme = useTheme();
+  const tenantDomain = useTenantDomain();
+
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [dialogAction, setDialogAction] = useState("");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  // State for action menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
+
+  // State for receive dialog
+  const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
+  const [receivingOrderId, setReceivingOrderId] = useState(null);
+
+  // State for update modal
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  // Delete mutation
+  const [deletePurchase] = useDeletePurchaseOrderMutation();
 
   const handleFilterMenuOpen = (event) => {
     setFilterMenuAnchor(event.currentTarget);
@@ -81,15 +109,80 @@ const OrderTable = ({ orderData }) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleOpenDialog = (action, order = null) => {
-    setDialogAction(action);
-    setSelectedOrder(order);
-    setOpenDialog(true);
-  };
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedOrder(null);
+  };
+
+  // Action menu handlers
+  const handleMenuOpen = (event, order) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedOrderForAction(order);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleViewOrder = () => {
+    handleMenuClose();
+  };
+
+  const handleEditOrder = () => {
+    setSelectedOrder(selectedOrderForAction);
+    setOpenUpdateModal(true);
+    handleMenuClose();
+  };
+
+  const handleOpenReceiveDialog = () => {
+    setReceivingOrderId(selectedOrderForAction._id);
+    setOpenReceiveDialog(true);
+    handleMenuClose();
+  };
+
+  const handleCloseReceiveDialog = () => {
+    setOpenReceiveDialog(false);
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!selectedOrderForAction) return;
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await deletePurchase({
+            tenantDomain,
+            id: selectedOrderForAction._id,
+          }).unwrap();
+
+          if (res.success) {
+            toast.success("Purchase order deleted successfully!");
+            refetch();
+
+            Swal.fire(
+              "Deleted!",
+              "The purchase order has been deleted.",
+              "success"
+            );
+          }
+        } catch (error) {
+          Swal.fire("Error", "Failed to delete purchase order", "error");
+          console.error(error);
+        }
+      }
+    });
+
+    handleMenuClose();
   };
 
   const getStatusColor = (status) => {
@@ -214,34 +307,8 @@ const OrderTable = ({ orderData }) => {
             <Divider />
             <MenuItem onClick={handleFilterMenuClose}>Apply Filters</MenuItem>
           </Menu>
-          <Tooltip title="Sort orders">
-            <Button
-              variant="outlined"
-              startIcon={<Sort />}
-              sx={{ mr: 1, borderRadius: 20 }}
-              onClick={handleSortMenuOpen}
-            >
-              Sort
-            </Button>
-          </Tooltip>
-          <Menu
-            anchorEl={sortMenuAnchor}
-            open={Boolean(sortMenuAnchor)}
-            onClose={handleSortMenuClose}
-          >
-            <MenuItem onClick={handleSortMenuClose}>
-              Date (Newest First)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Date (Oldest First)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Amount (High to Low)
-            </MenuItem>
-            <MenuItem onClick={handleSortMenuClose}>
-              Amount (Low to High)
-            </MenuItem>
-          </Menu>
+                     
+       
           <Button
             variant="contained"
             startIcon={<Add />}
@@ -253,7 +320,7 @@ const OrderTable = ({ orderData }) => {
                 0.3
               )}`,
             }}
-            onClick={() => handleOpenDialog("create")}
+            onClick={handleOpen}
           >
             Create Order
           </Button>
@@ -301,8 +368,7 @@ const OrderTable = ({ orderData }) => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                   ৳
-                    {order.grandTotal.toLocaleString()}
+                    ৳{order.grandTotal.toLocaleString()}
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -330,24 +396,11 @@ const OrderTable = ({ orderData }) => {
                   />
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title="View Order">
-                    <AnimatedIconButton
-                      size="small"
-                      onClick={() => handleOpenDialog("view", order)}
-                    >
-                      <Visibility fontSize="small" />
-                    </AnimatedIconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit Order">
-                    <AnimatedIconButton
-                      size="small"
-                      onClick={() => handleOpenDialog("edit", order)}
-                    >
-                      <Edit fontSize="small" />
-                    </AnimatedIconButton>
-                  </Tooltip>
                   <Tooltip title="More Options">
-                    <AnimatedIconButton size="small">
+                    <AnimatedIconButton
+                      size="small"
+                      onClick={(e) => handleMenuOpen(e, order)}
+                    >
                       <MoreVert fontSize="small" />
                     </AnimatedIconButton>
                   </Tooltip>
@@ -358,64 +411,42 @@ const OrderTable = ({ orderData }) => {
         </Table>
       </StyledTableContainer>
 
-      {/* Order Action Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          {dialogAction === "create" && "Create New Order"}
-          {dialogAction === "edit" && "Edit Order"}
-          {dialogAction === "view" && "Order Details"}
-        </DialogTitle>
-        <DialogContent>
-          {selectedOrder && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1">
-                Reference No: {selectedOrder.referenceNo}
-              </Typography>
-              <Typography variant="body1">
-                Order Date: {formatDate(selectedOrder.orderDate)}
-              </Typography>
-              <Typography variant="body1">
-                Items: {calculateTotalItems(selectedOrder.products)}
-              </Typography>
-              <Typography variant="body1">
-                Amount: ${selectedOrder.grandTotal.toLocaleString()}
-              </Typography>
-              <Typography variant="body1">
-                Delivery Date: {formatDate(selectedOrder.expectedDeliveryDate)}
-              </Typography>
-              <Typography variant="body1">
-                Status: {selectedOrder.status}
-              </Typography>
-              <Typography variant="body1">
-                Payment Status: {selectedOrder.paymentStatus}
-              </Typography>
-              <Typography variant="body1">
-                Payment Method: {selectedOrder.paymentMethod}
-              </Typography>
-              <Typography variant="body1">
-                Note: {selectedOrder.note}
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          {dialogAction !== "view" && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCloseDialog}
-            >
-              {dialogAction === "create" ? "Create" : "Save"}
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
+      {/* Action Menu */}
+      <ActionMenu
+        anchorEl={anchorEl}
+        selectedOrder={selectedOrderForAction}
+        onMenuClose={handleMenuClose}
+        onViewOrder={handleViewOrder}
+        onEditOrder={handleEditOrder}
+        onOpenReceiveDialog={handleOpenReceiveDialog}
+        onDeleteOrder={handleDeleteOrder}
+      />
+
+      {/* Receive Dialog */}
+      <ReceiveDialog
+        open={openReceiveDialog}
+        purchaseId={receivingOrderId}
+        onClose={handleCloseReceiveDialog}
+      />
+
+      {/* Update Purchase Order Modal */}
+      {openUpdateModal && selectedOrder && (
+        <UpdatePurchaseOrderModal
+          tenantDomain={tenantDomain}
+          onClose={() => setOpenUpdateModal(false)}
+          open={openUpdateModal}
+          orderId={selectedOrder._id}
+        />
+      )}
+      {open && (
+        <PurchaseOrderModal
+          tenantDomain={tenantDomain}
+          onClose={handleClose}
+          open={handleOpen}
+        />
+      )}
+
+    
     </GlassCard>
   );
 };

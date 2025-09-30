@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import GarageModal from "../../../../components/Share/Modal/GarageModal";
-import PurchaseForm from "../../Parchase/Purchasform";
+import PurChaseForm from "../../Parchase/PurChaseForm";
 
 export default function SupplierPurchaseModal({ open, setOpen }) {
   return (
@@ -9,12 +9,12 @@ export default function SupplierPurchaseModal({ open, setOpen }) {
       setOpen={setOpen}
       title="Create New Product"
       maxWidth="xl"
-      fullWidth 
+      fullWidth
       sx={{
         "& .MuiDialog-paper": { padding: "20px" },
       }}
     >
-      <PurchaseForm />
+      <PurChaseForm />
     </GarageModal>
   );
 }

@@ -15,7 +15,6 @@ import {
   useUpdateUserMutation,
 } from "../../../redux/api/userApi";
 
-// Import subcomponents
 import ProfileHeader from "./ProfileHeader";
 import ProfileTabs from "./ProfileTabs";
 import SubscriptionSection from "./SubscriptionSection";

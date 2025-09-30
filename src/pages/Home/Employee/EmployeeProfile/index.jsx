@@ -6,25 +6,12 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  Grid,
-  Avatar,
-  Button,
-  Chip,
   Tabs,
   Tab,
-  CircularProgress,
-  IconButton,
   useTheme,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import SendIcon from "@mui/icons-material/Send";
-import EditIcon from "@mui/icons-material/Edit";
 import { useGetSingleEmployeeQuery } from "../../../../redux/api/employee";
 import Loading from "../../../../components/Loading/Loading";
 import EmployeeAccount from "./EmployeeAccount";
@@ -33,9 +20,7 @@ import EmployeeSalary from "./EmployeeSalary";
 import EmployeeOvertime from "./EmployeeOvertime";
 import EmployeeAttendance from "./EmployeeAttendance";
 import "../Employee.css";
-import avatar from "../../../../../public/assets/chat3.jpg";
 import {
-  AnimatedAvatar,
   tabsStyles,
   tabStyles,
 } from "../../../../utils/customStyle";

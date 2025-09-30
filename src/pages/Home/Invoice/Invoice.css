@@ -1,6 +1,7 @@
 .invoicePrintWrap {
   background-color: #ddd;
   padding: 50px 0;
+
 }
 
 .invoiceHead {
@@ -17,6 +18,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding-top: 15px;
+  height: 100%;
 }
 
 .invoiceHeader {
@@ -476,7 +478,7 @@
 @media print {
   @page {
     size: A4;
-    margin: 0; /* উপরের, নিচের, ডান-বাম সব মার্জিন 0 */
+    margin: 0;
   }
 
   body {
@@ -487,9 +489,6 @@
     padding: 0 !important;
   }
 
-  body * {
-    visibility: hidden;
-  }
 
   .invoicePrintWrap,
   .invoicePrintWrap * {
@@ -506,13 +505,13 @@
   }
 
   .invoicePrint {
-    width: 210mm !important;   /* A4 width */
-    min-height: 297mm !important; /* A4 height */
+    width: 210mm !important;  
+    min-height: 297mm !important; 
     margin: 0 auto !important;
     background: #fff !important;
     box-shadow: none !important;
     padding: 10mm !important;
-    display: block !important;
+
   }
 
   /* Hide unnecessary buttons */
@@ -557,42 +556,4 @@
     flex-direction: row !important;
   }
 }
-@media print {
-  @page {
-    size: A4;
-    margin: 0; /* পুরো মার্জিন 0 */
-  }
 
-  html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  .invoicePrintWrap, .invoicePrintWrap * {
-    visibility: visible;
-  }
-
-  .invoicePrintWrap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .invoicePrint {
-    width: 210mm !important;
-    min-height: 297mm !important;
-    margin: 0 auto !important;
-    background: #fff !important;
-    padding: 10mm !important;
-  }
-}

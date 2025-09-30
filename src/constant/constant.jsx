@@ -48,3 +48,9 @@ export const getStatusIcon = (status) => {
   }
   return <Info fontSize="small" />;
 };
+
+export const returnStatuses = [
+  { value: "pending", label: "Pending", color: "warning" },
+  { value: "completed", label: "Completed", color: "success" },
+  { value: "cancelled", label: "Cancelled", color: "error" },
+];

@@ -1,13 +1,11 @@
 /* eslint-disable no-unused-vars */
-
-import { FaFileInvoice } from "react-icons/fa";
 import { ArrowBack, ArrowForwardIos } from "@mui/icons-material";
 import InvoiceTable from "./InvoiceTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import { backBtnStyle } from "../../../utils/customStyle";
-import { HiOutlineUserGroup } from "react-icons/hi";
-const ViewInvoice = () => {
+
+const InvoiceList = () => {
   const navigate = useNavigate();
   const handleBack = () => {
     navigate(-1);
@@ -26,7 +24,6 @@ const ViewInvoice = () => {
         </div>
 
         <div className="flex items-center justify-center ">
-      
           <div className="ml-2">
             <h3 className="text-2xl font-bold"> Invoice </h3>
             <span>
@@ -43,9 +40,9 @@ const ViewInvoice = () => {
         </div>
       </div>
 
-      <InvoiceTable />
+      <InvoiceTable title="Invoice List" />
     </div>
   );
 };
 
-export default ViewInvoice;
+export default InvoiceList;

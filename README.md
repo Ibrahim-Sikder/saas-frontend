@@ -23,3 +23,7 @@ Make the setup script executable (if not done yet) and run it with the domain as
 cd /root
 sudo chmod +x /root/setup-client-domain.sh
 sudo /root/setup-client-domain.sh garage.worldautosolution.com
+
+## for subdomain ssl 
+sudo certbot --nginx -d app.jannatautomobiles143.com
+

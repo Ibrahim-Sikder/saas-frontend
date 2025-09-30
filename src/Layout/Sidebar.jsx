@@ -284,7 +284,7 @@ const Sidebar = ({ toggle }) => {
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
                 <FaFileInvoiceDollar className="mr-2" />
-                <NavLink to="/dashboard/invoice-view">Invoice List</NavLink>
+                <NavLink to="/dashboard/invoice-list">Invoice List</NavLink>
               </span>
             </Typography>
           </AccordionDetails>
@@ -479,8 +479,8 @@ const Sidebar = ({ toggle }) => {
               </Typography>
             ))}
           </AccordionDetails>
-        </Accordion> 
-         <Accordion
+        </Accordion>
+        <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel18"}
@@ -529,18 +529,11 @@ const Sidebar = ({ toggle }) => {
                 </NavLink>
               </div>
             </Typography>
-            <Typography className="accordionTypoGrapy">
-              <div className="flex items-center">
-                <HiOutlineClipboardList className="mr-2" />
-                <NavLink to="/dashboard/purchase-history">
-                  Purchase History{" "}
-                </NavLink>
-              </div>
-            </Typography>
+          
           </AccordionDetails>
         </Accordion>
         {/* Inventory */}
-         <Accordion
+        <Accordion
           sx={{ paddingBottom: "10px" }}
           className="dashboardAccordion"
           expanded={expanded === "panel6"}
@@ -562,7 +555,6 @@ const Sidebar = ({ toggle }) => {
 
           <AccordionDetails>
             <div className="accordionTypoGrapy">
-              
               {[
                 {
                   icon: <Inventory2 />,
@@ -579,6 +571,7 @@ const Sidebar = ({ toggle }) => {
                   text: "Stock Transfer",
                   link: "/dashboard/stock-transfer",
                 },
+
                 {
                   icon: <HiOutlineSwitchHorizontal />,
                   text: "Quantity Adjustment",
@@ -593,6 +586,11 @@ const Sidebar = ({ toggle }) => {
                   icon: <FaExclamationTriangle />,
                   text: "Low Stock Alert",
                   link: "/dashboard/low-stocks",
+                },
+                {
+                  icon: <HiOutlineSwitchHorizontal />,
+                  text: "Stock Transaction",
+                  link: "/dashboard/stock-transaction",
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center mb-2">
@@ -627,8 +625,7 @@ const Sidebar = ({ toggle }) => {
           <AccordionDetails>
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
-                ৳
-                <NavLink to="/dashboard/add-income">Add Income</NavLink>
+                ৳<NavLink to="/dashboard/add-income">Add Income</NavLink>
               </div>
             </Typography>
             <Typography className="accordionTypoGrapy">
@@ -657,7 +654,7 @@ const Sidebar = ({ toggle }) => {
                 </NavLink>
               </div>
             </Typography>
-          
+
             <Typography className="accordionTypoGrapy">
               <div className="flex items-center">
                 <Savings className="mr-2" />
@@ -727,11 +724,10 @@ const Sidebar = ({ toggle }) => {
                 <NavLink to="/dashboard/employee-leave">Leave</NavLink>
               </span>
             </Typography>
-          
+
             <Typography className="accordionTypoGrapy">
               <span className="flex items-center">
-                ৳
-                <NavLink to="/dashboard/employee-salary">Salary</NavLink>
+                ৳<NavLink to="/dashboard/employee-salary">Salary</NavLink>
               </span>
             </Typography>
           </AccordionDetails>

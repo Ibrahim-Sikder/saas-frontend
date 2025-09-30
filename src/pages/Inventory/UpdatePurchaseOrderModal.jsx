@@ -14,19 +14,7 @@ import {
 } from "@mui/material";
 import {
   Close as CloseIcon,
-  Person as PersonIcon,
-  Store as StoreIcon,
-  LocalShipping as LocalShippingIcon,
-  Receipt as ReceiptIcon,
-  Payment as PaymentIcon,
-  Add as AddIcon,
-  Remove as RemoveIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
   Inventory as InventoryIcon,
-  Save as SaveIcon,
-  EventNote as EventNoteIcon,
-  CreditCard as CreditCardIcon,
 } from "@mui/icons-material";
 import PurchaseOrderForm from "./PurchaseOrderForm";
 

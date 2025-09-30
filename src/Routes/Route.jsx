@@ -3,7 +3,6 @@ import Main from "../Layout/Main";
 import Home from "../pages/Home/Home";
 import JobCardList from "../pages/Home/AddJobCard/JobCardList";
 import AddEmployee from "../pages/Home/Employee/AddEmployee";
-import ViewInvoice from "../pages/Home/Invoice/ViewInvoice";
 import Detail from "../pages/Home/Invoice/Detail";
 import UpdateInvoice from "../pages/Home/Invoice/UpdateInvoice";
 import Invoice from "../pages/Home/Invoice/Invoice";
@@ -97,27 +96,20 @@ import AddPaybill from "../pages/BillPay/AddPaybill";
 import BillPayList from "../pages/BillPay/BillPayList";
 import BillPayHistory from "../pages/BillPay/BillPayHistory";
 import UpdateEmployeeSalary from "../pages/Home/Employee/UpdateEmployeeSalary";
-import Signup from "../pages/Signup/Signup";
-import RegisterPage from "../pages/Login/Register";
-import TenantRegistrationPage from "../pages/Login/TenantRegister";
-import SubscriptionPage from "../pages/Login/Subscription";
-import PricingPage from "../pages/Login/PricingPage";
+
 import InventoryDashboard from "../pages/Inventory/InventoryDashboard";
 import ExpiredProduct from "../pages/Inventory/ExpiredProduct";
 import LowStock from "../pages/Inventory/LowStock";
 import Variants from "../pages/Inventory/Variants";
-import Warranties from "../pages/Inventory/Warranties";
 import StockPage from "../pages/Inventory/Stock";
 import RemoveStock from "../pages/Inventory/RemoveStock";
 import PurchaseReturn from "../pages/Inventory/PurchaseReturn";
-import PurchaseHistory from "../pages/Inventory/PurchaseHistory";
 import StockTransferPage from "../pages/Inventory/StockTransper";
 import ExpiredProductsReportPage from "../pages/Reports/ExpiredProductReport";
 import LowStockReportPage from "../pages/Reports/LowStockReport";
 import ProductStockReportPage from "../pages/Reports/ProductStockReport";
 import DailyStockMovementReportPage from "../pages/Reports/DailyStockReport";
 import ReportsPage from "../pages/Reports/Report";
-import PurchaseReturnList from "../pages/Inventory/PurchaseReturnList";
 import PurchaseReturnUpdate from "../pages/Inventory/PurchaseReturnUpdate";
 import WarehouseManagement from "../pages/Inventory/WarehouseManagement";
 import StockAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
@@ -125,7 +117,6 @@ import AddAdjustment from "../pages/Inventory/Adjustment/AddAdjustment";
 import QuantityAdjustment from "../pages/Inventory/Adjustment/AdjustmentList";
 import CreateTenant from "../pages/Tenant/CreateTenant";
 import LandingPage from "../pages/Login/LandingPage";
-import SubscriptionManagement from "../pages/Subscription/Subscription";
 import Login from "../pages/Login/Login";
 import AdminUserListPage from "../pages/Home/Profile/AllUserList";
 import UserProfilePage from "../pages/Home/Profile/Profile";
@@ -138,6 +129,11 @@ import Review from "../pages/Review/Review";
 import DonationList from "../pages/Donation/DonationList";
 import UpdateDonation from "../pages/Donation/UpdateDonation";
 import PurchaseOrder from "../pages/Inventory/PurchaseOrder/PurchaseOrder";
+import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturnList";
+import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
+import StockTransaction from "../pages/Inventory/StockTransaction/StockTransaction";
+import InvoiceList from "../pages/Home/Invoice/ViewInvoice";
+import RoleManagement from "../pages/RoleManagement";
 
 export const router = createBrowserRouter([
   {
@@ -148,10 +144,7 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
-      {
-        path: "signup",
-        element: <Signup />,
-      },
+
       {
         path: "login",
         element: <Login />,
@@ -159,27 +152,6 @@ export const router = createBrowserRouter([
       {
         path: "create-tenant",
         element: <CreateTenant />,
-      },
-      {
-        path: "register",
-        element: <RegisterPage />,
-      },
-      {
-        path: "tenant",
-        element: <TenantRegistrationPage />,
-      },
-
-      {
-        path: "subscription",
-        element: <SubscriptionManagement />,
-      },
-      {
-        path: "subscription",
-        element: <SubscriptionPage />,
-      },
-      {
-        path: "pricing",
-        element: <PricingPage />,
       },
     ],
   },
@@ -195,6 +167,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Home />,
+      },
+      {
+        path: "role-management",
+        element: <RoleManagement />,
       },
 
       {
@@ -348,7 +324,7 @@ export const router = createBrowserRouter([
         element: <UpdatePurchase />,
       },
       {
-        path: "purchase-return-update",
+        path: "update-purchase-return",
         element: <PurchaseReturnUpdate />,
       },
       {
@@ -392,8 +368,8 @@ export const router = createBrowserRouter([
         element: <Detail />,
       },
       {
-        path: "invoice-view",
-        element: <ViewInvoice />,
+        path: "invoice-list",
+        element: <InvoiceList />,
       },
 
       {
@@ -594,10 +570,14 @@ export const router = createBrowserRouter([
         path: "variants",
         element: <Variants />,
       },
+      {
+        path: "stock-transaction",
+        element: <StockTransaction />,
+      },
 
       {
         path: "warranties",
-        element: <Warranties />,
+        element: <WarrantiesPage />,
       },
       {
         path: "stock-transfer",
@@ -635,16 +615,13 @@ export const router = createBrowserRouter([
       },
       {
         path: "purchase-order",
-        element: <PurchaseOrder/>,
+        element: <PurchaseOrder />,
       },
       {
         path: "purchase-return-add",
         element: <PurchaseReturn />,
       },
-      {
-        path: "purchase-history",
-        element: <PurchaseHistory />,
-      },
+
       {
         path: "stock",
         element: <StockPage />,
