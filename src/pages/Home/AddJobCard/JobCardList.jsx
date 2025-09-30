@@ -1,5 +1,5 @@
 import { FaFileInvoice } from "react-icons/fa";
-import JobcardTable from "./JobcardTable";
+import JobcardTable from "./JobCardTable";
 import { ArrowForwardIos } from "@mui/icons-material";
 
 const JobCardList = () => {
