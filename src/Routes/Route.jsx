@@ -133,6 +133,7 @@ import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturn
 import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
 import StockTransaction from "../pages/Inventory/StockTransaction/StockTransaction";
 import InvoiceList from "../pages/Home/Invoice/ViewInvoice";
+import RoleManagement from "../pages/RoleManagement";
 
 export const router = createBrowserRouter([
   {
@@ -152,10 +153,6 @@ export const router = createBrowserRouter([
         path: "create-tenant",
         element: <CreateTenant />,
       },
-
-
-  
-
     ],
   },
   {
@@ -170,6 +167,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Home />,
+      },
+      {
+        path: "role-management",
+        element: <RoleManagement />,
       },
 
       {

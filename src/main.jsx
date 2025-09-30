@@ -1,3 +1,4 @@
+// src/index.js
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -12,22 +13,29 @@ import { ThemeProvider } from "@mui/material";
 import { theme } from "./Theme.jsx";
 import { Provider } from "react-redux";
 import { store } from "./redux/store.js";
+// import { PermissionProvider } from "./context/PermissionContext.jsx";
+import ErrorBoundary from "./components/ErrorBoundary";
+
 const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <Providers>
-          <PrintProvider>
-            <ToastContainer />
-            <RouterProvider router={router} />
-           
-          </PrintProvider>
-        </Providers>
-        
-      </ThemeProvider>
-    </QueryClientProvider>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider theme={theme}>
+            <Providers>
+              <PrintProvider>
+                {/* <PermissionProvider>
+                  
+                </PermissionProvider> */}
+                <ToastContainer />
+                  <RouterProvider router={router} />
+              </PrintProvider>
+            </Providers>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
