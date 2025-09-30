@@ -46,7 +46,7 @@ const Home = () => {
           onClick={() => setShowSensitiveData(!showSensitiveData)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          {showSensitiveData ? <><VisibilityOff/> Hide</>  : <><Visibility/> Show</>}
+          {showSensitiveData ? <VisibilityOff/>   : <Visibility/> }
         </button>
       </div>
 

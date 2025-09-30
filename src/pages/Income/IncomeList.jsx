@@ -171,12 +171,16 @@ const IncomeList = () => {
         />
       </Box>
 
+
+
       <TableContainer
         component={Paper}
+        className="tableContainer"
         sx={{
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           borderRadius: 2,
-          overflow: "hidden",
+          overflowX:"auto" 
+          
         }}
       >
         <Table sx={{ minWidth: 650 }} aria-label="income table">

@@ -168,7 +168,7 @@ export const Navigation = ({ scrollToSection }) => {
             </Stack>
           ) : (
             <IconButton color="inherit" onClick={() => setIsMenuOpen(true)}>
-              <MenuIcon />
+              <MenuIcon className="text-white"/>
             </IconButton>
           )}
         </Toolbar>
