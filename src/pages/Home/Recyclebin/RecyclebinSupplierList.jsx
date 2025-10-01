@@ -121,7 +121,7 @@ const tenantDomain = useTenantDomain();
         </div>
       </div>
       <div className="mt-20 overflow-x-auto">
-        <div className="md:flex items-center justify-between mb-5">
+        <div className="md:flex items-center justify-end mb-5">
           <h3 className="mb-3 text-xl md:text-3xl font-bold">
             Suppliers List:
           </h3>
