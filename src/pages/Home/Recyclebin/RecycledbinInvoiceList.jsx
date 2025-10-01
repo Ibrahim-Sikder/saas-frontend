@@ -123,6 +123,7 @@ const InvoiceTable = () => {
     <div className="mt-5 overflow-x-auto">
       <div className=" overflow-x-auto">
         <div className="flex flex-wrap  items-center justify-end mb-5">
+          {/* update */}
           <h3 className="mb-3 text-xl  md:text-3xl font-bold">
             Recycledbin Invoice List:
           </h3>
