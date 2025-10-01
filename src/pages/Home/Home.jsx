@@ -54,10 +54,17 @@ const Home = () => {
       <AllServices showSensitiveData={showSensitiveData} />
 
       {showSensitiveData && (
+       
         <DashboardSummary
           data={allMetaData?.data}
           accountSummary={accountSummary}
         />
+        
+      )}
+      {showSensitiveData && (
+        
+        <ProfitOverView />
+        
       )}
 
       {/* {showSensitiveData && (
@@ -67,7 +74,7 @@ const Home = () => {
         </>
       )} */}
 
-      <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
+      {/* <div className="flex xl:flex-nowrap flex-wrap sectionMargin  ">
         <MonthlyBarChart />
         <YearlyIncomeChart />
       </div>
@@ -78,8 +85,8 @@ const Home = () => {
         <h3 className="text-xl md:text-3xl font-semibold monthlyTitle">
           Yearly Income Chart
         </h3>
-      </div>
-      <ProfitOverView />
+      </div> */}
+      
       <ProjectOverView />
 
       <div className="recentCardWrap gap-5  xl:flex justify-between sectionMargin">

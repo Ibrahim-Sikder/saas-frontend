@@ -84,7 +84,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
 
   return (
     <div className=" mb-24 mt-10 w-full">
-      <div className="flex items-center justify-between mb-5 bg-[#F1F3F6] py-5 px-3">
+      <div className="flex items-center justify-end mb-5 bg-[#F1F3F6] py-5 px-3">
         <div className="flex items-center searcList">
           <div className="searchGroup">
             <input

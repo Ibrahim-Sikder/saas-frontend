@@ -171,8 +171,6 @@ const IncomeList = () => {
         />
       </Box>
 
-
-
       <TableContainer
         component={Paper}
         className="tableContainer"

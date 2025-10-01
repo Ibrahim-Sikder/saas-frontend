@@ -36,7 +36,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
   return (
     <div className="static w-full h-16 xl:h-16">
       <div className="w-full h-16 xl:h-16 bg-[#42A1DA] fixed z-10 ">
-        <div className="flex items-center justify-between lg:pr-8 pl-10 lg:pl-20 mt-3 md:mt-2 lg:mt-3">
+        <div className="flex items-center justify-between lg:pr-8 pl-10 lg:pl-10 xl:pl-20 mt-3 md:mt-2 lg:mt-3">
           <div
             className={`${toggle ? `activeToggle ` : `navActive`}`}
             ref={navRef}
@@ -48,7 +48,7 @@ const Appbar = ({ toggle, navRef, toggleSideBar }) => {
           </div>
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/dashboard">
-              <h3 className="ml-5 text-xl lg:text-2xl font-semibold text-white hidden xl:block">
+              <h3 className="w-[250px] ml-5 lg:text-xl xl:text-xl font-semibold text-white hidden xl:block">
                 {CompanyInfoData?.data?.companyName}
               </h3>
             </Link>
