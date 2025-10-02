@@ -1,3 +1,4 @@
+// src/Routes/Route.jsx
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../Layout/Main";
 import Home from "../pages/Home/Home";
@@ -59,7 +60,6 @@ import RunningProject from "../pages/Home/Projects/RunningProject";
 import CompletedProject from "../pages/Home/Projects/CompletedProject";
 import ViewEmployeeAttendance from "../pages/Home/Attendance/ViewEmployeeAttendance";
 import EmployeeHoliday from "../pages/Holiday/Holiday";
-
 import UpdateBillPay from "../pages/BillPay/UpdateBillPay";
 import BillPayInvoice from "../pages/BillPay/BillPayInvoice";
 import PurchaseList from "../pages/Home/Parchase/PurchasList";
@@ -90,13 +90,11 @@ import Backup from "../pages/Backup/Backup";
 import RestoreDatabase from "../pages/Backup/RestoreDatabase";
 import CreateHoliday from "../pages/Holiday/CreateHoliday";
 import CreateEmployeeOverTime from "../pages/Home/Employee/CreateEmployeeOverTime";
-import UpdateEmployeeOvertime from "../pages/Home/Employee/UpdateEmployeeOvertime";
 import UpdateHoliday from "../pages/Holiday/UpdateHoliday";
 import AddPaybill from "../pages/BillPay/AddPaybill";
 import BillPayList from "../pages/BillPay/BillPayList";
 import BillPayHistory from "../pages/BillPay/BillPayHistory";
 import UpdateEmployeeSalary from "../pages/Home/Employee/UpdateEmployeeSalary";
-
 import InventoryDashboard from "../pages/Inventory/InventoryDashboard";
 import ExpiredProduct from "../pages/Inventory/ExpiredProduct";
 import LowStock from "../pages/Inventory/LowStock";
@@ -119,7 +117,6 @@ import CreateTenant from "../pages/Tenant/CreateTenant";
 import LandingPage from "../pages/Login/LandingPage";
 import Login from "../pages/Login/Login";
 import AdminUserListPage from "../pages/Home/Profile/AllUserList";
-import UserProfilePage from "../pages/Home/Profile/Profile";
 import UpdateProfile from "../pages/Home/Profile/UpdateProfile";
 import AllTenantList from "../pages/Home/Tenant/AllTenantList";
 import AllUserList from "../pages/Home/Tenant/AllUserList";
@@ -133,7 +130,24 @@ import PurchaseReturnList from "../pages/Inventory/PurchaseReturn/PurchaseReturn
 import WarrantiesPage from "../pages/Inventory/Warranty/WarrantiesPage";
 import StockTransaction from "../pages/Inventory/StockTransaction/StockTransaction";
 import InvoiceList from "../pages/Home/Invoice/ViewInvoice";
+import Unauthorized from "../pages/Unauthorized";
+import ProtectedRoute from "./PrivateRoute";
+import FeatureAccess from "../pages/PermissionDashboard/FeatureAccess";
+import UserManagement from "../pages/PermissionDashboard/UserManagement";
+import PageManagement from "../pages/PageManagement/PageManagement";
 import RoleManagement from "../pages/RoleManagement";
+import Permission from "../pages/Permission/Permission";
+
+const createProtectedRoute = (path, element, pagePath, action = "view") => {
+  return {
+    path,
+    element: (
+      <ProtectedRoute pagePath={pagePath} action={action}>
+        {element}
+      </ProtectedRoute>
+    ),
+  };
+};
 
 export const router = createBrowserRouter([
   {
@@ -144,7 +158,6 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
-
       {
         path: "login",
         element: <Login />,
@@ -153,560 +166,658 @@ export const router = createBrowserRouter([
         path: "create-tenant",
         element: <CreateTenant />,
       },
+      {
+        path: "unauthorized",
+        element: <Unauthorized />,
+      },
     ],
   },
   {
     path: "dashboard",
-    element: (
-      // <PrivateRoute>
-      //   <DashboardLayout />
-      // </PrivateRoute>
-      <DashboardLayout /> 
-    ),
+    element: <DashboardLayout />,
     children: [
-      {
-        path: "/dashboard",
-        element: <Home />,
-      },
-      {
-        path: "role-management",
-        element: <RoleManagement />,
-      },
-
-      {
-        path: "addjob",
-        element: <AddJobCard />,
-      },
-      {
-        path: "preview",
-        element: <PreviewJobCard />,
-      },
-      {
-        path: "update-jobcard",
-        element: <UpdateJobCard />,
-      },
-      {
-        path: "profile",
-        element: <Profile />,
-      },
-      {
-        path: "invoice",
-        element: <Invoice />,
-      },
-
-      {
-        path: "product-list",
-        element: <ProductList />,
-      },
-      {
-        path: "adjustment",
-        element: <StockAdjustment />,
-      },
-      {
-        path: "add-product",
-        element: <AddProduct />,
-      },
-      {
-        path: "update-product",
-        element: <UpdateProduct />,
-      },
-      {
-        path: "update-product",
-        element: <UpdateProduct />,
-      },
-      {
-        path: "customer-list",
-        element: <CustomerList />,
-      },
-      {
-        path: "update-customer",
-        element: <UpdateCustomer />,
-      },
-      {
-        path: "add-customer",
-        element: <AddCustomer />,
-      },
-      {
-        path: "customer-profile",
-        element: <CustomerProfile />,
-      },
-      {
-        path: "company-profile",
-        element: <CompanyProfile />,
-      },
-      {
-        path: "add-company",
-        element: <AddCompany />,
-      },
-      {
-        path: "update-company",
-        element: <UpdateCompany />,
-      },
-
-      {
-        path: "company-list",
-        element: <CompanyList />,
-      },
-      {
-        path: "add-show-room",
-        element: <AddShowRoom />,
-      },
-      {
-        path: "update-show-room",
-        element: <UpdateShowRoom />,
-      },
-      {
-        path: "show-room-list",
-        element: <ShowRoomList />,
-      },
-      {
-        path: "show-room-profile",
-        element: <ShowRoomProfile />,
-      },
-      {
-        path: "expense-list",
-        element: <ExpenseList />,
-      },
-      {
-        path: "add-expense",
-        element: <AddExpense />,
-      },
-      {
-        path: "add-employee",
-        element: <AddEmployee />,
-      },
-      {
-        path: "employee-list",
-        element: <EmployeeList />,
-      },
-      {
-        path: "update-employee",
-        element: <UpdateEmployee />,
-      },
-      {
-        path: "employee-profile",
-        element: <EmployeeProfile />,
-      },
-      {
-        path: "employee-leave",
-        element: <EmployeeLeave />,
-      },
-      {
-        path: "employee-attendance",
-        element: <Attendance />,
-      },
-      {
-        path: "add-supplier",
-        element: <AddSuppliers />,
-      },
-      {
-        path: "supplier-list",
-        element: <SupplierList />,
-      },
-      {
-        path: "supplier-profile",
-        element: <SupplierProfile />,
-      },
-      {
-        path: "update-supplier",
-        element: <UpdateSupplier />,
-      },
-      {
-        path: "purchase-list",
-        element: <PurchaseList />,
-      },
-      {
-        path: "add-purchase",
-        element: <AddPurchase />,
-      },
-      {
-        path: "update-purchase",
-        element: <UpdatePurchase />,
-      },
-      {
-        path: "update-purchase-return",
-        element: <PurchaseReturnUpdate />,
-      },
-      {
-        path: "role",
-        element: <Role />,
-      },
-      {
-        path: "add-role",
-        element: <AddRole />,
-      },
-      {
-        path: "update-role",
-        element: <UpdateRole />,
-      },
-      {
-        path: "qutation",
-        element: <AddQuotation />,
-      },
-      {
-        path: "update-quotation",
-        element: <UpdateQuotation />,
-      },
-      {
-        path: "quotation-view",
-        element: <QuotationView />,
-      },
-      {
-        path: "quotation-list",
-        element: <QuotationList />,
-      },
-      {
-        path: "invoice",
-        element: <Invoice />,
-      },
-      {
-        path: "update-invoice",
-        element: <UpdateInvoice />,
-      },
-      {
-        path: "detail",
-        element: <Detail />,
-      },
-      {
-        path: "invoice-list",
-        element: <InvoiceList />,
-      },
-
-      {
-        path: "jobcard-list",
-        element: <JobCardList />,
-      },
-      {
-        path: "money-receive",
-        element: <MoneyReceived />,
-      },
-      {
-        path: "money-receipt-list",
-        element: <MoneyReceiptList />,
-      },
-      {
-        path: "money-receipt-view",
-        element: <MoneyReceiptView />,
-      },
-      {
-        path: "money-receipt-update",
-        element: <UpdateMoneyReceipt />,
-      },
-      {
-        path: "money-receipt-due",
-        element: <DuemoneyReceiptList />,
-      },
-      {
-        path: "add-expanse",
-        element: <AddExpense />,
-      },
-      {
-        path: "expanse-list",
-        element: <ExpenseList />,
-      },
-      {
-        path: "update-expense",
-        element: <UpdateExpense />,
-      },
-      {
-        path: "view-expense",
-        element: <ViewExpense />,
-      },
-      {
-        path: "expense-categories",
-        element: <ExpenseCategoryList />,
-      },
-      {
-        path: "add-attendance",
-        element: <AddAttendance />,
-      },
-      {
-        path: "attendance-list",
-        element: <AttendanceList />,
-      },
-      {
-        path: "update-attendance",
-        element: <UpdateAttendance />,
-      },
-      {
-        path: "employee-salary",
-        element: <EmployeeSalary />,
-      },
-      {
-        path: "employee-salary-update",
-        element: <UpdateEmployeeSalary />,
-      },
-      {
-        path: "employee-overtime",
-        element: <EmployeeOvertime />,
-      },
-      {
-        path: "create-overtime",
-        element: <CreateEmployeeOverTime />,
-      },
-      {
-        path: "update-overtime",
-        element: <UpdateEmployeeOvertime />,
-      },
-      {
-        path: "running-project",
-        element: <RunningProject />,
-      },
-      {
-        path: "complete-project",
-        element: <CompletedProject />,
-      },
-      {
-        path: "view-attendance",
-        element: <ViewEmployeeAttendance />,
-      },
-      {
-        path: "paybill",
-        element: <BillPayList />,
-      },
-      {
-        path: "add-paybill",
-        element: <AddPaybill />,
-      },
-      {
-        path: "update-paybill",
-        element: <UpdateBillPay />,
-      },
-      {
-        path: "paybill-view",
-        element: <BillPayInvoice />,
-      },
-      {
-        path: "bill-pay-history",
-        element: <BillPayHistory />,
-      },
-
-      {
-        path: "holiday",
-        element: <EmployeeHoliday />,
-      },
-      {
-        path: "create-holiday",
-        element: <CreateHoliday />,
-      },
-      {
-        path: "update-holiday",
-        element: <UpdateHoliday />,
-      },
-
-      {
-        path: "add-income",
-        element: <Income />,
-      },
-      {
-        path: "income-list",
-        element: <IncomeList />,
-      },
-      {
-        path: "update-income",
-        element: <UpdateIncome />,
-      },
-
-      {
-        path: "donation",
-        element: <Donation />,
-      },
-      {
-        path: "donation-list",
-        element: <DonationList />,
-      },
-      {
-        path: "update-donation",
-        element: <UpdateDonation />,
-      },
-      {
-        path: "category",
-        element: <CategoryList />,
-      },
-
-      {
-        path: "brand",
-        element: <Brand />,
-      },
-
-      {
-        path: "unit",
-        element: <Unit />,
-      },
-
-      {
-        path: "barcode",
-        element: <Barcode />,
-      },
-      {
-        path: "product-type",
-        element: <ProductType />,
-      },
-      {
-        path: "inventory-dashboard",
-        element: <InventoryDashboard />,
-      },
-      {
-        path: "expired-products",
-        element: <ExpiredProduct />,
-      },
-      {
-        path: "add-adjustment",
-        element: <AddAdjustment />,
-      },
-      {
-        path: "quantity-adjustment",
-        element: <QuantityAdjustment />,
-      },
-      {
-        path: "low-stocks",
-        element: <LowStock />,
-      },
-      {
-        path: "warehouse",
-        element: <WarehouseManagement />,
-      },
-      {
-        path: "variants",
-        element: <Variants />,
-      },
-      {
-        path: "stock-transaction",
-        element: <StockTransaction />,
-      },
-
-      {
-        path: "warranties",
-        element: <WarrantiesPage />,
-      },
-      {
-        path: "stock-transfer",
-        element: <StockTransferPage />,
-      },
-
-      {
-        path: "remove-stock",
-        element: <RemoveStock />,
-      },
-      {
-        path: "expired-product-report",
-        element: <ExpiredProductsReportPage />,
-      },
-      {
-        path: "low-stock-report",
-        element: <LowStockReportPage />,
-      },
-      {
-        path: "product-stock-report",
-        element: <ProductStockReportPage />,
-      },
-      {
-        path: "daily-stock-movement",
-        element: <DailyStockMovementReportPage />,
-      },
-      {
-        path: "report",
-        element: <ReportsPage />,
-      },
-
-      {
-        path: "purchase-return",
-        element: <PurchaseReturnList />,
-      },
-      {
-        path: "purchase-order",
-        element: <PurchaseOrder />,
-      },
-      {
-        path: "purchase-return-add",
-        element: <PurchaseReturn />,
-      },
-
-      {
-        path: "stock",
-        element: <StockPage />,
-      },
-
-      {
-        path: "recycle-bin-jobcard-list",
-        element: <RecyclebinJobcardList />,
-      },
-      {
-        path: "recycle-bin-quotation-list",
-        element: <RecycledQuotationList />,
-      },
-      {
-        path: "recycle-bin-moneyreceipt-list",
-        element: <RecycledMoneyReceipt />,
-      },
-      {
-        path: "recycle-bin-customer-list",
-        element: <RecycledbinCustomerList />,
-      },
-      {
-        path: "recycle-bin-company-list",
-        element: <RecycledbinCompanyList />,
-      },
-      {
-        path: "recycle-bin-showroom-list",
-        element: <RecycledbinShowRoomList />,
-      },
-      {
-        path: "recycle-bin-employee-list",
-        element: <RecycledbinEmployeeList />,
-      },
-      {
-        path: "recycle-bin-supplier-list",
-        element: <RecyclebinSupplierList />,
-      },
-      {
-        path: "recycle-bin-invoice-list",
-        element: <RecycledbinInvoiceList />,
-      },
-      {
-        path: "all-customer",
-        element: <AllCustomerList />,
-      },
-      {
-        path: "all-user",
-        element: <AdminUserListPage />,
-      },
-      {
-        path: "all-user",
-        element: <UserProfilePage />,
-      },
-      {
-        path: "profile-update",
-        element: <UpdateProfile />,
-      },
-      {
-        path: "all-tenant-list",
-        element: <AllTenantList />,
-      },
-      {
-        path: "all-user-list",
-        element: <AllUserList />,
-      },
-      {
-        path: "contact-customer",
-        element: <ContactUserList />,
-      },
-      {
-        path: "company-brand",
-        element: <CompanyBrand />,
-      },
-      {
-        path: "review",
-        element: <Review />,
-      },
-      {
-        path: "backup",
-        element: <Backup />,
-      },
-      {
-        path: "restore",
-        element: <RestoreDatabase />,
-      },
+      createProtectedRoute("", <Home />, "/dashboard"),
+      createProtectedRoute(
+        "addjob",
+        <AddJobCard />,
+        "/dashboard/addjob",
+        "create"
+      ),
+      createProtectedRoute(
+        "role-management",
+        <RoleManagement/>,
+        "/dashboard/role-management",
+        "create"
+      ),
+      createProtectedRoute(
+        "user-permission",
+        <Permission />,
+        "/dashboard/user-permission",
+        "create"
+      ),
+      createProtectedRoute(
+        "feature-access",
+        <FeatureAccess />,
+        "/dashboard/feature-access",
+        "create"
+      ),
+      createProtectedRoute(
+        "user-management",
+        <UserManagement />,
+        "/dashboard/user-management",
+        "create"
+      ),
+      createProtectedRoute(
+        "page-management",
+        <PageManagement />,
+        "/dashboard/page-management",
+        "create"
+      ),
+      createProtectedRoute("preview", <PreviewJobCard />, "/dashboard/preview"),
+      createProtectedRoute(
+        "update-jobcard",
+        <UpdateJobCard />,
+        "/dashboard/update-jobcard",
+        "edit"
+      ),
+      createProtectedRoute("profile", <Profile />, "/dashboard/profile"),
+      createProtectedRoute("invoice", <Invoice />, "/dashboard/invoice"),
+      createProtectedRoute(
+        "product-list",
+        <ProductList />,
+        "/dashboard/product-list"
+      ),
+      createProtectedRoute(
+        "adjustment",
+        <StockAdjustment />,
+        "/dashboard/adjustment"
+      ),
+      createProtectedRoute(
+        "add-product",
+        <AddProduct />,
+        "/dashboard/add-product",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-product",
+        <UpdateProduct />,
+        "/dashboard/update-product",
+        "edit"
+      ),
+      createProtectedRoute(
+        "customer-list",
+        <CustomerList />,
+        "/dashboard/customer-list"
+      ),
+      createProtectedRoute(
+        "update-customer",
+        <UpdateCustomer />,
+        "/dashboard/update-customer",
+        "edit"
+      ),
+      createProtectedRoute(
+        "add-customer",
+        <AddCustomer />,
+        "/dashboard/add-customer",
+        "create"
+      ),
+      createProtectedRoute(
+        "customer-profile",
+        <CustomerProfile />,
+        "/dashboard/customer-profile"
+      ),
+      createProtectedRoute(
+        "company-profile",
+        <CompanyProfile />,
+        "/dashboard/company-profile"
+      ),
+      createProtectedRoute(
+        "add-company",
+        <AddCompany />,
+        "/dashboard/add-company",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-company",
+        <UpdateCompany />,
+        "/dashboard/update-company",
+        "edit"
+      ),
+      createProtectedRoute(
+        "company-list",
+        <CompanyList />,
+        "/dashboard/company-list"
+      ),
+      createProtectedRoute(
+        "add-show-room",
+        <AddShowRoom />,
+        "/dashboard/add-show-room",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-show-room",
+        <UpdateShowRoom />,
+        "/dashboard/update-show-room",
+        "edit"
+      ),
+      createProtectedRoute(
+        "show-room-list",
+        <ShowRoomList />,
+        "/dashboard/show-room-list"
+      ),
+      createProtectedRoute(
+        "show-room-profile",
+        <ShowRoomProfile />,
+        "/dashboard/show-room-profile"
+      ),
+      createProtectedRoute(
+        "expense-list",
+        <ExpenseList />,
+        "/dashboard/expense-list"
+      ),
+      createProtectedRoute(
+        "add-expense",
+        <AddExpense />,
+        "/dashboard/add-expense",
+        "create"
+      ),
+      createProtectedRoute(
+        "add-employee",
+        <AddEmployee />,
+        "/dashboard/add-employee",
+        "create"
+      ),
+      createProtectedRoute(
+        "employee-list",
+        <EmployeeList />,
+        "/dashboard/employee-list"
+      ),
+      createProtectedRoute(
+        "update-employee",
+        <UpdateEmployee />,
+        "/dashboard/update-employee",
+        "edit"
+      ),
+      createProtectedRoute(
+        "employee-profile",
+        <EmployeeProfile />,
+        "/dashboard/employee-profile"
+      ),
+      createProtectedRoute(
+        "employee-leave",
+        <EmployeeLeave />,
+        "/dashboard/employee-leave"
+      ),
+      createProtectedRoute(
+        "employee-attendance",
+        <Attendance />,
+        "/dashboard/employee-attendance"
+      ),
+      createProtectedRoute(
+        "add-supplier",
+        <AddSuppliers />,
+        "/dashboard/add-supplier",
+        "create"
+      ),
+      createProtectedRoute(
+        "supplier-list",
+        <SupplierList />,
+        "/dashboard/supplier-list"
+      ),
+      createProtectedRoute(
+        "supplier-profile",
+        <SupplierProfile />,
+        "/dashboard/supplier-profile"
+      ),
+      createProtectedRoute(
+        "update-supplier",
+        <UpdateSupplier />,
+        "/dashboard/update-supplier",
+        "edit"
+      ),
+      createProtectedRoute(
+        "purchase-list",
+        <PurchaseList />,
+        "/dashboard/purchase-list"
+      ),
+      createProtectedRoute(
+        "add-purchase",
+        <AddPurchase />,
+        "/dashboard/add-purchase",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-purchase",
+        <UpdatePurchase />,
+        "/dashboard/update-purchase",
+        "edit"
+      ),
+      createProtectedRoute(
+        "update-purchase-return",
+        <PurchaseReturnUpdate />,
+        "/dashboard/update-purchase-return",
+        "edit"
+      ),
+      createProtectedRoute("role", <Role />, "/dashboard/role"),
+      createProtectedRoute(
+        "add-role",
+        <AddRole />,
+        "/dashboard/add-role",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-role",
+        <UpdateRole />,
+        "/dashboard/update-role",
+        "edit"
+      ),
+      createProtectedRoute(
+        "qutation",
+        <AddQuotation />,
+        "/dashboard/qutation",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-quotation",
+        <UpdateQuotation />,
+        "/dashboard/update-quotation",
+        "edit"
+      ),
+      createProtectedRoute(
+        "quotation-view",
+        <QuotationView />,
+        "/dashboard/quotation-view"
+      ),
+      createProtectedRoute(
+        "quotation-list",
+        <QuotationList />,
+        "/dashboard/quotation-list"
+      ),
+      createProtectedRoute(
+        "update-invoice",
+        <UpdateInvoice />,
+        "/dashboard/update-invoice",
+        "edit"
+      ),
+      createProtectedRoute("detail", <Detail />, "/dashboard/detail"),
+      createProtectedRoute(
+        "invoice-list",
+        <InvoiceList />,
+        "/dashboard/invoice-list"
+      ),
+      createProtectedRoute(
+        "jobcard-list",
+        <JobCardList />,
+        "/dashboard/jobcard-list"
+      ),
+      createProtectedRoute(
+        "money-receive",
+        <MoneyReceived />,
+        "/dashboard/money-receive",
+        "create"
+      ),
+      createProtectedRoute(
+        "money-receipt-list",
+        <MoneyReceiptList />,
+        "/dashboard/money-receipt-list"
+      ),
+      createProtectedRoute(
+        "money-receipt-view",
+        <MoneyReceiptView />,
+        "/dashboard/money-receipt-view"
+      ),
+      createProtectedRoute(
+        "money-receipt-update",
+        <UpdateMoneyReceipt />,
+        "/dashboard/money-receipt-update",
+        "edit"
+      ),
+      createProtectedRoute(
+        "money-receipt-due",
+        <DuemoneyReceiptList />,
+        "/dashboard/money-receipt-due"
+      ),
+      createProtectedRoute(
+        "add-expanse",
+        <AddExpense />,
+        "/dashboard/add-expanse",
+        "create"
+      ),
+      createProtectedRoute(
+        "expanse-list",
+        <ExpenseList />,
+        "/dashboard/expanse-list"
+      ),
+      createProtectedRoute(
+        "update-expense",
+        <UpdateExpense />,
+        "/dashboard/update-expense",
+        "edit"
+      ),
+      createProtectedRoute(
+        "view-expense",
+        <ViewExpense />,
+        "/dashboard/view-expense"
+      ),
+      createProtectedRoute(
+        "expense-categories",
+        <ExpenseCategoryList />,
+        "/dashboard/expense-categories"
+      ),
+      createProtectedRoute(
+        "add-attendance",
+        <AddAttendance />,
+        "/dashboard/add-attendance",
+        "create"
+      ),
+      createProtectedRoute(
+        "attendance-list",
+        <AttendanceList />,
+        "/dashboard/attendance-list"
+      ),
+      createProtectedRoute(
+        "update-attendance",
+        <UpdateAttendance />,
+        "/dashboard/update-attendance",
+        "edit"
+      ),
+      createProtectedRoute(
+        "employee-salary",
+        <EmployeeSalary />,
+        "/dashboard/employee-salary"
+      ),
+      createProtectedRoute(
+        "employee-salary-update",
+        <UpdateEmployeeSalary />,
+        "/dashboard/employee-salary-update",
+        "edit"
+      ),
+      createProtectedRoute(
+        "employee-overtime",
+        <EmployeeOvertime />,
+        "/dashboard/employee-overtime"
+      ),
+      createProtectedRoute(
+        "create-overtime",
+        <CreateEmployeeOverTime />,
+        "/dashboard/create-overtime",
+        "create"
+      ),
+      createProtectedRoute(
+        "running-project",
+        <RunningProject />,
+        "/dashboard/running-project"
+      ),
+      createProtectedRoute(
+        "complete-project",
+        <CompletedProject />,
+        "/dashboard/complete-project"
+      ),
+      createProtectedRoute(
+        "view-attendance",
+        <ViewEmployeeAttendance />,
+        "/dashboard/view-attendance"
+      ),
+      createProtectedRoute("paybill", <BillPayList />, "/dashboard/paybill"),
+      createProtectedRoute(
+        "add-paybill",
+        <AddPaybill />,
+        "/dashboard/add-paybill",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-paybill",
+        <UpdateBillPay />,
+        "/dashboard/update-paybill",
+        "edit"
+      ),
+      createProtectedRoute(
+        "paybill-view",
+        <BillPayInvoice />,
+        "/dashboard/paybill-view"
+      ),
+      createProtectedRoute(
+        "bill-pay-history",
+        <BillPayHistory />,
+        "/dashboard/bill-pay-history"
+      ),
+      createProtectedRoute(
+        "holiday",
+        <EmployeeHoliday />,
+        "/dashboard/holiday"
+      ),
+      createProtectedRoute(
+        "create-holiday",
+        <CreateHoliday />,
+        "/dashboard/create-holiday",
+        "create"
+      ),
+      createProtectedRoute(
+        "update-holiday",
+        <UpdateHoliday />,
+        "/dashboard/update-holiday",
+        "edit"
+      ),
+      createProtectedRoute(
+        "add-income",
+        <Income />,
+        "/dashboard/add-income",
+        "create"
+      ),
+      createProtectedRoute(
+        "income-list",
+        <IncomeList />,
+        "/dashboard/income-list"
+      ),
+      createProtectedRoute(
+        "update-income",
+        <UpdateIncome />,
+        "/dashboard/update-income",
+        "edit"
+      ),
+      createProtectedRoute(
+        "donation",
+        <Donation />,
+        "/dashboard/donation",
+        "create"
+      ),
+      createProtectedRoute(
+        "donation-list",
+        <DonationList />,
+        "/dashboard/donation-list"
+      ),
+      createProtectedRoute(
+        "update-donation",
+        <UpdateDonation />,
+        "/dashboard/update-donation",
+        "edit"
+      ),
+      createProtectedRoute("category", <CategoryList />, "/dashboard/category"),
+      createProtectedRoute("brand", <Brand />, "/dashboard/brand"),
+      createProtectedRoute("unit", <Unit />, "/dashboard/unit"),
+      createProtectedRoute("barcode", <Barcode />, "/dashboard/barcode"),
+      createProtectedRoute(
+        "product-type",
+        <ProductType />,
+        "/dashboard/product-type"
+      ),
+      createProtectedRoute(
+        "inventory-dashboard",
+        <InventoryDashboard />,
+        "/dashboard/inventory-dashboard"
+      ),
+      createProtectedRoute(
+        "expired-products",
+        <ExpiredProduct />,
+        "/dashboard/expired-products"
+      ),
+      createProtectedRoute(
+        "add-adjustment",
+        <AddAdjustment />,
+        "/dashboard/add-adjustment",
+        "create"
+      ),
+      createProtectedRoute(
+        "quantity-adjustment",
+        <QuantityAdjustment />,
+        "/dashboard/quantity-adjustment"
+      ),
+      createProtectedRoute("low-stocks", <LowStock />, "/dashboard/low-stocks"),
+      createProtectedRoute(
+        "warehouse",
+        <WarehouseManagement />,
+        "/dashboard/warehouse"
+      ),
+      createProtectedRoute("variants", <Variants />, "/dashboard/variants"),
+      createProtectedRoute(
+        "stock-transaction",
+        <StockTransaction />,
+        "/dashboard/stock-transaction"
+      ),
+      createProtectedRoute(
+        "warranties",
+        <WarrantiesPage />,
+        "/dashboard/warranties"
+      ),
+      createProtectedRoute(
+        "stock-transfer",
+        <StockTransferPage />,
+        "/dashboard/stock-transfer"
+      ),
+      createProtectedRoute(
+        "remove-stock",
+        <RemoveStock />,
+        "/dashboard/remove-stock",
+        "delete"
+      ),
+      createProtectedRoute(
+        "expired-product-report",
+        <ExpiredProductsReportPage />,
+        "/dashboard/expired-product-report"
+      ),
+      createProtectedRoute(
+        "low-stock-report",
+        <LowStockReportPage />,
+        "/dashboard/low-stock-report"
+      ),
+      createProtectedRoute(
+        "product-stock-report",
+        <ProductStockReportPage />,
+        "/dashboard/product-stock-report"
+      ),
+      createProtectedRoute(
+        "daily-stock-movement",
+        <DailyStockMovementReportPage />,
+        "/dashboard/daily-stock-movement"
+      ),
+      createProtectedRoute("report", <ReportsPage />, "/dashboard/report"),
+      createProtectedRoute(
+        "purchase-return",
+        <PurchaseReturnList />,
+        "/dashboard/purchase-return"
+      ),
+      createProtectedRoute(
+        "purchase-order",
+        <PurchaseOrder />,
+        "/dashboard/purchase-order"
+      ),
+      createProtectedRoute(
+        "purchase-return-add",
+        <PurchaseReturn />,
+        "/dashboard/purchase-return-add",
+        "create"
+      ),
+      createProtectedRoute("stock", <StockPage />, "/dashboard/stock"),
+      createProtectedRoute(
+        "recycle-bin-jobcard-list",
+        <RecyclebinJobcardList />,
+        "/dashboard/recycle-bin-jobcard-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-quotation-list",
+        <RecycledQuotationList />,
+        "/dashboard/recycle-bin-quotation-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-moneyreceipt-list",
+        <RecycledMoneyReceipt />,
+        "/dashboard/recycle-bin-moneyreceipt-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-customer-list",
+        <RecycledbinCustomerList />,
+        "/dashboard/recycle-bin-customer-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-company-list",
+        <RecycledbinCompanyList />,
+        "/dashboard/recycle-bin-company-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-showroom-list",
+        <RecycledbinShowRoomList />,
+        "/dashboard/recycle-bin-showroom-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-employee-list",
+        <RecycledbinEmployeeList />,
+        "/dashboard/recycle-bin-employee-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-supplier-list",
+        <RecyclebinSupplierList />,
+        "/dashboard/recycle-bin-supplier-list"
+      ),
+      createProtectedRoute(
+        "recycle-bin-invoice-list",
+        <RecycledbinInvoiceList />,
+        "/dashboard/recycle-bin-invoice-list"
+      ),
+      createProtectedRoute(
+        "all-customer",
+        <AllCustomerList />,
+        "/dashboard/all-customer"
+      ),
+      createProtectedRoute(
+        "all-user",
+        <AdminUserListPage />,
+        "/dashboard/all-user"
+      ),
+      // ডুপ্লিকেট রাউট রিমুভ করা হয়েছে
+      // createProtectedRoute("all-user", <UserProfilePage />, "/dashboard/all-user"),
+      createProtectedRoute(
+        "profile-update",
+        <UpdateProfile />,
+        "/dashboard/profile-update",
+        "edit"
+      ),
+      createProtectedRoute(
+        "all-tenant-list",
+        <AllTenantList />,
+        "/dashboard/all-tenant-list"
+      ),
+      createProtectedRoute(
+        "all-user-list",
+        <AllUserList />,
+        "/dashboard/all-user-list"
+      ),
+      createProtectedRoute(
+        "contact-customer",
+        <ContactUserList />,
+        "/dashboard/contact-customer"
+      ),
+      createProtectedRoute(
+        "company-brand",
+        <CompanyBrand />,
+        "/dashboard/company-brand"
+      ),
+      createProtectedRoute("review", <Review />, "/dashboard/review"),
+      createProtectedRoute("backup", <Backup />, "/dashboard/backup"),
+      createProtectedRoute(
+        "restore",
+        <RestoreDatabase />,
+        "/dashboard/restore"
+      ),
     ],
   },
 ]);
