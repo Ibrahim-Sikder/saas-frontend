@@ -44,7 +44,7 @@
 .dashboardCard {
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   padding: 20px;
-  width: 255px;
+  width: 230px;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -100,7 +100,7 @@
 
 .earningCard {
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  padding: 10px 20px;
+  padding: 10px 10px;
   border-radius: 10px;
   height: 140px;
 }
@@ -151,7 +151,7 @@
 
 @media only screen and (min-width: 1441px) {
   .earningCard {
-    width: 250px;
+    width: 220px;
   }
 
   .dashboardCardIcon {
@@ -184,7 +184,7 @@
   }
 
   .earningCard {
-    width: 180px;
+    /* width: 180px; */
   }
 
   .recentCard {

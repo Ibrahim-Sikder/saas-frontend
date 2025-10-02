@@ -1,374 +1,448 @@
-// src/pages/RoleManagement.js
-import { useState, useEffect } from 'react';
+// pages/RoleManagement.js
+import { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Grid,
+  Card,
   Typography,
   Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Avatar,
+  Chip,
+  IconButton,
+  Menu,
   MenuItem,
-  Checkbox,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Chip,
-  Alert,
-  Tab,
-  Tabs,
+  FormControl,
+  InputLabel,
+  Select,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Checkbox,
   Divider,
-
-} from '@mui/material';
+  Tabs,
+  Tab,
+  Badge,
+  useTheme,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import {
-  Add as AddIcon,
-
-} from '@mui/icons-material';
-import { SaveIcon } from 'lucide-react';
-import { usePermissions } from '../../context/PermissionContext';
+  Add,
+  MoreVert,
+  Edit,
+  Delete,
+  Visibility,
+  Settings,
+  Person,
+  AssignmentTurnedIn,
+  Business,
+} from "@mui/icons-material";
 
 const RoleManagement = () => {
-  const { checkPermission } = usePermissions();
-  const [roles, setRoles] = useState([]);
-  const [pages, setPages] = useState([]);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [permissions, setPermissions] = useState({});
+  const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [newRole, setNewRole] = useState({ name: '', type: '', description: '' });
   const [tabValue, setTabValue] = useState(0);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  useEffect(() => {
-    fetchRoles();
-    fetchPages();
-  }, []);
-
-  const fetchRoles = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/roles', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) setRoles(data.data);
-    } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to fetch roles', severity: 'error' });
-    }
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const fetchPages = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/pages', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) setPages(data.data);
-    } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to fetch pages', severity: 'error' });
-    }
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
-  const handleRoleSelect = (role) => {
-    setSelectedRole(role);
-    const perms = {};
-    role.permissions.forEach(perm => {
-      perms[perm.pageId] = {
-        create: perm.create,
-        edit: perm.edit,
-        view: perm.view,
-        delete: perm.delete,
-      };
-    });
-    setPermissions(perms);
-    setTabValue(0);
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
   };
 
-  const handlePermissionChange = (pageId, action) => {
-    setPermissions(prev => ({
-      ...prev,
-      [pageId]: {
-        ...prev[pageId],
-        [action]: !prev[pageId]?.[action],
-      },
-    }));
-  };
-
-  const savePermissions = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const permissionsArray = Object.keys(permissions).map(pageId => ({
-        pageId,
-        ...permissions[pageId],
-      }));
-
-      const response = await fetch(`/api/permissions/role/${selectedRole._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ permissions: permissionsArray }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setSnackbar({ open: true, message: 'Permissions saved successfully!', severity: 'success' });
-        fetchRoles();
-      } else {
-        setSnackbar({ open: true, message: 'Failed to save permissions', severity: 'error' });
-      }
-    } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to save permissions', severity: 'error' });
-    }
-  };
-
-  const handleCreateRole = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/roles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...newRole,
-          createdBy: 'admin',
-          permissions: []
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setSnackbar({ open: true, message: 'Role created successfully!', severity: 'success' });
-        fetchRoles();
-        setOpenDialog(false);
-        setNewRole({ name: '', type: '', description: '' });
-      } else {
-        setSnackbar({ open: true, message: 'Failed to create role', severity: 'error' });
-      }
-    } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to create role', severity: 'error' });
-    }
+  const handleDialogClose = () => {
+    setOpenDialog(false);
   };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+  const roles = [
+    {
+      id: 1,
+      name: "Admin",
+      description: "Full access to client operations and user management",
+      users: 12,
+      status: "Active",
+      permissions: 18,
+      client: "ABC Motors",
+    },
+    {
+      id: 2,
+      name: "Accountant",
+      description: "Access to financial operations and reporting",
+      users: 8,
+      status: "Active",
+      permissions: 12,
+      client: "XYZ Garage",
+    },
+    {
+      id: 3,
+      name: "User",
+      description: "Basic access to client and jobcard management",
+      users: 48,
+      status: "Active",
+      permissions: 8,
+      client: "Quick Auto",
+    },
+    {
+      id: 4,
+      name: "Mechanic",
+      description: "Access to jobcard and service operations",
+      users: 15,
+      status: "Active",
+      permissions: 10,
+      client: "Super Auto",
+    },
+  ];
+
+  const permissions = [
+    {
+      category: "Client Management",
+      items: [
+        { name: "View Clients", checked: true },
+        { name: "Create Clients", checked: true },
+        { name: "Edit Clients", checked: true },
+        { name: "Delete Clients", checked: false },
+      ],
+    },
+    {
+      category: "Jobcard Management",
+      items: [
+        { name: "View Jobcards", checked: true },
+        { name: "Create Jobcards", checked: true },
+        { name: "Edit Jobcards", checked: true },
+        { name: "Delete Jobcards", checked: false },
+      ],
+    },
+    {
+      category: "Invoice Management",
+      items: [
+        { name: "View Invoices", checked: true },
+        { name: "Create Invoices", checked: true },
+        { name: "Edit Invoices", checked: true },
+        { name: "Delete Invoices", checked: false },
+      ],
+    },
+    {
+      category: "Quotation Management",
+      items: [
+        { name: "View Quotations", checked: true },
+        { name: "Create Quotations", checked: true },
+        { name: "Edit Quotations", checked: true },
+        { name: "Delete Quotations", checked: false },
+      ],
+    },
+    {
+      category: "Money Receipt Management",
+      items: [
+        { name: "View Money Receipts", checked: true },
+        { name: "Create Money Receipts", checked: true },
+        { name: "Edit Money Receipts", checked: true },
+        { name: "Delete Money Receipts", checked: false },
+      ],
+    },
+  ];
+
+  const getRoleColor = (role) => {
+    return role === "Admin"
+      ? "primary"
+      : role === "Accountant"
+      ? "secondary"
+      : role === "User"
+      ? "info"
+      : "warning";
   };
 
-  const groupedPages = pages.reduce((acc, page) => {
-    if (!acc[page.category]) acc[page.category] = [];
-    acc[page.category].push(page);
-    return acc;
-  }, {});
-
-  if (!checkPermission('/dashboard/role-management', 'view')) {
-    return (
-      <Box p={3}>
-        <Alert severity="error">You dont have permission to view this page.</Alert>
-      </Box>
-    );
-  }
-
   return (
-    <Box p={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" fontWeight="bold">
-          Role Management
-        </Typography>
-        {checkPermission('/dashboard/role-management', 'create') && (
-          <Button 
-            variant="contained" 
-            startIcon={<AddIcon />}
-            onClick={() => setOpenDialog(true)}
+    <Box>
+      <Typography variant="h4" fontWeight="bold" mb={1}>
+        Role Management
+      </Typography>
+      <Typography variant="body1" color="text.secondary" mb={4}>
+        Create and manage user roles with specific permissions for each client
+      </Typography>
+
+      <Card elevation={0} sx={{ p: 3, mb: 4 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
+          <Typography variant="h5" fontWeight="bold">
+            Roles
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleDialogOpen}
           >
-            Add New Role
+            Add Role
           </Button>
-        )}
-      </Box>
+        </Box>
 
-      <Grid container spacing={3}>
-        {/* Role List */}
-        <Grid item xs={12} md={4}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Roles
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="role tabs"
+        >
+          <Tab label="All Roles" />
+          <Tab label="System Roles" />
+          <Tab label="Custom Roles" />
+        </Tabs>
+
+        <TableContainer component={Paper} elevation={0} sx={{ mt: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Role</TableCell>
+                <TableCell>Client</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Users</TableCell>
+                <TableCell>Permissions</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {roles.map((role) => (
+                <TableRow key={role.id}>
+                  <TableCell>
+                    <Box display="flex" alignItems="center">
+                      <Avatar
+                        sx={{
+                          bgcolor: getRoleColor(role.name) + ".main",
+                          mr: 2,
+                        }}
+                      >
+                        <Settings />
+                      </Avatar>
+                      <Typography variant="body1" fontWeight={500}>
+                        {role.name}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      icon={<Business />}
+                      label={role.client}
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                    />
+                  </TableCell>
+                  <TableCell>{role.description}</TableCell>
+                  <TableCell>
+                    <Chip
+                      icon={<Person />}
+                      label={`${role.users} users`}
+                      size="small"
+                      variant="outlined"
+                      color={getRoleColor(role.name)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Badge badgeContent={role.permissions} color="primary">
+                      <AssignmentTurnedIn />
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Chip label={role.status} size="small" color="success" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton onClick={handleMenuClick}>
+                      <MoreVert />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleMenuClose}>
+                        <Visibility fontSize="small" sx={{ mr: 1 }} /> View
+                      </MenuItem>
+                      <MenuItem onClick={handleMenuClose}>
+                        <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
+                      </MenuItem>
+                      <MenuItem onClick={handleMenuClose}>
+                        <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
+                      </MenuItem>
+                    </Menu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+
+      <Card elevation={0} sx={{ p: 3 }}>
+        <Typography variant="h5" fontWeight="bold" mb={3}>
+          Permission Matrix
+        </Typography>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Card elevation={0} sx={{ p: 2, height: "100%" }}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Admin Permissions
               </Typography>
-              <Box sx={{ maxHeight: 500, overflow: 'auto' }}>
-                {roles.map(role => (
-                  <Card 
-                    key={role._id} 
-                    variant="outlined" 
-                    sx={{ 
-                      mb: 1, 
-                      cursor: 'pointer',
-                      border: selectedRole?._id === role._id ? '2px solid' : '1px solid',
-                      borderColor: selectedRole?._id === role._id ? 'primary.main' : 'divider'
-                    }}
-                    onClick={() => handleRoleSelect(role)}
-                  >
-                    <CardContent sx={{ py: 1.5 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          {role.name}
-                        </Typography>
-                        <Chip 
-                          label={role.type} 
-                          size="small" 
-                          color={role.type === 'admin' ? 'secondary' : 'primary'}
-                        />
-                      </Box>
-                      <Typography variant="body2" color="textSecondary">
-                        {role.description || 'No description'}
-                      </Typography>
-                    </CardContent>
-                  </Card>
+              <List dense>
+                {permissions.map((category, index) => (
+                  <div key={index}>
+                    <Typography variant="body1" fontWeight={500} mt={1} mb={1}>
+                      {category.category}
+                    </Typography>
+                    {category.items.map((permission, idx) => (
+                      <ListItem key={idx} disablePadding>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={true}
+                            tabIndex={-1}
+                            disableRipple
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={permission.name} />
+                      </ListItem>
+                    ))}
+                    {index < permissions.length - 1 && (
+                      <Divider component="li" />
+                    )}
+                  </div>
                 ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+              </List>
+            </Card>
+          </Grid>
 
-        {/* Permission Settings */}
-        <Grid item xs={12} md={8}>
-          {selectedRole ? (
-            <Card elevation={3}>
-              <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="h6">
-                    Permissions for: {selectedRole.name}
-                  </Typography>
-                  <Button 
-                    variant="contained" 
-                    startIcon={<SaveIcon />}
-                    onClick={savePermissions}
-                    disabled={!checkPermission('/dashboard/role-management', 'edit')}
-                  >
-                    Save Permissions
-                  </Button>
-                </Box>
-
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="permission categories">
-                  {Object.keys(groupedPages).map(category => (
-                    <Tab key={category} label={category} />
-                  ))}
-                </Tabs>
-                <Divider sx={{ mb: 2 }} />
-
-                {Object.values(groupedPages)[tabValue]?.map(page => (
-                  <Card key={page._id} variant="outlined" sx={{ mb: 2 }}>
-                    <CardContent>
-                      <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
-                        {page.name}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" gutterBottom>
-                        {page.path}
-                      </Typography>
-                      <Box display="flex" gap={3} mt={1}>
-                        {['create', 'edit', 'view', 'delete'].map(action => (
-                          <Box key={action} display="flex" alignItems="center">
-                            <Checkbox
-                              checked={permissions[page._id]?.[action] || false}
-                              onChange={() => handlePermissionChange(page._id, action)}
-                              disabled={!checkPermission('/dashboard/role-management', 'edit')}
-                            />
-                            <Typography variant="body2">
-                              {action.charAt(0).toUpperCase() + action.slice(1)}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Box>
-                    </CardContent>
-                  </Card>
+          <Grid item xs={12} md={6}>
+            <Card elevation={0} sx={{ p: 2, height: "100%" }}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Accountant Permissions
+              </Typography>
+              <List dense>
+                {permissions.map((category, index) => (
+                  <div key={index}>
+                    <Typography variant="body1" fontWeight={500} mt={1} mb={1}>
+                      {category.category}
+                    </Typography>
+                    {category.items.map((permission, idx) => (
+                      <ListItem key={idx} disablePadding>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={permission.checked}
+                            tabIndex={-1}
+                            disableRipple
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={permission.name} />
+                      </ListItem>
+                    ))}
+                    {index < permissions.length - 1 && (
+                      <Divider component="li" />
+                    )}
+                  </div>
                 ))}
-              </CardContent>
+              </List>
             </Card>
-          ) : (
-            <Card elevation={3}>
-              <CardContent>
-                <Box 
-                  display="flex" 
-                  flexDirection="column" 
-                  justifyContent="center" 
-                  alignItems="center" 
-                  minHeight={300}
-                  textAlign="center"
-                >
-                  <Typography variant="h6" color="textSecondary">
-                    Select a role to manage permissions
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Choose a role from the list to view and edit its permissions
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          )}
+          </Grid>
         </Grid>
-      </Grid>
+      </Card>
 
-      {/* Create Role Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Create New Role</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Role Name"
-            fullWidth
-            variant="outlined"
-            value={newRole.name}
-            onChange={(e) => setNewRole({...newRole, name: e.target.value})}
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Role Type</InputLabel>
-            <Select
-              value={newRole.type}
-              onChange={(e) => setNewRole({...newRole, type: e.target.value})}
-              label="Role Type"
-            >
-              <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="manager">Manager</MenuItem>
-              <MenuItem value="employee">Employee</MenuItem>
-              <MenuItem value="user">User</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            label="Description"
-            fullWidth
-            variant="outlined"
-            multiline
-            rows={3}
-            value={newRole.description}
-            onChange={(e) => setNewRole({...newRole, description: e.target.value})}
-          />
+          <Box display="flex" flexDirection="column" gap={3} mt={1}>
+            <TextField
+              label="Role Name"
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Settings />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              label="Description"
+              variant="outlined"
+              fullWidth
+              multiline
+              rows={2}
+            />
+            <FormControl fullWidth>
+              <InputLabel>Client</InputLabel>
+              <Select label="Client" defaultValue="">
+                <MenuItem value="abc">ABC Motors</MenuItem>
+                <MenuItem value="xyz">XYZ Garage</MenuItem>
+                <MenuItem value="quick">Quick Auto</MenuItem>
+                <MenuItem value="super">Super Auto</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Typography variant="h6" fontWeight="bold" mt={1}>
+              Permissions
+            </Typography>
+
+            <List dense>
+              {permissions.map((category, index) => (
+                <div key={index}>
+                  <Typography variant="body1" fontWeight={500} mt={1} mb={1}>
+                    {category.category}
+                  </Typography>
+                  {category.items.map((permission, idx) => (
+                    <ListItem key={idx} disablePadding>
+                      <ListItemIcon>
+                        <Checkbox
+                          edge="start"
+                          checked={false}
+                          tabIndex={-1}
+                          disableRipple
+                        />
+                      </ListItemIcon>
+                      <ListItemText primary={permission.name} />
+                    </ListItem>
+                  ))}
+                  {index < permissions.length - 1 && <Divider component="li" />}
+                </div>
+              ))}
+            </List>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateRole} variant="contained">Create</Button>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button variant="contained" onClick={handleDialogClose}>
+            Create Role
+          </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Snackbar for notifications */}
-      {snackbar.open && (
-        <Alert 
-          severity={snackbar.severity} 
-          onClose={handleCloseSnackbar}
-          sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999 }}
-        >
-          {snackbar.message}
-        </Alert>
-      )}
     </Box>
   );
 };

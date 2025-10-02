@@ -122,19 +122,19 @@ const CustomerListTable = () => {
                 <section className="tableContainer overflow-x-auto">
                   <table className="customTable">
                     <thead>
-                      <tr>
+                      <tr className="text-sm">
                         <th>SL No </th>
                         <th>Customer ID </th>
                         <th>Customer Name</th>
                         <th>Veichle User Name</th>
-                        <th>Car Number </th>
+                        <th>Car No. </th>
                         {/* <th>Mileage History</th> */}
-                        <th>Mobile Number</th>
+                        <th>Mobile No.</th>
                         <th>Vehicle Name </th>
                         <th colSpan={3}>Action</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody >
                       {customerData?.data?.customers?.map((card, index) => {
                         const lastVehicle = card?.vehicles
                           ? [...card.vehicles].sort(
@@ -149,13 +149,14 @@ const CustomerListTable = () => {
                         return (
                           <tr
                             key={card?._id}
-                            className={` transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-100 hover:text-black`}
+                            className="transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-100 hover:text-black text-xs"
+                            
                           >
-                            <td>{globalIndex}</td>
-                            <td>{card?.customerId}</td>
-                            <td>{card?.customer_name}</td>
-                            <td>{card?.vehicle_username}</td>
-                            <td>
+                            <td style={{fontSize:15}}>{globalIndex}</td>
+                            <td style={{fontSize:15}}>{card?.customerId}</td>
+                            <td style={{fontSize:15}}>{card?.customer_name}</td>
+                            <td style={{fontSize:15}}>{card?.vehicle_username}</td>
+                            <td style={{fontSize:15}}>
                               {card?.vehicles.map((vehicle, index) => (
                                 <span key={index}>
                                   {vehicle.carReg_no}{" "}
@@ -182,7 +183,7 @@ const CustomerListTable = () => {
                                 <Link
                                   to={`/dashboard/update-customer?id=${card?._id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </td>
@@ -190,8 +191,15 @@ const CustomerListTable = () => {
                               <div
                                 onClick={() => handleMoveToRecyled(card?._id)}
                                 className="editIconWrap cursor-pointer "
+                                style={{
+                                      
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </div>
                             </td>
                           </tr>

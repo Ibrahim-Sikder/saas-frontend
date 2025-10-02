@@ -1,8 +1,8 @@
+// hooks/useTenantDomain.js
 import { useState, useEffect } from "react";
 
 export function getTenantDomain(hostname) {
   if (!hostname) return "";
-
 
   if (hostname.includes("localhost")) {
     const hostWithoutPort = hostname.split(":")[0]; 
@@ -10,7 +10,6 @@ export function getTenantDomain(hostname) {
     // Remove 'localhost' part (last part)
     return parts.slice(0, parts.length - 1).join(".");
   }
-
 
   return hostname;
 }
@@ -26,5 +25,6 @@ export function useTenantDomain() {
     }
   }, []);
 
-  return tenantDomain;
+  // Return an object instead of just the string
+  return { tenantDomain };
 }

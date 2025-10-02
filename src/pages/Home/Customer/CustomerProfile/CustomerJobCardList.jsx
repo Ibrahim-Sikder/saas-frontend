@@ -121,10 +121,10 @@ const CustomerJobCardList = ({
                   <thead>
                     <tr>
                       <th>SL No</th>
-                      <th>Order Number </th>
+                      <th>Order No. </th>
                       <th>User Id</th>
                       <th>User type</th>
-                      <th>Mobile Number</th>
+                      <th>Mobile No.</th>
                       <th>Date</th>
                       <th colSpan={5}>Action</th>
                     </tr>
@@ -198,7 +198,7 @@ const CustomerJobCardList = ({
 
                           <td>
                             <a
-                              className="editIconWrap edit2 group relative"
+                              className="flex flex-col items-center edit2 group relative"
                               href={`${
                                 import.meta.env.VITE_API_URL
                               }/jobCards/jobcard/${
@@ -209,7 +209,7 @@ const CustomerJobCardList = ({
                               target="_blank"
                               rel="noreferrer"
                             >
-                              <FaDownload className="editIcon" />
+                              <FaDownload className="editIcon text-yellow-300" />
                               <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                 Download
                               </span>
@@ -217,11 +217,11 @@ const CustomerJobCardList = ({
                           </td>
 
                           <td>
-                            <div className="editIconWrap edit group relative">
+                            <div className="flex flex-col items-center edit group relative">
                               <Link
                                 to={`/dashboard/update-jobcard?id=${card._id}&user_type=${user_type}&user=${id}`}
                               >
-                                <FaEdit className="editIcon" />
+                                <FaEdit className="editIcon text-blue-500" /> 
                               </Link>
                               <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                 Edit Job Card
@@ -234,8 +234,15 @@ const CustomerJobCardList = ({
                               disabled={deleteLoading}
                               onClick={() => deletePackage(card?._id)}
                               className="editIconWrap"
+                              style={{
+                                      
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                             >
-                              <FaTrashAlt className="deleteIcon" />
+                              <FaTrashAlt className="deleteIcon text-red-500" />
                             </button>
                           </td>
                         </tr>

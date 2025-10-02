@@ -118,10 +118,10 @@ const InvoiceTable = ({ title }) => {
                   <thead>
                     <tr>
                       <th>SL No</th>
-                      <th>Order Number</th>
+                      <th>Order No.</th>
                       <th>Customer Name</th>
                       <th>Car Reg No</th>
-                      <th>Mobile Number</th>
+                      <th>Mobile No.</th>
                       <th>Vehicle Brand</th>
                       <th>Vehicle Name</th>
                       <th>Date</th>
@@ -202,7 +202,7 @@ const InvoiceTable = ({ title }) => {
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/invoices/invoice/${
@@ -213,7 +213,7 @@ const InvoiceTable = ({ title }) => {
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <FaDownload className="editIcon" />
+                                <FaDownload className="editIcon text-yellow-300" />
                               </a>
                             </Tooltip>
                           </td>
@@ -222,7 +222,7 @@ const InvoiceTable = ({ title }) => {
                             <Tooltip title="Preview" arrow placement="top">
                               <div
                                 onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 style={{ cursor: "pointer" }}
                               >
                                 <FaEye className="editIcon" />
@@ -232,11 +232,11 @@ const InvoiceTable = ({ title }) => {
 
                           <td>
                             <Tooltip title="Edit Invoice" arrow placement="top">
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center edit">
                                 <Link
                                   to={`/dashboard/update-invoice?id=${card._id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </Tooltip>
@@ -259,12 +259,17 @@ const InvoiceTable = ({ title }) => {
                                     handleMoveToRecycledbin(card._id)
                                   }
                                   className="bg-white p-1 rounded-sm"
+                                 
                                   style={{
-                                    cursor: deleteLoading
-                                      ? "not-allowed"
-                                      : "pointer",
-                                    opacity: deleteLoading ? 0.7 : 1,
-                                  }}
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px",
+                                       opacity: deleteLoading ? 0.7 : 1,
+                                    }}
                                 >
                                   <FaTrashAlt className="text-[#f5365c] size-[16px]" />
                                 </button>

@@ -122,7 +122,8 @@ const InvoiceTable = () => {
   return (
     <div className="mt-5 overflow-x-auto">
       <div className=" overflow-x-auto">
-        <div className="flex flex-wrap  items-center justify-between mb-5">
+        <div className="flex flex-wrap  items-center justify-end mb-5">
+          {/* update */}
           <h3 className="mb-3 text-xl  md:text-3xl font-bold">
             Recycledbin Invoice List:
           </h3>
@@ -158,14 +159,14 @@ const InvoiceTable = () => {
                   <thead>
                     <tr>
                       <th>SL No </th>
-                      <th>Order Number </th>
+                      <th>Order No. </th>
                       <th>Customer Name</th>
                       <th>Vehicle Name</th>
                       <th>Car Reg Num </th>
                       <th>Vehicle Brand</th>
-                      <th>Car Number </th>
+                      <th>Car No. </th>
                       <th>Mileage History </th>
-                      <th>Mobile Number</th>
+                      <th>Mobile No.</th>
                       <th>Date</th>
                       <th colSpan={4}>Action</th>
                     </tr>
@@ -308,7 +309,7 @@ const InvoiceTable = () => {
                               <Link
                                 to={`/dashboard/update-invoice?id=${card._id}`}
                               >
-                                <FaEdit className="editIcon" />
+                                <FaEdit className="editIcon text-blue-500" /> 
                               </Link>
                             </div>
                           </td>
@@ -316,7 +317,16 @@ const InvoiceTable = () => {
                             <button
                               disabled={deleteLoading}
                               onClick={() => handleDeleteOrRestore(card._id)}
-                              className=" bg-white  p-1 rounded-sm "
+                              className=" bg-white  p-1  "
+                              style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                             >
                               <FaTrashAlt className="text-[#f5365c] size-[16px]" />
                             </button>

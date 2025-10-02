@@ -112,8 +112,8 @@ const EmployeeStatistics = () => {
       <div className=" xl:flex gap-5  justify-between sectionMargin  mb-10 ">
         <div className="earningCardWrap ">
           <p className="mb-3 font-semibold">Employee Statistic</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 justify-between gap-5">
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="grid grid-cols-1 md:grid-cols-2 justify-between gap-3">
+            <div className="flex items-center w-50 justify-between  earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
@@ -142,7 +142,7 @@ const EmployeeStatistics = () => {
                 {activeEmployeeCount} / {totalEmployee}{" "}
               </b>
             </div>
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="flex items-center w-20 justify-between earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
@@ -167,7 +167,7 @@ const EmployeeStatistics = () => {
               </div>
               <b> 5 / 30 </b>
             </div>
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="flex items-center w-20 justify-between earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
@@ -195,7 +195,7 @@ const EmployeeStatistics = () => {
                 {AbsentEmployeeCount} / {totalEmployee}
               </b>
             </div>
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="flex items-center w-20 justify-between earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
@@ -223,7 +223,7 @@ const EmployeeStatistics = () => {
                 {lateEmployeeCount} / {totalEmployee}
               </b>
             </div>
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="flex items-center w-20 justify-between earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
@@ -248,7 +248,7 @@ const EmployeeStatistics = () => {
               </div>
               <b className="">৳{advanceSalary}</b>
             </div>
-            <div className="flex items-center w-40 justify-between earningCard">
+            <div className="flex items-center w-20 justify-between earningCard">
               <div>
                 <div style={{ width: 60, height: 60 }}>
                   <CircularProgressbar
