@@ -1444,11 +1444,11 @@ const handleSelectSuggestion = (product) => {
           })}
           <div className="discountFieldWrap mt-5 ">
             <div className="flex items-center ">
-              <b className="mr-2 hideAmountText"> Total Amount: </b>
+              <b className="mr-2 "> Total Amount: </b>
               <span>{formatNumber(grandTotal)}</span>
             </div>
             <div>
-              <b className="mr-2 hideAmountText "> Discount: </b>
+              <b className="mr-2  "> Discount: </b>
               <input
                 className="py-1 text-center"
                 onChange={(e) => {
@@ -1462,7 +1462,7 @@ const handleSelectSuggestion = (product) => {
               />
             </div>
             <div>
-              <b className="mr-2 hideAmountText">Vat: </b>
+              <b className="mr-2 ">Vat: </b>
               <input
                 className="text-center"
                 onChange={(e) => {
@@ -1476,7 +1476,7 @@ const handleSelectSuggestion = (product) => {
               />
             </div>
             <div>
-              <b className="mr-2 hideAmountText">Tax: </b>
+              <b className="mr-2 ">Tax: </b>
               <input
                 className="text-center"
                 onChange={(e) => {
@@ -1496,12 +1496,14 @@ const handleSelectSuggestion = (product) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 md:mt-8  buttonGroup">
-            <div className="md:hidden flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
+          <div className="flex flex-col md:flex-row mt-4 md:mt-8  buttonGroup">
+
+            <div className=" flex md:hidden  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
                 Add Quotation{" "}
               </button>
             </div>
+
             <div className="flex">
               <button onClick={() => setGoOtherButton("preview")}>
                 Preview
@@ -1511,6 +1513,7 @@ const handleSelectSuggestion = (product) => {
                 Invoice{" "}
               </button>
             </div>
+
             <div className="hidden  md:flex  justify-end md:justify-start submitQutationBtn order-2 md:order-3 ">
               <button type="submit" disabled={createLoading}>
                 Add Quotation{" "}

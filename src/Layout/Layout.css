@@ -57,18 +57,18 @@
 }
 
 .navActive {
-	left: 32px;
+	left: 10px;
 	z-index: 999999 !important;
 }
 
 .activeToggle {
 	position: fixed;
-	left: 32px;
+	left: 10px;
 	transition: all .5s cubic-bezier(0.55, 0.54, 0.68, 0.63);
 }
 
 .activeRightSideBarWrap {
-	width: 89px;
+	width: 70px;
 	background: #2c3136;
 	height: 100% !important;
 	position: fixed;

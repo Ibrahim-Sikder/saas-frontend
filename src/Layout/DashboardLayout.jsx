@@ -46,7 +46,7 @@ const DashboardLayout = () => {
         <div
           ref={containerRef}
           onClick={handleToggleCloseBtn}
-          className={`${toggle ? `drawer-content` : `activeDrawer`} p-0 md:p-10 lg:p-10 xl:p-5 `}
+          className={`${toggle ? `drawer-content -pl-15 md:pl-32 lg:pl-12 lg:pr-3 xl:pl-12 xl:pr-6` : `activeDrawer lg:pl-10`}  `}
         >
           <Outlet />
         </div>

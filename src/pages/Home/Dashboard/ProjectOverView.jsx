@@ -53,9 +53,9 @@ const ProjectOverView = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1  xl:grid-cols-2 gap-5  sectionMargin place-content-center justify-content-center ">
+      <div className="grid grid-cols-1  xl:grid-cols-2 gap-5  mt-5   ">
         <div
-          className="grid grid-cols-1 md:grid-cols-3 gap-4
+          className="grid grid-cols-1 md:grid-cols-3 gap-10
         5"
         >
           {userData?.map((data, i) => (
@@ -79,7 +79,7 @@ const ProjectOverView = () => {
                     : null
                 }
               >
-                <div className="dashboardCard">
+                <div className="dashboardCard ">
                   <div className="dashboardIconWrap">
                     {i == 0 ? (
                       <HiOutlineUserGroup className="dashboardIcon" size={50} />
