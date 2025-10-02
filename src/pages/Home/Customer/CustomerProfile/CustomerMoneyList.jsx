@@ -84,7 +84,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
 
   return (
     <div className=" mb-24 mt-10 w-full">
-      <div className="flex items-center justify-between mb-5 bg-[#F1F3F6] py-5 px-3">
+      <div className="flex items-center justify-end mb-5 bg-[#F1F3F6] py-5 px-3">
         <div className="flex items-center searcList">
           <div className="searchGroup">
             <input
@@ -184,7 +184,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <FaDownload className="editIcon text-green-500" />
+                        <FaDownload className="editIcon text-yellow-300" />
                       </a>
                     </td>
 
@@ -202,7 +202,14 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         disabled={deleteLoading}
                         onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
+                        style={{                            
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                       >
+
                         <FaTrashAlt className="deleteIcon text-red-500" />
                       </button>
                     </td>

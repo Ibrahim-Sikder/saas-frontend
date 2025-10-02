@@ -122,7 +122,8 @@ const InvoiceTable = () => {
   return (
     <div className="mt-5 overflow-x-auto">
       <div className=" overflow-x-auto">
-        <div className="flex flex-wrap  items-center justify-between mb-5">
+        <div className="flex flex-wrap  items-center justify-end mb-5">
+          {/* update */}
           <h3 className="mb-3 text-xl  md:text-3xl font-bold">
             Recycledbin Invoice List:
           </h3>
@@ -316,7 +317,16 @@ const InvoiceTable = () => {
                             <button
                               disabled={deleteLoading}
                               onClick={() => handleDeleteOrRestore(card._id)}
-                              className=" bg-white  p-1 rounded-sm "
+                              className=" bg-white  p-1  "
+                              style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                             >
                               <FaTrashAlt className="text-[#f5365c] size-[16px]" />
                             </button>
