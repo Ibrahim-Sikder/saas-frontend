@@ -47,7 +47,7 @@ export const PageHeader = ({ searchTerm, setSearchTerm, handleOpenModal }) => {
           startIcon={<AddIcon />}
           onClick={handleOpenModal}
           sx={{
-            background: "linear-gradient(45deg, #6a1b9a, #8e24aa)",
+            background: "linear-gradient(45deg, #6a1b9a, #8e24aa)",color:'white'
           }}
         >
           New Warranty

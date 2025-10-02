@@ -145,11 +145,11 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                   <thead>
                     <tr>
                       <th>SL No </th>
-                      <th>Order Number </th>
+                      <th>Order No. </th>
                       <th>Name</th>
 
-                      <th>Car Number </th>
-                      <th>Mobile Number</th>
+                      <th>Car No. </th>
+                      <th>Mobile No.</th>
                       <th>Date</th>
                       <th colSpan={5}>Action</th>
                     </tr>
@@ -218,11 +218,11 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                           <td>
                             <Tooltip title="Create Invoice" arrow placement="top">
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
                                 rel="noreferrer"
                               >
-                                <FaFileInvoice className="editIcon" />
+                                <FaFileInvoice className="editIcon text-purple-600" />
                               </a>
                             </Tooltip>
                           </td>
@@ -234,7 +234,7 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/quotations/quotation/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
@@ -243,7 +243,7 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <FaDownload className="editIcon" />
+                                <FaDownload className="editIcon text-yellow-300" />
                               </a>
                             </Tooltip>
                           </td>
@@ -254,11 +254,11 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                               arrow
                               placement="top"
                             >
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center edit">
                                 <Link
                                   to={`/dashboard/update-quotation?id=${card._id}&user_type=${user_type}&user=${id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </Tooltip>
@@ -278,13 +278,16 @@ const CustomerQoutationList = ({ id, customerId, user_type, tenantDomain, compan
                                 disabled={deleteLoading}
                                 onClick={() => deletePackage(card._id)}
                                 className="editIconWrap cursor-pointer"
-                                style={{
-                                  border: "none",
-                                  background: "transparent",
-                                }}
+                               style={{
+                                      
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                                 aria-label="Delete Quotation"
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </button>
                             </Tooltip>
                           </td>

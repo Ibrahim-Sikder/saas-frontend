@@ -84,7 +84,7 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
 
   return (
     <div className=" mb-24 mt-10 w-full">
-      <div className="flex items-center justify-between mb-5 bg-[#F1F3F6] py-5 px-3">
+      <div className="flex items-center justify-end mb-5 bg-[#F1F3F6] py-5 px-3">
         <div className="flex items-center searcList">
           <div className="searchGroup">
             <input
@@ -168,14 +168,14 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                     <td>
                       <div
                         onClick={() => handleIconPreview(card._id)}
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                       >
                         <FaEye className="editIcon" />
                       </div>
                     </td>
                     <td>
                       <a
-                        className="editIconWrap edit2"
+                        className="flex flex-col items-center edit2"
                         href={`${
                           import.meta.env.VITE_API_URL
                         }/money-receipts/money/${card._id}?tenantDomain=${tenantDomain}&companyProfileData=${encodeURIComponent(
@@ -184,16 +184,16 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <FaDownload className="editIcon" />
+                        <FaDownload className="editIcon text-yellow-300" />
                       </a>
                     </td>
 
                     <td>
-                      <div className="editIconWrap edit">
+                      <div className="flex flex-col items-center edit">
                         <Link
                           to={`/dashboard/money-receipt-update?id=${card._id}&user_type=${user_type}&user=${id}`}
                         >
-                          <FaEdit className="editIcon" />
+                          <FaEdit className="editIcon text-blue-500" /> 
                         </Link>
                       </div>
                     </td>
@@ -202,8 +202,15 @@ const CustomerMoneyList = ({ id, user_type,tenantDomain, companyProfileData }) =
                         disabled={deleteLoading}
                         onClick={() => handleMoveRecycledbin(card._id)}
                         className="editIconWrap"
+                        style={{                            
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                       >
-                        <FaTrashAlt className="deleteIcon" />
+
+                        <FaTrashAlt className="deleteIcon text-red-500" />
                       </button>
                     </td>
                   </tr>

@@ -236,7 +236,7 @@ const tenantDomain = useTenantDomain();
                       <Link
                         to={`/dashboard/money-receipt-update?id=${card._id}`}
                       >
-                        <FaEdit className="editIcon" />
+                        <FaEdit className="editIcon text-blue-500" /> 
                       </Link>
                     </div>
                   </td>
@@ -245,8 +245,17 @@ const tenantDomain = useTenantDomain();
                       disabled={deleteLoading}
                       onClick={() => handleDeleteOrRestore(card._id)}
                       className="editIconWrap"
+                      style={{
+                                      cursor: deleteLoading
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                     >
-                      <FaTrashAlt className="deleteIcon" />
+                      <FaTrashAlt className="deleteIcon text-red-500" />
                     </button>
                   </td>
                 </tr>

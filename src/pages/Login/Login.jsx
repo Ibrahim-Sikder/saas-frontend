@@ -1,19 +1,21 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { Button, Box, Typography, Link, Divider, Alert } from "@mui/material";
-import { Lock, Google, Facebook, Person } from "@mui/icons-material";
+import { useDispatch } from "react-redux";
+import { Button, Alert } from "@mui/material";
+import { Lock, Person } from "@mui/icons-material";
 import AuthLayout from "../../auth/AuthLayout";
 import { useTenantLoginMutation } from "../../redux/api/authApi";
-import Cookies from "js-cookie";
 import GarageForm from "../../components/form/Form";
-import TASInput from "../../components/form/Input";
-import { toast } from "react-toastify";
+import FormInput from "../../components/form/Input";
+import { setUser } from "../../redux/feature/authSlice";
+import toast from "react-hot-toast";
+
 const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tenantLogin] = useTenantLoginMutation();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (data) => {
     setLoading(true);
@@ -22,18 +24,11 @@ const Login = () => {
     try {
       const res = await tenantLogin(data).unwrap();
 
-      
       if (res.success) {
         const accessToken = res?.data?.accessToken;
         const user = res?.data?.user;
 
-        Cookies.set("token", accessToken, { expires: 7 });
-
-        try {
-          localStorage.setItem("user", JSON.stringify(user));
-        } catch (e) {
-          console.error("Failed to save user to localStorage:", e);
-        }
+        dispatch(setUser({ user, token: accessToken }));
 
         toast.success(res.message || "Login successful!");
 
@@ -45,13 +40,12 @@ const Login = () => {
         if (tenantKey === "superadmin") {
           redirectURL = isLocalhost
             ? "http://localhost:5173/dashboard"
-            : "https://garage.trustautosolution.com/dashboard/all-tenant-list"
+            : "https://garage.trustautosolution.com/dashboard/all-tenant-list";
         } else {
           if (isLocalhost) {
-            redirectURL = `http://localhost:5173/dashboard`;
+            redirectURL = `http://trustautosolution.com.localhost:5173/dashboard`;
           } else {
-            // redirect to the tenant's custom domain
-            redirectURL = `https://${tenantKey}/dashboard`;
+                  redirectURL = `https://${tenantKey}/dashboard`;
           }
         }
 
@@ -81,7 +75,7 @@ const Login = () => {
       )}
 
       <GarageForm onSubmit={handleSubmit}>
-        <TASInput
+        <FormInput
           name="name"
           label="User Name"
           placeholder="User Name"
@@ -89,14 +83,14 @@ const Login = () => {
           icon={Person}
           iconPosition="start"
         />
-        <TASInput
+        <FormInput
           name="tenantDomain"
           label="Domain"
           required
           icon={Person}
           iconPosition="start"
         />
-        <TASInput
+        <FormInput
           name="password"
           label="User password"
           placeholder="User password"
@@ -104,8 +98,6 @@ const Login = () => {
           icon={Lock}
           iconPosition="start"
         />
-
-      
 
         <Button
           type="submit"
@@ -117,10 +109,6 @@ const Login = () => {
         >
           {loading ? "Signing in..." : "Sign In"}
         </Button>
-
-       
-
-       
       </GarageForm>
     </AuthLayout>
   );

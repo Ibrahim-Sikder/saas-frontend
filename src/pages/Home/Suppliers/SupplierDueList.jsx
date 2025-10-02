@@ -30,7 +30,7 @@ const SupplierDueList = () => {
               </td>
               <td>
                 <div className="editIconWrap">
-                  <FaTrashAlt className="deleteIcon" />
+                  <FaTrashAlt className="deleteIcon text-red-500" />
                 </div>
               </td>
             </tr>

@@ -1,6 +1,6 @@
 import { FaFileInvoice } from "react-icons/fa";
-import JobcardTable from "./JobcardTable";
 import { ArrowForwardIos } from "@mui/icons-material";
+import JobCardTable from "./JobcardTable";
 
 const JobCardList = () => {
   return (
@@ -25,7 +25,7 @@ const JobCardList = () => {
             </span>
           </div>
         </div>
-      <JobcardTable />
+      <JobCardTable />
     </>
   );
 };

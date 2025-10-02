@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store.js";
 // import { PermissionProvider } from "./context/PermissionContext.jsx";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { PermissionProvider } from "./context/PermissionContext.jsx";
 
 const queryClient = new QueryClient();
 
@@ -26,11 +27,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <ThemeProvider theme={theme}>
             <Providers>
               <PrintProvider>
-                {/* <PermissionProvider>
-                  
-                </PermissionProvider> */}
-                <ToastContainer />
+                <PermissionProvider>
+                  <ToastContainer />
                   <RouterProvider router={router} />
+                </PermissionProvider>
               </PrintProvider>
             </Providers>
           </ThemeProvider>

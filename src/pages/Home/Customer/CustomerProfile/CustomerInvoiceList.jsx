@@ -125,10 +125,10 @@ const CustomerInvoiceList = ({
                   <thead>
                     <tr>
                       <th>SL No </th>
-                      <th>Order Number </th>
+                      <th>Order No. </th>
                       <th>Customer Name</th>
-                      <th>Car Number </th>
-                      <th>Mobile Number</th>
+                      <th>Car No. </th>
+                      <th>Mobile No.</th>
                       <th>Date</th>
                       <th colSpan={5}>Action</th>
                     </tr>
@@ -198,7 +198,7 @@ const CustomerInvoiceList = ({
                             >
                               <div
                                 onClick={() => handleIconPreview(card._id)}
-                                className="editIconWrap edit2 cursor-pointer"
+                                className="flex flex-col items-center edit2 cursor-pointer"
                                 role="button"
                                 tabIndex={0}
                                 onKeyDown={(e) => {
@@ -218,7 +218,7 @@ const CustomerInvoiceList = ({
                               placement="top"
                             >
                               <a
-                                className="editIconWrap edit2"
+                                className="flex flex-col items-center edit2"
                                 href={`${
                                   import.meta.env.VITE_API_URL
                                 }/invoices/invoice/${
@@ -229,14 +229,14 @@ const CustomerInvoiceList = ({
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <FaDownload className="editIcon" />
+                                <FaDownload className="editIcon text-yellow-300" />
                               </a>
                             </Tooltip>
                           </td>
 
                           <td>
                             <Tooltip title="Edit Invoice" arrow placement="top">
-                              <div className="editIconWrap edit">
+                              <div className="flex flex-col items-center edit">
                                 <Link
                                   to={{
                                     pathname: `/dashboard/update-invoice`,
@@ -244,7 +244,7 @@ const CustomerInvoiceList = ({
                                     state: { redirectTo: "customer-profile" },
                                   }}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </Tooltip>
@@ -266,13 +266,15 @@ const CustomerInvoiceList = ({
                                   handleMoveToRecycledbin(card._id)
                                 }
                                 className="editIconWrap cursor-pointer"
-                                style={{
-                                  border: "none",
-                                  background: "transparent",
-                                }}
+                                style={{                                      
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                                 aria-label="Move to Recycle Bin"
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </button>
                             </Tooltip>
                           </td>

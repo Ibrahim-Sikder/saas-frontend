@@ -94,7 +94,7 @@ const ProfitOverView = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="profiteCardWrap lg:flex-nowrap flex-wrap flex items-center justify-between sectionMargin">
+    <div className="profiteCardWrap lg:flex-nowrap flex-wrap flex items-center justify-between sectionMargin gap-5">
       <div className="profitCard ">
         <div className="flex items-center justify-between">
           <b>Earnings</b>

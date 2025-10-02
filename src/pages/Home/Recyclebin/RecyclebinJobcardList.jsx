@@ -182,9 +182,9 @@ const tenantDomain = useTenantDomain();
                       <tr>
                         <th>SL No</th>
                         <th>User Id</th>
-                        <th>Order Number </th>
+                        <th>Order No. </th>
                         <th>User type</th>
-                        <th>Mobile Number</th>
+                        <th>Mobile No.</th>
                         <th>Date</th>
                         <th colSpan={4}>Action</th>
                       </tr>
@@ -227,7 +227,7 @@ const tenantDomain = useTenantDomain();
                                 <Link
                                   to={`/dashboard/update-jobcard?id=${card._id}`}
                                 >
-                                  <FaEdit className="editIcon" />
+                                  <FaEdit className="editIcon text-blue-500" /> 
                                 </Link>
                               </div>
                             </td>
@@ -236,8 +236,15 @@ const tenantDomain = useTenantDomain();
                                 disabled={deleteLoading || restoreLoading}
                                 onClick={() => handleDeleteOrRestore(card?._id)}
                                 className="editIconWrap"
+                                style={{
+                                    
+                                      background: "white",
+                                      border: "none",
+                                      padding: 5,
+                                      borderRadius: "9999px"
+                                    }}
                               >
-                                <FaTrashAlt className="deleteIcon" />
+                                <FaTrashAlt className="deleteIcon text-red-500" />
                               </button>
                             </td>
                           </tr>

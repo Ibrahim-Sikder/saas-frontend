@@ -146,12 +146,12 @@ const QuotationTable = ({title}) => {
                       <tr>
                         <th>SL No </th>
                         <th>Quotation ID </th>
-                        <th>Order Number </th>
+                        <th>Order No. </th>
                         <th>Name</th>
                         <th>Vehicle Name</th>
                         <th>Vehicle Brand</th>
-                        <th>Car Number </th>
-                        <th>Mobile Number</th>
+                        <th>Car No. </th>
+                        <th>Mobile No.</th>
                         {/* <th>Mileage History</th> */}
                         <th>Date</th>
                         <th colSpan={5}>Action</th>
@@ -231,11 +231,11 @@ const QuotationTable = ({title}) => {
                                 placement="top"
                               >
                                 <a
-                                  className="editIconWrap edit2"
+                                  className="flex justify-center edit2"
                                   href={`/dashboard/invoice?order_no=${card?.job_no}&id=${card._id}`}
                                   rel="noreferrer"
                                 >
-                                  <FaFileInvoice className="editIcon" />
+                                  <FaFileInvoice className="editIcon text-purple-600" />
                                 </a>
                               </Tooltip>
                             </td>
@@ -247,7 +247,7 @@ const QuotationTable = ({title}) => {
                                 placement="top"
                               >
                                 <a
-                                  className="editIconWrap edit2"
+                                  className="flex flex-col items-center edit2"
                                   href={`${
                                     import.meta.env.VITE_API_URL
                                   }/quotations/quotation/${
@@ -258,7 +258,7 @@ const QuotationTable = ({title}) => {
                                   target="_blank"
                                   rel="noreferrer"
                                 >
-                                  <FaDownload className="editIcon" />
+                                  <FaDownload className="editIcon text-yellow-300" />
                                 </a>
                               </Tooltip>
                             </td>
@@ -267,7 +267,7 @@ const QuotationTable = ({title}) => {
                               <Tooltip title="Preview" arrow placement="top">
                                 <div
                                   onClick={() => handleIconPreview(card._id)}
-                                  className="editIconWrap edit2"
+                                  className="flex flex-col items-center edit2"
                                   style={{ cursor: "pointer" }}
                                 >
                                   <FaEye className="editIcon" />
@@ -281,11 +281,11 @@ const QuotationTable = ({title}) => {
                                 arrow
                                 placement="top"
                               >
-                                <div className="editIconWrap edit">
+                                <div className="flex flex-col items-center edit">
                                   <Link
                                     to={`/dashboard/update-quotation?id=${card._id}`}
                                   >
-                                    <FaEdit className="editIcon" />
+                                    <FaEdit className="editIcon text-blue-500" /> 
                                   </Link>
                                 </div>
                               </Tooltip>
@@ -307,17 +307,18 @@ const QuotationTable = ({title}) => {
                                     onClick={() =>
                                       handleMoveToRecycled(card._id)
                                     }
-                                    className="editIconWrap"
+                                    className="editIconWrap rounded-full"
                                     style={{
                                       cursor: deleteLoading
                                         ? "not-allowed"
                                         : "pointer",
-                                      background: "none",
+                                      background: "white",
                                       border: "none",
-                                      padding: 0,
+                                      padding: 5,
+                                      borderRadius: "9999px"
                                     }}
                                   >
-                                    <FaTrashAlt className="deleteIcon" />
+                                    <FaTrashAlt className="deleteIcon text-red-500" />
                                   </button>
                                 </span>
                               </Tooltip>
